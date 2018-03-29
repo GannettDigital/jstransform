@@ -1,10 +1,14 @@
-package jsonschema
+// Package transform implements code which can use a JSON schema with transform sections to convert a JSON file to
+// match the schema format.
+package transform
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/GannettDigital/jstransform/jsonschema"
 
 	"github.com/PaesslerAG/jsonpath"
 )
@@ -18,14 +22,14 @@ import (
 type Transformer struct {
 	in                  interface{}
 	processedArrays     map[string][]interface{}
-	schema              *Schema
+	schema              *jsonschema.Schema
 	transformIdentifier string // Used to select the proper transform Instructions
 	transformed         map[string]interface{}
 }
 
 // NewTransformer returns a Transformer using the schema given.
 // The transformIdentifier is used to select the appropriate transform section from the schema.
-func NewTransformer(schema *Schema, tranformIdentifier string) (*Transformer, error) {
+func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Transformer, error) {
 	return &Transformer{schema: schema, transformIdentifier: tranformIdentifier}, nil
 }
 
@@ -46,7 +50,7 @@ func (tr *Transformer) Transform(in json.RawMessage) (json.RawMessage, error) {
 		return nil, fmt.Errorf("failed to parse input JSON: %v", err)
 	}
 
-	if err := Walk(tr.schema, tr.walker); err != nil {
+	if err := jsonschema.Walk(tr.schema, tr.walker); err != nil {
 		return nil, err
 	}
 
