@@ -1,0 +1,97 @@
+= JSON Schema Transform
+:toc:
+:toc-placement: preamble
+
+== Transform Object
+The transform object in the schema will be used as meta-data, next to the field, in order to instruct the consumers on how to transform data from the existing format, to this new schema. It uses JSONPath to identify the data location.
+
+The transform object has the following properties:
+```
+"transform": {                                                   // top level object
+    "cumulo|presentationv4": {                                   // this is an arbitrary name, which is an identifier to the consumer that this instructions set is destined for them.
+        "from" : [                                               // array of transform instruction objects
+            {
+                "jsonPath": ""                                   // jsonPath instructing the consumer where to find the data in the *input stream*.
+                "operations": [                                   // a list of operations to further execute on the data. The input defined by jsonPath will be passed to the operations
+                                {
+                                    "type": "duration|max|split|replace|changeCase"inverse", // type of operation to perform on the data. These are methods to further mutate the data that jsonPath does not currently support
+                                    "args": {
+                                        ...                      // discussed below based on the type of operation.
+                                    }
+                                }
+                            ]
+            }
+        ],
+         "method": "first|last|concatenate",              // the method to be used in the event that there are more than one "from" paths. Can be one of first, last, concatenate                                        
+    }                  
+}   
+```
+
+=== Implementation Requirements
+
+
+- The jsonPath selector is an identifier of the location of the _input_ path. All paths should start with the root object `$`. The exception here is for an Array of objects, where the relative `@` operator should be used on the leaf objects to signify the location is relative to the parent transform (more on this below)
+
+- If a transform object exists on a property, the consumer should automatically use that. In the event a transform object does not exist on a property, the consumer should attempt to find the value in the input at the location that corresponds to the same location in the schema. In other words, if the consumer is operating on schema field `$.foo.bar` which has no `transform.<consumer>` property, the consumer should use `$.foo.bar` as the location to pull the value from the input. This provides a nice "default" for those fields that are 1:1 match.
+
+- `first` is the default method of transform
+
+- Arrays should have a transform object. The properties of the array should then use the relative `@` jsonPath selector. The consumer will then iterate over the input array and utilize the relative path to find the type specific field at that location in the array
+
+
+
+=== Operations
+Operations allow further mutation of data, for mutation types that are not currently supported by jsonPath. At this time, we've only implemented the type of operations that were in need, but the list may very well grow in the future.
+
+==== duration
+
+Accepts a string in the format "MM:SS" or "HH:MM:SS" and converts it to a number of seconds.
+Fails if the input string does not match one of the above formats.
+
+===== args
+ no args
+
+==== changeCase
+
+Accepts a string, returns a string
+
+===== args
+  "args" : {
+     "to": "lower|upper" // the case to change to
+  }
+
+==== inverse
+
+Accepts boolean as input, returns boolean
+
+===== args
+ no args
+
+==== max
+
+Accepts an array and finds the max value of these items. Can return a generic or a complex object
+
+===== args
+  "args" : {
+    "by": "@.encodingRate", // a jsonPath selector that identifies a number to take the max of
+    "return": "@.url" // a jsonPath selector that identifies the property to return of that item identified as "max"
+  }
+
+==== replace
+
+Accepts a string, and returns a string
+
+===== args
+"args": {
+    "regex": "foo\\.com", // regex string that will be used to match the part of the string that will be replaced
+    "new": "https://media.gannett-cdn.com" // the value to replace with, this will be placed at capture group 1
+}
+
+==== split
+
+Accepts a string and returns an array
+
+===== args
+  "args" : {
+    "on": "|" // the string to split on
+  }

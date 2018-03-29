@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "crops": {
+      "type": "array",
+      "*items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "path": {
+            "type": "string"
+          },
+          "relativePath": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "width",
+          "height",
+          "path",
+          "relativePath"
+        ]
+      }
+    }
+  }
+}

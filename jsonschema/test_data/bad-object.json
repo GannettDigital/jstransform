@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "image"
+      ]
+    },
+    "URL": {
+      "type": "object",
+      "propertiess": {
+        "publish": {
+          "type": "string",
+          "transform": {
+            "from" : [
+              "$.publishUrl"
+            ]
+          }
+        },
+        "absolute": {
+          "type": "string",
+          "transform": {
+            "from" : [
+              "$.absoluteUrl"
+            ]
+          }
+        }
+      },
+      "required":[
+        "publish",
+        "absolute"
+      ]
+    }
+  }
+}

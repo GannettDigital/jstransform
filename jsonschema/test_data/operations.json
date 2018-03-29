@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "caseSplit": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "transform": {
+          "cumulo": {
+            "from": [
+              {
+                "jsonPath": "@"
+              }
+            ]
+          }
+        }
+      },
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.mixedCase",
+              "operations": [
+                {
+                  "type": "changeCase",
+                  "args": {
+                    "to": "lower"
+                  }
+                },
+                {
+                  "type": "split",
+                  "args": {
+                    "on": "|"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "contributor": {
+      "type": "string",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.data.contributors[*]",
+              "operations": [
+                {
+                  "type": "max",
+                  "args": {
+                    "by": "@.id",
+                    "return": "@.fullname"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "url": {
+      "type": "string",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.url",
+              "operations": [
+                {
+                  "type": "replace",
+                  "args": {
+                    "regex": "foo\\.com",
+                    "new": "gannettdigital.com"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "valid": {
+      "type": "boolean",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.invalid",
+              "operations": [
+                {
+                  "type": "inverse"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "duration": {
+      "type": "number",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.data.attributes[?(@.name==\"length\")].value",
+              "operations": [
+                {
+                  "type": "duration"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

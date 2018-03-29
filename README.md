@@ -7,7 +7,7 @@ The result is that you can write one JSON schema that defines both the desired r
 The code also provides some utilities for walking a JSON schema file section by section and generating Golang structs from a JSON schema file.
 
 ## JSON Schema Transform extension
-Details on this are found in this [doc]() and this [schema file]()
+Details on this are found in this [doc](./transform.adoc) and this [schema file](./jsonschema.json)
 
 ## Usage
 For details on using the project as a library for transformations refer to the godocs.
@@ -17,4 +17,4 @@ To leverage this tool to install dependencies, run the following command from th
 
     dep ensure
 
-Testing is done using standard go tooling, ie `go test ./...`.
+Testing is done using standard go tooling, ie `go test ./...`
