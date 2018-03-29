@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "image"
+      ]
+    },
+    "crops": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "name"
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "path": {
+            "type": "string"
+          },
+          "relativePath": {
+            "type": "string"
+          }
+        },
+        "required":[
+          "name",
+          "width",
+          "height",
+          "path",
+          "relativePath"
+        ]
+      }
+    },
+    "URL": {
+      "type": "object",
+      "properties": {
+        "publish": {
+          "type": "string",
+          "transform": {
+            "cumulo": {
+              "from" : [
+                {
+                  "jsonPath": "$.publishUrl"
+                }
+              ]
+            }
+          }
+        },
+        "absolute": {
+          "type": "string",
+          "transform": {
+            "cumulo": {
+              "from" : [
+                {
+                  "jsonPath": "$.absoluteUrl"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "required":[
+        "publish",
+        "absolute"
+      ]
+    }
+  },
+  "required": [
+    "type",
+    "crops",
+    "orientation",
+    "credit",
+    "URL",
+    "caption",
+    "originalSize",
+    "datePhotoTaken"
+  ]
+}
