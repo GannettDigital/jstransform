@@ -1,0 +1,20 @@
+---
+app:
+  repo: GannettDigital/jstransform
+  environment: staging
+  region: us-east-1
+  slack-webhook: VAULT.production.slack
+auth:
+  artifactory-key: VAULT.production.artifactory
+  newrelic-license: VAULT.production.nrlicense
+  x-api-key: VAULT.production.tyk
+  scalr:
+    x-scalr-access-key: VAULT.production.scalraccess
+    x-scalr-secret-key: VAULT.production.scalrsecret
+  kube:
+    x-kubernetes-api-user: VAULT.production.kube_staging_user
+    x-kubernetes-api-token: VAULT.production.kube_staging
+delete:
+  is-docker: false
+skip:
+  skip-swagger: true
