@@ -64,7 +64,7 @@ func (tr *Transformer) Transform(in json.RawMessage) (json.RawMessage, error) {
 
 // walker is a WalkFunc for the Transformer which does the bulk of the work instance by instance.
 // It includes the logic to handle arrays properly.
-func (tr *Transformer) walker(path string, value json.RawMessage) error {
+func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.RawMessage) error {
 	ifields := struct {
 		Type      string    `json:"type"`
 		Transform transform `json:"transform"`
