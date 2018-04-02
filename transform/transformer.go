@@ -17,8 +17,6 @@ import (
 // matching the schema.
 // More details on the transform section of the schema are found at
 // https://github.com/GannettDigital/content-schema/blob/master/v1/assets/README.md
-//
-// Note: Root level arrays in the JSON output are not currently supported
 type Transformer struct {
 	in                  interface{}
 	processedArrays     map[string][]interface{}
