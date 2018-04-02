@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// schemaInstance represents a JSON schema instance.
-type schemaInstance struct {
+// Instance represents a JSON Schema instance.
+type Instance struct {
 	Type       string                     `json:"type"`
 	Items      json.RawMessage            `json:"items,omitempty"`
 	Properties map[string]json.RawMessage `json:"properties,omitempty"`
@@ -23,7 +23,7 @@ type schemaRef struct {
 
 // schemaJSON represents the basic supported structure of a JSON Schema file
 type schemaJSON struct {
-	schemaInstance
+	Instance
 
 	Schema      string      `json:"$schema"`
 	Description string      `json:"description,omitempty"`
@@ -35,7 +35,7 @@ type schemaJSON struct {
 // This is not a fully spec compatible representation but a basic representation useful for walking through the schema
 // instances within a schema.
 type Schema struct {
-	schemaInstance
+	Instance
 }
 
 // SchemaFromFile parses a file at the given path and returns a schema based on its contents.
@@ -45,7 +45,7 @@ type Schema struct {
 //
 // Only file references are supported.
 //
-// Note: A top level array will use th items from the first file to define them.
+// Note: A top level array will use the items from the first file to define them.
 func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	data, err := ioutil.ReadFile(schemaPath)
 	if err != nil {
@@ -58,7 +58,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	}
 
 	s := Schema{
-		schemaInstance: schemaInstance{
+		Instance: Instance{
 			Items:      sj.Items,
 			Properties: sj.Properties,
 		},
