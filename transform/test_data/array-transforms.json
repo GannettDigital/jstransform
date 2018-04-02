@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.data.lines"
+            }
+          ]
+        }
+      }
+    },
+    "contributors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+          "type": "string",
+          "transform": {
+            "cumulo": {
+              "from": [
+                {
+                  "jsonPath": "@.id"
+                }
+              ]
+            },
+            "presentationv4": {
+              "from": [
+                {
+                  "jsonPath": "@.id"
+                }
+              ]
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "transform": {
+            "cumulo": {
+              "from": [
+                {
+                  "jsonPath": "@.fullname"
+                }
+              ]
+            },
+            "presentationv4": {
+              "from": [
+                {
+                  "jsonPath": "@.name"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+      },
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.data.contributors[*]"
+            }
+          ]
+        },
+        "presentationv4": {
+          "from": [
+            {
+              "jsonPath": "$.attribution.contributors[*]"
+            }
+          ]
+        }
+      }
+    },
+    "wasSingleObject": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "transform": {
+              "cumulo": {
+                "from": [
+                  {
+                    "jsonPath": "@.id"
+                  }
+                ]
+              }
+            }
+          },
+          "name": {
+            "type": "string",
+            "transform": {
+              "cumulo": {
+                "from": [
+                  {
+                    "jsonPath": "@.name"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.aSingleObject[*]"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

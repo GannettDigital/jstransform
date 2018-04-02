@@ -1,16 +1,18 @@
-package jsonschema
+package transform
 
 import (
 	"encoding/json"
 	"reflect"
 	"testing"
+
+	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
 // used for the Transformer test and benchmark
 var (
-	imageSchema, _           = SchemaFromFile("./test_data/image.json", "")
-	arrayTransformsSchema, _ = SchemaFromFile("./test_data/array-transforms.json", "")
-	operationsSchema, _      = SchemaFromFile("./test_data/operations.json", "")
+	imageSchema, _           = jsonschema.SchemaFromFile("./test_data/image.json", "")
+	arrayTransformsSchema, _ = jsonschema.SchemaFromFile("./test_data/array-transforms.json", "")
+	operationsSchema, _      = jsonschema.SchemaFromFile("./test_data/operations.json", "")
 
 	transformerTests = []struct {
 		description string
