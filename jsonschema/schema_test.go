@@ -91,7 +91,7 @@ func TestSchemaFromFile(t *testing.T) {
 			description: "Basic Schema Load",
 			schemaPath:  "./test_data/image.json",
 			want: &Schema{
-				schemaInstance{
+				Instance{
 					Properties: imageProperties,
 				},
 			},
@@ -100,7 +100,7 @@ func TestSchemaFromFile(t *testing.T) {
 			description: "Load allOf, no oneOf",
 			schemaPath:  "./test_data/embed_parent.json",
 			want: &Schema{
-				schemaInstance{
+				Instance{
 					Properties: map[string]json.RawMessage{
 						"type": json.RawMessage(`{
       "type": "string",
@@ -117,7 +117,7 @@ func TestSchemaFromFile(t *testing.T) {
 			oneOfType:   "image",
 			schemaPath:  "./test_data/image_parent.json",
 			want: &Schema{
-				schemaInstance{
+				Instance{
 					Properties: imageProperties,
 				},
 			},
@@ -127,7 +127,7 @@ func TestSchemaFromFile(t *testing.T) {
 			oneOfType:   "image",
 			schemaPath:  "./test_data/parent.json",
 			want: &Schema{
-				schemaInstance{
+				Instance{
 					Properties: imageProperties,
 				},
 			},
