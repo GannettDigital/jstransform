@@ -1,5 +1,8 @@
 # jstransform CHANGELOG
 
+# 0.0.5
+Tim Kuhlman - Implement go struct generation from JSON schema
+
 # 0.0.4
 Dennis Nguyen - default nil booleans
 

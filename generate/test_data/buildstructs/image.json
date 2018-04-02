@@ -1,0 +1,321 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "image"
+            ],
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.type"
+                        }
+                    ]
+                }
+            }
+        },
+        "crops": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.name"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.name"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "width": {
+                        "type": "number",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.width"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.width"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "height": {
+                        "type": "number",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.height"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.height"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "path": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.path"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.path"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "relativePath": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.relativePath"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.relativePath"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "name",
+                    "width",
+                    "height",
+                    "path",
+                    "relativePath"
+                ]
+            },
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.ratios[*].crop[*]"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.crops[*]"
+                        }
+                    ]
+                }
+            }
+        },
+        "orientation": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"orientation\")].value"
+                        }
+                    ]
+                }
+            }
+        },
+        "credit": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"credit\")].value"
+                        }
+                    ]
+                }
+            }
+        },
+        "cutline": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"cutline\")].value"
+                        }
+                    ]
+                }
+            }
+        },
+        "URL": {
+            "type": "object",
+            "properties": {
+                "publish": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.attributes[?(@.name==\"publishurl\")].value"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.URL.publish"
+                                },
+                                {
+                                    "jsonPath": "$.publishUrl"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "absolute": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.attributes[?(@.name==\"publishurl\")].value"
+                                },
+                                {
+                                    "jsonPath": "$.data.attributes[?(@.name==\"rootpath\")].value"
+                                },
+                                {
+                                    "jsonPath": "$.data.attributes[?(@.name==\"basename\")].value"
+                                }
+                            ],
+                            "method": "concatenate"
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.URL.absolute"
+                                },
+                                {
+                                    "jsonPath": "$.absoluteUrl"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "required": [
+                "publish",
+                "absolute"
+            ]
+        },
+        "caption": {
+            "type": "string"
+        },
+        "originalSize": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "number",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.attributes[?(@.name==\"oimageheight\")].value"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.originalSize.height"
+                                },
+                                {
+                                    "jsonPath": "$.originalHeight"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "width": {
+                    "type": "number",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.attributes[?(@.name==\"oimagewidth\")].value"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.originalSize.width"
+                                },
+                                {
+                                    "jsonPath": "$.originalWidth"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "required": [
+                "height",
+                "width"
+            ]
+        },
+        "datePhotoTaken": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"datephototaken\")].value"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "required": [
+        "type",
+        "crops",
+        "orientation",
+        "credit",
+        "URL",
+        "caption",
+        "originalSize",
+        "datePhotoTaken"
+    ]
+}

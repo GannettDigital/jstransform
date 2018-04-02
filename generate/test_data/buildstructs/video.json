@@ -1,0 +1,658 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "video",
+                "360video",
+                "livevideo"
+            ],
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.type"
+                        }
+                    ]
+                }
+            }
+        },
+        "brightcoveId": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"brightcoveVideoId\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.brightcoveId"
+                        },
+                        {
+                            "jsonPath": "$._attributes.brightcoveid"
+                        },
+                        {
+                            "jsonPath": "$.brightcoveVideoId"
+                        }
+                    ]
+                }
+            }
+        },
+        "origin": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"origin\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.origin"
+                        },
+                        {
+                            "jsonPath": "$._attributes.origin"
+                        }
+                    ]
+                }
+            }
+        },
+        "brightcoveAccountId": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"brightcoveaccount\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.brightcoveAccountId"
+                        },
+                        {
+                            "jsonPath": "$._attributes.brightcoveaccount"
+                        },
+                        {
+                            "jsonPath": "$.brightcoveaccount"
+                        },
+                        {
+                            "jsonPath": "$.brightcoveAccountNumber"
+                        }
+                    ]
+                }
+            }
+        },
+        "thumbnail": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"thumbnail\")].value",
+                            "operations": [
+                                {
+                                  "type": "replace",
+                                  "args": {
+                                    "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                    "new": "https://media.gannett-cdn.com"
+                                  }
+                                } 
+                            ]
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.thumbnail",
+                            "operations": [
+                                {
+                                  "type": "replace",
+                                  "args": {
+                                    "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                    "new": "https://media.gannett-cdn.com"
+                                  }
+                                } 
+                            ]
+                        },
+                        {
+                            "jsonPath": "$._attributes.thumbnail",
+                            "operations": [
+                                {
+                                  "type": "replace",
+                                  "args": {
+                                    "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                    "new": "https://media.gannett-cdn.com"
+                                  }
+                                } 
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "length": {
+            "type": "number",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"length\")].value",
+                            "operations": [
+                                {
+                                    "type": "duration"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.length"
+                        },
+                        {
+                            "jsonPath": "$._attributes.length"
+                        }
+                    ]
+                }
+            }
+        },
+        "videoStill": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"videostill\")].value",
+                            "operations": [
+                                {
+                                  "type": "replace",
+                                  "args": {
+                                    "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                    "new": "https://media.gannett-cdn.com"
+                                  }
+                                } 
+                            ]
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.videoStill",
+                            "operations": [
+                                {
+                                  "type": "replace",
+                                  "args": {
+                                    "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                    "new": "https://media.gannett-cdn.com"
+                                  }
+                                } 
+                            ]
+                        },
+                        {
+                            "jsonPath": "$._attributes.videostill",
+                            "operations": [
+                                {
+                                  "type": "replace",
+                                  "args": {
+                                    "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                    "new": "https://media.gannett-cdn.com"
+                                  }
+                                } 
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "gannettTracking": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"gannetttracking\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.gannettTracking"
+                        },
+                        {
+                            "jsonPath": "$._attributes.gannetttracking"
+                        }
+                    ]
+                }
+            }
+        },
+        "hlsURL": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"iosFlvUrl\")].value",
+                            "operations": [
+                                {
+                                  "type": "replace",
+                                  "args": {
+                                    "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                    "new": "https://media.gannett-cdn.com"
+                                  }
+                                } 
+                            ]
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.hlsURL",
+                            "operations": [
+                                {
+                                  "type": "replace",
+                                  "args": {
+                                    "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                    "new": "https://media.gannett-cdn.com"
+                                  }
+                                } 
+                            ]
+                        },
+                        {
+                            "jsonPath": "$.iosFlvUrl",
+                            "operations": [
+                                {
+                                  "type": "replace",
+                                  "args": {
+                                    "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                    "new": "https://media.gannett-cdn.com"
+                                  }
+                                } 
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "mp4URL": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                          "jsonPath": "$.data.renditions[*]",
+                          "operations": [
+                            {
+                              "type": "max",
+                              "args" : {
+                                "by": "@.encodingRate",
+                                "return": "@.url"
+                              }
+                            },
+                            {
+                              "type": "replace",
+                              "args": {
+                                "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                "new": "https://media.gannett-cdn.com"
+                              }
+                            } 
+                          ]
+                        }
+                    ]
+                },
+                "presentationv4": {
+                  "from": [
+                      {
+                        "jsonPath": "$.renditions[*]",
+                        "operations": [
+                          {
+                            "type": "max",
+                            "args" : {
+                              "by": "@.encodingRate",
+                              "return": "@.url"
+                            }
+                          },
+                          {
+                            "type": "replace",
+                            "args": {
+                                "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                "new": "https://media.gannett-cdn.com"
+                            }
+                          } 
+                        ]
+                      }
+                  ]
+              }
+            }
+        },
+        "credit": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"credit\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.credit"
+                        },
+                        {
+                            "jsonPath": "$._attributes.credit"
+                        }
+                    ]
+                }
+            }
+        },
+        "renditions": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "audioOnly": {
+                        "type": "boolean",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.audioOnly"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.audioOnly"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "displayName": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.displayName"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.displayName"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "encodingRate": {
+                        "type": "number",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.encodingRate"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.encodingRate"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "height": {
+                        "type": "number",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.height"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.height"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "width": {
+                        "type": "number",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.width"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.width"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "size": {
+                        "type": "number",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.size"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.size"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "URL": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.url",
+                                        "operations": [
+                                            {
+                                              "type": "replace",
+                                              "args": {
+                                                "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                                "new": "https://media.gannett-cdn.com"
+                                              }
+                                            } 
+                                        ]
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.URL",
+                                        "operations": [
+                                            {
+                                              "type": "replace",
+                                              "args": {
+                                                "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                                "new": "https://media.gannett-cdn.com"
+                                              }
+                                            } 
+                                        ]
+                                    },
+                                    {
+                                        "jsonPath": "@.url",
+                                        "operations": [
+                                            {
+                                              "type": "replace",
+                                              "args": {
+                                                "regex": ".*\\.edgesuite\\.net|.*\\.akamaihd\\.net",
+                                                "new": "https://media.gannett-cdn.com"
+                                              }
+                                            } 
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "codec": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.codec"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.codec"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "container": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.container"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.container"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "duration": {
+                        "type": "number",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.duration"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.duration"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "hls",
+                            "http",
+                            "rtmp",
+                            "undefined"
+                        ],
+                        "default": "undefined",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.type"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.type"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "audioOnly",
+                    "encodingRate",
+                    "height",
+                    "width",
+                    "size",
+                    "URL",
+                    "codec",
+                    "container",
+                    "duration",
+                    "type"
+                ]
+            },
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.renditions[*]"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.renditions[*]"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "required": [
+        "type",
+        "brightcoveId",
+        "length",
+        "brightcoveAccountId",
+        "origin",
+        "videoStill",
+        "mp4URL"
+    ]
+}

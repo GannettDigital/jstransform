@@ -93,6 +93,16 @@ func TestSchemaFromFile(t *testing.T) {
 			want: &Schema{
 				Instance{
 					Properties: imageProperties,
+					Required: []string{
+						"type",
+						"crops",
+						"orientation",
+						"credit",
+						"URL",
+						"caption",
+						"originalSize",
+						"datePhotoTaken",
+					},
 				},
 			},
 		},
@@ -119,6 +129,16 @@ func TestSchemaFromFile(t *testing.T) {
 			want: &Schema{
 				Instance{
 					Properties: imageProperties,
+					Required: []string{
+						"type",
+						"crops",
+						"orientation",
+						"credit",
+						"URL",
+						"caption",
+						"originalSize",
+						"datePhotoTaken",
+					},
 				},
 			},
 		},
@@ -129,6 +149,16 @@ func TestSchemaFromFile(t *testing.T) {
 			want: &Schema{
 				Instance{
 					Properties: imageProperties,
+					Required: []string{
+						"type",
+						"crops",
+						"orientation",
+						"credit",
+						"URL",
+						"caption",
+						"originalSize",
+						"datePhotoTaken",
+					},
 				},
 			},
 		},
@@ -159,6 +189,8 @@ func TestSchemaFromFile(t *testing.T) {
 			t.Errorf("Test %q - got Properties\n%s\nwant\n%s", test.description, got.Properties, test.want.Properties)
 		case !reflect.DeepEqual(got.Items, test.want.Items):
 			t.Errorf("Test %q - got Items\n%s\nwant\n%s", test.description, got.Items, test.want.Items)
+		case !reflect.DeepEqual(got.Required, test.want.Required):
+			t.Errorf("Test %q - got Required\n%s\nwant\n%s", test.description, got.Required, test.want.Required)
 		}
 	}
 }
