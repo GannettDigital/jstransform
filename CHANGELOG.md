@@ -1,5 +1,8 @@
 # jstransform CHANGELOG
 
+# 0.0.4
+Dennis Nguyen - default nil booleans
+
 # 0.0.3
 Tim Kuhlman - Expand the walk function to walk by instance or raw JSON
 

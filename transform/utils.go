@@ -70,6 +70,8 @@ func convertBoolean(raw interface{}) (interface{}, error) {
 		return t > 0, nil
 	case float64:
 		return t > 0, nil
+	case nil:
+		return nil, nil
 	default:
 		return nil, fmt.Errorf("unable to convert type %q to boolean", reflect.TypeOf(raw))
 	}
