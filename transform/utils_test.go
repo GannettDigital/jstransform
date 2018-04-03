@@ -83,6 +83,12 @@ func TestConvert(t *testing.T) {
 			want:        true,
 		},
 		{
+			description: "nil -> bool",
+			raw:         nil,
+			jsonType:    "boolean",
+			want:        nil,
+		},
+		{
 			description: "bool -> number, true",
 			raw:         true,
 			jsonType:    "number",
