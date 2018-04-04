@@ -1,0 +1,466 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "oembed"
+            ],
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.type"
+                        }
+                    ]
+                }
+            }
+        },
+        "providerURL": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"provider_url\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.providerURL"
+                        },
+                        {
+                            "jsonPath": "$._attributes.provider_url"
+                        }
+                    ]
+                }
+            }
+        },
+        "description": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"description\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.description"
+                        },
+                        {
+                            "jsonPath": "$._attributes.description"
+                        }
+                    ]
+                }
+            }
+        },
+        "thumbnailWidth": {
+            "type": "number",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"thumbnail_width\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.thumbnailWidth"
+                        },
+                        {
+                            "jsonPath": "$._attributes.thumbnail_width"
+                        }
+                    ]
+                }
+            }
+        },
+        "URL": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"url\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.URL"
+                        },
+                        {
+                            "jsonPath": "$._attributes.url"
+                        }
+                    ]
+                }
+            }
+        },
+        "thumbnailURL": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"thumbnail_url\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.thumbnailURL"
+                        },
+                        {
+                            "jsonPath": "$._attributes.thumbnail_url"
+                        }
+                    ]
+                }
+            }
+        },
+        "version": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"version\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.version"
+                        },
+                        {
+                            "jsonPath": "$._attributes.version"
+                        }
+                    ]
+                }
+            }
+        },
+        "providerName": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"provider_name\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.providerName"
+                        },
+                        {
+                            "jsonPath": "$._attributes.provider_name"
+                        }
+                    ]
+                }
+            }
+        },
+        "thumbnailHeight": {
+            "type": "number",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"thumbnail_height\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.thumbnailHeight"
+                        },
+                        {
+                            "jsonPath": "$._attributes.thumbnail_height"
+                        }
+                    ]
+                }
+            }
+        },
+        "html": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"html\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.html"
+                        },
+                        {
+                            "jsonPath": "$._attributes.html"
+                        }
+                    ]
+                }
+            }
+        },
+        "originalType": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"original_type\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.originalType"
+                        },
+                        {
+                            "jsonPath": "$._attributes.original_type"
+                        }
+                    ]
+                }
+            }
+        },
+        "oembedType": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"type\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.oembedType"
+                        },
+                        {
+                            "jsonPath": "$._attributes.type"
+                        }
+                    ]
+                }
+            }
+        },
+        "cacheAge": {
+            "type": "number",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"cache_age\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.cacheAge"
+                        },
+                        {
+                            "jsonPath": "$._attributes.cache_age"
+                        }
+                    ]
+                }
+            }
+        },
+        "assetId": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"assetId\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.assetId"
+                        },
+                        {
+                            "jsonPath": "$._attributes.assetId"
+                        }
+                    ]
+                }
+            }
+        },
+        "authorName": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"author_name\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.authorName"
+                        },
+                        {
+                            "jsonPath": "$._attributes.author_name"
+                        }
+                    ]
+                }
+            }
+        },
+        "authorURL": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"author_url\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.authorURL"
+                        },
+                        {
+                            "jsonPath": "$._attributes.author_url"
+                        }
+                    ]
+                }
+            }
+        },
+        "name": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"name\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.name"
+                        },
+                        {
+                            "jsonPath": "$._attributes.name"
+                        }
+                    ]
+                }
+            }
+        },
+        "originkey": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"originkey\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.originkey"
+                        },
+                        {
+                            "jsonPath": "$._attributes.originkey"
+                        }
+                    ]
+                }
+            }
+        },
+        "width": {
+            "type": "number",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"width\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.width"
+                        },
+                        {
+                            "jsonPath": "$._attributes.width"
+                        }
+                    ]
+                }
+            }
+        },
+        "height": {
+            "type": "number",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"height\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.height"
+                        },
+                        {
+                            "jsonPath": "$._attributes.height"
+                        }
+                    ]
+                }
+            }
+        },
+        "dURI": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"dURI\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.dURI"
+                        },
+                        {
+                            "jsonPath": "$._attributes.dURI"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "required": [
+        "URL",
+        "providerName",
+        "cacheAge"
+    ]
+}

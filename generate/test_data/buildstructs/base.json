@@ -1,0 +1,1775 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "description": "The base asset properties inherited by every asset type",
+    "properties": {
+        "id": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.id"
+                        }
+                    ]
+                }
+            }
+        },
+        "schemaVersion": {
+            "type": "number"
+        },
+        "authoringTypeCode": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.authoringtypecode"
+                        }
+                    ]
+                }
+            }
+        },
+        "authoringBehavior": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.authoringBehavior"
+                        }
+                    ]
+                }
+            }
+        },
+        "propertyId": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.propertyID"
+                        }
+                    ]
+                }
+            }
+        },
+        "propertyName": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.propertyName"
+                        }
+                    ]
+                }
+            }
+        },
+        "propertyDisplayName": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.propertyDisplayName"
+                        }
+                    ]
+                }
+            }
+        },
+        "assetGroup": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.assetGroup.id"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.assetGroup.id"
+                                },
+                                {
+                                    "jsonPath": "$.assetGroupId"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.assetGroup.name"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.assetGroup.name"
+                                },
+                                {
+                                    "jsonPath": "$.assetGroupName"
+                                }
+                            ],
+                            "method": "first"
+                        }
+                    }
+                },
+                "siteId": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.assetGroup.siteId"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.assetGroup.siteId"
+                                },
+                                {
+                                    "jsonPath": "$.siteId"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "URL": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.assetGroup.url"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.assetGroup.URL"
+                                },
+                                {
+                                    "jsonPath": "$.assetGroup.url"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "type": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.assetGroup.type"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "sstsId": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.assetGroup.sstsId"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "siteCode": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.sitecode"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.assetGroup.siteCode"
+                                },
+                                {
+                                    "jsonPath": "$.siteCode"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "siteName": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.sitename"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.assetGroup.siteName"
+                                },
+                                {
+                                    "jsonPath": "$.siteName"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "logoURL": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.attributes[?(@.name==\"logoUrl\")].value"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.assetGroup.logoURL"
+                                },
+                                {
+                                    "jsonPath": "$._attributes.logoUrl"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "siteId",
+                "siteName"
+            ]
+        },
+        "contentSourceCode": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.contentsourcecode"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.contentSourceCode"
+                        },
+                        {
+                            "jsonPath": "$._attributes.source"
+                        }
+                    ]
+                }
+            }
+        },
+        "statusName": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.status"
+                        }
+                    ]
+                }
+            }
+        },
+        "promoBrief": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"brief\")].value",
+                            "description": "warning, these actually return an array"
+                        },
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"longdescription\")].value",
+                            "description": "warning, these actually return an array"
+                        },
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"shortdescription\")].value",
+                            "description": "warning, these actually return an array"
+                        },
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"cutline\")].value",
+                            "description": "warning, these actually return an array"
+                        },
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"caption\")].value",
+                            "description": "warning, these actually return an array"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.promoBrief"
+                        },
+                        {
+                            "jsonPath": "$._attributes.brief"
+                        }
+                    ]
+                }
+            }
+        },
+        "title": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"title\")].value",
+                            "description": "warning, these actually return an array"
+                        },
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"posttitle\")].value",
+                            "description": "warning, these actually return an array"
+                        },
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"headline\")].value",
+                            "description": "warning, these actually return an array"
+                        },
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"caption\")].value",
+                            "description": "warning, these actually return an array"
+                        },
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"name\")].value",
+                            "description": "warning, these actually return an array"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.title"
+                        },
+                        {
+                            "jsonPath": "$.name"
+                        },
+                        {
+                            "jsonPath": "$._attributes.name"
+                        }
+                    ]
+                }
+            }
+        },
+        "shortHeadline": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"short-hed\")].value",
+                            "description": "warning, these actually return an array"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.shortHeadline"
+                        },
+                        {
+                            "jsonPath": "$._attributes['short-hed']"
+                        },
+                        {
+                            "jsonPath": "$.shortHed"
+                        },
+                        {
+                            "jsonPath": "$.shorthed"
+                        }
+                    ]
+                }
+            }
+        },
+        "headline": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.headline"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.headline"
+                        },
+                        {
+                            "jsonPath": "$._attributes.headline"
+                        }
+                    ]
+                }
+            }
+        },
+        "publishUser": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.userId"
+                        }
+                    ]
+                }
+            }
+        },
+        "publishSystem": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.systemId"
+                        }
+                    ]
+                }
+            }
+        },
+        "createSystem": {
+            "type": "string",
+            "enum": [
+                "Presto",
+                "cumulo-rsp",
+                "Presto Next",
+                "geronimo-integration-test",
+                "undefined"
+            ],
+            "default": "undefined",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.createsystem"
+                        }
+                    ]
+                }
+            }
+        },
+        "eventDate": {
+            "type": "string",
+            "format": "date-time",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.date"
+                        }
+                    ]
+                }
+            }
+        },
+        "backfillDate": {
+            "type": "string",
+            "format": "date-time",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.backfillDate"
+                        },
+                        {
+                            "jsonPath": "$.data.LastPublishedDate"
+                        }
+                    ]
+                }
+            }
+        },
+        "expirationDate": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.expirationDate"
+                        },
+                        {
+                            "jsonPath": "$.data.expirationdate"
+                        }
+                    ]
+                }
+            }
+        },
+        "createUser": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.CreateUser"
+                        }
+                    ]
+                }
+            }
+        },
+        "updateUser": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.UpdateUser"
+                        }
+                    ]
+                }
+            }
+        },
+        "embargoDate": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.embargodate"
+                        }
+                    ]
+                }
+            }
+        },
+        "createDate": {
+            "type": "string",
+            "format": "date-time",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.CreateDate"
+                        }
+                    ]
+                }
+            }
+        },
+        "updateDate": {
+            "type": "string",
+            "format": "date-time",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.UpdateDate"
+                        }
+                    ]
+                }
+            }
+        },
+        "publishDate": {
+            "type": "string",
+            "format": "date-time",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.LastPublishedDate"
+                        }
+                    ]
+                }
+            }
+        },
+        "initialPublishDate": {
+            "type": "string",
+            "format": "date-time",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.initialpublishdate"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.initialPublishDate"
+                        },
+                        {
+                            "jsonPath": "$._attributes.initialpublishdate"
+                        }
+                    ]
+                }
+            }
+        },
+        "storyHighlights": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"storyhighlights\")].value",
+                            "operations": [
+                                {
+                                    "type": "split",
+                                    "args": {
+                                        "on": "|"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.storyHighlights"
+                        },
+                        {
+                            "jsonPath": "$._attributes.storyHighlights"
+                        }
+                    ]
+                }
+            }
+        },
+        "ssts": {
+            "type": "object",
+            "properties": {
+                "section": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.handling.publishto.ssts.section"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "subsection": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.handling.publishto.ssts.subsection"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "topic": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.handling.publishto.ssts.topic"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "subtopic": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.handling.publishto.ssts.subtopic"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "path": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.handling.publishto.ssts.sstsPath"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.ssts.path"
+                                },
+                                {
+                                    "jsonPath": "$.ssts.sstsPath"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storysubject": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.handling.publishto.ssts.storysubject"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "leafName": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.handling.publishto.ssts.leafName"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "taxonomyEntityDisplayName": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.handling.publishto.ssts.taxonomyEntityDisplayName"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "assetDocumentData": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"assetdocumentdata\")].value",
+                            "description": "warning, this filter actually returns an array"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.assetDocumentData"
+                        },
+                        {
+                            "jsonPath": "$._attributes.assetDocumentData"
+                        }
+                    ]
+                }
+            }
+        },
+        "pageURL": {
+            "type": "object",
+            "properties": {
+                "long": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.handling.publishto.pageurl.Text"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.pageURL.long"
+                                },
+                                {
+                                    "jsonPath": "$._links.longUrl.href"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "short": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.handling.publishto.pageurl.shortUrl"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.pageURL.short"
+                                },
+                                {
+                                    "jsonPath": "$._attributes.shortUrl"
+                                },
+                                {
+                                    "jsonPath": "$._links.shortUrl.href"
+                                },
+                                {
+                                    "jsonPath": "$._attributes.storyURL"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "required": [
+                "long",
+                "short"
+            ]
+        },
+        "byline": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"attribution\")].value"
+                        },
+                        {
+                            "jsonPath": "$.data.attribution.bylineOverride"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.byline"
+                        },
+                        {
+                            "jsonPath": "$.attribution.byline"
+                        },
+                        {
+                            "jsonPath": "$._attributes.byline"
+                        },
+                        {
+                            "jsonPath": "$._attributes.overridebyline"
+                        }
+                    ]
+                }
+            }
+        },
+        "contributors": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.id"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.id"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "name": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.name"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.name"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "name"
+                ]
+            },
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.contributors[*]"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.attribution.contributors[*]"
+                        }
+                    ]
+                }
+            }
+        },
+        "publication": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attribution.sourceOverride"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.publication"
+                        },
+                        {
+                            "jsonPath": "$.attribution.publication"
+                        }
+                    ]
+                }
+            }
+        },
+        "links": {
+            "type": "object",
+            "properties": {
+                "photoId": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.promoImageId"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.links.photoId"
+                                },
+                                {
+                                    "jsonPath": "$._links.photo.id"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "assets": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "transform": {
+                                    "cumulo": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.id"
+                                            }
+                                        ]
+                                    },
+                                    "presentationv4": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.id"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "position": {
+                                "type": "number",
+                                "transform": {
+                                    "cumulo": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.position"
+                                            }
+                                        ]
+                                    },
+                                    "presentationv4": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.position"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "overrides": {
+                                "type": "object",
+                                "properties": {
+                                    "caption": {
+                                        "type": "string",
+                                        "transform": {
+                                            "cumulo": {
+                                                "from": [
+                                                    {
+                                                        "jsonPath": "@.overrides.caption"
+                                                    }
+                                                ]
+                                            },
+                                            "presentationv4": {
+                                                "from": [
+                                                    {
+                                                        "jsonPath": "@.overrides.caption"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "relationshipTypeFlags": {
+                                "type": "string",
+                                "enum": [
+                                    "PromoImage",
+                                    "Undefined"
+                                ],
+                                "default": "Undefined",
+                                "transform": {
+                                    "cumulo": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.relationshiptypeflags"
+                                            }
+                                        ]
+                                    },
+                                    "presentationv4": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.relationshiptypeflags"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "position",
+                            "relationshipTypeFlags"
+                        ]
+                    },
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.Assets[*]"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.album._links.assets[*]"
+                                },
+                                {
+                                    "jsonPath": "$._links.assets[*]"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "required": [
+                "assets"
+            ]
+        },
+        "source": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.source"
+                        }
+                    ]
+                }
+            }
+        },
+        "isEvergreen": {
+            "type": "boolean",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.isevergreen"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.isEvergreen"
+                        },
+                        {
+                            "jsonPath": "$._attributes.evergreen"
+                        }
+                    ]
+                }
+            }
+        },
+        "adsEnabled": {
+            "type": "boolean",
+            "default": false,
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"adsenabled\")].value"
+                        },
+                        {
+                            "jsonPath": "$.data.attributes.noadvertising",
+                            "operations": [
+                              {
+                                "type": "inverse"
+                              }
+                            ]
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.adsEnabled"
+                        },
+                        {
+                            "jsonPath": "$.noadvertising",
+                            "operations": [
+                              {
+                                "type": "inverse"
+                              }
+                            ]
+                        },
+                        {
+                            "jsonPath": "$._attributes.noadvertising",
+                            "operations": [
+                              {
+                                "type": "inverse"
+                              }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "readerCommentsEnabled": {
+            "type": "boolean",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"readercommentsenabled\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.readerCommentsEnabled"
+                        },
+                        {
+                            "jsonPath": "$._attributes.readerCommentsEnabled"
+                        }
+                    ]
+                }
+            }
+        },
+        "fronts": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.id"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.id"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "name": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.location"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.name"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "front",
+                            "series",
+                            "topic-front",
+                            "section-front",
+                            "undefined"
+                        ],
+                        "default": "undefined",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.type"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.type"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "recommendedDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.holduntildate"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.recommendedDate"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "type",
+                    "recommendedDate"
+                ]
+            },
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.handling.publishto.fronts[*]"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.fronts[*]"
+                        }
+                    ]
+                }
+            }
+        },
+        "tags": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "A UUID/GUID",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.id"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.id"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "name": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.name"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.name"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "type": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.type"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.type"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "path": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.path"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.path"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "isPrimary": {
+                        "type": "boolean",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.isPrimary"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.isPrimary"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "relevanceScore": {
+                        "type": "number",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.relevanceScore"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.relevanceScore"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "parentId": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.parentId"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.parentId"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "topicType": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.topicType"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.topicType"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "dateTagged": {
+                        "type": "string",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.dateTagged"
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.dateTagged"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "taggingStatus": {
+                        "type": "string",
+                        "enum": [
+                            "AutoTagged",
+                            "UserTagged",
+                            "Untagged",
+                            "undefined"
+                        ],
+                        "default": "undefined",
+                        "transform": {
+                            "cumulo": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.taggingStatus",
+                                        "operations": [
+                                            {
+                                                "type": "replace",
+                                                "args": {
+                                                    "regex": "^\\s*$",
+                                                    "new": "undefined"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            "presentationv4": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.taggingStatus"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "type",
+                    "path",
+                    "isPrimary",
+                    "relevanceScore",
+                    "topicType",
+                    "dateTagged",
+                    "taggingStatus"
+                ]
+            },
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.TaxonomyEntities[*]"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.tags[*]"
+                        }
+                    ]
+                }
+            }
+        },
+        "topic": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"topic\")].value"
+                        }
+                    ]
+                }
+            }
+        },
+        "awsPath": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.awsPath"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.awsPath"
+                        },
+                        {
+                            "jsonPath": "$._attributes.awspath"
+                        }
+                    ]
+                }
+            }
+        },
+        "excludeFromMobile": {
+            "type": "boolean",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"excludemobile\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.excludeFromMobile"
+                        },
+                        {
+                            "jsonPath": "$.excludemobile"
+                        },
+                        {
+                            "jsonPath": "$._attributes.excludemobile"
+                        }
+                    ]
+                }
+            }
+        },
+        "contentProtectionState": {
+            "type": "string",
+            "enum": [
+                "free",
+                "metered",
+                "premium"
+            ],
+            "default": "free",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"content-protection-state\")].value",
+                            "operations": [
+                              {
+                                "type": "replace",
+                                "args": {
+                                  "regex": "^\\s*$",
+                                  "new": "free"
+                                }
+                              },
+                              {
+                                "type": "changeCase",
+                                "args": {
+                                  "to": "lower"
+                                }
+                              }
+                            ]
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.contentProtectionState",
+                            "operations": [
+                              {
+                                "type": "changeCase",
+                                "args": {
+                                  "to": "lower"
+                                }
+                              }
+                            ]
+                        },
+                        {
+                            "jsonPath": "$['content-protection-state']",
+                            "operations": [
+                              {
+                                "type": "changeCase",
+                                "args": {
+                                  "to": "lower"
+                                }
+                              }
+                            ]
+                        },
+                        {
+                            "jsonPath": "$._attributes['content-protection-state']",
+                            "operations": [
+                              {
+                                "type": "changeCase",
+                                "args": {
+                                  "to": "lower"
+                                }
+                              }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "keywords": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"keywords\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.keywords"
+                        },
+                        {
+                            "jsonPath": "$._attributes.keywords"
+                        },
+                        {
+                            "jsonPath": "$._attributes.seoKeywords"
+                        }
+                    ]
+                }
+            }
+        },
+        "bookReviewPageURL": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"bookreviewpageurl\")].value"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "required": [
+        "id",
+        "schemaVersion",
+        "authoringTypeCode",
+        "authoringBehavior",
+        "propertyId",
+        "propertyName",
+        "propertyDisplayName",
+        "assetGroup",
+        "statusName",
+        "title",
+        "shortHeadline",
+        "createSystem",
+        "eventDate",
+        "createUser",
+        "updateUser",
+        "embargoDate",
+        "createDate",
+        "updateDate",
+        "publishDate",
+        "storyHighlights",
+        "assetDocumentData",
+        "pageURL",
+        "contributors",
+        "publication",
+        "links",
+        "isEvergreen",
+        "adsEnabled",
+        "readerCommentsEnabled",
+        "fronts",
+        "topic",
+        "awsPath",
+        "excludeFromMobile",
+        "contentProtectionState"
+    ]
+}

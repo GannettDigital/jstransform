@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "oneOf": [
+        {
+            "$ref": "./breakingNews.json"
+        },
+        {
+            "$ref": "./embed.json"
+        },
+        {
+            "$ref": "./gallery.json"
+        },
+        {
+            "$ref": "./image.json"
+        },
+        {
+            "$ref": "./oEmbed.json"
+        },
+        {
+            "$ref": "./pullQuote.json"
+        },
+        {
+            "$ref": "./text.json"
+        },
+        {
+            "$ref": "./videoPlaylist.json"
+        },
+        {
+            "$ref": "./video.json"
+        }
+    ],
+    "allOf": [
+        {
+            "$ref": "./base.json"
+        }
+    ]
+}

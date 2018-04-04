@@ -1,0 +1,366 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "text"
+            ],
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.type"
+                        }
+                    ]
+                }
+            }
+        },
+        "body": {
+            "type": "object",
+            "properties": {
+                "desktop": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "asset",
+                                    "text",
+                                    "undefined"
+                                ],
+                                "default": "undefined",
+                                "transform": {
+                                    "cumulo": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.type"
+                                            }
+                                        ]
+                                    },
+                                    "presentationv4": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.type"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "value": {
+                                "type": "string",
+                                "transform": {
+                                    "cumulo": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.value"
+                                            }
+                                        ]
+                                    },
+                                    "presentationv4": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.value"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.desktopBody[*]"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.body.desktop[*]"
+                                },
+                                {
+                                    "jsonPath": "$.desktopBody[*]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "mobile": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "asset",
+                                    "text",
+                                    "undefined"
+                                ],
+                                "default": "undefined",
+                                "transform": {
+                                    "cumulo": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.type"
+                                            }
+                                        ]
+                                    },
+                                    "presentationv4": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.type"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "value": {
+                                "type": "string",
+                                "transform": {
+                                    "cumulo": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.value"
+                                            }
+                                        ]
+                                    },
+                                    "presentationv4": {
+                                        "from": [
+                                            {
+                                                "jsonPath": "@.value"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.mobileBody[*]"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.body.mobile[*]"
+                                },
+                                {
+                                    "jsonPath": "$.mobileBody[*]"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "required": [
+                "desktop",
+                "mobile"
+            ]
+        },
+        "fullText": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.body"
+                        }
+                    ]
+                }
+            }
+        },
+        "layoutPriorityAssetId": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.layoutPriorityAssetId"
+                        }
+                    ]
+                }
+            }
+        },
+        "seoTitle": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"seoTitle\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.seoTitle"
+                        },
+                        {
+                            "jsonPath": "$._attributes.seoTitle"
+                        }
+                    ]
+                }
+            }
+        },
+        "canonicalURL": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"canonicalURL\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.canonicalURL"
+                        },
+                        {
+                            "jsonPath": "$._attributes.canonicalURL"
+                        }
+                    ]
+                }
+            }
+        },
+        "versionHash": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"versionHash\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.versionHash"
+                        },
+                        {
+                            "jsonPath": "$._attributes.versionHash"
+                        }
+                    ]
+                }
+            }
+        },
+        "aggregateId": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"aggregateId\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.aggregateId"
+                        },
+                        {
+                            "jsonPath": "$._attributes.aggregateId"
+                        }
+                    ]
+                }
+            }
+        },
+        "pagetitle": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"pagetitle\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.pagetitle"
+                        },
+                        {
+                            "jsonPath": "$._attributes.pagetitle"
+                        }
+                    ]
+                }
+            }
+        },
+        "shortMobileURL": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"shortMobileUrl\")].value"
+                        },
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"shortmobileurl\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.shortMobileURL"
+                        },
+                        {
+                            "jsonPath": "$._attributes.shortMobileUrl"
+                        },
+                        {
+                            "jsonPath": "$._attributes.shortmobileurl"
+                        }
+                    ]
+                }
+            }
+        },
+        "geolocation": {
+            "type": "string",
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.attributes[?(@.name==\"geolocation\")].value"
+                        }
+                    ]
+                },
+                "presentationv4": {
+                    "from": [
+                        {
+                            "jsonPath": "$.geolocation"
+                        },
+                        {
+                            "jsonPath": "$._attributes.geolocation"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "required": [
+        "body",
+        "layoutPriorityAssetId"
+    ]
+}

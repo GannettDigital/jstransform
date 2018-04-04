@@ -1,0 +1,90 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "gallery"
+            ],
+            "transform": {
+                "cumulo": {
+                    "from": [
+                        {
+                            "jsonPath": "$.data.type"
+                        }
+                    ]
+                }
+            }
+        },
+        "promoImage": {
+            "type": "object",
+            "properties": {
+                "thumbnailAssetId": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.thumbnailAssetId"
+                                },
+                                {
+                                    "jsonPath": "$.data.attributes[?(@.name==\"thumbnailAssetId\")].value"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.promoImage.thumbnailAssetId"
+                                },
+                                {
+                                    "jsonPath": "$.thumbnailAssetId"
+                                },
+                                {
+                                    "jsonPath": "$._attributes.thumbnailAssetId"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "thumbnailPath": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.data.thumbnailPath"
+                                },
+                                {
+                                    "jsonPath": "$.data.attributes[?(@.name==\"thumbnailPath\")].value"
+                                }
+                            ]
+                        },
+                        "presentationv4": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.promoImage.thumbnailPath"
+                                },
+                                {
+                                    "jsonPath": "$.thumbnailPath"
+                                },
+                                {
+                                    "jsonPath": "$._attributes.thumbnailPath"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "required": [
+                "thumbnailAssetId",
+                "thumbnailPath"
+            ]
+        }
+    },
+    "required": [
+        "type",
+        "promoImage"
+    ]
+}
