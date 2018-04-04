@@ -29,6 +29,7 @@ type schemaJSON struct {
 	Description string      `json:"description,omitempty"`
 	AllOf       []schemaRef `json:"allOf,omitempty"`
 	OneOf       []schemaRef `json:"oneOf,omitempty"`
+	Required    []string    `json:"required,omitempty"`
 }
 
 // Schema represents a JSON Schema with the AllOf and OneOf references parsed and squashed into a single representation.
@@ -61,6 +62,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 		Instance: Instance{
 			Items:      sj.Items,
 			Properties: sj.Properties,
+			Required:   sj.Required,
 		},
 	}
 
@@ -71,6 +73,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 			return nil, fmt.Errorf("failed parsing allOf file %q: %v", path, err)
 		}
 		s.Properties = mergeProperties(s.Properties, child.Properties)
+		s.Required = append(s.Required, child.Required...)
 		if s.Items == nil {
 			s.Items = child.Items
 		}
@@ -87,12 +90,33 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 			return nil, fmt.Errorf("failed parsing oneOf file %q: %v", path, err)
 		}
 		s.Properties = mergeProperties(s.Properties, child.Properties)
+		s.Required = append(s.Required, child.Required...)
 		if s.Items == nil {
 			s.Items = child.Items
 		}
 	}
 
 	return &s, nil
+}
+
+// SchemaOneOfTypes will parse the given file and report which oneOfTypes are found in that schema.
+func SchemaOneOfTypes(schemaPath string) ([]string, error) {
+	data, err := ioutil.ReadFile(schemaPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
+	}
+
+	var sj schemaJSON
+	if err := json.Unmarshal(data, &sj); err != nil {
+		return nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
+	}
+
+	var types []string
+	for _, one := range sj.OneOf {
+		types = append(types, strings.Split(filepath.Base(one.Ref), ".")[0])
+	}
+
+	return types, nil
 }
 
 func mergeProperties(parent, child map[string]json.RawMessage) map[string]json.RawMessage {
