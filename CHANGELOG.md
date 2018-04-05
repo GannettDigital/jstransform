@@ -1,6 +1,6 @@
 # jstransform CHANGELOG
 
-# 0.0.5
+# 0.0.6
 John Lin - jstransform handle JSON files with no oneOfTypes
 
 # 0.0.5
