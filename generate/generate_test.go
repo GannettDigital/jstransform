@@ -146,8 +146,12 @@ func TestAddField(t *testing.T) {
 func TestBuildStructs(t *testing.T) {
 	testdir := "test_data/buildstructs"
 
+	if err := BuildStructs(fmt.Sprintf("%s/base.json", testdir), testdir); err != nil {
+		t.Fatalf("failed BuildStructs without oneOfTypes: %v", err)
+	}
+
 	if err := BuildStructs(fmt.Sprintf("%s/schema.json", testdir), testdir); err != nil {
-		t.Fatalf("failed BuildStructs: %v", err)
+		t.Fatalf("failed BuildStructs with oneOfTypes: %v", err)
 	}
 
 	cmd := exec.Command("git", "diff", "--quiet", testdir)

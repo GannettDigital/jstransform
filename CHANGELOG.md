@@ -1,6 +1,9 @@
 # jstransform CHANGELOG
 
 # 0.0.5
+John Lin - jstransform handle JSON files with no oneOfTypes
+
+# 0.0.5
 Tim Kuhlman - Implement go struct generation from JSON schema
 
 # 0.0.4
