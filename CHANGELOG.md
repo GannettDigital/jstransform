@@ -1,5 +1,8 @@
 # jstransform CHANGELOG
 
+# 0.0.6
+Kent Lee - Expand input/output paths and added examples
+
 # 0.0.5
 Tim Kuhlman - Implement go struct generation from JSON schema
 
