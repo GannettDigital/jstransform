@@ -18,3 +18,10 @@ To leverage this tool to install dependencies, run the following command from th
     dep ensure
 
 Testing is done using standard go tooling, ie `go test ./...`
+
+Command line transformations are available, for example:
+
+    go run main.go source-schema-file.json output-directory
+    go run main.go some-jsonschema.json ./
+    go run main.go your-schema.json
+    go run main.go  # showUsage
