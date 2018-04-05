@@ -23,7 +23,7 @@ func main() {
 	inputPath, _ := filepath.Abs(os.Args[1])
 	err := generate.BuildStructs(inputPath, outputPath)
 	if err == nil {
-		fmt.Print("Finished")
+		fmt.Printf("Finished, check output directory %s\n", outputPath)
 	} else {
 		panic(err)
 	}

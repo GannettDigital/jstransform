@@ -21,7 +21,8 @@ Testing is done using standard go tooling, ie `go test ./...`
 
 Command line transformations are available, for example:
 
-    go run main.go source-schema-file.json output-directory
-    go run main.go some-jsonschema.json ./
-    go run main.go your-schema.json
-    go run main.go  # showUsage
+    go run main.go ../content-api/schema/v1/asset.json /tmp
+    go run main.go source/schema/file.json output-directory
+    go run main.go ../some/jsonschema.json ./
+    go run main.go your-schema.json #pwd
+    go run main.go #showUsage
