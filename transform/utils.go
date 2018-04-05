@@ -117,6 +117,8 @@ func convertString(raw interface{}) (interface{}, error) {
 		return strconv.FormatFloat(t64, 'f', -1, 32), nil
 	case float64:
 		return strconv.FormatFloat(t, 'f', -1, 64), nil
+	case nil:
+		return nil, nil
 	default:
 		return nil, fmt.Errorf("unable to convert type %q to a string", reflect.TypeOf(raw))
 	}
