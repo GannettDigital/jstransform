@@ -1,5 +1,8 @@
 # jstransform CHANGELOG
 
+# 0.0.7
+John Lin - handle JSON files with no oneOfTypes
+
 # 0.0.6
 Tim Kuhlman - Converting a nil to a string should result in a nil return with no error
 
