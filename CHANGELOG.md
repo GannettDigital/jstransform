@@ -1,7 +1,10 @@
 # jstransform CHANGELOG
 
+# 0.0.7
+John Lin - handle JSON files with no oneOfTypes
+
 # 0.0.6
-John Lin - jstransform handle JSON files with no oneOfTypes
+Tim Kuhlman - Converting a nil to a string should result in a nil return with no error
 
 # 0.0.5
 Tim Kuhlman - Implement go struct generation from JSON schema
