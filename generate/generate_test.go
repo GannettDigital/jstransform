@@ -145,18 +145,29 @@ func TestAddField(t *testing.T) {
 
 func TestBuildStructs(t *testing.T) {
 	testdir := "test_data/buildstructs"
-
-	if err := BuildStructs(fmt.Sprintf("%s/base.json", testdir), testdir); err != nil {
-		t.Fatalf("failed BuildStructs without oneOfTypes: %v", err)
+	tests := []struct {
+		description string
+		file        string
+	}{
+		{
+			file:        "noOneOf.json",
+			description: "without oneOfTypes",
+		},
+		{
+			file:         "schema.json",
+			description: "with oneOfType",
+		},
 	}
 
-	if err := BuildStructs(fmt.Sprintf("%s/schema.json", testdir), testdir); err != nil {
-		t.Fatalf("failed BuildStructs with oneOfTypes: %v", err)
-	}
-
-	cmd := exec.Command("git", "diff", "--quiet", testdir)
-	if err := cmd.Run(); err != nil {
-		t.Errorf("Build Structs run found differences, this left %q in a modified state: %v", testdir, err)
+	for _, test := range tests {
+		if err := BuildStructs(fmt.Sprintf("%s/%s", testdir, test.file), testdir); err != nil {
+			t.Fatalf("BuildStructs failed for %s (%s): %v", test.file, test.description, err)
+		}
+		cmd := exec.Command("git", "diff", "--quiet", testdir)
+		if err := cmd.Run(); err != nil {
+			t.Errorf("BuildStructs for %s (%s) found differences, this left %q in a modified state: %v",
+			    test.file, test.description, testdir, err)
+		}
 	}
 }
 

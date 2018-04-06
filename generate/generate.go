@@ -36,7 +36,11 @@ func BuildStructs(schemaPath string, outputPath string) error {
 	packageName := filepath.Base(outputPath)
 
 	oneOfTypes, err := jsonschema.SchemaOneOfTypes(schemaPath)
-	if err == nil {
+	if err != nil {
+		return fmt.Errorf("failed to discover oneOfTypes: %v", err)
+	}
+
+	if (len(oneOfTypes) == 0) {
 		oneOfTypes = append(oneOfTypes, strings.Split(filepath.Base(schemaPath), ".")[0])
 	}
 
