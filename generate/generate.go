@@ -40,6 +40,10 @@ func BuildStructs(schemaPath string, outputPath string) error {
 		return fmt.Errorf("failed to discover oneOfTypes: %v", err)
 	}
 
+	if (len(oneOfTypes) == 0) {
+		oneOfTypes = append(oneOfTypes, strings.Split(filepath.Base(schemaPath), ".")[0])
+	}
+
 	for _, oneOf := range oneOfTypes {
 		path := filepath.Join(outputPath, oneOf+".go")
 		gfile, err := os.Create(path)
