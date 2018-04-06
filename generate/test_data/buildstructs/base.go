@@ -6,28 +6,26 @@ type Base struct {
 	AdsEnabled        bool   `json:"adsEnabled"`
 	AssetDocumentData string `json:"assetDocumentData"`
 	AssetGroup        struct {
-		ID         string  `json:"id"`
-		LogoURL    string  `json:"logoURL"`
-		Name       string  `json:"name"`
-		PropertyID float64 `json:"propertyId"`
-		SiteCode   string  `json:"siteCode"`
-		SiteID     string  `json:"siteId"`
-		SiteName   string  `json:"siteName"`
-		SstsID     string  `json:"sstsId"`
-		Title      string  `json:"title"`
-		Type       string  `json:"type"`
-		URL        string  `json:"URL"`
+		Id       string `json:"id"`
+		LogoURL  string `json:"logoURL,omitempty"`
+		Name     string `json:"name"`
+		SiteCode string `json:"siteCode,omitempty"`
+		SiteId   string `json:"siteId"`
+		SiteName string `json:"siteName"`
+		SstsId   string `json:"sstsId,omitempty"`
+		Type     string `json:"type,omitempty"`
+		URL      string `json:"URL,omitempty"`
 	} `json:"assetGroup"`
 	AuthoringBehavior      string `json:"authoringBehavior"`
 	AuthoringTypeCode      string `json:"authoringTypeCode"`
 	AwsPath                string `json:"awsPath"`
-	BackfillDate           string `json:"backfillDate"`
-	BookReviewPageURL      string `json:"bookReviewPageURL"`
-	Byline                 string `json:"byline"`
+	BackfillDate           string `json:"backfillDate,omitempty"`
+	BookReviewPageURL      string `json:"bookReviewPageURL,omitempty"`
+	Byline                 string `json:"byline,omitempty"`
 	ContentProtectionState string `json:"contentProtectionState"`
-	ContentSourceCode      string `json:"contentSourceCode"`
+	ContentSourceCode      string `json:"contentSourceCode,omitempty"`
 	Contributors           []struct {
-		ID   string `json:"id"`
+		Id   string `json:"id"`
 		Name string `json:"name"`
 	} `json:"contributors"`
 	CreateDate        string `json:"createDate"`
@@ -36,72 +34,71 @@ type Base struct {
 	EmbargoDate       string `json:"embargoDate"`
 	EventDate         string `json:"eventDate"`
 	ExcludeFromMobile bool   `json:"excludeFromMobile"`
-	ExpirationDate    string `json:"expirationDate"`
+	ExpirationDate    string `json:"expirationDate,omitempty"`
 	Fronts            []struct {
-		ID              string `json:"id"`
+		Id              string `json:"id"`
 		Name            string `json:"name"`
-		Type            string `json:"type"`
 		RecommendedDate string `json:"recommendedDate"`
+		Type            string `json:"type"`
 	} `json:"fronts"`
-	Headline           string `json:"headline"`
-	ID                 string `json:"id"`
-	InitialPublishDate string `json:"initialPublishDate"`
+	Headline           string `json:"headline,omitempty"`
+	Id                 string `json:"id"`
+	InitialPublishDate string `json:"initialPublishDate,omitempty"`
 	IsEvergreen        bool   `json:"isEvergreen"`
-	Keywords           string `json:"keywords"`
+	Keywords           string `json:"keywords,omitempty"`
 	Links              struct {
 		Assets []struct {
-			ID        string `json:"id"`
+			Id        string `json:"id"`
 			Overrides struct {
-				Caption string `json:"caption"`
-			} `json:"overrides"`
+				Caption string `json:"caption,omitempty"`
+			} `json:"overrides,omitempty"`
 			Position              float64 `json:"position"`
 			RelationshipTypeFlags string  `json:"relationshipTypeFlags"`
 		} `json:"assets"`
-		PhotoID string `json:"photoId"`
+		PhotoId string `json:"photoId,omitempty"`
 	} `json:"links"`
 	PageURL struct {
 		Long  string `json:"long"`
 		Short string `json:"short"`
 	} `json:"pageURL"`
-	PromoBrief            string `json:"promoBrief"`
-	PropertyID            string `json:"propertyId"`
-	PropertyName          string `json:"propertyName"`
-	PropertyDisplayName   string `json:"propertyDisplayName"`
-	Publication           string `json:"publication"`
-	PublishDate           string `json:"publishDate"`
-	PublishSystem         string `json:"publishSystem"`
-	PublishUser           string `json:"publishUser"`
-	ReaderCommentsEnabled bool   `json:"readerCommentsEnabled"`
-	SchemaVersion         int    `json:"schemaVersion"`
-	ShortHeadline         string `json:"shortHeadline"`
-	Source                string `json:"source"`
+	PromoBrief            string  `json:"promoBrief,omitempty"`
+	PropertyDisplayName   string  `json:"propertyDisplayName"`
+	PropertyId            string  `json:"propertyId"`
+	PropertyName          string  `json:"propertyName"`
+	Publication           string  `json:"publication"`
+	PublishDate           string  `json:"publishDate"`
+	PublishSystem         string  `json:"publishSystem,omitempty"`
+	PublishUser           string  `json:"publishUser,omitempty"`
+	ReaderCommentsEnabled bool    `json:"readerCommentsEnabled"`
+	SchemaVersion         float64 `json:"schemaVersion"`
+	ShortHeadline         string  `json:"shortHeadline"`
+	Source                string  `json:"source,omitempty"`
 	Ssts                  struct {
-		LeafName                  string `json:"leafName"`
-		Path                      string `json:"path"`
-		Section                   string `json:"section"`
-		Storysubject              string `json:"storysubject"`
-		Subsection                string `json:"subsection"`
-		Subtopic                  string `json:"subtopic"`
-		TaxonomyEntityDisplayName string `json:"taxonomyEntityDisplayName"`
-		Topic                     string `json:"topic"`
-	} `json:"ssts"`
+		LeafName                  string `json:"leafName,omitempty"`
+		Path                      string `json:"path,omitempty"`
+		Section                   string `json:"section,omitempty"`
+		Storysubject              string `json:"storysubject,omitempty"`
+		Subsection                string `json:"subsection,omitempty"`
+		Subtopic                  string `json:"subtopic,omitempty"`
+		TaxonomyEntityDisplayName string `json:"taxonomyEntityDisplayName,omitempty"`
+		Topic                     string `json:"topic,omitempty"`
+	} `json:"ssts,omitempty"`
 	StatusName      string   `json:"statusName"`
 	StoryHighlights []string `json:"storyHighlights"`
 	Tags            []struct {
 		DateTagged     string  `json:"dateTagged"`
-		ID             string  `json:"id"`
+		Id             string  `json:"id"`
 		IsPrimary      bool    `json:"isPrimary"`
 		Name           string  `json:"name"`
-		ParentID       string  `json:"parentId"`
+		ParentId       string  `json:"parentId,omitempty"`
 		Path           string  `json:"path"`
 		RelevanceScore float64 `json:"relevanceScore"`
 		TaggingStatus  string  `json:"taggingStatus"`
 		TopicType      string  `json:"topicType"`
 		Type           string  `json:"type"`
-	} `json:"tags"`
+	} `json:"tags,omitempty"`
 	Title      string `json:"title"`
 	Topic      string `json:"topic"`
-	Type       string `json:"type"`
 	UpdateDate string `json:"updateDate"`
 	UpdateUser string `json:"updateUser"`
 }
