@@ -99,24 +99,28 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	return &s, nil
 }
 
-// SchemaOneOfTypes will parse the given file and report which oneOfTypes are found in that schema.
-func SchemaOneOfTypes(schemaPath string) ([]string, error) {
+// SchemaTypes will parse the given file and report which top level allOfTypes and oneOfTypes are found in that schema.
+func SchemaTypes(schemaPath string) ([]string, []string, error) {
 	data, err := ioutil.ReadFile(schemaPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
+		return nil, nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
 	}
 
 	var sj schemaJSON
 	if err := json.Unmarshal(data, &sj); err != nil {
-		return nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
+		return nil, nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
 	}
 
-	var types []string
+	var allOfTypes []string
+	for _, a := range sj.AllOf {
+		allOfTypes = append(allOfTypes, a.Ref)
+	}
+	var oneOfTypes []string
 	for _, one := range sj.OneOf {
-		types = append(types, strings.Split(filepath.Base(one.Ref), ".")[0])
+		oneOfTypes = append(oneOfTypes, one.Ref)
 	}
 
-	return types, nil
+	return allOfTypes, oneOfTypes, nil
 }
 
 func mergeProperties(parent, child map[string]json.RawMessage) map[string]json.RawMessage {
