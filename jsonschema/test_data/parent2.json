@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "oneOf": [
+    {
+      "$ref": "./image.json"
+    },
+    {
+      "$ref": "./array-of-array.json"
+    }
+  ],
+  "allOf": [
+    {
+      "$ref": "./embed.json"
+    },
+    {
+      "$ref": "./operations.json"
+    }
+  ]
+}

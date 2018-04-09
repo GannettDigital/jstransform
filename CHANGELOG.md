@@ -1,7 +1,10 @@
 # jstransform CHANGELOG
 
 # 0.0.9
-Kent Lee - Expand input/output paths and added examples
+Kent Lee - Expand input/output paths and add go generate examples
+
+# 0.0.8
+Tim Kuhlman - Generate a parent struct to embed in others for JSON schemas with allOf refs
 
 # 0.0.7
 John Lin - handle JSON files with no oneOfTypes
