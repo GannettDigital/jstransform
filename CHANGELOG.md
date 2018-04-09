@@ -1,5 +1,8 @@
 # jstransform CHANGELOG
 
+# 0.1.0
+Tim Kuhlman - Add support for creating time.Time fields based on the format type in the JSON schema.
+
 # 0.0.9
 Kent Lee - Expand input/output paths and add go generate examples
 

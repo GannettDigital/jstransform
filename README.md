@@ -7,25 +7,30 @@ The result is that you can write one JSON schema that defines both the desired r
 The code also provides some utilities for walking a JSON schema file section by section and generating Golang structs from a JSON schema file.
 
 ## JSON Schema Transform extension
-Details on this are found in this [doc](./transform.adoc) and this [schema file](./jsonschema.json)
+Details on this are found in this [doc](./transform.adoc) and this [schema file](./transformSchema.json)
 
 ## Usage
-For details on using the project as a library for transformations refer to the godocs.
+For details on using the project as a library for transformations or JSON schema walking refer to the godocs.
 
-This project uses the Go package management tool [Dep](https://github.com/golang/dep) for package versioning.
+The Golang struct generation portion of this code based is intended to be used with [go generate](https://blog.golang.org/generate).
+
+### Go Generate Examples
+
+To use the struct generation with go generate include a generate line in a go source file for example:
+
+    //go:generate go run ../../vendor/github.com/GannettDigital/jstransform/main.go myschema.json $PWD
+
+or if you have compiled the tool and have it in your path rather than vendoring the source:
+
+    //go:generate jstransform myschema.json $PWD
+    
+then simply run `go generate`.
+    
+## Contributing
+This project uses the Go package management tool [Dep](https://github.com/golang/dep) for dependencies.
 To leverage this tool to install dependencies, run the following command from the project root:
 
     dep ensure
 
 Testing is done using standard go tooling, ie `go test ./...`
-
-## Examples
-
-The structs in `github.com/GannettDigital/content-api/model/asset` are built from the JSON schema using this code. To regenerate these structs simple run [go generate](https://blog.golang.org/generate) within that directory. This tool was not intended for command-line use, but regeneration from this repo would be:
-
-    go run main.go ../content-api/schema/v1/asset.json ../content-api/model/asset
-
-or any one of them can be transformed individually:
-
-    go run main.go ../content-api/schema/v1/assets/base.json /tmp
 
