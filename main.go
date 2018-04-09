@@ -9,6 +9,7 @@ import (
 	"github.com/GannettDigital/jstransform/generate"
 )
 
+//go:generate go run examples/dynamic.go
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Printf("Usage: %s <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
