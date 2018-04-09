@@ -18,3 +18,14 @@ To leverage this tool to install dependencies, run the following command from th
     dep ensure
 
 Testing is done using standard go tooling, ie `go test ./...`
+
+## Examples
+
+The structs in `github.com/GannettDigital/content-api/model/asset` are built from the JSON schema using this code. To regenerate these structs simple run [go generate](https://blog.golang.org/generate) within that directory. This tool was not intended for command-line use, but regeneration from this repo would be:
+
+    go run main.go ../content-api/schema/v1/asset.json ../content-api/model/asset
+
+or any one of them can be transformed individually:
+
+    go run main.go ../content-api/schema/v1/assets/base.json /tmp
+

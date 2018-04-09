@@ -1,25 +1,37 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
+	"path"
+	"path/filepath"
 
 	"github.com/GannettDigital/jstransform/generate"
 )
 
 func main() {
 	if len(os.Args) < 2 {
-		log.Fatalf("Usage: %s <JSON Schema Path> [output directory]", os.Args[0])
+		fmt.Printf("Usage: %s <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
+		os.Exit(1)
+	}
+
+	inputPath, err := filepath.Abs(os.Args[1])
+	if err != nil {
+		fmt.Printf("Input directory %s error: %v", os.Args[1], err)
+		os.Exit(2)
 	}
 
 	var outputPath string
 	if len(os.Args) == 3 {
-		outputPath = os.Args[2]
+		outputPath, err = filepath.Abs(os.Args[2])
+		if err != nil {
+			fmt.Printf("Output directory %s error: %v", os.Args[2], err)
+			os.Exit(3)
+		}
 	}
-	err := generate.BuildStructs(os.Args[1], outputPath)
-	if err == nil {
-		log.Print("Finished")
-	} else {
-		log.Fatal(err)
+
+	if err = generate.BuildStructs(inputPath, outputPath); err != nil {
+		fmt.Printf("Golang Struct generation failed: %v", err)
+		os.Exit(4)
 	}
 }
