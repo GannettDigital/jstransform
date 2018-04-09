@@ -203,6 +203,20 @@ func (gen *generatedStruct) write(w io.Writer) error {
 		return fmt.Errorf("failed writing struct: %v", err)
 	}
 
+	var includeTime bool
+	for _, field := range gen.fields {
+		if field.jsonType == "date-time" {
+			includeTime = true
+			break
+		}
+	}
+
+	if includeTime {
+		if _, err := buf.Write([]byte("import \"time\"\n")); err != nil {
+			return fmt.Errorf("failed writing struct: %v", err)
+		}
+	}
+
 	embeds := strings.Join(gen.embededStructs, "\n")
 	if embeds != "" {
 		embeds += "\n"
@@ -255,6 +269,9 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance) e
 		jsonName: tree[0],
 		jsonType: inst.Type,
 	}
+	if inst.Type == "string" && inst.Format == "date-time" {
+		f.jsonType = "date-time"
+	}
 	// Second processing of an array type
 	if exists, ok := fields[f.jsonName]; ok {
 		f = exists
@@ -291,6 +308,8 @@ func exportedName(name string) string {
 
 // goType maps a jsonType to a string representation of the go type.
 // If Array is true it makes the type into an array.
+// If the JSON Schema had a type of "string" and a format of "date-time" it is expected the input jsonType will be
+// "date-time".
 func goType(jsonType string, array bool) string {
 	var goType string
 	switch jsonType {
@@ -300,6 +319,8 @@ func goType(jsonType string, array bool) string {
 		goType = "float64"
 	case "string":
 		goType = "string"
+	case "date-time":
+		goType = "time.Time"
 	case "object":
 		goType = "struct"
 	}
