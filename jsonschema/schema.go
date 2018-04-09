@@ -11,6 +11,7 @@ import (
 // Instance represents a JSON Schema instance.
 type Instance struct {
 	Type       string                     `json:"type"`
+	Format     string                     `json:"format"`
 	Items      json.RawMessage            `json:"items,omitempty"`
 	Properties map[string]json.RawMessage `json:"properties,omitempty"`
 	Required   []string                   `json:"Required,omitempty"`
