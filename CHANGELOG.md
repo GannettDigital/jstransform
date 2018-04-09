@@ -1,5 +1,8 @@
 # jstransform CHANGELOG
 
+# 0.0.8
+Tim Kuhlman - Generate a parent struct to embed in others for JSON schemas with allOf refs
+
 # 0.0.7
 John Lin - handle JSON files with no oneOfTypes
 
