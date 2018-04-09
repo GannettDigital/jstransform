@@ -226,6 +226,12 @@ func TestConvert(t *testing.T) {
 			jsonType:    "string",
 			want:        nil,
 		},
+		{
+			description: "[]interface{nil} returns nil",
+			raw:         []interface{}{nil},
+			jsonType:    "string",
+			want:        nil,
+		},
 	}
 
 	for _, test := range tests {
