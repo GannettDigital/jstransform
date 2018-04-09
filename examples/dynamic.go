@@ -17,7 +17,7 @@ func main() {
 	for title, source := range schemas {
 		schemaPath, err := filepath.Abs(source)
 		if err != nil {
-			fmt.Println(title, "not present")
+			fmt.Printf("Path for %s not present!\n", title)
 		} else {
 			fmt.Printf("\nExamples using %s:\n", title)
 			if stat, err := os.Stat(schemaPath); err == nil && stat.IsDir() {
