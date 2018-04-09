@@ -154,7 +154,7 @@ func TestBuildStructs(t *testing.T) {
 			description: "without oneOfTypes",
 		},
 		{
-			file:         "schema.json",
+			file:        "schema.json",
 			description: "with oneOfType",
 		},
 	}
@@ -166,7 +166,7 @@ func TestBuildStructs(t *testing.T) {
 		cmd := exec.Command("git", "diff", "--quiet", testdir)
 		if err := cmd.Run(); err != nil {
 			t.Errorf("BuildStructs for %s (%s) found differences, this left %q in a modified state: %v",
-			    test.file, test.description, testdir, err)
+				test.file, test.description, testdir, err)
 		}
 	}
 }
@@ -251,9 +251,10 @@ func TestExtractedField_Write(t *testing.T) {
 	}
 }
 
-func TestGenerateGoStruct(t *testing.T) {
+func TestGeneratedStruct(t *testing.T) {
 	tests := []struct {
 		description  string
+		embeds       []string
 		schemaPath   string
 		packageName  string
 		oneOfType    string
@@ -268,6 +269,7 @@ func TestGenerateGoStruct(t *testing.T) {
 		},
 		{
 			description:  "Complex schema",
+			embeds:       []string{"Simple"},
 			schemaPath:   "test_data/test_schema.json",
 			packageName:  "test",
 			oneOfType:    "complex",
@@ -276,9 +278,18 @@ func TestGenerateGoStruct(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		buf := &bytes.Buffer{}
-		if err := generateGoStruct(test.schemaPath, test.packageName, test.oneOfType, buf); err != nil {
+		schema, err := jsonschema.SchemaFromFile(test.schemaPath, test.oneOfType)
+		if err != nil {
+			t.Fatalf("Test %q - SchemaFromFile failed: %v", test.description, err)
+		}
+		g, err := newGeneratedStruct(schema, test.oneOfType, test.packageName, test.embeds)
+		if err != nil {
 			t.Fatalf("Test %q - failed: %v", test.description, err)
+		}
+
+		buf := &bytes.Buffer{}
+		if err := g.write(buf); err != nil {
+			t.Fatalf("Test %q - failed write: %v", test.description, err)
 		}
 		got := buf.Bytes()
 

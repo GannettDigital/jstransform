@@ -194,3 +194,53 @@ func TestSchemaFromFile(t *testing.T) {
 		}
 	}
 }
+
+func TestSchemaTypes(t *testing.T) {
+	tests := []struct {
+		description string
+		path        string
+		wantAllOf   []string
+		wantOneOf   []string
+	}{
+		{
+			description: "Single AllOf",
+			path:        "test_data/embed_parent.json",
+			wantAllOf:   []string{"./embed.json"},
+		},
+		{
+			description: "Single oneOf",
+			path:        "test_data/image_parent.json",
+			wantOneOf:   []string{"./image.json"},
+		},
+		{
+			description: "Multiple oneOf",
+			path:        "test_data/parent.json",
+			wantOneOf:   []string{"./image.json", "./array-of-array.json"},
+		},
+		{
+			description: "Multiple allOf and oneOf",
+			path:        "test_data/parent2.json",
+			wantAllOf:   []string{"./embed.json", "./operations.json"},
+			wantOneOf:   []string{"./image.json", "./array-of-array.json"},
+		},
+		{
+			description: "No oneOf or allOf",
+			path:        "test_data/image.json",
+		},
+	}
+
+	for _, test := range tests {
+		gotAllOf, gotOneOf, err := SchemaTypes(test.path)
+		if err != nil {
+			t.Fatalf("Test %q - failed: %v", test.description, err)
+		}
+
+		if !reflect.DeepEqual(gotAllOf, test.wantAllOf) {
+			t.Errorf("Test %q - got AllOf %v, want %v", test.description, gotAllOf, test.wantAllOf)
+		}
+
+		if !reflect.DeepEqual(gotOneOf, test.wantOneOf) {
+			t.Errorf("Test %q - got OneOf %v, want %v", test.description, gotOneOf, test.wantOneOf)
+		}
+	}
+}
