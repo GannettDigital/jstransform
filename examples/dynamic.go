@@ -23,7 +23,7 @@ func main() {
 			if stat, err := os.Stat(schemaPath); err == nil && stat.IsDir() {
 				filepath.Walk(schemaPath, func(jsonPath string, f os.FileInfo, err error) error {
 					if strings.HasSuffix(jsonPath, ".json") {
-						fmt.Printf("\tgo run main.go %s %s\n", path.Base(jsonPath), source)
+						fmt.Printf("\tgo run main.go %s/%s %s\n", source, path.Base(jsonPath), source)
 					}
 					return nil
 				})
