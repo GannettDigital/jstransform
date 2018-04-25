@@ -39,7 +39,7 @@ func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Tran
 // Errors are returned for failures to perform operations but are not returned for empty fields which are either
 // omitted from the output or set to an empty value.
 //
-// Validation of the output against the schema is not done and is the responsibility of the caller.
+// Validation of the output against the schema is the final step in the process.
 func (tr *Transformer) Transform(in json.RawMessage) (json.RawMessage, error) {
 	// reset transformed and processed so that each time this is called it repeats the operation
 	tr.transformed = make(map[string]interface{})
@@ -55,6 +55,14 @@ func (tr *Transformer) Transform(in json.RawMessage) (json.RawMessage, error) {
 	out, err := json.Marshal(tr.transformed)
 	if err != nil {
 		return nil, fmt.Errorf("failed to JSON marsal transformed data: %v", err)
+	}
+
+	valid, err := tr.schema.Validate(out)
+	if err != nil {
+		return nil, fmt.Errorf("transformed result validation error: %v", err)
+	}
+	if !valid {
+		return nil, errors.New("schema validation of the transformed result reports invalid")
 	}
 
 	return out, nil

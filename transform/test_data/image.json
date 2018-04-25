@@ -76,11 +76,6 @@
   "required": [
     "type",
     "crops",
-    "orientation",
-    "credit",
-    "URL",
-    "caption",
-    "originalSize",
-    "datePhotoTaken"
+    "URL"
   ]
 }

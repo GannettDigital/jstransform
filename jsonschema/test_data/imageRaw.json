@@ -1,0 +1,204 @@
+{
+    "id": "107833025",
+    "schemaVersion": 3,
+    "authoringTypeCode": "image",
+    "authoringBehavior": "image",
+    "propertyId": "3123",
+    "propertyName": "TXNMGroup",
+    "propertyDisplayName": "Texas/Mexico Group",
+    "assetGroup": {
+        "id": "777",
+        "name": "StGeorge",
+        "siteId": "159",
+        "siteCode": "PSTG",
+        "siteName": "StGeorge"
+    },
+    "contentSourceCode": "unknown",
+    "statusName": "published",
+    "title": "jpeg&c=6&a=2ec4b37e.jpeg",
+    "shortHeadline": "",
+    "publishUser": "cumulo-rsp-asset",
+    "publishSystem": "cumulo-rsp",
+    "createSystem": "undefined",
+    "eventDate": "2018-02-20T15:40:19.7922963-05:00",
+    "backfillDate": "2017-12-14T11:29:01.207Z",
+    "expirationDate": "0001-01-01T05:00:00Z",
+    "createUser": "GAIA - DataServicesUser",
+    "updateUser": "GAIA - DataServicesUser",
+    "embargoDate": "2018-02-20T20:39:57.85Z",
+    "createDate": "2017-12-14T11:29:01.083Z",
+    "updateDate": "2018-02-20T20:40:19.437Z",
+    "publishDate": "2017-12-14T11:29:01.207Z",
+    "initialPublishDate": "2017-12-14T11:29:01.207Z",
+    "storyHighlights": [],
+    "ssts": {},
+    "assetDocumentData": "",
+    "pageURL": {
+        "long": "",
+        "short": ""
+    },
+    "byline": "Deseret News Hive",
+    "contributors": [],
+    "publication": "",
+    "links": {
+        "assets": []
+    },
+    "source": "DeseretDigital.com",
+    "isEvergreen": false,
+    "adsEnabled": false,
+    "readerCommentsEnabled": false,
+    "fronts": [],
+    "topic": "",
+    "awsPath": "news",
+    "excludeFromMobile": false,
+    "contentProtectionState": "free",
+    "type": "image",
+    "crops": [
+        {
+            "name": "16_9",
+            "width": 700,
+            "height": 394,
+            "path": "/-mm-/5ac7bc9c6a3fbd9f8425d1fe36b6ebc91a532e52/c=0-240-700-634/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-16-9super",
+            "width": 2048,
+            "height": 1162,
+            "path": "/-mm-/11e4218310199a8667d57f94d6080de76d355733/c=0-240-700-634&r=2048x1162/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-16-9",
+            "width": 1280,
+            "height": 720,
+            "path": "/-mm-/00fc9c4aff6e9d0c6fe1108bc632d79f447ccc0d/c=0-240-700-634&r=1280x720/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "1_1",
+            "width": 700,
+            "height": 700,
+            "path": "/-mm-/637d54b225dea1432ac280e2c14562e25deadef8/c=0-87-700-787/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-supersquare",
+            "width": 1024,
+            "height": 1024,
+            "path": "/-mm-/a208777ead59cbb2395e9f289b3d7e37a114ee53/c=0-87-700-787&r=1024x1024/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-square",
+            "width": 98,
+            "height": 98,
+            "path": "/-mm-/8f551e8584afb3d463390beea0c3955912ee425c/c=0-87-700-787&r=98x98/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x48",
+            "width": 48,
+            "height": 48,
+            "path": "/-mm-/273a68657b89faeab562b489f88d977abe9a4aec/c=0-87-700-787&r=48x48/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "3_4",
+            "width": 656,
+            "height": 874,
+            "path": "/-mm-/7aa2e1e2287c823286bc38c2a06b023dcaf8f7a4/c=22-0-678-874/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-3-4",
+            "width": 768,
+            "height": 1024,
+            "path": "/-mm-/61ba94ec4176c11bafb74b81c1a9161dfd6adfe7/c=22-0-678-874&r=768x1024/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "4_3",
+            "width": 700,
+            "height": 525,
+            "path": "/-mm-/f52f92b4e26d85eee7018c41b6a887e2c37fb715/c=0-174-700-699/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-superlarge",
+            "width": 2048,
+            "height": 1536,
+            "path": "/-mm-/d2c2c9a3b173d39e99c2b6799195055f3ed18277/c=0-174-700-699&r=2048x1536/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-extralarge",
+            "width": 1024,
+            "height": 768,
+            "path": "/-mm-/f61413f96e35e8a655814cf0890f85a7bd4ccd3d/c=0-174-700-699&r=1024x768/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-large",
+            "width": 490,
+            "height": 368,
+            "path": "/-mm-/04d95a4e7809be731a6f176474ab6ab3e5bea5a3/c=0-174-700-699&r=490x368/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x",
+            "width": 245,
+            "height": 184,
+            "path": "/-mm-/168e279e17f167f2a71b06e6388e292ce92bdc46/c=0-174-700-699&r=245x184/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x86",
+            "width": 115,
+            "height": 86,
+            "path": "/-mm-/b9a039ed1d2527010ee82b5483c6b8772c03958d/c=0-174-700-699&r=115x86/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "9_16",
+            "width": 492,
+            "height": 874,
+            "path": "/-mm-/589d7e7112a8157ddbbe8344c239fef05e6fa039/c=104-0-596-874/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-9-16",
+            "width": 720,
+            "height": 1280,
+            "path": "/-mm-/2e4c24fed6642b6983db402328672c93d8aa67ff/c=104-0-596-874&r=720x1280/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "front_thumb",
+            "width": 700,
+            "height": 599,
+            "path": "/-mm-/72d382b40be6c7410c5cbc32f741261af5ef097f/c=0-138-700-737/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-front-thumb",
+            "width": 115,
+            "height": 98,
+            "path": "/-mm-/e4ebf6c1db38364f6ea8ce0b537d48cc414e2e86/c=0-138-700-737&r=115x98/local/-/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg",
+            "relativePath": ""
+        }
+    ],
+    "orientation": "vertical",
+    "credit": "Deseret News Hive",
+    "URL": {
+        "publish": "http://assets-staging.gannettdigital.com",
+        "absolute": "http://assets-staging.gannettdigital.com/media/2018/02/20/StGeorge/jpeg&c=6&a=2ec4b37e.jpeg"
+    },
+    "caption": "",
+    "originalSize": {
+        "height": 874,
+        "width": 700
+    },
+    "datePhotoTaken": "2017-12-14T11:21:28.0000000Z",
+    "tags": []
+}
