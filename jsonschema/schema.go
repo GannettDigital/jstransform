@@ -36,8 +36,17 @@ type schemaJSON struct {
 // Schema represents a JSON Schema with the AllOf and OneOf references parsed and squashed into a single representation.
 // This is not a fully spec compatible representation but a basic representation useful for walking through the schema
 // instances within a schema.
+//
+// A fully spec compatible version of the schema is kept for validation purposes.
 type Schema struct {
 	Instance
+
+	validator Validator
+}
+
+// Validate will check that the given json is validate according the schema.
+func (s *Schema) Validate(raw json.RawMessage) (bool, error) {
+	return s.validator.Validate(raw)
 }
 
 // SchemaFromFile parses a file at the given path and returns a schema based on its contents.
@@ -53,6 +62,10 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
 	}
+	v, err := NewValidator(schemaPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize schema validator: %v", err)
+	}
 
 	var sj schemaJSON
 	if err := json.Unmarshal(data, &sj); err != nil {
@@ -65,6 +78,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 			Properties: sj.Properties,
 			Required:   sj.Required,
 		},
+		validator: v,
 	}
 
 	for _, all := range sj.AllOf {
