@@ -29,6 +29,32 @@ var (
 				"type": "image",
 				"crops": [
 					{
+						"height": 0,
+						"path": "path",
+						"relativePath": "",
+						"width": 0
+					},
+					{
+						"name": "aname",
+						"height": 0,
+						"path": "empty",
+						"relativePath": "empty",
+						"width": 0
+					}
+				],
+				"publishUrl": "publishURL",
+				"absoluteUrl": "absoluteURL"
+			}`),
+			want: json.RawMessage(`{"URL":{"absolute":"absoluteURL","publish":"publishURL"},"crops":[{"height":0,"name":"name","path":"path","relativePath":"","width":0},{"height":0,"name":"aname","path":"empty","relativePath":"empty","width":0}],"type":"image"}`),
+		},
+		{
+			description: "Input too simple, fails validation",
+			transformer: Transformer{schema: imageSchema, transformIdentifier: "cumulo"},
+			in: json.RawMessage(`
+			{
+				"type": "image",
+				"crops": [
+					{
 						"path": "path"
 					},
 					{
@@ -39,7 +65,8 @@ var (
 				"publishUrl": "publishURL",
 				"absoluteUrl": "absoluteURL"
 			}`),
-			want: json.RawMessage(`{"URL":{"absolute":"absoluteURL","publish":"publishURL"},"crops":[{"name":"name","path":"path"},{"name":"aname","relativePath":"empty"}],"type":"image"}`),
+			want:    json.RawMessage(`{"URL":{"absolute":"absoluteURL","publish":"publishURL"},"crops":[{"name":"name","path":"path"},{"name":"aname","relativePath":"empty"}],"type":"image"}`),
+			wantErr: true,
 		},
 		{
 			description: "Array transforms, tests arrays with string type and with a single object type",

@@ -1,5 +1,8 @@
 # jstransform CHANGELOG
 
+# 0.2.0
+Tim Kuhlman - Add a validator for the jsonschema package and use it as the last transform step.
+
 # 0.1.0
 Tim Kuhlman - Add support for creating time.Time fields based on the format type in the JSON schema.
 
