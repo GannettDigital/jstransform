@@ -1,5 +1,8 @@
 # jstransform CHANGELOG
 
+# 0.2.1
+Tim Kuhlman - Prep for open sourcing.
+
 # 0.2.0
 Tim Kuhlman - Add a validator for the jsonschema package and use it as the last transform step.
 
