@@ -23,14 +23,13 @@ To use the struct generation with go generate include a generate line in a go so
 or if you have compiled the tool and have it in your path rather than vendoring the source:
 
     //go:generate jstransform myschema.json $PWD
-    
+
 then simply run `go generate`.
-    
-## Contributing
+
+## Building/Testing
 This project uses the Go package management tool [Dep](https://github.com/golang/dep) for dependencies.
 To leverage this tool to install dependencies, run the following command from the project root:
 
     dep ensure
 
 Testing is done using standard go tooling, ie `go test ./...`
-
