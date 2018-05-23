@@ -278,12 +278,12 @@ func TestSchemaDefault(t *testing.T) {
 		{
 			description: "object without default",
 			schema:      json.RawMessage(`{"type":"object"}`),
-			want:        map[string]interface{}{},
+			want:        nil,
 		},
 		{
 			description: "array without default",
 			schema:      json.RawMessage(`{"type":"array"}`),
-			want:        []interface{}{},
+			want:        nil,
 		},
 	}
 

@@ -75,7 +75,6 @@
   },
   "required": [
     "type",
-    "crops",
-    "URL"
+    "crops"
   ]
 }
