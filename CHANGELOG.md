@@ -1,5 +1,8 @@
 # jstransform CHANGELOG
 
+# 0.2.2
+Tim Kuhlman - Fix handling of non-required empty objects and arrays
+
 # 0.2.1
 Tim Kuhlman - Prep for open sourcing.
 

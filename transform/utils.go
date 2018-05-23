@@ -125,10 +125,9 @@ func convertString(raw interface{}) (interface{}, error) {
 }
 
 // schemaDefault determines the default for an instance based on the JSONSchema.
-// If no default is defined for arrays and objects it will return an empty value, for all other types nil.
+// If no default is defined nil is returned.
 func schemaDefault(schema json.RawMessage) (interface{}, error) {
 	ifields := struct {
-		Type    string      `json:"type"`
 		Default interface{} `json:"default"`
 	}{}
 	if err := json.Unmarshal(schema, &ifields); err != nil {
@@ -140,12 +139,5 @@ func schemaDefault(schema json.RawMessage) (interface{}, error) {
 		return ifields.Default, nil
 	}
 
-	switch ifields.Type {
-	case "object":
-		return map[string]interface{}{}, nil
-	case "array":
-		return []interface{}{}, nil
-	default:
-		return nil, nil
-	}
+	return nil, nil
 }
