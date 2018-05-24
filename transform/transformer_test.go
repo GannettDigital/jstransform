@@ -25,46 +25,46 @@ var (
 			description: "Use basic transforms, copy from input and default to build result",
 			transformer: Transformer{schema: imageSchema, transformIdentifier: "cumulo"},
 			in: json.RawMessage(`
-			{
-				"type": "image",
-				"crops": [
-					{
-						"height": 0,
-						"path": "path",
-						"relativePath": "",
-						"width": 0
-					},
-					{
-						"name": "aname",
-						"height": 0,
-						"path": "empty",
-						"relativePath": "empty",
-						"width": 0
-					}
-				],
-				"publishUrl": "publishURL",
-				"absoluteUrl": "absoluteURL"
-			}`),
+				{
+					"type": "image",
+					"crops": [
+						{
+							"height": 0,
+							"path": "path",
+							"relativePath": "",
+							"width": 0
+						},
+						{
+							"name": "aname",
+							"height": 0,
+							"path": "empty",
+							"relativePath": "empty",
+							"width": 0
+						}
+					],
+					"publishUrl": "publishURL",
+					"absoluteUrl": "absoluteURL"
+				}`),
 			want: json.RawMessage(`{"URL":{"absolute":"absoluteURL","publish":"publishURL"},"crops":[{"height":0,"name":"name","path":"path","relativePath":"","width":0},{"height":0,"name":"aname","path":"empty","relativePath":"empty","width":0}],"type":"image"}`),
 		},
 		{
 			description: "Input too simple, fails validation",
 			transformer: Transformer{schema: imageSchema, transformIdentifier: "cumulo"},
 			in: json.RawMessage(`
-			{
-				"type": "image",
-				"crops": [
-					{
-						"path": "path"
-					},
-					{
-						"name": "aname",
-						"relativePath": "empty"
-					}
-				],
-				"publishUrl": "publishURL",
-				"absoluteUrl": "absoluteURL"
-			}`),
+				{
+					"type": "image",
+					"crops": [
+						{
+							"path": "path"
+						},
+						{
+							"name": "aname",
+							"relativePath": "empty"
+						}
+					],
+					"publishUrl": "publishURL",
+					"absoluteUrl": "absoluteURL"
+				}`),
 			want:    json.RawMessage(`{"URL":{"absolute":"absoluteURL","publish":"publishURL"},"crops":[{"name":"name","path":"path"},{"name":"aname","relativePath":"empty"}],"type":"image"}`),
 			wantErr: true,
 		},
@@ -116,6 +116,51 @@ var (
 					"url": "http://foo.com/blah"
 				}`),
 			want: json.RawMessage(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"url":"http://gannettdigital.com/blah","valid":true}`),
+		},
+		{
+			description: "Test empty non-required object",
+			transformer: Transformer{schema: imageSchema, transformIdentifier: "cumulo"},
+			in: json.RawMessage(`
+				{
+					"type": "image",
+					"crops": [
+						{
+							"height": 0,
+							"path": "path",
+							"relativePath": "",
+							"width": 0
+						},
+						{
+							"name": "aname",
+							"height": 0,
+							"path": "empty",
+							"relativePath": "empty",
+							"width": 0
+						}
+					]
+				}`),
+			want: json.RawMessage(`{"crops":[{"height":0,"name":"name","path":"path","relativePath":"","width":0},{"height":0,"name":"aname","path":"empty","relativePath":"empty","width":0}],"type":"image"}`),
+		},
+		{
+			description: "Test empty non-required array",
+			transformer: Transformer{schema: arrayTransformsSchema, transformIdentifier: "cumulo"},
+			in: json.RawMessage(`
+				{
+					"type": "image",
+					"data": {
+						"lines": [
+							"line1",
+							"line2"
+						]
+					},
+					"aSingleObject": [
+						{
+							"id": 1,
+							"name": "test1"
+						}
+					]
+				}`),
+			want: json.RawMessage(`{"lines":["line1","line2"],"wasSingleObject":[{"id":"1","name":"test1"}]}`),
 		},
 	}
 )

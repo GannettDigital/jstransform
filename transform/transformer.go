@@ -103,17 +103,14 @@ func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.Ra
 		return err
 	}
 
-	// Arrays are processed as a whole independent, save the to be used when processing the subfields and write an
-	// empty array to the output which will be filled in by the subfield calls
+	// Arrays items are processed above as they are encountered, this saves an base array used during that processing
 	if ifields.Type == "array" {
+		if newValue == nil {
+			return nil
+		}
 		newArray, ok := newValue.([]interface{})
 		if !ok {
-			newArray = []interface{}{}
-			if newValue != nil {
-				newArray = []interface{}{newValue}
-			} else {
-				newArray = []interface{}{}
-			}
+			newArray = []interface{}{newValue}
 		}
 		tr.processedArrays[path] = newArray
 		return tr.saveValue(path, make([]interface{}, len(newArray)))
@@ -135,9 +132,17 @@ func (tr *Transformer) processArrayItems(relativePath string, arraySrc []interfa
 		}
 
 		if trimmed := strings.TrimLeft(relativePath, "."); len(trimmed) > 0 {
-			newMap, ok := array[i].(map[string]interface{})
-			if !ok {
-				return errors.New("expected map[string]interface{} array items")
+			item := array[i]
+			var newMap map[string]interface{}
+			if item == nil {
+				newMap = make(map[string]interface{})
+				array[i] = newMap
+			} else {
+				var ok bool
+				newMap, ok = item.(map[string]interface{})
+				if !ok {
+					return errors.New("expected map[string]interface{} array items")
+				}
 			}
 			if err := saveInTree(newMap, trimmed, newValue); err != nil {
 				return err
@@ -207,9 +212,16 @@ func saveInTree(tree map[string]interface{}, path string, value interface{}) err
 	}
 	newTree, ok := tree[splits[0]]
 	if ok {
-		newTreeMap, ok := newTree.(map[string]interface{})
-		if !ok {
-			return fmt.Errorf("value at %q is not a map[string]interface{}", splits[0])
+		var newTreeMap map[string]interface{}
+		if newTree == nil {
+			newTreeMap = make(map[string]interface{})
+			tree[splits[0]] = newTreeMap
+		} else {
+			var ok bool
+			newTreeMap, ok = newTree.(map[string]interface{})
+			if !ok {
+				return fmt.Errorf("value at %q is not a map[string]interface{}", splits[0])
+			}
 		}
 		return saveInTree(newTreeMap, strings.Join(splits[1:], "."), value)
 	}
