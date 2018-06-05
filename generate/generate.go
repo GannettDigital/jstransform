@@ -317,6 +317,8 @@ func goType(jsonType string, array bool) string {
 		goType = "bool"
 	case "number":
 		goType = "float64"
+	case "integer":
+		goType = "int64"
 	case "string":
 		goType = "string"
 	case "date-time":
