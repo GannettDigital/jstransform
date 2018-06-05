@@ -1,0 +1,19 @@
+language: go
+go:
+  - 1.10.2
+
+services:
+  - docker
+sudo: required
+
+install:
+  - go get -u github.com/golang/dep/...
+  - dep ensure
+  - go get github.com/mattn/goveralls
+
+script:
+  - go test -v -race ./...
+  - go test -coverprofile=coverage.txt ./...
+
+after_success:
+  - goveralls -coverprofile=coverage.txt -service=travis-ci
