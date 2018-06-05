@@ -5,6 +5,9 @@
     "type": {
       "type": "string"
     },
+    "height": {
+      "type": "integer"
+    },
     "width": {
       "type": "number"
     },

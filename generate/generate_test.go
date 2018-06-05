@@ -323,6 +323,17 @@ func TestGoType(t *testing.T) {
 			want:        "[]bool",
 		},
 		{
+			description: "JSON integer",
+			jsonType:    "integer",
+			want:        "int64",
+		},
+		{
+			description: "JSON integer",
+			jsonType:    "integer",
+			array:       true,
+			want:        "[]int64",
+		},
+		{
 			description: "JSON number",
 			jsonType:    "number",
 			want:        "float64",
