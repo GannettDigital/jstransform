@@ -6,9 +6,6 @@ import (
 	"reflect"
 	"testing"
 
-	"fmt"
-	"os/exec"
-
 	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
@@ -143,34 +140,6 @@ func TestAddField(t *testing.T) {
 	}
 }
 
-func TestBuildStructs(t *testing.T) {
-	testdir := "test_data/buildstructs"
-	tests := []struct {
-		description string
-		file        string
-	}{
-		{
-			file:        "noOneOf.json",
-			description: "without oneOfTypes",
-		},
-		{
-			file:        "schema.json",
-			description: "with oneOfType",
-		},
-	}
-
-	for _, test := range tests {
-		if err := BuildStructs(fmt.Sprintf("%s/%s", testdir, test.file), testdir); err != nil {
-			t.Fatalf("BuildStructs failed for %s (%s): %v", test.file, test.description, err)
-		}
-		cmd := exec.Command("git", "diff", "--quiet", testdir)
-		if err := cmd.Run(); err != nil {
-			t.Errorf("BuildStructs for %s (%s) found differences, this left %q in a modified state: %v",
-				test.file, test.description, testdir, err)
-		}
-	}
-}
-
 func TestExtractedFields_Sorted(t *testing.T) {
 	a := &extractedField{name: "A"}
 	b := &extractedField{name: "B"}
@@ -265,7 +234,7 @@ func TestGeneratedStruct(t *testing.T) {
 			schemaPath:   "test_data/test_schema.json",
 			packageName:  "test",
 			oneOfType:    "simple",
-			wantFilePath: "test_data/simple.go",
+			wantFilePath: "test_data/simple.go.out",
 		},
 		{
 			description:  "Complex schema",
@@ -273,7 +242,7 @@ func TestGeneratedStruct(t *testing.T) {
 			schemaPath:   "test_data/test_schema.json",
 			packageName:  "test",
 			oneOfType:    "complex",
-			wantFilePath: "test_data/complex.go",
+			wantFilePath: "test_data/complex.go.out",
 		},
 	}
 

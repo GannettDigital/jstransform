@@ -1,0 +1,151 @@
+{
+    "id": "123",
+    "type": "image",
+    "crops": [
+        {
+            "name": "16_9",
+            "width": 700,
+            "height": 394,
+            "path": "16_9.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-16-9super",
+            "width": 2048,
+            "height": 1162,
+            "path": "x-16-9super.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-16-9",
+            "width": 1280,
+            "height": 720,
+            "path": "x-16-9.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "1_1",
+            "width": 700,
+            "height": 700,
+            "path": "1_1.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-supersquare",
+            "width": 1024,
+            "height": 1024,
+            "path": "x-supersquare.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-square",
+            "width": 98,
+            "height": 98,
+            "path": "x-square.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x48",
+            "width": 48,
+            "height": 48,
+            "path": "x48.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "3_4",
+            "width": 656,
+            "height": 874,
+            "path": "3_4.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-3-4",
+            "width": 768,
+            "height": 1024,
+            "path": "x-3-4.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "4_3",
+            "width": 700,
+            "height": 525,
+            "path": "4_3.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-superlarge",
+            "width": 2048,
+            "height": 1536,
+            "path": "x-superlarge.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-extralarge",
+            "width": 1024,
+            "height": 768,
+            "path": "x-extralarge.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-large",
+            "width": 490,
+            "height": 368,
+            "path": "x-large.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x",
+            "width": 245,
+            "height": 184,
+            "path": "x.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x86",
+            "width": 115,
+            "height": 86,
+            "path": "x86.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "9_16",
+            "width": 492,
+            "height": 874,
+            "path": "9_16.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-9-16",
+            "width": 720,
+            "height": 1280,
+            "path": "x-9-16.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "front_thumb",
+            "width": 700,
+            "height": 599,
+            "path": "front_thumb.jpeg",
+            "relativePath": ""
+        },
+        {
+            "name": "x-front-thumb",
+            "width": 115,
+            "height": 98,
+            "path": "x-front-thumb.jpeg",
+            "relativePath": ""
+        }
+    ],
+    "orientation": "vertical",
+    "credit": "Test Image",
+    "URL": {
+        "publish": "http://test-images.com",
+        "absolute": "http://test-images.com/123"
+    },
+    "caption": "",
+    "originalSize": {
+        "height": 874,
+        "width": 700
+    },
+    "datePhotoTaken": "2017-12-14T11:21:28.0000000Z"
+}
