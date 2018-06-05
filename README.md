@@ -1,4 +1,9 @@
 # jstransform
+[![Go Docs](https://godoc.org/github.com/GannettDigital/jstransform?status.svg)](https://godoc.org/github.com/GannettDigital/jstransform)
+[![Build Status](https://travis-ci.org/GannettDigital/jstransform.svg)](https://travis-ci.org/GannettDigital/jstransform)
+[![Go Report Card](https://goreportcard.com/badge/github.com/GannettDigital/jstransform)](https://goreportcard.com/report/github.com/GannettDigital/jstransform)
+[![Coverage Status](https://coveralls.io/repos/github/GannettDigital/jstransform/badge.svg?branch=master)](https://coveralls.io/github/GannettDigital/jstransform?branch=master)
+
 
 This repo provides an extension to [JSON Schema](http://json-schema.org/) which defines a `transform` section which can be added for each field.
 This transform section is then used to guide a transformation process which converts JSON input into the format defined by the schema.
