@@ -1,5 +1,8 @@
 # jstransform CHANGELOG
 
+# 0.2.3
+Aaron Thatcher - Add integer as acceptable schema datatype
+
 # 0.2.2
 Tim Kuhlman - Fix handling of non-required empty objects and arrays
 
