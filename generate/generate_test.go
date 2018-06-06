@@ -6,6 +6,10 @@ import (
 	"reflect"
 	"testing"
 
+	"path/filepath"
+
+	"os"
+
 	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
@@ -165,6 +169,55 @@ func TestExtractedFields_Sorted(t *testing.T) {
 		got := test.efs.Sorted()
 		if !reflect.DeepEqual(got, test.want) {
 			t.Errorf("Test %q - got %v, want %v", test.description, got, test.want)
+		}
+	}
+}
+
+func TestBuildStructs(t *testing.T) {
+	testdir := "test_data"
+	tests := []struct {
+		description   string
+		file          string
+		expectedFiles []string
+		wantFiles     []string
+	}{
+		{
+			file:          "complex.json",
+			description:   "without oneOfTypes",
+			expectedFiles: []string{"complex.go"},
+			wantFiles:     []string{"complex.go.out2"},
+		},
+		{
+			file:          "test_schema.json",
+			description:   "with oneOfType",
+			expectedFiles: []string{"simple.go", "complex.go"},
+			wantFiles:     []string{"simple.go.out2", "complex.go.out2"},
+		},
+	}
+
+	for _, test := range tests {
+		if err := BuildStructs(filepath.Join(testdir, test.file), testdir); err != nil {
+			t.Fatalf("Test %q - BuildStructs failed: %v", test.description, err)
+		}
+
+		for i := range test.expectedFiles {
+			got, err := ioutil.ReadFile(filepath.Join(testdir, test.expectedFiles[i]))
+			if err != nil {
+				t.Errorf("Test %q - failed to read expected file %q: %v", test.description, test.expectedFiles[i], err)
+			}
+
+			want, err := ioutil.ReadFile(filepath.Join(testdir, test.wantFiles[i]))
+			if err != nil {
+				t.Errorf("Test %q - failed to read want file %q: %v", test.description, test.wantFiles[i], err)
+			}
+
+			if string(got) != string(want) {
+				t.Errorf("Test %q - file %q got %q != want %q", test.description, test.expectedFiles[i], got, want)
+			}
+
+			if err := os.Remove(filepath.Join(testdir, test.expectedFiles[i])); err != nil {
+				t.Errorf("Test %q - failed to remove file %q: %v", test.description, test.expectedFiles[i], err)
+			}
 		}
 	}
 }
