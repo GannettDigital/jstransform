@@ -16,7 +16,7 @@ import (
 // Transformer uses a JSON schema and the transform sections within it to take a set of JSON and transform it to
 // matching the schema.
 // More details on the transform section of the schema are found at
-// https://github.com/GannettDigital/content-schema/blob/master/v1/assets/README.md
+// https://github.com/GannettDigital/jstransform/blob/master/transform.adoc
 type Transformer struct {
 	in                  interface{}
 	processedArrays     map[string][]interface{}
