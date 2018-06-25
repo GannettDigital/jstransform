@@ -73,7 +73,7 @@ func (tr *Transformer) Transform(in json.RawMessage) (json.RawMessage, error) {
 func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.RawMessage) error {
 	ifields := struct {
 		Type      string    `json:"type"`
-		Format    string	`json:"format"`
+		Format    string    `json:"format"`
 		Transform transform `json:"transform"`
 	}{}
 	if err := json.Unmarshal(value, &ifields); err != nil {
