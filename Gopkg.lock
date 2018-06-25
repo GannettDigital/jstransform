@@ -14,6 +14,66 @@
   version = "v0.1.0"
 
 [[projects]]
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
+  version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/franela/goreq"
+  packages = ["."]
+  revision = "bcd34c9993f899273c74baaa95e15386cd97b6e7"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lestrrat/go-jspointer"
+  packages = ["."]
+  revision = "d5f7c71bfd03c8e9489a636874cd106c22d3a47c"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lestrrat/go-jsref"
+  packages = [
+    ".",
+    "provider"
+  ]
+  revision = "50df7b2d07d799426a9ac43fa24bdb4785f72a54"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lestrrat/go-jsschema"
+  packages = ["."]
+  revision = "a6a42341b50d8d7e2a733db922eefaa756321021"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lestrrat/go-jsval"
+  packages = [
+    ".",
+    "builder"
+  ]
+  revision = "cf70aae60f5b41a32922066c41287b0168e55904"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lestrrat/go-pdebug"
+  packages = ["."]
+  revision = "569c97477ae8837e053e5a50bc739e15172b8ebe"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lestrrat/go-structinfo"
+  packages = ["."]
+  revision = "8204d40bbcd79eb7603cd4c2c998e60eb2479ded"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/xeipuuv/gojsonpointer"
   packages = ["."]
@@ -34,6 +94,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f9be992b2581e94ab56f4096c3c09373250f31b7870c597b33d2e600bc6238ec"
+  inputs-digest = "36241dc8f613c3adb4d25d35845e7b697da67d870e0ffad01ca0b383b9ee2692"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$ref": "#/definitions/asset-event-facebook",
+  "definitions": {
+    "asset-event-facebook": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "assetId": {
+          "type": "string",
+          "pattern": "\\d+"
+        },
+        "fbiaStatus": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FbiaStatus"
+          }
+        },
+        "contentSourceCode": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "[A-Z0-9]$"
+        }
+      },
+      "required": [
+        "assetId",
+        "fbiaStatus",
+        "contentSourceCode"
+      ],
+      "title": "asset-event-facebook"
+    },
+    "FbiaStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "providerUrl": {
+          "type": "string",
+          "format": "url"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FbiaStatusItem"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "success",
+            "error",
+            "disallowed"
+          ]
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FbiaStatusItem"
+          }
+        }
+      },
+      "required": [
+        "providerUrl",
+        "time",
+        "status"
+      ],
+      "title": "FbiaStatus"
+    },
+    "FbiaStatusItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "title": "FbiaStatusItem",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["ERROR", "WARNING"]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

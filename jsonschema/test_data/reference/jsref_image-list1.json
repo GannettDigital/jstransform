@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "image"
+      ]
+    },
+    "crops": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "name"
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "path": {
+            "type": "string"
+          },
+          "relativePath": {
+            "type": "string"
+          }
+        },
+        "required":[
+          "name",
+          "width",
+          "height",
+          "path",
+          "relativePath"
+        ]
+      }
+    },
+    "URL": {
+      "allOf": [
+        {
+          "properties": {
+            "index": "first"
+          }
+        },
+        {
+          "$ref": "./jsref_image-defs.json#/definitions/imageurl"
+        },
+        {
+          "properties": {
+            "index": "last"
+          }
+        }
+      ]
+    }
+  },
+  "required": [
+    "type",
+    "crops",
+    "orientation",
+    "credit",
+    "URL",
+    "caption",
+    "originalSize",
+    "datePhotoTaken"
+  ]
+}

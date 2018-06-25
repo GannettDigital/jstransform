@@ -1,0 +1,187 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "properties": {
+        "URL": {
+            "allOf": [
+                {
+                    "properties": {
+                        "index": "first"
+                    }
+                },
+                {
+                    "$schema": "http://json-schema.org/draft-04/schema#",
+                    "properties": {
+                        "URL": {
+                            "allOf": [
+                                {
+                                    "properties": {
+                                        "absolute": {
+                                            "transform": {
+                                                "cumulo": {
+                                                    "from": [
+                                                        {
+                                                            "jsonPath": "$.absoluteUrl"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "string"
+                                        },
+                                        "publish": {
+                                            "transform": {
+                                                "cumulo": {
+                                                    "from": [
+                                                        {
+                                                            "jsonPath": "$.publishUrl"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                {
+                                    "properties": {
+                                        "index": "middle"
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "absolute": {
+                                            "transform": {
+                                                "cumulo": {
+                                                    "from": [
+                                                        {
+                                                            "jsonPath": "$.absoluteUrl"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "string"
+                                        },
+                                        "publish": {
+                                            "transform": {
+                                                "cumulo": {
+                                                    "from": [
+                                                        {
+                                                            "jsonPath": "$.publishUrl"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            ]
+                        },
+                        "crops": {
+                            "items": {
+                                "properties": {
+                                    "height": {
+                                        "type": "number"
+                                    },
+                                    "name": {
+                                        "default": "name",
+                                        "type": "string"
+                                    },
+                                    "path": {
+                                        "type": "string"
+                                    },
+                                    "relativePath": {
+                                        "type": "string"
+                                    },
+                                    "width": {
+                                        "type": "number"
+                                    }
+                                },
+                                "required": [
+                                    "name",
+                                    "width",
+                                    "height",
+                                    "path",
+                                    "relativePath"
+                                ],
+                                "type": "object"
+                            },
+                            "type": "array"
+                        },
+                        "type": {
+                            "enum": [
+                                "image"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "crops",
+                        "orientation",
+                        "credit",
+                        "URL",
+                        "caption",
+                        "originalSize",
+                        "datePhotoTaken"
+                    ],
+                    "type": "object"
+                },
+                {
+                    "properties": {
+                        "index": "last"
+                    }
+                }
+            ]
+        },
+        "crops": {
+            "items": {
+                "properties": {
+                    "height": {
+                        "type": "number"
+                    },
+                    "name": {
+                        "default": "name",
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "relativePath": {
+                        "type": "string"
+                    },
+                    "width": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "name",
+                    "width",
+                    "height",
+                    "path",
+                    "relativePath"
+                ],
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "type": {
+            "enum": [
+                "image"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+        "type",
+        "crops",
+        "orientation",
+        "credit",
+        "URL",
+        "caption",
+        "originalSize",
+        "datePhotoTaken"
+    ],
+    "type": "object"
+}
