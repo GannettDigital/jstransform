@@ -73,10 +73,16 @@ func (tr *Transformer) Transform(in json.RawMessage) (json.RawMessage, error) {
 func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.RawMessage) error {
 	ifields := struct {
 		Type      string    `json:"type"`
+		Format    string    `json:"format"`
 		Transform transform `json:"transform"`
 	}{}
 	if err := json.Unmarshal(value, &ifields); err != nil {
 		return fmt.Errorf("failed to extract transform: %v", err)
+	}
+
+	jsonType := ifields.Type
+	if jsonType == "string" && ifields.Format == "date-time" {
+		jsonType = "date-time"
 	}
 
 	// For array items process every item in the array at the same time
@@ -91,20 +97,20 @@ func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.Ra
 			if !ok {
 				return fmt.Errorf("expected array in transformed object at path %q", key)
 			}
-			if err := tr.processArrayItems(relativePath, arraySrc, array, ifields.Type, ifields.Transform, value); err != nil {
+			if err := tr.processArrayItems(relativePath, arraySrc, array, jsonType, ifields.Transform, value); err != nil {
 				return fmt.Errorf("failed processing array items at path %q: %v", path, err)
 			}
 			return nil
 		}
 	}
 
-	newValue, err := tr.getInstanceValue(ifields.Transform, tr.in, ifields.Type, path, value)
+	newValue, err := tr.getInstanceValue(ifields.Transform, tr.in, jsonType, path, value)
 	if err != nil {
 		return err
 	}
 
 	// Arrays items are processed above as they are encountered, this saves an base array used during that processing
-	if ifields.Type == "array" {
+	if jsonType == "array" {
 		if newValue == nil {
 			return nil
 		}

@@ -13,6 +13,7 @@ var (
 	imageSchema, _           = jsonschema.SchemaFromFile("./test_data/image.json", "")
 	arrayTransformsSchema, _ = jsonschema.SchemaFromFile("./test_data/array-transforms.json", "")
 	operationsSchema, _      = jsonschema.SchemaFromFile("./test_data/operations.json", "")
+	dateTimesSchema, _       = jsonschema.SchemaFromFile("./test_data/date-times.json", "")
 
 	transformerTests = []struct {
 		description string
@@ -161,6 +162,20 @@ var (
 					]
 				}`),
 			want: json.RawMessage(`{"lines":["line1","line2"],"wasSingleObject":[{"id":"1","name":"test1"}]}`),
+		},
+		{
+			description: "Test format: date-time strings",
+			transformer: Transformer{schema: dateTimesSchema, transformIdentifier: "cumulo"},
+			in: json.RawMessage(`
+				{
+					"dates": [
+						1529958073,
+						"2018-06-25T20:21:13Z"
+					],
+					"requiredDate": "2018-06-25T20:21:13Z",
+					"optionalDate": ""
+				}`),
+			want: json.RawMessage(`{"dates":["2018-06-25T20:21:13Z","2018-06-25T20:21:13Z"],"requiredDate":"2018-06-25T20:21:13Z"}`),
 		},
 	}
 )

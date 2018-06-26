@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 // Concat will combine any two arbitrary values, though only strings are supported for non-trivial concatenation.
@@ -51,6 +52,8 @@ func convert(raw interface{}, jsonType string) (interface{}, error) {
 		return convertNumber(raw)
 	case "string":
 		return convertString(raw)
+	case "date-time":
+		return convertDateTime(raw)
 	}
 	return raw, nil
 }
@@ -99,6 +102,22 @@ func convertNumber(raw interface{}) (interface{}, error) {
 		return raw, nil
 	default:
 		return nil, fmt.Errorf("unable to convert type %q to a number", reflect.TypeOf(raw))
+	}
+}
+
+func convertDateTime(raw interface{}) (interface{}, error) {
+	switch t := raw.(type) {
+	case string:
+		if t == "" {
+			return nil, nil
+		}
+		return time.Parse(time.RFC3339, t)
+	case int:
+		return time.Unix(int64(t), 0).UTC(), nil
+	case float64:
+		return time.Unix(int64(t), 0).UTC(), nil
+	default:
+		return nil, fmt.Errorf("unable to convert type %q to a date-time", reflect.TypeOf(raw))
 	}
 }
 
