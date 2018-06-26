@@ -67,8 +67,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 		return nil, fmt.Errorf("failed to initialize schema validator: %v", err)
 	}
 
-	var dj schemaJSON // deferenced JSON
-	dj, data, err = Dereference(schemaPath, data)
+	data, err = Dereference(schemaPath, data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to Dereference Schema: %v", err)
 	}
@@ -76,13 +75,6 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	var sj schemaJSON
 	if err := json.Unmarshal(data, &sj); err != nil {
 		return nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
-	}
-
-	if len(dj.AllOf) > 0 {
-		sj.AllOf = dj.AllOf
-	}
-	if len(dj.OneOf) > 0 {
-		sj.OneOf = dj.OneOf
 	}
 
 	s := Schema{

@@ -20,29 +20,19 @@ type jsonRef struct {
 }
 
 // Dereference parse JSON string and replaces all $ref with the referenced data.
-func Dereference(schemaPath string, input []byte) (schemaJSON, []byte, error) {
-	var dj schemaJSON
+func Dereference(schemaPath string, input []byte) ([]byte, error) {
 	if !strings.Contains(string(input), "$ref") {
-		return dj, input, nil
+		return input, nil
 	}
 
 	var data interface{}
 	json.Unmarshal([]byte(input), &data)
 	refs, err := walkInterface(data, []string{}, []jsonRef{})
 	if err != nil {
-		return dj, input, fmt.Errorf("unable to walk interface %s: %v", schemaPath, err)
+		return input, fmt.Errorf("unable to walk interface %s: %v", schemaPath, err)
 	}
 
 	for _, ref := range refs {
-		if !strings.HasPrefix(ref.Target, "#") {
-			if ref.Source[0] == "allOf" {
-				dj.AllOf = append(dj.AllOf, schemaRef{Ref: ref.Target})
-			}
-			if ref.Source[0] == "oneOf" {
-				dj.OneOf = append(dj.OneOf, schemaRef{Ref: ref.Target})
-			}
-		}
-
 		top := data
 		for i, item := range ref.Source {
 			if i < len(ref.Source)-1 {
@@ -55,7 +45,7 @@ func Dereference(schemaPath string, input []byte) (schemaJSON, []byte, error) {
 			} else {
 				targetRef, err := buildReference(schemaPath, data, ref.Target)
 				if err != nil {
-					return dj, input, fmt.Errorf("unable to build reference from %s: %v", ref.Target, err)
+					return input, fmt.Errorf("unable to build reference from %s: %v", ref.Target, err)
 				}
 				targetKeys := reflect.ValueOf(targetRef).MapKeys()
 				if len(targetKeys) > 1 {
@@ -81,8 +71,7 @@ func Dereference(schemaPath string, input []byte) (schemaJSON, []byte, error) {
 		}
 	}
 
-	deref, err := json.Marshal(data)
-	return dj, deref, err
+	return json.Marshal(data)
 }
 
 // walkInterface traverses the map[string]interface{} to located json references
@@ -116,6 +105,11 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef
 	return refs, nil
 }
 
+// HttpReferenceClient isolates the HTTP call for testing purposes
+func HttpReferenceClient(url string) (*goreq.Response, error) {
+	return goreq.Request{Uri: url}.Do()
+}
+
 // buildReference constructs the json reference: internal, file or http
 func buildReference(schemaPath string, top interface{}, ref string) (interface{}, error) {
 	target := strings.Split(ref, "#")
@@ -128,9 +122,7 @@ func buildReference(schemaPath string, top interface{}, ref string) (interface{}
 	case len(target[0]) == 0:
 		source = top
 	case strings.HasPrefix(target[0], "http"):
-		res, err := goreq.Request{
-			Uri: target[0],
-		}.Do()
+		res, err := HttpReferenceClient(target[0])
 		if err != nil {
 			return nil, fmt.Errorf("unable to get reference from %s: %v", target[0], err)
 		}
@@ -144,10 +136,9 @@ func buildReference(schemaPath string, top interface{}, ref string) (interface{}
 		if err != nil {
 			return nil, fmt.Errorf("failed to read reference file %q: %v", refPath, err)
 		}
-		var dj schemaJSON
-		dj, data, err = Dereference(refPath, data)
+		data, err = Dereference(refPath, data)
 		if err != nil {
-			return dj, fmt.Errorf("failed to dereference refPath %s: %v", refPath, err)
+			return nil, fmt.Errorf("failed to dereference refPath %s: %v", refPath, err)
 		}
 		json.Unmarshal([]byte(data), &source)
 	}
