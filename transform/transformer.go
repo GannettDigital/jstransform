@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
@@ -19,8 +20,9 @@ import (
 // https://github.com/GannettDigital/jstransform/blob/master/transform.adoc
 type Transformer struct {
 	in                  interface{}
-	processedArrays     map[string][]interface{}
+	relativePath        string
 	schema              *jsonschema.Schema
+	skipPrefix          string
 	transformIdentifier string // Used to select the proper transform Instructions
 	transformed         map[string]interface{}
 }
@@ -43,7 +45,6 @@ func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Tran
 func (tr *Transformer) Transform(in json.RawMessage) (json.RawMessage, error) {
 	// reset transformed and processed so that each time this is called it repeats the operation
 	tr.transformed = make(map[string]interface{})
-	tr.processedArrays = make(map[string][]interface{})
 	if err := json.Unmarshal(in, &tr.in); err != nil {
 		return nil, fmt.Errorf("failed to parse input JSON: %v", err)
 	}
@@ -71,6 +72,18 @@ func (tr *Transformer) Transform(in json.RawMessage) (json.RawMessage, error) {
 // walker is a WalkFunc for the Transformer which does the bulk of the work instance by instance.
 // It includes the logic to handle arrays properly.
 func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.RawMessage) error {
+	// arrays are processed as a group when encountered as part of the parent item
+	if tr.skipPrefix != "" {
+		if strings.HasPrefix(path, tr.skipPrefix) {
+			path = strings.Replace(path, tr.skipPrefix, tr.relativePath, 1)
+		} else {
+			return nil
+		}
+	}
+	if strings.Contains(path, "[*]") {
+		return nil
+	}
+
 	ifields := struct {
 		Type      string    `json:"type"`
 		Format    string    `json:"format"`
@@ -85,23 +98,8 @@ func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.Ra
 		jsonType = "date-time"
 	}
 
-	// For array items process every item in the array at the same time
-	for key, arraySrc := range tr.processedArrays {
-		if strings.Contains(path, key) {
-			relativePath := strings.Replace(path, key+"[*]", "", 1)
-			rawArray, err := jsonpath.Get(key, tr.transformed)
-			if err != nil {
-				return err
-			}
-			array, ok := rawArray.([]interface{})
-			if !ok {
-				return fmt.Errorf("expected array in transformed object at path %q", key)
-			}
-			if err := tr.processArrayItems(relativePath, arraySrc, array, jsonType, ifields.Transform, value); err != nil {
-				return fmt.Errorf("failed processing array items at path %q: %v", path, err)
-			}
-			return nil
-		}
+	if tr.relativePath != "" { // TODO this should also only apply the jsonPath's starting with @ not any
+		ifields.Transform = ifields.Transform.replaceJSONPath("@", tr.relativePath)
 	}
 
 	newValue, err := tr.getInstanceValue(ifields.Transform, tr.in, jsonType, path, value)
@@ -109,7 +107,7 @@ func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.Ra
 		return err
 	}
 
-	// Arrays items are processed above as they are encountered, this saves an base array used during that processing
+	// Arrays items are processed as a group when the parent is encountered
 	if jsonType == "array" {
 		if newValue == nil {
 			return nil
@@ -118,8 +116,10 @@ func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.Ra
 		if !ok {
 			newArray = []interface{}{newValue}
 		}
-		tr.processedArrays[path] = newArray
-		return tr.saveValue(path, make([]interface{}, len(newArray)))
+		newValue, err = tr.processArrayItems(path, newArray, in.Items, value)
+		if err != nil {
+			return fmt.Errorf("failed processing array items at path %q: %v", path, err)
+		}
 	}
 
 	return tr.saveValue(path, newValue)
@@ -127,37 +127,50 @@ func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.Ra
 
 // processArrayItems handles the walker processing of Array items. These are different because the new array items
 // are build based on the transformed data from the array instance and for each field in an array item processing of
-// field for all array items happens in one step.
-func (tr *Transformer) processArrayItems(relativePath string, arraySrc []interface{}, array []interface{}, jsonType string, instanceTransform transform, value json.RawMessage) error {
-	for i := range array {
-		itemTransform := instanceTransform.replaceJSONPath("@", fmt.Sprintf("$[%d]", i))
+// field for all array items happens in one step. This function can recursively handle nested arrays.
+func (tr *Transformer) processArrayItems(path string, arraySrc []interface{}, rawSchema json.RawMessage, value json.RawMessage) ([]interface{}, error) {
+	var instance jsonschema.Instance
+	if err := json.Unmarshal(rawSchema, &instance); err != nil {
+		return nil, fmt.Errorf("failed to parse array instance schema: %v", err)
+	}
 
-		newValue, err := tr.getInstanceValue(itemTransform, arraySrc, jsonType, fmt.Sprintf("$[%d]%s", i, relativePath), value)
-		if err != nil {
-			return err
+	atrIn, ok := tr.in.(map[string]interface{})
+	if !ok {
+		atrIn = make(map[string]interface{})
+	}
+	if err := saveInTree(atrIn, path[2:], arraySrc); err != nil {
+		return nil, fmt.Errorf("failed to initialize array walker: %v", err)
+	}
+
+	var newArray []interface{}
+
+	for i := range arraySrc {
+		skipPaths := strings.Split(path, "[")
+		skipPath := skipPaths[0]
+		for _, part := range skipPaths[1:] {
+			skipPath += "[*]" + part[2:]
+		}
+		atr := &Transformer{
+			in:                  atrIn,
+			relativePath:        fmt.Sprintf("%s[%d]", path, i),
+			schema:              tr.schema,
+			skipPrefix:          fmt.Sprintf("%s[*]", skipPath),
+			transformIdentifier: tr.transformIdentifier,
+			transformed:         make(map[string]interface{}),
 		}
 
-		if trimmed := strings.TrimLeft(relativePath, "."); len(trimmed) > 0 {
-			item := array[i]
-			var newMap map[string]interface{}
-			if item == nil {
-				newMap = make(map[string]interface{})
-				array[i] = newMap
-			} else {
-				var ok bool
-				newMap, ok = item.(map[string]interface{})
-				if !ok {
-					return errors.New("expected map[string]interface{} array items")
-				}
+		if err := jsonschema.Walk(tr.schema, atr.walker); err != nil {
+			return nil, err
+		}
+		if len(atr.transformed) != 0 {
+			arrayValue, err := jsonpath.Get(fmt.Sprintf("%s[%d]", path, i), atr.transformed)
+			if err != nil {
+				continue
 			}
-			if err := saveInTree(newMap, trimmed, newValue); err != nil {
-				return err
-			}
-		} else {
-			array[i] = newValue
+			newArray = append(newArray, arrayValue)
 		}
 	}
-	return nil
+	return newArray, nil
 
 }
 
@@ -198,23 +211,37 @@ func saveInTree(tree map[string]interface{}, path string, value interface{}) err
 	}
 	splits := strings.Split(path, ".")
 	if len(splits) == 1 {
-		arraySplits := strings.SplitN(splits[0], "[", 2)
-		if len(arraySplits) == 1 { // leaf value save it and return
-			tree[splits[0]] = value
-			return nil
-		}
+		return saveLeaf(tree, splits[0], value)
+	}
 
+	arraySplits := strings.SplitN(splits[0], "[", 2)
+	if len(arraySplits) != 1 {
+		index, err := strconv.Atoi(strings.Trim(arraySplits[1], "]"))
+		if err != nil {
+			return fmt.Errorf("failed ot determine index of %q", splits[0])
+		}
+		var slices []interface{}
 		rawSlice, ok := tree[arraySplits[0]]
 		if !ok {
-			tree[arraySplits[0]] = []interface{}{value}
-			return nil
+			slices = make([]interface{}, 0)
+		} else {
+			slices, ok = rawSlice.([]interface{})
+			if !ok {
+				return fmt.Errorf("value at %q is not a slice of interface{}", arraySplits[0])
+			}
 		}
-		sValue, ok := rawSlice.([]interface{})
+
+		for i := len(slices); i <= index; i++ {
+			slices = append(slices, make(map[string]interface{}))
+		}
+
+		tree[arraySplits[0]] = slices
+		sliceMap, ok := slices[index].(map[string]interface{})
 		if !ok {
-			return fmt.Errorf("value at %q is not a []interface{}", arraySplits[0])
+			return fmt.Errorf("value at %q is not a slice of map[string]interface{}", arraySplits[0])
 		}
-		tree[arraySplits[0]] = append(sValue, value)
-		return nil
+
+		return saveInTree(sliceMap, strings.Join(splits[1:], "."), value)
 	}
 	newTree, ok := tree[splits[0]]
 	if ok {
@@ -234,6 +261,51 @@ func saveInTree(tree map[string]interface{}, path string, value interface{}) err
 	newTreeMap := make(map[string]interface{})
 	tree[splits[0]] = newTreeMap
 	return saveInTree(newTreeMap, strings.Join(splits[1:], "."), value)
+}
+
+func saveLeaf(tree map[string]interface{}, path string, value interface{}) error {
+	arraySplits := strings.Split(path, "[")
+	if len(arraySplits) == 1 {
+		tree[path] = value
+		return nil
+	}
+
+	rawSlice, ok := tree[arraySplits[0]]
+	if !ok {
+		rawSlice = make([]interface{}, 0)
+	}
+	sValue, ok := rawSlice.([]interface{})
+	if !ok {
+		return fmt.Errorf("value at %q is not a []interface{}", arraySplits[0])
+	}
+
+	for i := len(arraySplits) - 1; i > 0; i-- {
+		nestedArray := arraySplits[i]
+		index, err := strconv.Atoi(strings.Trim(nestedArray, "]"))
+		if err != nil {
+			return fmt.Errorf("failed to determine index of %q", path)
+		}
+
+		intermediateValue := make([]interface{}, 0)
+		if i == 1 {
+			intermediateValue = sValue
+		}
+		for j := len(intermediateValue); j <= index; j++ {
+			intermediateValue = append(intermediateValue, nil)
+		}
+
+		intermediateValue[index] = value
+		value = intermediateValue
+
+		if i == 1 {
+			sValue = intermediateValue
+		}
+		// TODO this handles if the first level of the nested arrays has other values in it, but doesn't handle if
+		// some of the nested arrays have other values
+	}
+
+	tree[arraySplits[0]] = sValue
+	return nil
 }
 
 // getInstanceValue retrieves the value for a JSONSchema instance following this process:
