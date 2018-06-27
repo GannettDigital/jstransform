@@ -35,7 +35,7 @@ func dereference(schemaPath string, input []byte, isTop bool) ([]byte, error) {
 	for _, ref := range refs {
 		top := data
 		for i, item := range ref.Source {
-			if isTop && len(ref.Source[0]) == 5 && strings.HasSuffix(ref.Source[0], "Of") {
+			if isTop && (ref.Source[0] == "allOf" || ref.Source[0] == "oneOf") {
 				continue // do not dereference top-level allOr and oneOf
 			}
 			if i < len(ref.Source)-1 { // iterate
