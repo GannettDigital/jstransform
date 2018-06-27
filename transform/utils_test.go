@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestConcat(t *testing.T) {
@@ -231,6 +232,48 @@ func TestConvert(t *testing.T) {
 			raw:         []interface{}{nil},
 			jsonType:    "string",
 			want:        nil,
+		},
+		{
+			description: "valid ISO8601 string -> date-time",
+			raw:         "2018-06-25T20:21:13Z",
+			jsonType:    "date-time",
+			want:        time.Unix(1529958073, 0).UTC(),
+		},
+		{
+			description: "invalid ISO8601 string -> error",
+			raw:         "20148-06-25T20:21:13Z",
+			jsonType:    "date-time",
+			wantErr:     true,
+		},
+		{
+			description: "valid unix epoch (int64) -> date-time",
+			raw:         2147483648,
+			jsonType:    "date-time",
+			want:        time.Unix(2147483648, 0).UTC(),
+		},
+		{
+			description: "valid unix epoch (int) -> date-time",
+			raw:         1529958073,
+			jsonType:    "date-time",
+			want:        time.Unix(1529958073, 0).UTC(),
+		},
+		{
+			description: "empty string -> nil date-time",
+			raw:         "",
+			jsonType:    "date-time",
+			want:        nil,
+		},
+		{
+			description: "nil -> nil date-time",
+			raw:         nil,
+			jsonType:    "date-time",
+			want:        nil,
+		},
+		{
+			description: "boolean -> invalid date-time",
+			raw:         true,
+			jsonType:    "date-time",
+			wantErr:     true,
 		},
 	}
 

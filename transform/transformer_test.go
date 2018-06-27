@@ -12,7 +12,9 @@ import (
 var (
 	imageSchema, _           = jsonschema.SchemaFromFile("./test_data/image.json", "")
 	arrayTransformsSchema, _ = jsonschema.SchemaFromFile("./test_data/array-transforms.json", "")
+	doublearraySchema, _     = jsonschema.SchemaFromFile("./test_data/double-array.json", "")
 	operationsSchema, _      = jsonschema.SchemaFromFile("./test_data/operations.json", "")
+	dateTimesSchema, _       = jsonschema.SchemaFromFile("./test_data/date-times.json", "")
 
 	transformerTests = []struct {
 		description string
@@ -25,46 +27,46 @@ var (
 			description: "Use basic transforms, copy from input and default to build result",
 			transformer: Transformer{schema: imageSchema, transformIdentifier: "cumulo"},
 			in: json.RawMessage(`
-				{
-					"type": "image",
-					"crops": [
-						{
-							"height": 0,
-							"path": "path",
-							"relativePath": "",
-							"width": 0
-						},
-						{
-							"name": "aname",
-							"height": 0,
-							"path": "empty",
-							"relativePath": "empty",
-							"width": 0
-						}
-					],
-					"publishUrl": "publishURL",
-					"absoluteUrl": "absoluteURL"
-				}`),
+							{
+								"type": "image",
+								"crops": [
+									{
+										"height": 0,
+										"path": "path",
+										"relativePath": "",
+										"width": 0
+									},
+									{
+										"name": "aname",
+										"height": 0,
+										"path": "empty",
+										"relativePath": "empty",
+										"width": 0
+									}
+								],
+								"publishUrl": "publishURL",
+								"absoluteUrl": "absoluteURL"
+							}`),
 			want: json.RawMessage(`{"URL":{"absolute":"absoluteURL","publish":"publishURL"},"crops":[{"height":0,"name":"name","path":"path","relativePath":"","width":0},{"height":0,"name":"aname","path":"empty","relativePath":"empty","width":0}],"type":"image"}`),
 		},
 		{
 			description: "Input too simple, fails validation",
 			transformer: Transformer{schema: imageSchema, transformIdentifier: "cumulo"},
 			in: json.RawMessage(`
-				{
-					"type": "image",
-					"crops": [
-						{
-							"path": "path"
-						},
-						{
-							"name": "aname",
-							"relativePath": "empty"
-						}
-					],
-					"publishUrl": "publishURL",
-					"absoluteUrl": "absoluteURL"
-				}`),
+							{
+								"type": "image",
+								"crops": [
+									{
+										"path": "path"
+									},
+									{
+										"name": "aname",
+										"relativePath": "empty"
+									}
+								],
+								"publishUrl": "publishURL",
+								"absoluteUrl": "absoluteURL"
+							}`),
 			want:    json.RawMessage(`{"URL":{"absolute":"absoluteURL","publish":"publishURL"},"crops":[{"name":"name","path":"path"},{"name":"aname","relativePath":"empty"}],"type":"image"}`),
 			wantErr: true,
 		},
@@ -72,95 +74,144 @@ var (
 			description: "Array transforms, tests arrays with string type and with a single object type",
 			transformer: Transformer{schema: arrayTransformsSchema, transformIdentifier: "cumulo"},
 			in: json.RawMessage(`
-				{
-					"type": "image",
-					"data": {
-						"contributors": [
-							{"id": 1, "fullname": "one"},
-							{"id": 2, "fullname": "two"}
-						],
-						"lines": [
-							"line1",
-							"line2"
-						]
-					},
-					"aSingleObject": [
-						{
-							"id": 1,
-							"name": "test1"
-						}
-					]
-				}`),
+							{
+								"type": "image",
+								"data": {
+									"contributors": [
+										{"id": 1, "fullname": "one"},
+										{"id": 2, "fullname": "two"}
+									],
+									"lines": [
+										"line1",
+										"line2"
+									]
+								},
+								"aSingleObject": [
+									{
+										"id": 1,
+										"name": "test1"
+									}
+								]
+							}`),
 			want: json.RawMessage(`{"contributors":[{"id":"1","name":"one"},{"id":"2","name":"two"}],"lines":["line1","line2"],"wasSingleObject":[{"id":"1","name":"test1"}]}`),
 		},
 		{
 			description: "Test all operations",
 			transformer: Transformer{schema: operationsSchema, transformIdentifier: "cumulo"},
 			in: json.RawMessage(`
-				{
-					"type": "image",
-					"data": {
-						"attributes": [
-							{
-								"name": "length",
-								"value": "00:13"
-							}
-						],
-						"contributors": [
-							{"id": 1, "fullname": "one"},
-							{"id": 2, "fullname": "two"}
-						]
-					},
-					"mixedCase": "a|B|c|D",
-					"invalid": false,
-					"url": "http://foo.com/blah"
-				}`),
+						{
+							"type": "image",
+							"data": {
+								"attributes": [
+									{
+										"name": "length",
+										"value": "00:13"
+									}
+								],
+								"contributors": [
+									{"id": 1, "fullname": "one"},
+									{"id": 2, "fullname": "two"}
+								]
+							},
+							"mixedCase": "a|B|c|D",
+							"invalid": false,
+							"url": "http://foo.com/blah"
+						}`),
 			want: json.RawMessage(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"url":"http://gannettdigital.com/blah","valid":true}`),
 		},
 		{
 			description: "Test empty non-required object",
 			transformer: Transformer{schema: imageSchema, transformIdentifier: "cumulo"},
 			in: json.RawMessage(`
-				{
-					"type": "image",
-					"crops": [
 						{
-							"height": 0,
-							"path": "path",
-							"relativePath": "",
-							"width": 0
-						},
-						{
-							"name": "aname",
-							"height": 0,
-							"path": "empty",
-							"relativePath": "empty",
-							"width": 0
-						}
-					]
-				}`),
+							"type": "image",
+							"crops": [
+								{
+									"height": 0,
+									"path": "path",
+									"relativePath": "",
+									"width": 0
+								},
+								{
+									"name": "aname",
+									"height": 0,
+									"path": "empty",
+									"relativePath": "empty",
+									"width": 0
+								}
+							]
+						}`),
 			want: json.RawMessage(`{"crops":[{"height":0,"name":"name","path":"path","relativePath":"","width":0},{"height":0,"name":"aname","path":"empty","relativePath":"empty","width":0}],"type":"image"}`),
 		},
 		{
 			description: "Test empty non-required array",
 			transformer: Transformer{schema: arrayTransformsSchema, transformIdentifier: "cumulo"},
 			in: json.RawMessage(`
+						{
+							"type": "image",
+							"data": {
+								"lines": [
+									"line1",
+									"line2"
+								]
+							},
+							"aSingleObject": [
+								{
+									"id": 1,
+									"name": "test1"
+								}
+							]
+						}`),
+			want: json.RawMessage(`{"lines":["line1","line2"],"wasSingleObject":[{"id":"1","name":"test1"}]}`),
+		},
+		{
+			description: "Test nested arrays",
+			transformer: Transformer{schema: doublearraySchema, transformIdentifier: "cumulo"},
+			in: json.RawMessage(`
 				{
-					"type": "image",
-					"data": {
-						"lines": [
-							"line1",
-							"line2"
+					"data" : {
+						"double": [
+							["1-1", "1-2"],
+							["2-1", "2-2"]
 						]
 					},
-					"aSingleObject": [
+					"array1": [
 						{
-							"id": 1,
-							"name": "test1"
+							"name": "array1-1",
+							"array2": [
+								{
+									"name": "array1-1-1"
+								},
+								{
+									"name": "array1-1-2"
+								}
+							]
+						},
+						{
+							"name": "array1-2",
+							"array2": [
+								{
+									"name": "array1-2-1"
+								}
+							]
 						}
 					]
 				}`),
-			want: json.RawMessage(`{"lines":["line1","line2"],"wasSingleObject":[{"id":"1","name":"test1"}]}`),
+			want: json.RawMessage(`{"array1":[{"array2":[{"level2Name":"array1-1-1"},{"level2Name":"array1-1-2"}],"level1Name":"array1-1"},{"array2":[{"level2Name":"array1-2-1"}],"level1Name":"array1-2"}],"double":[["1-1","1-2"],["2-1","2-2"]]}`),
+		},
+		{
+			description: "Test format: date-time strings",
+			transformer: Transformer{schema: dateTimesSchema, transformIdentifier: "cumulo"},
+			in: json.RawMessage(`
+				{
+					"dates": [
+						1529958073,
+						"2018-06-25T20:21:13Z"
+					],
+					"requiredDate": "2018-06-25T20:21:13Z",
+					"optionalDate": ""
+				}`),
+			want: json.RawMessage(`{"dates":["2018-06-25T20:21:13Z","2018-06-25T20:21:13Z"],"requiredDate":"2018-06-25T20:21:13Z"}`),
 		},
 	}
 )
@@ -247,9 +298,58 @@ func TestSaveValue(t *testing.T) {
 		{
 			description:     "Save value in existing Array",
 			tr:              Transformer{transformed: map[string]interface{}{"test1": []interface{}{"a", "b"}}},
-			jsonPath:        "$.test1[3]",
+			jsonPath:        "$.test1[2]",
 			value:           "c",
 			wantTransformed: map[string]interface{}{"test1": []interface{}{"a", "b", "c"}},
+		},
+		{
+			description:     "Save value in new Array of objects",
+			tr:              Transformer{transformed: map[string]interface{}{}},
+			jsonPath:        "$.test1[0].a",
+			value:           "aValue",
+			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}}},
+		},
+		{
+			description:     "Save value in existing Array of objects",
+			tr:              Transformer{transformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}}}},
+			jsonPath:        "$.test1[0].b",
+			value:           "bValue",
+			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue", "b": "bValue"}}},
+		},
+		{
+			description:     "Save new array item value in existing Array of objects",
+			tr:              Transformer{transformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}}}},
+			jsonPath:        "$.test1[1].a",
+			value:           "a2ndValue",
+			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}, map[string]interface{}{"a": "a2ndValue"}}},
+		},
+		{
+			description:     "Save new array item simple nested Array",
+			tr:              Transformer{transformed: map[string]interface{}{}},
+			jsonPath:        "$.test1[0][1]",
+			value:           "nestedValue",
+			wantTransformed: map[string]interface{}{"test1": []interface{}{[]interface{}{nil, "nestedValue"}}},
+		},
+		{
+			description:     "Save new array item new nested Array",
+			tr:              Transformer{transformed: map[string]interface{}{}},
+			jsonPath:        "$.test1[0].a[1]",
+			value:           "nestedValue",
+			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{nil, "nestedValue"}}}},
+		},
+		{
+			description:     "Save object field in new nested Array",
+			tr:              Transformer{transformed: map[string]interface{}{}},
+			jsonPath:        "$.test1[0].a[1].name",
+			value:           "nestedName",
+			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{map[string]interface{}{}, map[string]interface{}{"name": "nestedName"}}}}},
+		},
+		{
+			description:     "Save new array item existing nested Array",
+			tr:              Transformer{transformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{"existingValue"}}}}},
+			jsonPath:        "$.test1[0].a[1]",
+			value:           "nestedValue",
+			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{"existingValue", "nestedValue"}}}},
 		},
 	}
 

@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "double": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.data.double"
+            }
+          ]
+        }
+      }
+    },
+    "array1": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "level1Name": {
+            "type": "string",
+            "transform": {
+              "cumulo": {
+                "from": [
+                  {
+                    "jsonPath": "@.name"
+                  }
+                ]
+              }
+            }
+          },
+          "array2": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "level2Name": {
+                  "type": "string",
+                  "transform": {
+                    "cumulo": {
+                      "from": [
+                        {
+                          "jsonPath": "@.name"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "transform": {
+              "cumulo": {
+                "from": [
+                  {
+                    "jsonPath": "@.array2[*]"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "@.array1[*]"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
