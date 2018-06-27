@@ -10,27 +10,16 @@ import (
 
 // Instance represents a JSON Schema instance.
 type Instance struct {
-	Type       string                     `json:"type"`
-	Format     string                     `json:"format"`
-	Items      json.RawMessage            `json:"items,omitempty"`
-	Properties map[string]json.RawMessage `json:"properties,omitempty"`
-	Required   []string                   `json:"Required,omitempty"`
-}
-
-// schemaRef represents a JSON Schema reference.
-type schemaRef struct {
-	Ref string `json:"$ref"`
-}
-
-// schemaJSON represents the basic supported structure of a JSON Schema file
-type schemaJSON struct {
-	Instance
-
-	Schema      string      `json:"$schema"`
-	Description string      `json:"description,omitempty"`
-	AllOf       []schemaRef `json:"allOf,omitempty"`
-	OneOf       []schemaRef `json:"oneOf,omitempty"`
-	Required    []string    `json:"required,omitempty"`
+	Ref         string                     `json:"$ref,omitempty"`
+	Schema      string                     `json:"$schema,omitempty"`
+	Description string                     `json:"description,omitempty"`
+	Type        string                     `json:"type"`
+	Format      string                     `json:"format,omitempty"`
+	Items       json.RawMessage            `json:"items,omitempty"`
+	Properties  map[string]json.RawMessage `json:"properties,omitempty"`
+	AllOf       []Instance                 `json:"allOf,omitempty"`
+	OneOf       []Instance                 `json:"oneOf,omitempty"`
+	Required    []string                   `json:"Required,omitempty"`
 }
 
 // Schema represents a JSON Schema with the AllOf and OneOf references parsed and squashed into a single representation.
@@ -67,21 +56,25 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 		return nil, fmt.Errorf("failed to initialize schema validator: %v", err)
 	}
 
-	data, err = Dereference(schemaPath, data)
+	data, err = dereference(schemaPath, data, true)
 	if err != nil {
 		return nil, fmt.Errorf("failed to Dereference Schema: %v", err)
 	}
 
-	var sj schemaJSON
+	var sj Instance
 	if err := json.Unmarshal(data, &sj); err != nil {
 		return nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
 	}
 
 	s := Schema{
 		Instance: Instance{
+			Type:       sj.Type,
+			Format:     sj.Format,
 			Items:      sj.Items,
 			Properties: sj.Properties,
 			Required:   sj.Required,
+			AllOf:      sj.AllOf,
+			OneOf:      sj.OneOf,
 		},
 		validator: v,
 	}
@@ -126,7 +119,7 @@ func SchemaTypes(schemaPath string) ([]string, []string, error) {
 		return nil, nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
 	}
 
-	var sj schemaJSON
+	var sj Instance
 	if err := json.Unmarshal(data, &sj); err != nil {
 		return nil, nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
 	}

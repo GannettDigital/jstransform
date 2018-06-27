@@ -19,8 +19,8 @@ type jsonRef struct {
 	Target string
 }
 
-// Dereference parse JSON string and replaces all $ref with the referenced data.
-func Dereference(schemaPath string, input []byte) ([]byte, error) {
+// dereference parses JSON string and replaces all $ref with the referenced data.
+func dereference(schemaPath string, input []byte, isTop bool) ([]byte, error) {
 	if !strings.Contains(string(input), "$ref") {
 		return input, nil
 	}
@@ -35,6 +35,9 @@ func Dereference(schemaPath string, input []byte) ([]byte, error) {
 	for _, ref := range refs {
 		top := data
 		for i, item := range ref.Source {
+			if isTop && len(ref.Source[0]) == 5 && strings.HasSuffix(ref.Source[0], "Of") {
+				continue // do not dereference top-level allOr and oneOf
+			}
 			if i < len(ref.Source)-1 {
 				// assuming integer item is slice[index] instead of map[string]
 				if intKey, err := strconv.Atoi(item); err == nil {
@@ -136,7 +139,7 @@ func buildReference(schemaPath string, top interface{}, ref string) (interface{}
 		if err != nil {
 			return nil, fmt.Errorf("failed to read reference file %q: %v", refPath, err)
 		}
-		data, err = Dereference(refPath, data)
+		data, err = dereference(refPath, data, false)
 		if err != nil {
 			return nil, fmt.Errorf("failed to dereference refPath %s: %v", refPath, err)
 		}
