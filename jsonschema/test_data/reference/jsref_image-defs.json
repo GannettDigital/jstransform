@@ -1,6 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "definitions": {
+      "arraytype": {
+          "type": "array"
+      },
       "imageurl": {
           "type": "object",
           "properties": {
@@ -29,6 +32,13 @@
               }
             }
           }
+      },
+      "deeply": {
+        "nested": {
+          "objecttype": {
+            "type": "object"
+          }
+        }
       }
   }
 }

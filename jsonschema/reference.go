@@ -38,14 +38,13 @@ func dereference(schemaPath string, input []byte, isTop bool) ([]byte, error) {
 			if isTop && len(ref.Source[0]) == 5 && strings.HasSuffix(ref.Source[0], "Of") {
 				continue // do not dereference top-level allOr and oneOf
 			}
-			if i < len(ref.Source)-1 {
-				// assuming integer item is slice[index] instead of map[string]
+			if i < len(ref.Source)-1 { // iterate
 				if intKey, err := strconv.Atoi(item); err == nil {
 					top = top.([]interface{})[intKey]
 				} else {
 					top = top.(map[string]interface{})[item]
 				}
-			} else {
+			} else { // set reference
 				targetRef, err := buildReference(schemaPath, data, ref.Target)
 				if err != nil {
 					return input, fmt.Errorf("unable to build reference from %s: %v", ref.Target, err)
@@ -108,11 +107,6 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef
 	return refs, nil
 }
 
-// HttpReferenceClient isolates the HTTP call for testing purposes
-func HttpReferenceClient(url string) (*goreq.Response, error) {
-	return goreq.Request{Uri: url}.Do()
-}
-
 // buildReference constructs the json reference: internal, file or http
 func buildReference(schemaPath string, top interface{}, ref string) (interface{}, error) {
 	target := strings.Split(ref, "#")
@@ -125,7 +119,7 @@ func buildReference(schemaPath string, top interface{}, ref string) (interface{}
 	case len(target[0]) == 0:
 		source = top
 	case strings.HasPrefix(target[0], "http"):
-		res, err := HttpReferenceClient(target[0])
+		res, err := goreq.Request{Uri: target[0]}.Do()
 		if err != nil {
 			return nil, fmt.Errorf("unable to get reference from %s: %v", target[0], err)
 		}
@@ -134,6 +128,9 @@ func buildReference(schemaPath string, top interface{}, ref string) (interface{}
 		refPath, err := filepath.Abs(path.Dir(schemaPath) + "/" + target[0])
 		if err != nil {
 			return nil, fmt.Errorf("unable to expand reference filepath %s: %v", target[0], err)
+		}
+		if schemaPath == refPath {
+			return nil, fmt.Errorf("infinite loop detected in reference file %q: %v", refPath, err)
 		}
 		data, err := ioutil.ReadFile(refPath)
 		if err != nil {

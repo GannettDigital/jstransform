@@ -40,7 +40,21 @@
       }
     },
     "URL": {
-      "$ref": "http://127.0.0.1:12345/jsref_image-defs.json#/definitions/imageurl"
+      "allOf": [
+        {
+          "properties": {
+            "index": "first"
+          }
+        },
+        {
+          "$ref": "./jsref_image-loop.json"
+        },
+        {
+          "properties": {
+            "index": "last"
+          }
+        }
+      ]
     }
   },
   "required": [
