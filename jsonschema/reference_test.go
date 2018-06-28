@@ -72,6 +72,10 @@ func TestDereference(t *testing.T) {
 			description: "Ingestion Example",
 			schemaPath:  "./test_data/reference/jsref_asset-event-facebook.json",
 		},
+		{
+			description: "Sports Matchup Example",
+			schemaPath:  "./test_data/reference/jsref_matchup-mlb.json",
+		},
 	}
 	for _, test := range tests {
 

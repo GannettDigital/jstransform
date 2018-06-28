@@ -83,8 +83,10 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef
 		switch reflect.TypeOf(val).Kind() {
 		case reflect.String:
 			if key == "$ref" {
+				sourceRef := make([]string, len(source))
+				copy(sourceRef, source)
 				refs = append(refs, jsonRef{
-					Source: source,
+					Source: sourceRef,
 					Target: val.(string),
 				})
 			}
