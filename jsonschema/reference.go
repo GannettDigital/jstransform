@@ -36,7 +36,7 @@ func dereference(schemaPath string, input []byte, isTop bool) ([]byte, error) {
 		top := data
 		for i, item := range ref.Source {
 			if isTop && (ref.Source[0] == "allOf" || ref.Source[0] == "oneOf") {
-				continue // do not dereference top-level allOr and oneOf
+				continue // do not dereference top-level allOf and oneOf
 			}
 			if i < len(ref.Source)-1 { // iterate
 				if intKey, err := strconv.Atoi(item); err == nil {
@@ -91,6 +91,10 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef
 				})
 			}
 		case reflect.Slice:
+			valMap, ok := val.([]interface{})
+			if !ok {
+				return nil, fmt.Errorf("failed assertion of val: %q", valMap)
+			}
 			for i, item := range val.([]interface{}) {
 				if reflect.TypeOf(item).Kind() == reflect.Map {
 					refs, err = walkInterface(item, append(source, key, strconv.Itoa(i)), refs)
@@ -100,6 +104,10 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef
 				}
 			}
 		case reflect.Map:
+			nodeMap, ok := node.(map[string]interface{})
+			if !ok {
+				return nil, fmt.Errorf("failed assertion of node: %q", nodeMap)
+			}
 			refs, err = walkInterface(node.(map[string]interface{})[key], append(source, key), refs)
 			if err != nil {
 				return nil, fmt.Errorf("unable to walk map interface: %v", err)
@@ -143,6 +151,10 @@ func buildReference(schemaPath string, top interface{}, ref string) (interface{}
 			return nil, fmt.Errorf("failed to dereference refPath %s: %v", refPath, err)
 		}
 		json.Unmarshal([]byte(data), &source)
+	}
+	sourceMap, ok := source.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("failed assertion of source: %q", sourceMap)
 	}
 	return parseReference(source, strings.Split(target[1], "/")[1:]), nil
 }
