@@ -79,7 +79,11 @@ func dereference(schemaPath string, input []byte, isTop bool) ([]byte, error) {
 // walkInterface traverses the map[string]interface{} to located json references
 func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef, error) {
 	var err error
-	for key, val := range node.(map[string]interface{}) {
+	nodeMap, ok := node.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("failed assertion of node: %q", nodeMap)
+	}
+	for key, val := range nodeMap {
 		switch reflect.TypeOf(val).Kind() {
 		case reflect.String:
 			if key == "$ref" {
@@ -104,10 +108,6 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef
 				}
 			}
 		case reflect.Map:
-			nodeMap, ok := node.(map[string]interface{})
-			if !ok {
-				return nil, fmt.Errorf("failed assertion of node: %q", nodeMap)
-			}
 			refs, err = walkInterface(nodeMap[key], append(source, key), refs)
 			if err != nil {
 				return nil, fmt.Errorf("unable to walk map interface: %v", err)
@@ -161,11 +161,15 @@ func buildReference(schemaPath string, top interface{}, ref string) (interface{}
 
 // parseReference recursively parses the given reference path
 func parseReference(source interface{}, refPaths []string) interface{} {
+	sourceMap, ok := source.(map[string]interface{})
+	if !ok {
+		return nil
+	}
 	if len(refPaths) > 1 {
-		return parseReference(source.(map[string]interface{})[refPaths[0]], refPaths[1:])
+		return parseReference(sourceMap[refPaths[0]], refPaths[1:])
 	} else {
 		if refPaths[0] != "" {
-			return source.(map[string]interface{})[refPaths[0]]
+			return sourceMap[refPaths[0]]
 		} else {
 			return source
 		}
