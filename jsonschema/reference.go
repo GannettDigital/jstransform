@@ -95,7 +95,7 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef
 			if !ok {
 				return nil, fmt.Errorf("failed assertion of val: %q", valMap)
 			}
-			for i, item := range val.([]interface{}) {
+			for i, item := range valMap {
 				if reflect.TypeOf(item).Kind() == reflect.Map {
 					refs, err = walkInterface(item, append(source, key, strconv.Itoa(i)), refs)
 					if err != nil {
@@ -108,7 +108,7 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef
 			if !ok {
 				return nil, fmt.Errorf("failed assertion of node: %q", nodeMap)
 			}
-			refs, err = walkInterface(node.(map[string]interface{})[key], append(source, key), refs)
+			refs, err = walkInterface(nodeMap[key], append(source, key), refs)
 			if err != nil {
 				return nil, fmt.Errorf("unable to walk map interface: %v", err)
 			}
@@ -156,7 +156,7 @@ func buildReference(schemaPath string, top interface{}, ref string) (interface{}
 	if !ok {
 		return nil, fmt.Errorf("failed assertion of source: %q", sourceMap)
 	}
-	return parseReference(source, strings.Split(target[1], "/")[1:]), nil
+	return parseReference(sourceMap, strings.Split(target[1], "/")[1:]), nil
 }
 
 // parseReference recursively parses the given reference path
