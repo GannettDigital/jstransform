@@ -1,0 +1,188 @@
+{
+    "$ref": "#/definitions/asset-event-facebook",
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "definitions": {
+        "FbiaStatus": {
+            "additionalProperties": false,
+            "properties": {
+                "errors": {
+                    "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                            "level": {
+                                "enum": [
+                                    "ERROR",
+                                    "WARNING"
+                                ],
+                                "type": "string"
+                            },
+                            "message": {
+                                "minLength": 1,
+                                "type": "string"
+                            }
+                        },
+                        "title": "FbiaStatusItem",
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "providerUrl": {
+                    "format": "url",
+                    "type": "string"
+                },
+                "status": {
+                    "enum": [
+                        "success",
+                        "error",
+                        "disallowed"
+                    ],
+                    "type": "string"
+                },
+                "time": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "warnings": {
+                    "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                            "level": {
+                                "enum": [
+                                    "ERROR",
+                                    "WARNING"
+                                ],
+                                "type": "string"
+                            },
+                            "message": {
+                                "minLength": 1,
+                                "type": "string"
+                            }
+                        },
+                        "title": "FbiaStatusItem",
+                        "type": "object"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "providerUrl",
+                "time",
+                "status"
+            ],
+            "title": "FbiaStatus",
+            "type": "object"
+        },
+        "FbiaStatusItem": {
+            "additionalProperties": false,
+            "properties": {
+                "level": {
+                    "enum": [
+                        "ERROR",
+                        "WARNING"
+                    ],
+                    "type": "string"
+                },
+                "message": {
+                    "minLength": 1,
+                    "type": "string"
+                }
+            },
+            "title": "FbiaStatusItem",
+            "type": "object"
+        },
+        "asset-event-facebook": {
+            "additionalProperties": false,
+            "properties": {
+                "assetId": {
+                    "pattern": "\\d+",
+                    "type": "string"
+                },
+                "contentSourceCode": {
+                    "minLength": 1,
+                    "pattern": "[A-Z0-9]$",
+                    "type": "string"
+                },
+                "fbiaStatus": {
+                    "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                            "errors": {
+                                "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "level": {
+                                            "enum": [
+                                                "ERROR",
+                                                "WARNING"
+                                            ],
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "minLength": 1,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "title": "FbiaStatusItem",
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            },
+                            "providerUrl": {
+                                "format": "url",
+                                "type": "string"
+                            },
+                            "status": {
+                                "enum": [
+                                    "success",
+                                    "error",
+                                    "disallowed"
+                                ],
+                                "type": "string"
+                            },
+                            "time": {
+                                "format": "date-time",
+                                "type": "string"
+                            },
+                            "warnings": {
+                                "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "level": {
+                                            "enum": [
+                                                "ERROR",
+                                                "WARNING"
+                                            ],
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "minLength": 1,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "title": "FbiaStatusItem",
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            }
+                        },
+                        "required": [
+                            "providerUrl",
+                            "time",
+                            "status"
+                        ],
+                        "title": "FbiaStatus",
+                        "type": "object"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "assetId",
+                "fbiaStatus",
+                "contentSourceCode"
+            ],
+            "title": "asset-event-facebook",
+            "type": "object"
+        }
+    }
+}

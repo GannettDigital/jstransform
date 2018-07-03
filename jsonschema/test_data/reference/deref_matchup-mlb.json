@@ -1,0 +1,603 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "definitions": {
+        "matchupStats": {
+            "properties": {
+                "avgInningsPitched": {
+                    "type": "number"
+                },
+                "battersFaced": {
+                    "type": "integer"
+                },
+                "battingAverage": {
+                    "type": "number"
+                },
+                "daysRest": {
+                    "type": "integer"
+                },
+                "earnedRunAverage": {
+                    "type": "number"
+                },
+                "earnedRunsAgainst": {
+                    "type": "integer"
+                },
+                "flyBallOuts": {
+                    "type": "integer"
+                },
+                "gamesPlayed": {
+                    "type": "integer"
+                },
+                "groundBallOuts": {
+                    "type": "integer"
+                },
+                "hitBatters": {
+                    "type": "integer"
+                },
+                "hits": {
+                    "type": "integer"
+                },
+                "homeruns": {
+                    "type": "integer"
+                },
+                "onBasePercentage": {
+                    "type": "number"
+                },
+                "outsPitched": {
+                    "type": "integer"
+                },
+                "runs": {
+                    "type": "integer"
+                },
+                "runsPerNineInnings": {
+                    "type": "number"
+                },
+                "strikeouts": {
+                    "type": "integer"
+                },
+                "walks": {
+                    "type": "integer"
+                },
+                "whip": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "matchupTeam": {
+            "properties": {
+                "player": {
+                    "properties": {
+                        "firstName": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "string"
+                        },
+                        "lastName": {
+                            "type": "string"
+                        },
+                        "statistics": {
+                            "items": {
+                                "properties": {
+                                    "avgInningsPitched": {
+                                        "type": "number"
+                                    },
+                                    "battersFaced": {
+                                        "type": "integer"
+                                    },
+                                    "battingAverage": {
+                                        "type": "number"
+                                    },
+                                    "daysRest": {
+                                        "type": "integer"
+                                    },
+                                    "earnedRunAverage": {
+                                        "type": "number"
+                                    },
+                                    "earnedRunsAgainst": {
+                                        "type": "integer"
+                                    },
+                                    "flyBallOuts": {
+                                        "type": "integer"
+                                    },
+                                    "gamesPlayed": {
+                                        "type": "integer"
+                                    },
+                                    "groundBallOuts": {
+                                        "type": "integer"
+                                    },
+                                    "hitBatters": {
+                                        "type": "integer"
+                                    },
+                                    "hits": {
+                                        "type": "integer"
+                                    },
+                                    "homeruns": {
+                                        "type": "integer"
+                                    },
+                                    "onBasePercentage": {
+                                        "type": "number"
+                                    },
+                                    "outsPitched": {
+                                        "type": "integer"
+                                    },
+                                    "runs": {
+                                        "type": "integer"
+                                    },
+                                    "runsPerNineInnings": {
+                                        "type": "number"
+                                    },
+                                    "strikeouts": {
+                                        "type": "integer"
+                                    },
+                                    "walks": {
+                                        "type": "integer"
+                                    },
+                                    "whip": {
+                                        "type": "number"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "firstName",
+                        "lastName",
+                        "statistics"
+                    ],
+                    "type": "object"
+                },
+                "team": {
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "statistics": {
+                            "items": {
+                                "properties": {
+                                    "avgInningsPitched": {
+                                        "type": "number"
+                                    },
+                                    "battersFaced": {
+                                        "type": "integer"
+                                    },
+                                    "battingAverage": {
+                                        "type": "number"
+                                    },
+                                    "daysRest": {
+                                        "type": "integer"
+                                    },
+                                    "earnedRunAverage": {
+                                        "type": "number"
+                                    },
+                                    "earnedRunsAgainst": {
+                                        "type": "integer"
+                                    },
+                                    "flyBallOuts": {
+                                        "type": "integer"
+                                    },
+                                    "gamesPlayed": {
+                                        "type": "integer"
+                                    },
+                                    "groundBallOuts": {
+                                        "type": "integer"
+                                    },
+                                    "hitBatters": {
+                                        "type": "integer"
+                                    },
+                                    "hits": {
+                                        "type": "integer"
+                                    },
+                                    "homeruns": {
+                                        "type": "integer"
+                                    },
+                                    "onBasePercentage": {
+                                        "type": "number"
+                                    },
+                                    "outsPitched": {
+                                        "type": "integer"
+                                    },
+                                    "runs": {
+                                        "type": "integer"
+                                    },
+                                    "runsPerNineInnings": {
+                                        "type": "number"
+                                    },
+                                    "strikeouts": {
+                                        "type": "integer"
+                                    },
+                                    "walks": {
+                                        "type": "integer"
+                                    },
+                                    "whip": {
+                                        "type": "number"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "statistics"
+                    ],
+                    "type": "object"
+                }
+            },
+            "required": [
+                "player",
+                "team"
+            ],
+            "type": "object"
+        }
+    },
+    "properties": {
+        "competition": {
+            "properties": {
+                "away": {
+                    "properties": {
+                        "player": {
+                            "properties": {
+                                "firstName": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "lastName": {
+                                    "type": "string"
+                                },
+                                "statistics": {
+                                    "items": {
+                                        "properties": {
+                                            "avgInningsPitched": {
+                                                "type": "number"
+                                            },
+                                            "battersFaced": {
+                                                "type": "integer"
+                                            },
+                                            "battingAverage": {
+                                                "type": "number"
+                                            },
+                                            "daysRest": {
+                                                "type": "integer"
+                                            },
+                                            "earnedRunAverage": {
+                                                "type": "number"
+                                            },
+                                            "earnedRunsAgainst": {
+                                                "type": "integer"
+                                            },
+                                            "flyBallOuts": {
+                                                "type": "integer"
+                                            },
+                                            "gamesPlayed": {
+                                                "type": "integer"
+                                            },
+                                            "groundBallOuts": {
+                                                "type": "integer"
+                                            },
+                                            "hitBatters": {
+                                                "type": "integer"
+                                            },
+                                            "hits": {
+                                                "type": "integer"
+                                            },
+                                            "homeruns": {
+                                                "type": "integer"
+                                            },
+                                            "onBasePercentage": {
+                                                "type": "number"
+                                            },
+                                            "outsPitched": {
+                                                "type": "integer"
+                                            },
+                                            "runs": {
+                                                "type": "integer"
+                                            },
+                                            "runsPerNineInnings": {
+                                                "type": "number"
+                                            },
+                                            "strikeouts": {
+                                                "type": "integer"
+                                            },
+                                            "walks": {
+                                                "type": "integer"
+                                            },
+                                            "whip": {
+                                                "type": "number"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "firstName",
+                                "lastName",
+                                "statistics"
+                            ],
+                            "type": "object"
+                        },
+                        "team": {
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "statistics": {
+                                    "items": {
+                                        "properties": {
+                                            "avgInningsPitched": {
+                                                "type": "number"
+                                            },
+                                            "battersFaced": {
+                                                "type": "integer"
+                                            },
+                                            "battingAverage": {
+                                                "type": "number"
+                                            },
+                                            "daysRest": {
+                                                "type": "integer"
+                                            },
+                                            "earnedRunAverage": {
+                                                "type": "number"
+                                            },
+                                            "earnedRunsAgainst": {
+                                                "type": "integer"
+                                            },
+                                            "flyBallOuts": {
+                                                "type": "integer"
+                                            },
+                                            "gamesPlayed": {
+                                                "type": "integer"
+                                            },
+                                            "groundBallOuts": {
+                                                "type": "integer"
+                                            },
+                                            "hitBatters": {
+                                                "type": "integer"
+                                            },
+                                            "hits": {
+                                                "type": "integer"
+                                            },
+                                            "homeruns": {
+                                                "type": "integer"
+                                            },
+                                            "onBasePercentage": {
+                                                "type": "number"
+                                            },
+                                            "outsPitched": {
+                                                "type": "integer"
+                                            },
+                                            "runs": {
+                                                "type": "integer"
+                                            },
+                                            "runsPerNineInnings": {
+                                                "type": "number"
+                                            },
+                                            "strikeouts": {
+                                                "type": "integer"
+                                            },
+                                            "walks": {
+                                                "type": "integer"
+                                            },
+                                            "whip": {
+                                                "type": "number"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "name",
+                                "statistics"
+                            ],
+                            "type": "object"
+                        }
+                    },
+                    "required": [
+                        "player",
+                        "team"
+                    ],
+                    "type": "object"
+                },
+                "home": {
+                    "properties": {
+                        "player": {
+                            "properties": {
+                                "firstName": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "lastName": {
+                                    "type": "string"
+                                },
+                                "statistics": {
+                                    "items": {
+                                        "properties": {
+                                            "avgInningsPitched": {
+                                                "type": "number"
+                                            },
+                                            "battersFaced": {
+                                                "type": "integer"
+                                            },
+                                            "battingAverage": {
+                                                "type": "number"
+                                            },
+                                            "daysRest": {
+                                                "type": "integer"
+                                            },
+                                            "earnedRunAverage": {
+                                                "type": "number"
+                                            },
+                                            "earnedRunsAgainst": {
+                                                "type": "integer"
+                                            },
+                                            "flyBallOuts": {
+                                                "type": "integer"
+                                            },
+                                            "gamesPlayed": {
+                                                "type": "integer"
+                                            },
+                                            "groundBallOuts": {
+                                                "type": "integer"
+                                            },
+                                            "hitBatters": {
+                                                "type": "integer"
+                                            },
+                                            "hits": {
+                                                "type": "integer"
+                                            },
+                                            "homeruns": {
+                                                "type": "integer"
+                                            },
+                                            "onBasePercentage": {
+                                                "type": "number"
+                                            },
+                                            "outsPitched": {
+                                                "type": "integer"
+                                            },
+                                            "runs": {
+                                                "type": "integer"
+                                            },
+                                            "runsPerNineInnings": {
+                                                "type": "number"
+                                            },
+                                            "strikeouts": {
+                                                "type": "integer"
+                                            },
+                                            "walks": {
+                                                "type": "integer"
+                                            },
+                                            "whip": {
+                                                "type": "number"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "firstName",
+                                "lastName",
+                                "statistics"
+                            ],
+                            "type": "object"
+                        },
+                        "team": {
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "statistics": {
+                                    "items": {
+                                        "properties": {
+                                            "avgInningsPitched": {
+                                                "type": "number"
+                                            },
+                                            "battersFaced": {
+                                                "type": "integer"
+                                            },
+                                            "battingAverage": {
+                                                "type": "number"
+                                            },
+                                            "daysRest": {
+                                                "type": "integer"
+                                            },
+                                            "earnedRunAverage": {
+                                                "type": "number"
+                                            },
+                                            "earnedRunsAgainst": {
+                                                "type": "integer"
+                                            },
+                                            "flyBallOuts": {
+                                                "type": "integer"
+                                            },
+                                            "gamesPlayed": {
+                                                "type": "integer"
+                                            },
+                                            "groundBallOuts": {
+                                                "type": "integer"
+                                            },
+                                            "hitBatters": {
+                                                "type": "integer"
+                                            },
+                                            "hits": {
+                                                "type": "integer"
+                                            },
+                                            "homeruns": {
+                                                "type": "integer"
+                                            },
+                                            "onBasePercentage": {
+                                                "type": "number"
+                                            },
+                                            "outsPitched": {
+                                                "type": "integer"
+                                            },
+                                            "runs": {
+                                                "type": "integer"
+                                            },
+                                            "runsPerNineInnings": {
+                                                "type": "number"
+                                            },
+                                            "strikeouts": {
+                                                "type": "integer"
+                                            },
+                                            "walks": {
+                                                "type": "integer"
+                                            },
+                                            "whip": {
+                                                "type": "number"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "name",
+                                "statistics"
+                            ],
+                            "type": "object"
+                        }
+                    },
+                    "required": [
+                        "player",
+                        "team"
+                    ],
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "required": [
+        "competition"
+    ],
+    "type": "object"
+}

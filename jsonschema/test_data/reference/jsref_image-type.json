@@ -1,0 +1,87 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "definitions": {
+        "arraytype": {
+            "type": "array"
+        }
+    },
+    "properties": {
+        "URL": {
+            "type": "object",
+            "properties": {
+                "absolute": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.absoluteUrl"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "publish": {
+                    "type": "string",
+                    "transform": {
+                        "cumulo": {
+                            "from": [
+                                {
+                                    "jsonPath": "$.publishUrl"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "crops": {
+            "$ref": "#/definitions/arraytype",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "height": {
+                        "type": "number"
+                    },
+                    "name": {
+                        "default": "name",
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "relativePath": {
+                        "type": "string"
+                    },
+                    "width": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "name",
+                    "width",
+                    "height",
+                    "path",
+                    "relativePath"
+                ]
+            }
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "image"
+            ]
+        }
+    },
+    "required": [
+        "type",
+        "crops",
+        "orientation",
+        "credit",
+        "URL",
+        "caption",
+        "originalSize",
+        "datePhotoTaken"
+    ],
+    "type": "object"
+}
