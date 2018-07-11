@@ -86,6 +86,9 @@ func buildStructFile(schemaPath, childPath, name, packageName string, embeds []s
 	}
 
 	generated, err := newGeneratedStruct(schema, name, packageName, embeds)
+	if err != nil {
+		return fmt.Errorf("failed to build generated struct: %v", err)
+	}
 
 	outPath := filepath.Join(outputDir, name+".go")
 	gfile, err := os.Create(outPath)
