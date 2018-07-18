@@ -35,6 +35,9 @@ func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Tran
 
 // Transform takes the provided JSON and converts the JSON to match the pre-defined JSON Schema using the transform
 // sections in the schema.
+//
+// The Transform operation is not concurrency safe, only one Transform at a time should be performed for any given transformer.
+//
 // By default fields with no Transform section but with matching path and type are copied verbatim into the new
 // JSON structure. Fields which are missing from the input are set to a default value in the output.
 //
