@@ -148,16 +148,11 @@ func (tr *Transformer) processArrayItems(path string, arraySrc []interface{}, ra
 	var newArray []interface{}
 
 	for i := range arraySrc {
-		skipPaths := strings.Split(path, "[")
-		skipPath := skipPaths[0]
-		for _, part := range skipPaths[1:] {
-			skipPath += "[*]" + part[2:]
-		}
 		atr := &Transformer{
 			in:                  atrIn,
 			relativePath:        fmt.Sprintf("%s[%d]", path, i),
 			schema:              tr.schema,
-			skipPrefix:          fmt.Sprintf("%s[*]", skipPath),
+			skipPrefix:          fmt.Sprintf("%s[*]", replaceIndex(path)),
 			transformIdentifier: tr.transformIdentifier,
 			transformed:         make(map[string]interface{}),
 		}
