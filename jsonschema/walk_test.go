@@ -690,3 +690,18 @@ func TestWalkJSONSchemaRaw(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkWalk(b *testing.B) {
+	schema, err := SchemaFromFile("./test_data/image_parent.json", "image")
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+
+		if err := Walk(schema, func(path string, i Instance, value json.RawMessage) error { return nil }); err != nil {
+			b.Fatal(err)
+		}
+	}
+}

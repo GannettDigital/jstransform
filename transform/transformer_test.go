@@ -388,6 +388,9 @@ func TestTransformer(t *testing.T) {
 
 func BenchmarkTransformer(b *testing.B) {
 	for _, test := range transformerTests {
+		if test.wantErr {
+			continue
+		}
 		b.Run(test.description, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				_, err := test.transformer.Transform(test.in)
