@@ -12,6 +12,7 @@ import (
 	"github.com/GannettDigital/jstransform/jsonschema"
 
 	"github.com/PaesslerAG/jsonpath"
+	"github.com/buger/jsonparser"
 )
 
 // Transformer uses a JSON schema and the transform sections within it to take a set of JSON and transform it to
@@ -52,7 +53,7 @@ func (tr *Transformer) Transform(in json.RawMessage) (json.RawMessage, error) {
 		return nil, fmt.Errorf("failed to parse input JSON: %v", err)
 	}
 
-	if err := jsonschema.Walk(tr.schema, tr.walker); err != nil {
+	if err := jsonschema.WalkRaw(tr.schema, tr.walker); err != nil {
 		return nil, err
 	}
 
@@ -74,7 +75,7 @@ func (tr *Transformer) Transform(in json.RawMessage) (json.RawMessage, error) {
 
 // walker is a WalkFunc for the Transformer which does the bulk of the work instance by instance.
 // It includes the logic to handle arrays properly.
-func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.RawMessage) error {
+func (tr *Transformer) walker(path string, value json.RawMessage) error {
 	// arrays are processed as a group when encountered as part of the parent item
 	if tr.skipPrefix != "" {
 		if strings.HasPrefix(path, tr.skipPrefix) {
@@ -119,7 +120,11 @@ func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.Ra
 		if !ok {
 			newArray = []interface{}{newValue}
 		}
-		newValue, err = tr.processArrayItems(path, newArray, in.Items, value)
+		items, _, _, err := jsonparser.Get(value, "items")
+		if err != nil {
+			return fmt.Errorf("failed parsing array items at path %q: %v", path, err)
+		}
+		newValue, err = tr.processArrayItems(path, newArray, items, value)
 		if err != nil {
 			return fmt.Errorf("failed processing array items at path %q: %v", path, err)
 		}
@@ -152,7 +157,7 @@ func (tr *Transformer) processArrayItems(path string, arraySrc []interface{}, ra
 			transformed:         make(map[string]interface{}),
 		}
 
-		if err := jsonschema.Walk(tr.schema, atr.walker); err != nil {
+		if err := jsonschema.WalkRaw(tr.schema, atr.walker); err != nil {
 			return nil, err
 		}
 		if len(atr.transformed) != 0 {

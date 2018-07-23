@@ -4,7 +4,6 @@ package generate
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"go/format"
 	"io"
@@ -195,7 +194,7 @@ func newGeneratedStruct(schema *jsonschema.Schema, name, packageName string, emb
 
 // walkFunc is a jsonschema.WalkFunc which builds the fields in the generatedStructFile as the JSON schema file is
 // walked.
-func (gen *generatedStruct) walkFunc(path string, i jsonschema.Instance, raw json.RawMessage) error {
+func (gen *generatedStruct) walkFunc(path string, i jsonschema.Instance) error {
 	if err := addField(gen.fields, splitJSONPath(path), i); err != nil {
 		return err
 	}

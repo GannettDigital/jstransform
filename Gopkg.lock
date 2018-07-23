@@ -15,6 +15,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/buger/jsonparser"
+  packages = ["."]
+  revision = "2cac668e8456b4284edb0715e17e2af02d3ec993"
+
+[[projects]]
+  branch = "master"
   name = "github.com/franela/goreq"
   packages = ["."]
   revision = "bcd34c9993f899273c74baaa95e15386cd97b6e7"
@@ -40,6 +46,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c041b89e586f68639981a735f02b6d6decd74a1a1188e1e509e610e4c607f4f0"
+  inputs-digest = "dc8665100d1e42cbf822e210590b8ed2f1f5ba367f410e86053202132a954511"
   solver-name = "gps-cdcl"
   solver-version = 1
