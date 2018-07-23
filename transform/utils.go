@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+var indexRe = regexp.MustCompile(`\[([\d]+)\]`)
+
 // Concat will combine any two arbitrary values, though only strings are supported for non-trivial concatenation.
 func concat(a, b interface{}) (interface{}, error) {
 	switch {
@@ -165,6 +167,5 @@ func schemaDefault(schema json.RawMessage) (interface{}, error) {
 // replaceIndex takes a path which may include array index values like `a[0].b.c[23].d` with the index values replaced
 // with "*", ie `a[*].b.c[*].d`
 func replaceIndex(path string) string {
-	re := regexp.MustCompile(`\[([\d]+)\]`)
-	return re.ReplaceAllString(path, "[*]")
+	return indexRe.ReplaceAllString(path, "[*]")
 }

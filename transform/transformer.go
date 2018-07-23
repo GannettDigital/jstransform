@@ -132,11 +132,6 @@ func (tr *Transformer) walker(path string, in jsonschema.Instance, value json.Ra
 // are build based on the transformed data from the array instance and for each field in an array item processing of
 // field for all array items happens in one step. This function can recursively handle nested arrays.
 func (tr *Transformer) processArrayItems(path string, arraySrc []interface{}, rawSchema json.RawMessage, value json.RawMessage) ([]interface{}, error) {
-	var instance jsonschema.Instance
-	if err := json.Unmarshal(rawSchema, &instance); err != nil {
-		return nil, fmt.Errorf("failed to parse array instance schema: %v", err)
-	}
-
 	atrIn, ok := tr.in.(map[string]interface{})
 	if !ok {
 		atrIn = make(map[string]interface{})
