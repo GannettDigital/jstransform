@@ -11,8 +11,12 @@ type testWalker struct {
 	rawCalls map[string]json.RawMessage
 }
 
-func (tw *testWalker) walkFn(path string, i Instance, value json.RawMessage) error {
+func (tw *testWalker) walkFn(path string, i Instance) error {
 	tw.calls[path] = i
+	return nil
+}
+
+func (tw *testWalker) walkRawFn(path string, value json.RawMessage) error {
 	tw.rawCalls[path] = value
 	return nil
 }
@@ -664,7 +668,7 @@ func TestWalkJSONSchemaRaw(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = Walk(schema, walker.walkFn)
+		err = WalkRaw(schema, walker.walkRawFn)
 
 		switch {
 		case test.wantErr && err != nil:
@@ -687,6 +691,36 @@ func TestWalkJSONSchemaRaw(t *testing.T) {
 			if !reflect.DeepEqual(call, walker.rawCalls[key]) {
 				t.Errorf("Test %q - at want key %q got call\n%s\n\twant\n%s", test.description, key, walker.rawCalls[key], call)
 			}
+		}
+	}
+}
+
+func BenchmarkWalkInstance(b *testing.B) {
+	schema, err := SchemaFromFile("./test_data/image_parent.json", "image")
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+
+		if err := Walk(schema, func(path string, i Instance) error { return nil }); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkWalkRaw(b *testing.B) {
+	schema, err := SchemaFromFile("./test_data/image_parent.json", "image")
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+
+		if err := WalkRaw(schema, func(path string, raw json.RawMessage) error { return nil }); err != nil {
+			b.Fatal(err)
 		}
 	}
 }

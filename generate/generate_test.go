@@ -3,12 +3,10 @@ package generate
 import (
 	"bytes"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
-
-	"path/filepath"
-
-	"os"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
 )

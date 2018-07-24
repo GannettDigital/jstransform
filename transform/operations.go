@@ -10,6 +10,8 @@ import (
 	"github.com/PaesslerAG/jsonpath"
 )
 
+var durationRe = regexp.MustCompile(`^([\d]*?):?([\d]*):([\d]*)$`)
+
 // duration is a transformOperation which changes from a string duration like "MM:SS" to a number of seconds as
 // an integer.
 type duration struct {
@@ -17,9 +19,8 @@ type duration struct {
 }
 
 func (c *duration) init(args map[string]string) error {
-	re, err := regexp.Compile(`^([\d]*?):?([\d]*):([\d]*)$`)
-	c.re = re
-	return err
+	c.re = durationRe
+	return nil
 }
 
 func (c *duration) transform(raw interface{}) (interface{}, error) {
