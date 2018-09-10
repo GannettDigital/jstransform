@@ -194,7 +194,7 @@ func TestBuildStructs(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if err := BuildStructs(filepath.Join(testdir, test.file), testdir); err != nil {
+		if err := BuildStructs(filepath.Join(testdir, test.file), testdir, false); err != nil {
 			t.Fatalf("Test %q - BuildStructs failed: %v", test.description, err)
 		}
 
