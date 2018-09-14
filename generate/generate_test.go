@@ -174,27 +174,30 @@ func TestExtractedFields_Sorted(t *testing.T) {
 func TestBuildStructs(t *testing.T) {
 	testdir := "test_data"
 	tests := []struct {
-		description   string
-		file          string
-		expectedFiles []string
-		wantFiles     []string
+		description    string
+		file           string
+		expectedFiles  []string
+		wantFiles      []string
+		useMessagePack bool
 	}{
 		{
-			file:          "complex.json",
-			description:   "without oneOfTypes",
-			expectedFiles: []string{"complex.go"},
-			wantFiles:     []string{"complex.go.out2"},
+			file:           "complex.json",
+			description:    "without oneOfTypes",
+			expectedFiles:  []string{"complex.go"},
+			wantFiles:      []string{"complex.go.out2"},
+			useMessagePack: false,
 		},
 		{
-			file:          "test_schema.json",
-			description:   "with oneOfType",
-			expectedFiles: []string{"simple.go", "complex.go"},
-			wantFiles:     []string{"simple.go.out2", "complex.go.out2"},
+			file:           "test_schema.json",
+			description:    "with oneOfType",
+			expectedFiles:  []string{"simple.go", "complex.go", "test_data_msgp.go", "test_data_msgp_test.go"},
+			wantFiles:      []string{"simple.go.out2", "complex.go.out2", "test_data_msgp.go.out", "test_data_msgp_test.go.out"},
+			useMessagePack: true,
 		},
 	}
 
 	for _, test := range tests {
-		if err := BuildStructs(filepath.Join(testdir, test.file), testdir, false); err != nil {
+		if err := BuildStructs(filepath.Join(testdir, test.file), testdir, test.useMessagePack); err != nil {
 			t.Fatalf("Test %q - BuildStructs failed: %v", test.description, err)
 		}
 
