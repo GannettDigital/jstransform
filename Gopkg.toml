@@ -24,10 +24,13 @@
 #   go-tests = true
 #   unused-packages = true
 
-
 [[constraint]]
   name = "github.com/PaesslerAG/jsonpath"
   version = "0.1.0"
+
+ [[constraint]]
+   name = "github.com/tinylib/msgp"
+   revision = "f65876d3ea05943d6613bca6b8ed391843044bd4"
 
 [prune]
   go-tests = true
