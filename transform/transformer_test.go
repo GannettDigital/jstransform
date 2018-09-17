@@ -214,10 +214,8 @@ var (
 			want: json.RawMessage(`{"dates":["2018-06-25T20:21:13Z","2018-06-25T20:21:13Z"],"requiredDate":"2018-06-25T20:21:13Z"}`),
 		},
 	}
-)
 
-func TestSaveValue(t *testing.T) {
-	tests := []struct {
+	saveValueTests = []struct {
 		description     string
 		tr              Transformer
 		jsonPath        string
@@ -342,7 +340,7 @@ func TestSaveValue(t *testing.T) {
 			tr:              Transformer{transformed: map[string]interface{}{}},
 			jsonPath:        "$.test1[0].a[1].name",
 			value:           "nestedName",
-			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{map[string]interface{}{}, map[string]interface{}{"name": "nestedName"}}}}},
+			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{nil, map[string]interface{}{"name": "nestedName"}}}}},
 		},
 		{
 			description:     "Save new array item existing nested Array",
@@ -352,8 +350,10 @@ func TestSaveValue(t *testing.T) {
 			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{"existingValue", "nestedValue"}}}},
 		},
 	}
+)
 
-	for _, test := range tests {
+func TestSaveValue(t *testing.T) {
+	for _, test := range saveValueTests {
 		err := test.tr.saveValue(test.jsonPath, test.value)
 
 		switch {
@@ -399,5 +399,16 @@ func BenchmarkTransformer(b *testing.B) {
 				}
 			}
 		})
+	}
+}
+
+func BenchmarkSaveInValue(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for _, test := range saveValueTests {
+			err := test.tr.saveValue(test.jsonPath, test.value)
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
 	}
 }
