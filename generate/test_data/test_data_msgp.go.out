@@ -612,27 +612,47 @@ func (z *Simple) DecodeMsg(dc *msgp.Reader) (err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
-		case "Dates":
-			var zb0002 uint32
-			zb0002, err = dc.ReadArrayHeader()
-			if err != nil {
-				return
-			}
-			if cap(z.Dates) >= int(zb0002) {
-				z.Dates = (z.Dates)[:zb0002]
-			} else {
-				z.Dates = make([]time.Time, zb0002)
-			}
-			for za0001 := range z.Dates {
-				z.Dates[za0001], err = dc.ReadTime()
-				if err != nil {
-					return
-				}
-			}
 		case "Height":
 			z.Height, err = dc.ReadInt64()
 			if err != nil {
 				return
+			}
+		case "SomeDateObj":
+			var zb0002 uint32
+			zb0002, err = dc.ReadMapHeader()
+			if err != nil {
+				return
+			}
+			for zb0002 > 0 {
+				zb0002--
+				field, err = dc.ReadMapKeyPtr()
+				if err != nil {
+					return
+				}
+				switch msgp.UnsafeString(field) {
+				case "Dates":
+					var zb0003 uint32
+					zb0003, err = dc.ReadArrayHeader()
+					if err != nil {
+						return
+					}
+					if cap(z.SomeDateObj.Dates) >= int(zb0003) {
+						z.SomeDateObj.Dates = (z.SomeDateObj.Dates)[:zb0003]
+					} else {
+						z.SomeDateObj.Dates = make([]time.Time, zb0003)
+					}
+					for za0001 := range z.SomeDateObj.Dates {
+						z.SomeDateObj.Dates[za0001], err = dc.ReadTime()
+						if err != nil {
+							return
+						}
+					}
+				default:
+					err = dc.Skip()
+					if err != nil {
+						return
+					}
+				}
 			}
 		case "Type":
 			z.Type, err = dc.ReadString()
@@ -662,29 +682,31 @@ func (z *Simple) DecodeMsg(dc *msgp.Reader) (err error) {
 // EncodeMsg implements msgp.Encodable
 func (z *Simple) EncodeMsg(en *msgp.Writer) (err error) {
 	// map header, size 5
-	// write "Dates"
-	err = en.Append(0x85, 0xa5, 0x44, 0x61, 0x74, 0x65, 0x73)
-	if err != nil {
-		return
-	}
-	err = en.WriteArrayHeader(uint32(len(z.Dates)))
-	if err != nil {
-		return
-	}
-	for za0001 := range z.Dates {
-		err = en.WriteTime(z.Dates[za0001])
-		if err != nil {
-			return
-		}
-	}
 	// write "Height"
-	err = en.Append(0xa6, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74)
+	err = en.Append(0x85, 0xa6, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74)
 	if err != nil {
 		return
 	}
 	err = en.WriteInt64(z.Height)
 	if err != nil {
 		return
+	}
+	// write "SomeDateObj"
+	// map header, size 1
+	// write "Dates"
+	err = en.Append(0xab, 0x53, 0x6f, 0x6d, 0x65, 0x44, 0x61, 0x74, 0x65, 0x4f, 0x62, 0x6a, 0x81, 0xa5, 0x44, 0x61, 0x74, 0x65, 0x73)
+	if err != nil {
+		return
+	}
+	err = en.WriteArrayHeader(uint32(len(z.SomeDateObj.Dates)))
+	if err != nil {
+		return
+	}
+	for za0001 := range z.SomeDateObj.Dates {
+		err = en.WriteTime(z.SomeDateObj.Dates[za0001])
+		if err != nil {
+			return
+		}
 	}
 	// write "Type"
 	err = en.Append(0xa4, 0x54, 0x79, 0x70, 0x65)
@@ -720,15 +742,17 @@ func (z *Simple) EncodeMsg(en *msgp.Writer) (err error) {
 func (z *Simple) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
 	// map header, size 5
-	// string "Dates"
-	o = append(o, 0x85, 0xa5, 0x44, 0x61, 0x74, 0x65, 0x73)
-	o = msgp.AppendArrayHeader(o, uint32(len(z.Dates)))
-	for za0001 := range z.Dates {
-		o = msgp.AppendTime(o, z.Dates[za0001])
-	}
 	// string "Height"
-	o = append(o, 0xa6, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74)
+	o = append(o, 0x85, 0xa6, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74)
 	o = msgp.AppendInt64(o, z.Height)
+	// string "SomeDateObj"
+	// map header, size 1
+	// string "Dates"
+	o = append(o, 0xab, 0x53, 0x6f, 0x6d, 0x65, 0x44, 0x61, 0x74, 0x65, 0x4f, 0x62, 0x6a, 0x81, 0xa5, 0x44, 0x61, 0x74, 0x65, 0x73)
+	o = msgp.AppendArrayHeader(o, uint32(len(z.SomeDateObj.Dates)))
+	for za0001 := range z.SomeDateObj.Dates {
+		o = msgp.AppendTime(o, z.SomeDateObj.Dates[za0001])
+	}
 	// string "Type"
 	o = append(o, 0xa4, 0x54, 0x79, 0x70, 0x65)
 	o = msgp.AppendString(o, z.Type)
@@ -757,27 +781,47 @@ func (z *Simple) UnmarshalMsg(bts []byte) (o []byte, err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
-		case "Dates":
-			var zb0002 uint32
-			zb0002, bts, err = msgp.ReadArrayHeaderBytes(bts)
-			if err != nil {
-				return
-			}
-			if cap(z.Dates) >= int(zb0002) {
-				z.Dates = (z.Dates)[:zb0002]
-			} else {
-				z.Dates = make([]time.Time, zb0002)
-			}
-			for za0001 := range z.Dates {
-				z.Dates[za0001], bts, err = msgp.ReadTimeBytes(bts)
-				if err != nil {
-					return
-				}
-			}
 		case "Height":
 			z.Height, bts, err = msgp.ReadInt64Bytes(bts)
 			if err != nil {
 				return
+			}
+		case "SomeDateObj":
+			var zb0002 uint32
+			zb0002, bts, err = msgp.ReadMapHeaderBytes(bts)
+			if err != nil {
+				return
+			}
+			for zb0002 > 0 {
+				zb0002--
+				field, bts, err = msgp.ReadMapKeyZC(bts)
+				if err != nil {
+					return
+				}
+				switch msgp.UnsafeString(field) {
+				case "Dates":
+					var zb0003 uint32
+					zb0003, bts, err = msgp.ReadArrayHeaderBytes(bts)
+					if err != nil {
+						return
+					}
+					if cap(z.SomeDateObj.Dates) >= int(zb0003) {
+						z.SomeDateObj.Dates = (z.SomeDateObj.Dates)[:zb0003]
+					} else {
+						z.SomeDateObj.Dates = make([]time.Time, zb0003)
+					}
+					for za0001 := range z.SomeDateObj.Dates {
+						z.SomeDateObj.Dates[za0001], bts, err = msgp.ReadTimeBytes(bts)
+						if err != nil {
+							return
+						}
+					}
+				default:
+					bts, err = msgp.Skip(bts)
+					if err != nil {
+						return
+					}
+				}
 			}
 		case "Type":
 			z.Type, bts, err = msgp.ReadStringBytes(bts)
@@ -807,6 +851,6 @@ func (z *Simple) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z *Simple) Msgsize() (s int) {
-	s = 1 + 6 + msgp.ArrayHeaderSize + (len(z.Dates) * (msgp.TimeSize)) + 7 + msgp.Int64Size + 5 + msgp.StringPrefixSize + len(z.Type) + 8 + msgp.BoolSize + 6 + msgp.Float64Size
+	s = 1 + 7 + msgp.Int64Size + 12 + 1 + 6 + msgp.ArrayHeaderSize + (len(z.SomeDateObj.Dates) * (msgp.TimeSize)) + 5 + msgp.StringPrefixSize + len(z.Type) + 8 + msgp.BoolSize + 6 + msgp.Float64Size
 	return
 }

@@ -172,6 +172,21 @@ func (ef *extractedField) write(w io.Writer, prefix string, required bool) error
 // extractedFields is a map of fields keyed on the field name.
 type extractedFields map[string]*extractedField
 
+// IncludeTime does a depth-first recursive search to see if any field or child field is of type "date-time"
+func (efs extractedFields) IncludeTime() bool {
+	for _, field := range efs {
+		if field.fields != nil {
+			if field.fields.IncludeTime() {
+				return true
+			}
+		}
+		if field.jsonType == "date-time" {
+			return true
+		}
+	}
+	return false
+}
+
 // Sorted will return the fields in a sorted list. The sort is a string sort on the keys
 func (efs extractedFields) Sorted() []*extractedField {
 	var sorted []*extractedField
@@ -235,15 +250,7 @@ func (gen *generatedStruct) write(w io.Writer) error {
 		return fmt.Errorf("failed writing struct: %v", err)
 	}
 
-	var includeTime bool
-	for _, field := range gen.fields {
-		if field.jsonType == "date-time" {
-			includeTime = true
-			break
-		}
-	}
-
-	if includeTime {
+	if gen.fields.IncludeTime() {
 		if _, err := buf.Write([]byte("import \"time\"\n")); err != nil {
 			return fmt.Errorf("failed writing struct: %v", err)
 		}

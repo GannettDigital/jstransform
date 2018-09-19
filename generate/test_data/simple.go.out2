@@ -5,9 +5,11 @@ package test_data
 import "time"
 
 type Simple struct {
-	Dates   []time.Time `json:"dates,omitempty"`
-	Height  int64       `json:"height,omitempty"`
-	Type    string      `json:"type"`
-	Visible bool        `json:"visible,omitempty"`
-	Width   float64     `json:"width,omitempty"`
+	Height      int64 `json:"height,omitempty"`
+	SomeDateObj struct {
+		Dates []time.Time `json:"dates,omitempty"`
+	} `json:"someDateObj,omitempty"`
+	Type    string  `json:"type"`
+	Visible bool    `json:"visible,omitempty"`
+	Width   float64 `json:"width,omitempty"`
 }

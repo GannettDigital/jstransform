@@ -14,11 +14,16 @@
     "visible": {
       "type": "boolean"
     },
-    "dates": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "format": "date-time"
+    "someDateObj": {
+      "type": "object",
+      "properties": {
+        "dates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
       }
     }
   },
