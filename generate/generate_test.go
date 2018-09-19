@@ -184,14 +184,14 @@ func TestBuildStructs(t *testing.T) {
 			file:           "complex.json",
 			description:    "without oneOfTypes",
 			expectedFiles:  []string{"complex.go"},
-			wantFiles:      []string{"complex.go.out"},
+			wantFiles:      []string{"complex.go.out2"},
 			useMessagePack: false,
 		},
 		{
 			file:           "test_schema.json",
 			description:    "with oneOfType",
 			expectedFiles:  []string{"simple.go", "complex.go", "test_data_msgp.go", "test_data_msgp_test.go"},
-			wantFiles:      []string{"simple.go.out", "complex.go.out", "test_data_msgp.go.out", "test_data_msgp_test.go.out"},
+			wantFiles:      []string{"simple.go.out2", "complex.go.out2", "test_data_msgp.go.out", "test_data_msgp_test.go.out"},
 			useMessagePack: true,
 		},
 	}
