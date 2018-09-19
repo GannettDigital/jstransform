@@ -389,6 +389,18 @@ func TestGoType(t *testing.T) {
 			array:       true,
 			want:        "[]struct",
 		},
+		{
+			description: "JSON string date-time",
+			jsonType:    "date-time",
+			array:       false,
+			want:        "time.Time",
+		},
+		{
+			description: "JSON string date-time array",
+			jsonType:    "date-time",
+			array:       true,
+			want:        "[]time.Time",
+		},
 	}
 
 	for _, test := range tests {
