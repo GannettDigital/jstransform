@@ -17,15 +17,17 @@ var (
 	dateTimesSchema, _       = jsonschema.SchemaFromFile("./test_data/date-times.json", "")
 
 	transformerTests = []struct {
-		description string
-		transformer Transformer
-		in          json.RawMessage
-		want        json.RawMessage
-		wantErr     bool
+		description         string
+		schema              *jsonschema.Schema
+		transformIdentifier string
+		in                  json.RawMessage
+		want                json.RawMessage
+		wantErr             bool
 	}{
 		{
-			description: "Use basic transforms, copy from input and default to build result",
-			transformer: Transformer{schema: imageSchema, transformIdentifier: "cumulo"},
+			description:         "Use basic transforms, copy from input and default to build result",
+			schema:              imageSchema,
+			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
 							{
 								"type": "image",
@@ -50,8 +52,9 @@ var (
 			want: json.RawMessage(`{"URL":{"absolute":"absoluteURL","publish":"publishURL"},"crops":[{"height":0,"name":"name","path":"path","relativePath":"","width":0},{"height":0,"name":"aname","path":"empty","relativePath":"empty","width":0}],"type":"image"}`),
 		},
 		{
-			description: "Input too simple, fails validation",
-			transformer: Transformer{schema: imageSchema, transformIdentifier: "cumulo"},
+			description:         "Input too simple, fails validation",
+			schema:              imageSchema,
+			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
 							{
 								"type": "image",
@@ -71,8 +74,9 @@ var (
 			wantErr: true,
 		},
 		{
-			description: "Array transforms, tests arrays with string type and with a single object type",
-			transformer: Transformer{schema: arrayTransformsSchema, transformIdentifier: "cumulo"},
+			description:         "Array transforms, tests arrays with string type and with a single object type",
+			schema:              arrayTransformsSchema,
+			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
 							{
 								"type": "image",
@@ -96,8 +100,9 @@ var (
 			want: json.RawMessage(`{"contributors":[{"id":"1","name":"one"},{"id":"2","name":"two"}],"lines":["line1","line2"],"wasSingleObject":[{"id":"1","name":"test1"}]}`),
 		},
 		{
-			description: "Test all operations",
-			transformer: Transformer{schema: operationsSchema, transformIdentifier: "cumulo"},
+			description:         "Test all operations",
+			schema:              operationsSchema,
+			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
 						{
 							"type": "image",
@@ -120,8 +125,9 @@ var (
 			want: json.RawMessage(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"url":"http://gannettdigital.com/blah","valid":true}`),
 		},
 		{
-			description: "Test empty non-required object",
-			transformer: Transformer{schema: imageSchema, transformIdentifier: "cumulo"},
+			description:         "Test empty non-required object",
+			schema:              imageSchema,
+			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
 						{
 							"type": "image",
@@ -144,8 +150,9 @@ var (
 			want: json.RawMessage(`{"crops":[{"height":0,"name":"name","path":"path","relativePath":"","width":0},{"height":0,"name":"aname","path":"empty","relativePath":"empty","width":0}],"type":"image"}`),
 		},
 		{
-			description: "Test empty non-required array",
-			transformer: Transformer{schema: arrayTransformsSchema, transformIdentifier: "cumulo"},
+			description:         "Test empty non-required array",
+			schema:              arrayTransformsSchema,
+			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
 						{
 							"type": "image",
@@ -165,8 +172,9 @@ var (
 			want: json.RawMessage(`{"lines":["line1","line2"],"wasSingleObject":[{"id":"1","name":"test1"}]}`),
 		},
 		{
-			description: "Test nested arrays",
-			transformer: Transformer{schema: doublearraySchema, transformIdentifier: "cumulo"},
+			description:         "Test nested arrays",
+			schema:              doublearraySchema,
+			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
 				{
 					"data" : {
@@ -200,8 +208,9 @@ var (
 			want: json.RawMessage(`{"array1":[{"array2":[{"level2Name":"array1-1-1"},{"level2Name":"array1-1-2"}],"level1Name":"array1-1"},{"array2":[{"level2Name":"array1-2-1"}],"level1Name":"array1-2"}],"double":[["1-1","1-2"],["2-1","2-2"]]}`),
 		},
 		{
-			description: "Test format: date-time strings",
-			transformer: Transformer{schema: dateTimesSchema, transformIdentifier: "cumulo"},
+			description:         "Test format: date-time strings",
+			schema:              dateTimesSchema,
+			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
 				{
 					"dates": [
@@ -216,145 +225,145 @@ var (
 	}
 
 	saveValueTests = []struct {
-		description     string
-		tr              Transformer
-		jsonPath        string
-		value           interface{}
-		wantTransformed map[string]interface{}
-		wantErr         bool
+		description string
+		tree        map[string]interface{}
+		jsonPath    string
+		value       interface{}
+		want        map[string]interface{}
+		wantErr     bool
 	}{
 		{
-			description:     "Simple string value at empty root",
-			tr:              Transformer{transformed: make(map[string]interface{})},
-			jsonPath:        "$.test",
-			value:           "string",
-			wantTransformed: map[string]interface{}{"test": "string"},
+			description: "Simple string value at empty root",
+			tree:        make(map[string]interface{}),
+			jsonPath:    "$.test",
+			value:       "string",
+			want:        map[string]interface{}{"test": "string"},
 		},
 		{
-			description:     "nil value",
-			tr:              Transformer{transformed: make(map[string]interface{})},
-			jsonPath:        "$.test",
-			value:           nil,
-			wantTransformed: map[string]interface{}{},
+			description: "nil value",
+			tree:        make(map[string]interface{}),
+			jsonPath:    "$.test",
+			value:       nil,
+			want:        map[string]interface{}{},
 		},
 		{
-			description:     "Simple string value at existing root",
-			tr:              Transformer{transformed: map[string]interface{}{"test1": 1}},
-			jsonPath:        "$.test",
-			value:           "string",
-			wantTransformed: map[string]interface{}{"test": "string", "test1": 1},
+			description: "Simple string value at existing root",
+			tree:        map[string]interface{}{"test1": 1},
+			jsonPath:    "$.test",
+			value:       "string",
+			want:        map[string]interface{}{"test": "string", "test1": 1},
 		},
 		{
-			description:     "Simple string value overwriting existing value",
-			tr:              Transformer{transformed: map[string]interface{}{"test1": 1}},
-			jsonPath:        "$.test1",
-			value:           "string",
-			wantTransformed: map[string]interface{}{"test1": "string"},
+			description: "Simple string value overwriting existing value",
+			tree:        map[string]interface{}{"test1": 1},
+			jsonPath:    "$.test1",
+			value:       "string",
+			want:        map[string]interface{}{"test1": "string"},
 		},
 		{
-			description:     "Simple string value non-existent parent",
-			tr:              Transformer{transformed: map[string]interface{}{}},
-			jsonPath:        "$.test1.test2",
-			value:           "string",
-			wantTransformed: map[string]interface{}{"test1": map[string]interface{}{"test2": "string"}},
+			description: "Simple string value non-existent parent",
+			tree:        map[string]interface{}{},
+			jsonPath:    "$.test1.test2",
+			value:       "string",
+			want:        map[string]interface{}{"test1": map[string]interface{}{"test2": "string"}},
 		},
 		{
-			description:     "Simple int value at empty root",
-			tr:              Transformer{transformed: make(map[string]interface{})},
-			jsonPath:        "$.test",
-			value:           1,
-			wantTransformed: map[string]interface{}{"test": 1},
+			description: "Simple int value at empty root",
+			tree:        make(map[string]interface{}),
+			jsonPath:    "$.test",
+			value:       1,
+			want:        map[string]interface{}{"test": 1},
 		},
 		{
-			description:     "New Map at empty root",
-			tr:              Transformer{transformed: map[string]interface{}{}},
-			jsonPath:        "$.test1",
-			value:           map[string]interface{}{},
-			wantTransformed: map[string]interface{}{"test1": map[string]interface{}{}},
+			description: "New Map at empty root",
+			tree:        map[string]interface{}{},
+			jsonPath:    "$.test1",
+			value:       map[string]interface{}{},
+			want:        map[string]interface{}{"test1": map[string]interface{}{}},
 		},
 		{
-			description:     "Map with values at empty root",
-			tr:              Transformer{transformed: map[string]interface{}{}},
-			jsonPath:        "$.test1",
-			value:           map[string]interface{}{"testA": "a"},
-			wantTransformed: map[string]interface{}{"test1": map[string]interface{}{"testA": "a"}},
+			description: "Map with values at empty root",
+			tree:        map[string]interface{}{},
+			jsonPath:    "$.test1",
+			value:       map[string]interface{}{"testA": "a"},
+			want:        map[string]interface{}{"test1": map[string]interface{}{"testA": "a"}},
 		},
 		{
-			description:     "Save new value in existing Map",
-			tr:              Transformer{transformed: map[string]interface{}{"test1": map[string]interface{}{"testA": "a"}}},
-			jsonPath:        "$.test1.testB",
-			value:           "B",
-			wantTransformed: map[string]interface{}{"test1": map[string]interface{}{"testA": "a", "testB": "B"}},
+			description: "Save new value in existing Map",
+			tree:        map[string]interface{}{"test1": map[string]interface{}{"testA": "a"}},
+			jsonPath:    "$.test1.testB",
+			value:       "B",
+			want:        map[string]interface{}{"test1": map[string]interface{}{"testA": "a", "testB": "B"}},
 		},
 		{
-			description:     "Array at empty root",
-			tr:              Transformer{transformed: map[string]interface{}{}},
-			jsonPath:        "$.test1",
-			value:           []interface{}{"a", "b"},
-			wantTransformed: map[string]interface{}{"test1": []interface{}{"a", "b"}},
+			description: "Array at empty root",
+			tree:        map[string]interface{}{},
+			jsonPath:    "$.test1",
+			value:       []interface{}{"a", "b"},
+			want:        map[string]interface{}{"test1": []interface{}{"a", "b"}},
 		},
 		{
-			description:     "Save value in existing Array",
-			tr:              Transformer{transformed: map[string]interface{}{"test1": []interface{}{"a", "b"}}},
-			jsonPath:        "$.test1[2]",
-			value:           "c",
-			wantTransformed: map[string]interface{}{"test1": []interface{}{"a", "b", "c"}},
+			description: "Save value in existing Array",
+			tree:        map[string]interface{}{"test1": []interface{}{"a", "b"}},
+			jsonPath:    "$.test1[2]",
+			value:       "c",
+			want:        map[string]interface{}{"test1": []interface{}{"a", "b", "c"}},
 		},
 		{
-			description:     "Save value in new Array of objects",
-			tr:              Transformer{transformed: map[string]interface{}{}},
-			jsonPath:        "$.test1[0].a",
-			value:           "aValue",
-			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}}},
+			description: "Save value in new Array of objects",
+			tree:        map[string]interface{}{},
+			jsonPath:    "$.test1[0].a",
+			value:       "aValue",
+			want:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}}},
 		},
 		{
-			description:     "Save value in existing Array of objects",
-			tr:              Transformer{transformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}}}},
-			jsonPath:        "$.test1[0].b",
-			value:           "bValue",
-			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue", "b": "bValue"}}},
+			description: "Save value in existing Array of objects",
+			tree:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}}},
+			jsonPath:    "$.test1[0].b",
+			value:       "bValue",
+			want:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue", "b": "bValue"}}},
 		},
 		{
-			description:     "Save new array item value in existing Array of objects",
-			tr:              Transformer{transformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}}}},
-			jsonPath:        "$.test1[1].a",
-			value:           "a2ndValue",
-			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}, map[string]interface{}{"a": "a2ndValue"}}},
+			description: "Save new array item value in existing Array of objects",
+			tree:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}}},
+			jsonPath:    "$.test1[1].a",
+			value:       "a2ndValue",
+			want:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}, map[string]interface{}{"a": "a2ndValue"}}},
 		},
 		{
-			description:     "Save new array item simple nested Array",
-			tr:              Transformer{transformed: map[string]interface{}{}},
-			jsonPath:        "$.test1[0][1]",
-			value:           "nestedValue",
-			wantTransformed: map[string]interface{}{"test1": []interface{}{[]interface{}{nil, "nestedValue"}}},
+			description: "Save new array item simple nested Array",
+			tree:        map[string]interface{}{},
+			jsonPath:    "$.test1[0][1]",
+			value:       "nestedValue",
+			want:        map[string]interface{}{"test1": []interface{}{[]interface{}{nil, "nestedValue"}}},
 		},
 		{
-			description:     "Save new array item new nested Array",
-			tr:              Transformer{transformed: map[string]interface{}{}},
-			jsonPath:        "$.test1[0].a[1]",
-			value:           "nestedValue",
-			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{nil, "nestedValue"}}}},
+			description: "Save new array item new nested Array",
+			tree:        map[string]interface{}{},
+			jsonPath:    "$.test1[0].a[1]",
+			value:       "nestedValue",
+			want:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{nil, "nestedValue"}}}},
 		},
 		{
-			description:     "Save object field in new nested Array",
-			tr:              Transformer{transformed: map[string]interface{}{}},
-			jsonPath:        "$.test1[0].a[1].name",
-			value:           "nestedName",
-			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{nil, map[string]interface{}{"name": "nestedName"}}}}},
+			description: "Save object field in new nested Array",
+			tree:        map[string]interface{}{},
+			jsonPath:    "$.test1[0].a[1].name",
+			value:       "nestedName",
+			want:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{nil, map[string]interface{}{"name": "nestedName"}}}}},
 		},
 		{
-			description:     "Save new array item existing nested Array",
-			tr:              Transformer{transformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{"existingValue"}}}}},
-			jsonPath:        "$.test1[0].a[1]",
-			value:           "nestedValue",
-			wantTransformed: map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{"existingValue", "nestedValue"}}}},
+			description: "Save new array item existing nested Array",
+			tree:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{"existingValue"}}}},
+			jsonPath:    "$.test1[0].a[1]",
+			value:       "nestedValue",
+			want:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{"existingValue", "nestedValue"}}}},
 		},
 	}
 )
 
 func TestSaveValue(t *testing.T) {
 	for _, test := range saveValueTests {
-		err := test.tr.saveValue(test.jsonPath, test.value)
+		err := saveInTree(test.tree, test.jsonPath, test.value)
 
 		switch {
 		case test.wantErr && err != nil:
@@ -363,15 +372,20 @@ func TestSaveValue(t *testing.T) {
 			t.Errorf("Test %q - got nil, want error", test.description)
 		case !test.wantErr && err != nil:
 			t.Errorf("Test %q - got error, want nil: %v", test.description, err)
-		case !reflect.DeepEqual(test.tr.transformed, test.wantTransformed):
-			t.Errorf("Test %q - got %v, want %v", test.description, test.tr.transformed, test.wantTransformed)
+		case !reflect.DeepEqual(test.tree, test.want):
+			t.Errorf("Test %q - got %v, want %v", test.description, test.tree, test.want)
 		}
 	}
 }
 
 func TestTransformer(t *testing.T) {
 	for _, test := range transformerTests {
-		got, err := test.transformer.Transform(test.in)
+		tr, err := NewTransformer(test.schema, test.transformIdentifier)
+		if err != nil {
+			t.Fatalf("Test %q - failed to initialize transformer: %v", test.description, err)
+		}
+
+		got, err := tr.Transform(test.in)
 
 		switch {
 		case test.wantErr && err != nil:
@@ -391,9 +405,15 @@ func BenchmarkTransformer(b *testing.B) {
 		if test.wantErr {
 			continue
 		}
+
+		tr, err := NewTransformer(test.schema, test.transformIdentifier)
+		if err != nil {
+			b.Fatalf("Test %q - failed to initialize transformer: %v", test.description, err)
+		}
+
 		b.Run(test.description, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_, err := test.transformer.Transform(test.in)
+				_, err := tr.Transform(test.in)
 				if err != nil {
 					b.Fatal(err)
 				}
@@ -402,10 +422,10 @@ func BenchmarkTransformer(b *testing.B) {
 	}
 }
 
-func BenchmarkSaveInValue(b *testing.B) {
+func BenchmarkSaveInTree(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, test := range saveValueTests {
-			err := test.tr.saveValue(test.jsonPath, test.value)
+			err := saveInTree(test.tree, test.jsonPath, test.value)
 			if err != nil {
 				b.Fatal(err)
 			}
