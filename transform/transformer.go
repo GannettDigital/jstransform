@@ -73,6 +73,41 @@ func (tr *Transformer) Transform(in json.RawMessage) (json.RawMessage, error) {
 	return out, nil
 }
 
+// getInstanceValue retrieves the value for a JSONSchema instance following this process:
+//
+// 1. Use a Transform if it exists.
+//
+// 2. Look for the same JSONPath in the input and use directly if possible.
+//
+// 3. Fall back to the JSON Schema default value.
+func (tr *Transformer) getInstanceValue(t transform, jsonType string, path string, value json.RawMessage) (interface{}, error) {
+	// 1. Use a transform if it exists
+	newValue, err := tr.processTransform(t, jsonType)
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. Look for the same JSONPath in the input and use directly if possible.
+	if newValue == nil && jsonType != "object" {
+		rawValue, err := jsonpath.Get(path, tr.in)
+		if err == nil {
+			newValue, err = convert(rawValue, jsonType)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// 3. Fall back to the JSON Schema default value.
+	if newValue == nil {
+		newValue, err = schemaDefault(value)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return newValue, nil
+}
+
 // walker is a WalkFunc for the Transformer which does the bulk of the work instance by instance.
 // It includes the logic to handle arrays properly.
 func (tr *Transformer) walker(path string, value json.RawMessage) error {
@@ -88,25 +123,39 @@ func (tr *Transformer) walker(path string, value json.RawMessage) error {
 		return nil
 	}
 
-	ifields := struct {
-		Type      string    `json:"type"`
-		Format    string    `json:"format"`
-		Transform transform `json:"transform"`
-	}{}
-	if err := json.Unmarshal(value, &ifields); err != nil {
-		return fmt.Errorf("failed to extract transform: %v", err)
+	instanceType, err := jsonparser.GetString(value, "type")
+	if err != nil {
+		return fmt.Errorf("failed to extract instance type: %v", err)
 	}
 
-	jsonType := ifields.Type
-	if jsonType == "string" && ifields.Format == "date-time" {
-		jsonType = "date-time"
+	jsonType := instanceType
+	if jsonType == "string" {
+		instanctFormat, err := jsonparser.GetString(value, "format")
+		if err != nil && err != jsonparser.KeyPathNotFoundError {
+			return fmt.Errorf("failed to extract instance format: %v", err)
+		}
+		if instanctFormat == "date-time" {
+			jsonType = "date-time"
+		}
 	}
 
-	if tr.relativePath != "" { // TODO this should also only apply the jsonPath's starting with @ not any
-		ifields.Transform = ifields.Transform.replaceJSONPath("@", tr.relativePath)
+	var iTransform transform
+	rawTransformInstruction, _, _, err := jsonparser.Get(value, "transform", tr.transformIdentifier)
+	if err != nil && err != jsonparser.KeyPathNotFoundError {
+		return fmt.Errorf("failed to extract raw instance transform: %v", err)
+	} else if len(rawTransformInstruction) != 0 {
+		var tis transformInstructions
+		if err := json.Unmarshal(rawTransformInstruction, &tis); err != nil {
+			return fmt.Errorf("failed to unmarshal instance transform: %v", err)
+		}
+		iTransform = transform{tr.transformIdentifier: tis}
+
+		if tr.relativePath != "" { // TODO this should also only apply the jsonPath's starting with @ not any
+			iTransform = iTransform.replaceJSONPath("@", tr.relativePath)
+		}
 	}
 
-	newValue, err := tr.getInstanceValue(ifields.Transform, tr.in, jsonType, path, value)
+	newValue, err := tr.getInstanceValue(iTransform, jsonType, path, value)
 	if err != nil {
 		return err
 	}
@@ -174,7 +223,7 @@ func (tr *Transformer) processArrayItems(path string, arraySrc []interface{}, ra
 
 // processTransform determines the value for a given instance using a transform, returning nil if there is no value
 // determined.
-func (tr *Transformer) processTransform(t transform, in interface{}, jsonType string) (interface{}, error) {
+func (tr *Transformer) processTransform(t transform, jsonType string) (interface{}, error) {
 	if t == nil {
 		return nil, nil
 	}
@@ -184,7 +233,7 @@ func (tr *Transformer) processTransform(t transform, in interface{}, jsonType st
 		return nil, nil
 	}
 
-	newValue, err := instructions.transform(in, jsonType)
+	newValue, err := instructions.transform(tr.in, jsonType)
 	if err != nil {
 		return nil, err
 	}
@@ -304,39 +353,4 @@ func saveInSlice(current []interface{}, arraySplits []string, value interface{})
 	newValue, err := saveInSlice(nested, arraySplits[1:], value)
 	current[index] = newValue
 	return current, nil
-}
-
-// getInstanceValue retrieves the value for a JSONSchema instance following this process:
-//
-// 1. Use a Transform if it exists.
-//
-// 2. Look for the same JSONPath in the input and use directly if possible.
-//
-// 3. Fall back to the JSON Schema default value.
-func (tr *Transformer) getInstanceValue(t transform, in interface{}, jsonType string, path string, value json.RawMessage) (interface{}, error) {
-	// 1. Use a transform if it exists
-	newValue, err := tr.processTransform(t, in, jsonType)
-	if err != nil {
-		return nil, err
-	}
-
-	// 2. Look for the same JSONPath in the input and use directly if possible.
-	if newValue == nil && jsonType != "object" {
-		rawValue, err := jsonpath.Get(path, in)
-		if err == nil {
-			newValue, err = convert(rawValue, jsonType)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	// 3. Fall back to the JSON Schema default value.
-	if newValue == nil {
-		newValue, err = schemaDefault(value)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return newValue, nil
 }
