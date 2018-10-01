@@ -192,8 +192,6 @@ func (tr *Transformer) processTransform(t transform, in interface{}, jsonType st
 }
 
 // saveValue adds the given value to the tr.transformed object at the place specified by jsonPath.
-// It does not support writing a value to an array which is inside another array, rather it assumes all array
-// members are saved as a complete whole.
 func (tr *Transformer) saveValue(jsonPath string, value interface{}) error {
 	splits := strings.SplitN(jsonPath, ".", 2)
 	if splits[0] != "$" {
@@ -212,55 +210,40 @@ func saveInTree(tree map[string]interface{}, path string, value interface{}) err
 		return saveLeaf(tree, splits[0], value)
 	}
 
-	arraySplits := strings.SplitN(splits[0], "[", 2)
-	if len(arraySplits) != 1 {
-		index, err := strconv.Atoi(strings.Trim(arraySplits[1], "]"))
+	arraySplits := strings.Split(splits[0], "[")
+	if len(arraySplits) != 1 { // the case of an array or nested arrays with an object in them
+		var sValue []interface{}
+		if rawSlice, ok := tree[arraySplits[0]]; ok {
+			sValue = rawSlice.([]interface{})
+		}
+
+		newTreeMap := make(map[string]interface{})
+		newValue, err := saveInSlice(sValue, arraySplits[1:], newTreeMap)
 		if err != nil {
-			return fmt.Errorf("failed ot determine index of %q", splits[0])
-		}
-		var slices []interface{}
-		rawSlice, ok := tree[arraySplits[0]]
-		if !ok {
-			slices = make([]interface{}, 0)
-		} else {
-			slices, ok = rawSlice.([]interface{})
-			if !ok {
-				return fmt.Errorf("value at %q is not a slice of interface{}", arraySplits[0])
-			}
+			return err
 		}
 
-		for i := len(slices); i <= index; i++ {
-			slices = append(slices, make(map[string]interface{}))
-		}
-
-		tree[arraySplits[0]] = slices
-		sliceMap, ok := slices[index].(map[string]interface{})
-		if !ok {
-			return fmt.Errorf("value at %q is not a slice of map[string]interface{}", arraySplits[0])
-		}
-
-		return saveInTree(sliceMap, strings.Join(splits[1:], "."), value)
-	}
-	newTree, ok := tree[splits[0]]
-	if ok {
-		var newTreeMap map[string]interface{}
-		if newTree == nil {
-			newTreeMap = make(map[string]interface{})
-			tree[splits[0]] = newTreeMap
-		} else {
-			var ok bool
-			newTreeMap, ok = newTree.(map[string]interface{})
-			if !ok {
-				return fmt.Errorf("value at %q is not a map[string]interface{}", splits[0])
-			}
-		}
+		tree[arraySplits[0]] = newValue
 		return saveInTree(newTreeMap, strings.Join(splits[1:], "."), value)
 	}
-	newTreeMap := make(map[string]interface{})
+
+	var newTreeMap map[string]interface{}
+	newTree, ok := tree[splits[0]]
+	if !ok || newTree == nil {
+		newTreeMap = make(map[string]interface{})
+	} else {
+		newTreeMap, ok = newTree.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("value at %q is not a map[string]interface{}", splits[0])
+		}
+	}
 	tree[splits[0]] = newTreeMap
 	return saveInTree(newTreeMap, strings.Join(splits[1:], "."), value)
 }
 
+// saveLeaf will save a leaf value in the tree at the given path. If the path specifies an array or set of nested
+// arrays it will build the array items as needed to reach the specified index. New array items are created as nil.
+// Any nested array items will be recursively treated the same way.
 func saveLeaf(tree map[string]interface{}, path string, value interface{}) error {
 	arraySplits := strings.Split(path, "[")
 	if len(arraySplits) == 1 {
@@ -268,42 +251,59 @@ func saveLeaf(tree map[string]interface{}, path string, value interface{}) error
 		return nil
 	}
 
-	rawSlice, ok := tree[arraySplits[0]]
-	if !ok {
-		rawSlice = make([]interface{}, 0)
-	}
-	sValue, ok := rawSlice.([]interface{})
-	if !ok {
-		return fmt.Errorf("value at %q is not a []interface{}", arraySplits[0])
+	var sValue []interface{}
+	if rawSlice, ok := tree[arraySplits[0]]; ok {
+		sValue = rawSlice.([]interface{})
 	}
 
-	for i := len(arraySplits) - 1; i > 0; i-- {
-		nestedArray := arraySplits[i]
-		index, err := strconv.Atoi(strings.Trim(nestedArray, "]"))
-		if err != nil {
-			return fmt.Errorf("failed to determine index of %q", path)
-		}
-
-		intermediateValue := make([]interface{}, 0)
-		if i == 1 {
-			intermediateValue = sValue
-		}
-		for j := len(intermediateValue); j <= index; j++ {
-			intermediateValue = append(intermediateValue, nil)
-		}
-
-		intermediateValue[index] = value
-		value = intermediateValue
-
-		if i == 1 {
-			sValue = intermediateValue
-		}
-		// TODO this handles if the first level of the nested arrays has other values in it, but doesn't handle if
-		// some of the nested arrays have other values
+	newValue, err := saveInSlice(sValue, arraySplits[1:], value)
+	if err != nil {
+		return err
 	}
-
-	tree[arraySplits[0]] = sValue
+	tree[arraySplits[0]] = newValue
 	return nil
+}
+
+func saveInSlice(current []interface{}, arraySplits []string, value interface{}) ([]interface{}, error) {
+	index, err := strconv.Atoi(strings.Trim(arraySplits[0], "]"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to determine index of %q", arraySplits[0])
+	}
+
+	if current == nil {
+		current = make([]interface{}, 0, index)
+	}
+
+	// fill up the slice slots with nil if the slice isn't the right size
+	for j := len(current); j <= index; j++ {
+		current = append(current, nil)
+	}
+
+	if len(arraySplits) == 1 {
+		// if this is the last array split save the value and break
+		if newValue, ok := value.(map[string]interface{}); ok { // special case combine existing values into new value if a map
+			if oldValue, ok := current[index].(map[string]interface{}); ok {
+				for k, v := range oldValue {
+					if _, ok := newValue[k]; !ok {
+						newValue[k] = v
+					}
+				}
+				value = newValue
+			}
+		}
+		current[index] = value
+		return current, nil
+	}
+
+	// recurse as needed
+	nested, ok := current[index].([]interface{})
+	if !ok {
+		nested = nil
+	}
+
+	newValue, err := saveInSlice(nested, arraySplits[1:], value)
+	current[index] = newValue
+	return current, nil
 }
 
 // getInstanceValue retrieves the value for a JSONSchema instance following this process:
