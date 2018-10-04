@@ -112,13 +112,13 @@ func (ti *transformInstruction) transform(in interface{}, fieldType string) (int
 // trransformInstructions defines a set of instructions and a method for combining their results.
 // The default method is to take the first non-nil result.
 type transformInstructions struct {
-	From   []transformInstruction `json:"from"`
-	Method transformMethod        `json:"method"`
+	From   []*transformInstruction `json:"from"`
+	Method transformMethod         `json:"method"`
 }
 
 type transformInstructionsJSON struct {
-	From   []transformInstruction `json:"from"`
-	Method string                 `json:"method"`
+	From   []*transformInstruction `json:"from"`
+	Method string                  `json:"method"`
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface, this function exists to properly map the method.
@@ -153,7 +153,7 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string) (i
 	var concatResult bool
 	switch tis.Method {
 	case last:
-		var newFrom []transformInstruction
+		var newFrom []*transformInstruction
 		for i := len(tis.From) - 1; i >= 0; i-- {
 			newFrom = append(newFrom, tis.From[i])
 		}
@@ -185,23 +185,14 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string) (i
 	return result, nil
 }
 
-type transform map[string]transformInstructions
-
-// replaceJSONPath will return a new transform after replacing the string old for new in any JSONPaths within the
-// instructions.
-func (t *transform) replaceJSONPath(old, new string) transform {
-	newTR := transform{}
-	for id, instructions := range *t {
-		newInstructions := transformInstructions{Method: instructions.Method, From: []transformInstruction{}}
-		for _, instruction := range instructions.From {
-			newPath := strings.Replace(instruction.JsonPath, old, new, 1)
-			newInstructions.From = append(newInstructions.From,
-				transformInstruction{
-					JsonPath:   newPath,
-					Operations: instruction.Operations,
-				})
+// replaceJSONPathPrefix will switch old for new in the path of the transform instructions if the path starts with
+// old.
+func (tis *transformInstructions) replaceJSONPathPrefix(old, new string) {
+	for _, instruction := range tis.From {
+		if strings.HasPrefix(instruction.JsonPath, old) {
+			instruction.JsonPath = strings.Replace(instruction.JsonPath, old, new, 1)
 		}
-		newTR[id] = newInstructions
 	}
-	return newTR
 }
+
+type transform map[string]transformInstructions

@@ -6,7 +6,10 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/buger/jsonparser"
 )
 
 var indexRe = regexp.MustCompile(`\[([\d]+)\]`)
@@ -144,6 +147,26 @@ func convertString(raw interface{}) (interface{}, error) {
 	default:
 		return nil, fmt.Errorf("unable to convert type %q to a string", reflect.TypeOf(raw))
 	}
+}
+
+func extractTransformInstructions(raw json.RawMessage, transformIdentifier, path string) (*transformInstructions, error) {
+	rawTransformInstruction, _, _, err := jsonparser.Get(raw, "transform", transformIdentifier)
+	if err != nil && err != jsonparser.KeyPathNotFoundError {
+		return nil, fmt.Errorf("failed to extract raw instance transform: %v", err)
+	} else if len(rawTransformInstruction) == 0 {
+		return nil, nil
+	}
+
+	splits := strings.Split(path, ".")
+	parentPath := strings.Join(splits[:len(splits)-1], ".")
+
+	var tis transformInstructions
+	if err := json.Unmarshal(rawTransformInstruction, &tis); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal instance transform: %v", err)
+	}
+	tis.replaceJSONPathPrefix("@.", parentPath+".")
+
+	return &tis, nil
 }
 
 // schemaDefault determines the default for an instance based on the JSONSchema.
