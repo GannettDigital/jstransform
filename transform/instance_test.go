@@ -515,11 +515,11 @@ func TestScalarTransform(t *testing.T) {
 
 		if err != nil {
 			if err.Error() == test.wantError {
-				break // pass
+				continue// pass
 			}
 			if test.wantError != ""{
 				t.Errorf("Test %q - failed to produce error: %v, instead got: %v", test.description, test.wantError, err)
-				break
+				continue
 			}
 			t.Errorf("Test %q - failed transform: %v", test.description, err)
 		}
