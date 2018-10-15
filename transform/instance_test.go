@@ -57,7 +57,14 @@ var (
 		"publishUrl":  "publishURL",
 		"absoluteUrl": "absoluteURL",
 	}
+
+	testInBadTime = map[string]interface{}{
+		"date": testBadTimeStr,
+	}
+
 	testTimeStr = "2018-01-01T01:01:00Z"
+
+	testBadTimeStr = "2000-10-15"
 )
 
 func TestArrayTransform(t *testing.T) {
@@ -390,6 +397,7 @@ func TestScalarTransform(t *testing.T) {
 		instanceType string
 		raw          json.RawMessage
 		want         interface{}
+		wantError    string
 	}{
 		{
 			description:  "unchanged string",
@@ -487,6 +495,14 @@ func TestScalarTransform(t *testing.T) {
 			raw:          json.RawMessage(`{ "type": "boolean","transform":{"test":{"from":[{"jsonPath":"$.published"}]}}}`),
 			want:         true,
 		},
+		{
+			description:  "time transform with bad formatting",
+			in:           testInBadTime,
+			path:         "$.date",
+			instanceType: "string",
+			raw:          json.RawMessage(`{ "type": "string", "format": "date-time"}`),
+			wantError:    "parsing time \"2000-10-15\" as \"2006-01-02T15:04:05Z07:00\": cannot parse \"\" as \"T\"",
+		},
 	}
 
 	for _, test := range tests {
@@ -496,7 +512,15 @@ func TestScalarTransform(t *testing.T) {
 		}
 
 		got, err := st.transform(test.in)
+
 		if err != nil {
+			if err.Error() == test.wantError {
+				continue// pass
+			}
+			if test.wantError != ""{
+				t.Errorf("Test %q - failed to produce error: %v, instead got: %v", test.description, test.wantError, err)
+				continue
+			}
 			t.Errorf("Test %q - failed transform: %v", test.description, err)
 		}
 

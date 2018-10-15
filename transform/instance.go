@@ -335,10 +335,10 @@ func (st *scalarTransformer) transform(in interface{}) (interface{}, error) {
 	// 2. Look for the same JSONPath in the input and use directly if possible.
 	rawValue, err := jsonpath.Get(st.jsonPath, in)
 	if err == nil {
-		newValue, _ := convert(rawValue, st.jsonType)
+		newValue, err := convert(rawValue, st.jsonType)
 		// if there is a conversion error fall through to the default
 		if newValue != nil {
-			return newValue, nil
+			return newValue, err
 		}
 	}
 
