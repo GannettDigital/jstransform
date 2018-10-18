@@ -16,7 +16,7 @@ install:
   - dep ensure
 
 script:
-  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+  - go test -v -race -parallel 4 -coverprofile=coverage.txt -covermode=atomic ./...
 
 after_success:
   - goveralls -coverprofile=coverage.txt -service=travis-ci

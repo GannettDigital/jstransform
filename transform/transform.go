@@ -31,7 +31,7 @@ type transformOperationJSON struct {
 // data from that path.
 type transformInstruction struct {
 	// For JSONPath format see http://goessner.net/articles/JsonPath/
-	JsonPath   string               `json:"jsonPath"`
+	jsonPath   string
 	Operations []transformOperation `json:"operations"`
 }
 
@@ -48,7 +48,7 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("failed to extract transform from JSON: %v", err)
 	}
 
-	ti.JsonPath = jti.JsonPath
+	ti.jsonPath = jti.JsonPath
 	ti.Operations = []transformOperation{}
 
 	for _, toj := range jti.Operations {
@@ -82,8 +82,12 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 // It handles the logic for finding the value to be transformed and chaining the Operations.
 // It will not error if the value is not found, rather it returns nil for the value.
 // If a conversion or operation fails an error is returned.
-func (ti *transformInstruction) transform(in interface{}, fieldType string) (interface{}, error) {
-	rawValue, err := jsonpath.Get(ti.JsonPath, in)
+func (ti *transformInstruction) transform(in interface{}, fieldType string, modifier pathModifier) (interface{}, error) {
+	path := ti.jsonPath
+	if modifier != nil {
+		path = modifier(path)
+	}
+	rawValue, err := jsonpath.Get(path, in)
 	if err != nil {
 		return nil, nil
 	}
@@ -103,7 +107,7 @@ func (ti *transformInstruction) transform(in interface{}, fieldType string) (int
 	for _, op := range ti.Operations {
 		value, err = op.transform(value)
 		if err != nil {
-			return nil, fmt.Errorf("failed operation on value from JSONPath %q: %v", ti.JsonPath, err)
+			return nil, fmt.Errorf("failed operation on value from JSONPath %q: %v", path, err)
 		}
 	}
 	return value, nil
@@ -149,7 +153,7 @@ func (tis *transformInstructions) UnmarshalJSON(data []byte) error {
 
 // transform runs the instructions in this object returning the new transformed value or nil if none is found.
 // It handles the logic for concatenation, first or last methods.
-func (tis *transformInstructions) transform(in interface{}, fieldType string) (interface{}, error) {
+func (tis *transformInstructions) transform(in interface{}, fieldType string, modifier pathModifier) (interface{}, error) {
 	var concatResult bool
 	switch tis.Method {
 	case last:
@@ -165,7 +169,7 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string) (i
 	var result interface{}
 
 	for _, from := range tis.From {
-		value, err := from.transform(in, fieldType)
+		value, err := from.transform(in, fieldType, modifier)
 		if err != nil {
 			return nil, err
 		}
@@ -189,8 +193,8 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string) (i
 // old.
 func (tis *transformInstructions) replaceJSONPathPrefix(old, new string) {
 	for _, instruction := range tis.From {
-		if strings.HasPrefix(instruction.JsonPath, old) {
-			instruction.JsonPath = strings.Replace(instruction.JsonPath, old, new, 1)
+		if strings.HasPrefix(instruction.jsonPath, old) {
+			instruction.jsonPath = strings.Replace(instruction.jsonPath, old, new, 1)
 		}
 	}
 }

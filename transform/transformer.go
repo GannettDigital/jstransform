@@ -65,7 +65,7 @@ func (tr *Transformer) Transform(raw json.RawMessage) (json.RawMessage, error) {
 		return nil, fmt.Errorf("failed to parse input JSON: %v", err)
 	}
 
-	transformed, err := tr.root.transform(in)
+	transformed, err := tr.root.transform(in, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed transformation: %v", err)
 	}
