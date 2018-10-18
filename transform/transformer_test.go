@@ -386,23 +386,25 @@ func TestTransformer(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Test %q - failed to initialize transformer: %v", test.description, err)
 		}
-		testFunc := func(t *testing.T) {
-			t.Parallel()
-			got, err := tr.Transform(test.in)
+		testFunc := func(description string, in json.RawMessage, wantErr bool, want json.RawMessage) func(t *testing.T) {
+			return func(t *testing.T) {
+				t.Parallel()
+				got, err := tr.Transform(in)
 
-			switch {
-			case test.wantErr && err != nil:
-				return
-			case test.wantErr && err == nil:
-				t.Errorf("Test %q - got nil, want error", test.description)
-			case !test.wantErr && err != nil:
-				t.Errorf("Test %q - got error, want nil: %v", test.description, err)
-			case !reflect.DeepEqual(got, test.want):
-				t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, test.want)
+				switch {
+				case wantErr && err != nil:
+					return
+				case wantErr && err == nil:
+					t.Errorf("Test %q - got nil, want error", description)
+				case !wantErr && err != nil:
+					t.Errorf("Test %q - got error, want nil: %v", description, err)
+				case !reflect.DeepEqual(got, want):
+					t.Errorf("Test %q - got\n%s\nwant\n%s", description, got, want)
+				}
 			}
 		}
 		for i := 0; i < parallelRuns; i++ {
-			t.Run(fmt.Sprintf("%s-%d", test.description, i), testFunc)
+			t.Run(fmt.Sprintf("%s-%d", test.description, i), testFunc(test.description, test.in, test.wantErr, test.want))
 		}
 	}
 }

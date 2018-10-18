@@ -130,7 +130,7 @@ func TestArrayTransform(t *testing.T) {
 				jsonType:     "string",
 				jsonPath:     "$.crops[*]",
 				transforms: &transformInstructions{
-					From:   []*transformInstruction{{JsonPath: "$.crops[*].name"}},
+					From:   []*transformInstruction{{jsonPath: "$.crops[*].name"}},
 					Method: 0,
 				},
 			},
@@ -148,7 +148,7 @@ func TestArrayTransform(t *testing.T) {
 						jsonType:     "string",
 						jsonPath:     "$.crops[*].name",
 						transforms: &transformInstructions{
-							From:   []*transformInstruction{{JsonPath: "$.crops[0].name"}},
+							From:   []*transformInstruction{{jsonPath: "$.crops[*].name"}},
 							Method: 0,
 						},
 					},
@@ -156,7 +156,7 @@ func TestArrayTransform(t *testing.T) {
 						jsonType: "number",
 						jsonPath: "$.crops[*].height",
 						transforms: &transformInstructions{
-							From:   []*transformInstruction{{JsonPath: "$.crops[0].height"}},
+							From:   []*transformInstruction{{jsonPath: "$.crops[*].height"}},
 							Method: 0,
 						},
 					},
@@ -164,7 +164,7 @@ func TestArrayTransform(t *testing.T) {
 						jsonType: "string",
 						jsonPath: "$.crops[*].path",
 						transforms: &transformInstructions{
-							From:   []*transformInstruction{{JsonPath: "$.crops[0].path"}},
+							From:   []*transformInstruction{{jsonPath: "$.crops[*].path"}},
 							Method: 0,
 						},
 					},
@@ -172,7 +172,7 @@ func TestArrayTransform(t *testing.T) {
 						jsonType: "string",
 						jsonPath: "$.crops[*].relativePath",
 						transforms: &transformInstructions{
-							From:   []*transformInstruction{{JsonPath: "$.crops[0].relativePath"}},
+							From:   []*transformInstruction{{jsonPath: "$.crops[*].relativePath"}},
 							Method: 0,
 						},
 					},
@@ -180,7 +180,7 @@ func TestArrayTransform(t *testing.T) {
 						jsonType: "number",
 						jsonPath: "$.crops[*].width",
 						transforms: &transformInstructions{
-							From:   []*transformInstruction{{JsonPath: "$.crops[0].width"}},
+							From:   []*transformInstruction{{jsonPath: "$.crops[*].width"}},
 							Method: 0,
 						},
 					},
@@ -280,7 +280,7 @@ func TestArrayTransform(t *testing.T) {
 		for k, v := range testIn {
 			testInCopy[k] = v
 		}
-		got, err := at.transform(testInCopy)
+		got, err := at.transform(testInCopy, nil)
 		if err != nil {
 			t.Errorf("Test %q - failed transform: %v", test.description, err)
 		}
@@ -316,7 +316,7 @@ func TestObjectTransform(t *testing.T) {
 					jsonType:     "string",
 					jsonPath:     "$.firstCrop.name",
 					transforms: &transformInstructions{
-						From:   []*transformInstruction{{JsonPath: "$.crops[0].name"}},
+						From:   []*transformInstruction{{jsonPath: "$.crops[0].name"}},
 						Method: 0,
 					},
 				},
@@ -324,7 +324,7 @@ func TestObjectTransform(t *testing.T) {
 					jsonType: "number",
 					jsonPath: "$.firstCrop.height",
 					transforms: &transformInstructions{
-						From:   []*transformInstruction{{JsonPath: "$.crops[0].height"}},
+						From:   []*transformInstruction{{jsonPath: "$.crops[0].height"}},
 						Method: 0,
 					},
 				},
@@ -332,7 +332,7 @@ func TestObjectTransform(t *testing.T) {
 					jsonType: "string",
 					jsonPath: "$.firstCrop.path",
 					transforms: &transformInstructions{
-						From:   []*transformInstruction{{JsonPath: "$.crops[0].path"}},
+						From:   []*transformInstruction{{jsonPath: "$.crops[0].path"}},
 						Method: 0,
 					},
 				},
@@ -340,7 +340,7 @@ func TestObjectTransform(t *testing.T) {
 					jsonType: "string",
 					jsonPath: "$.firstCrop.relativePath",
 					transforms: &transformInstructions{
-						From:   []*transformInstruction{{JsonPath: "$.crops[0].relativePath"}},
+						From:   []*transformInstruction{{jsonPath: "$.crops[0].relativePath"}},
 						Method: 0,
 					},
 				},
@@ -348,7 +348,7 @@ func TestObjectTransform(t *testing.T) {
 					jsonType: "number",
 					jsonPath: "$.firstCrop.width",
 					transforms: &transformInstructions{
-						From:   []*transformInstruction{{JsonPath: "$.crops[0].width"}},
+						From:   []*transformInstruction{{jsonPath: "$.crops[0].width"}},
 						Method: 0,
 					},
 				},
@@ -373,7 +373,7 @@ func TestObjectTransform(t *testing.T) {
 
 		ot.children = test.children
 
-		got, err := ot.transform(test.in)
+		got, err := ot.transform(test.in, nil)
 		if err != nil {
 			t.Errorf("Test %q - failed transform: %v", test.description, err)
 		}
@@ -511,13 +511,13 @@ func TestScalarTransform(t *testing.T) {
 			t.Fatalf("Test %q - failed to initialize scalar transformer: %v", test.description, err)
 		}
 
-		got, err := st.transform(test.in)
+		got, err := st.transform(test.in, nil)
 
 		if err != nil {
 			if err.Error() == test.wantError {
-				continue// pass
+				continue // pass
 			}
-			if test.wantError != ""{
+			if test.wantError != "" {
 				t.Errorf("Test %q - failed to produce error: %v, instead got: %v", test.description, test.wantError, err)
 				continue
 			}

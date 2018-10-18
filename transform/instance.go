@@ -10,6 +10,19 @@ import (
 	"github.com/buger/jsonparser"
 )
 
+// pathModifier is used to modify the JSON path of an instance to indicate
+type pathModifier func(string) string
+
+func pathReplace(old, new string, modifier pathModifier) pathModifier {
+	return func(path string) string {
+		if modifier != nil {
+			path = modifier(path)
+		}
+		path = strings.Replace(path, old, new, 1)
+		return path
+	}
+}
+
 // instanceTransformer represents a JSON schema instance with transform details in it.
 // The primary function it performs is to transform (or not) data given as input.
 // In some cases instances contain other instances, in such a case the children transformers are called as needed to
@@ -19,8 +32,7 @@ type instanceTransformer interface {
 	child() instanceTransformer // Arrays return a child object all others nil
 	path() string
 	selectChild(string) instanceTransformer // This returns nil for everything except objects
-	pathReplace(string, string)
-	transform(interface{}) (interface{}, error)
+	transform(interface{}, pathModifier) (interface{}, error)
 }
 
 // arrayTransformer represents a JSON instance of type array.
@@ -62,10 +74,10 @@ func (at *arrayTransformer) addChild(child instanceTransformer) error {
 	return nil
 }
 
-func (at *arrayTransformer) baseValue(in interface{}) ([]interface{}, bool, error) {
+func (at *arrayTransformer) baseValue(in interface{}, path string, modifier pathModifier) ([]interface{}, bool, error) {
 	// 1. Use a transform if it exists
 	if at.transforms != nil {
-		rawValue, err := at.transforms.transform(in, "array")
+		rawValue, err := at.transforms.transform(in, "array", modifier)
 		if err != nil {
 			return nil, false, err
 		}
@@ -79,7 +91,7 @@ func (at *arrayTransformer) baseValue(in interface{}) ([]interface{}, bool, erro
 	}
 
 	// 2. Look for the same JSONPath in the input and use directly if possible.
-	rawValue, err := jsonpath.Get(at.jsonPath, in)
+	rawValue, err := jsonpath.Get(path, in)
 	if err == nil && rawValue != nil {
 		newValue, ok := rawValue.([]interface{})
 		if !ok {
@@ -98,32 +110,29 @@ func (at *arrayTransformer) baseValue(in interface{}) ([]interface{}, bool, erro
 func (at *arrayTransformer) child() instanceTransformer                 { return at.childTransformer }
 func (at *arrayTransformer) path() string                               { return at.jsonPath }
 func (at *arrayTransformer) selectChild(key string) instanceTransformer { return nil }
-func (at *arrayTransformer) pathReplace(old, new string) {
-	at.jsonPath = strings.Replace(at.jsonPath, old, new, 1)
-	if at.transforms != nil {
-		at.transforms.replaceJSONPathPrefix(old, new)
-	}
-	at.childTransformer.pathReplace(old, new)
-}
 
 // transform retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields.
-func (at *arrayTransformer) transform(in interface{}) (interface{}, error) {
-	base, changed, err := at.baseValue(in)
+func (at *arrayTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
+	path := at.jsonPath
+	if modifier != nil {
+		path = modifier(path)
+	}
+	base, changed, err := at.baseValue(in, path, modifier)
 	if err != nil {
 		return nil, err
 	}
 
 	if changed {
 		// save the array base to in as children will use the value from this for their transforms
-		if at.jsonPath == "$" {
+		if path == "$" {
 			in = base
 		} else {
 			inMap, ok := in.(map[string]interface{})
 			if !ok {
 				return nil, errors.New("input is neither a JSON array nor object")
 			}
-			if err := saveInTree(inMap, at.jsonPath, base); err != nil {
+			if err := saveInTree(inMap, path, base); err != nil {
 				return nil, fmt.Errorf("failed to save array transform to input data: %v", err)
 			}
 		}
@@ -133,25 +142,20 @@ func (at *arrayTransformer) transform(in interface{}) (interface{}, error) {
 		return base, nil
 	}
 
-	oldPath := at.jsonPath + "[*]"
+	oldPath := path + "[*]"
 	newArray := make([]interface{}, 0, len(base))
 
 	for i := range base {
-		currentPath := at.jsonPath + fmt.Sprintf("[%d]", i)
-		at.childTransformer.pathReplace(oldPath, currentPath)
-		oldPath = currentPath
+		currentPath := path + fmt.Sprintf("[%d]", i)
 
-		childValue, err := at.childTransformer.transform(in)
+		childValue, err := at.childTransformer.transform(in, pathReplace(oldPath, currentPath, modifier))
 		if err != nil {
-			at.childTransformer.pathReplace(oldPath, at.jsonPath+"[*]") // reset the paths
 			return nil, err
 		}
 		if childValue != nil {
 			newArray = append(newArray, childValue)
 		}
 	}
-
-	at.childTransformer.pathReplace(oldPath, at.jsonPath+"[*]") // reset the paths
 
 	if len(newArray) == 0 {
 		return nil, nil
@@ -209,24 +213,19 @@ func (ot *objectTransformer) addChild(child instanceTransformer) error {
 func (ot *objectTransformer) child() instanceTransformer                 { return nil }
 func (ot *objectTransformer) path() string                               { return ot.jsonPath }
 func (ot *objectTransformer) selectChild(key string) instanceTransformer { return ot.children[key] }
-func (ot *objectTransformer) pathReplace(old, new string) {
-	ot.jsonPath = strings.Replace(ot.jsonPath, old, new, 1)
-	if ot.transforms != nil {
-		ot.transforms.replaceJSONPathPrefix(old, new)
-	}
-	for _, child := range ot.children {
-		child.pathReplace(old, new)
-	}
-}
 
 // transform retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields.
-func (ot *objectTransformer) transform(in interface{}) (interface{}, error) {
+func (ot *objectTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
+	path := ot.jsonPath
+	if modifier != nil {
+		path = modifier(path)
+	}
 	var newValue map[string]interface{}
 
 	// For the object use a transform if it exists or the default or an empty map
 	if ot.transforms != nil {
-		rawValue, err := ot.transforms.transform(in, "object")
+		rawValue, err := ot.transforms.transform(in, "object", modifier)
 		if err != nil {
 			return nil, err
 		}
@@ -246,7 +245,7 @@ func (ot *objectTransformer) transform(in interface{}) (interface{}, error) {
 
 	// Add each child value to the paren
 	for _, child := range ot.children {
-		childValue, err := child.transform(in)
+		childValue, err := child.transform(in, modifier)
 		if err != nil {
 			return nil, err
 		}
@@ -306,12 +305,6 @@ func (st *scalarTransformer) addChild(instanceTransformer) error     { return ni
 func (st *scalarTransformer) child() instanceTransformer             { return nil }
 func (st *scalarTransformer) path() string                           { return st.jsonPath }
 func (st *scalarTransformer) selectChild(string) instanceTransformer { return nil }
-func (st *scalarTransformer) pathReplace(old, new string) {
-	st.jsonPath = strings.Replace(st.jsonPath, old, new, 1)
-	if st.transforms != nil {
-		st.transforms.replaceJSONPathPrefix(old, new)
-	}
-}
 
 // transform retrieves the value for a scalar instance following this process:
 //
@@ -320,10 +313,14 @@ func (st *scalarTransformer) pathReplace(old, new string) {
 // 2. Look for the same JSONPath in the input and use directly if possible.
 //
 // 3. Fall back to the JSON Schema default value.
-func (st *scalarTransformer) transform(in interface{}) (interface{}, error) {
+func (st *scalarTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
+	path := st.jsonPath
+	if modifier != nil {
+		path = modifier(path)
+	}
 	// 1. Use a transform if it exists
 	if st.transforms != nil {
-		newValue, err := st.transforms.transform(in, st.jsonType)
+		newValue, err := st.transforms.transform(in, st.jsonType, modifier)
 		if err != nil {
 			return nil, err
 		}
@@ -333,7 +330,7 @@ func (st *scalarTransformer) transform(in interface{}) (interface{}, error) {
 	}
 
 	// 2. Look for the same JSONPath in the input and use directly if possible.
-	rawValue, err := jsonpath.Get(st.jsonPath, in)
+	rawValue, err := jsonpath.Get(path, in)
 	if err == nil {
 		newValue, err := convert(rawValue, st.jsonType)
 		// if there is a conversion error fall through to the default
