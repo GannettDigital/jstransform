@@ -1,0 +1,6 @@
+{
+  "additionalProperties": true,
+  "description": "missing",
+  "type": "object",
+  "required": ["required"]
+}

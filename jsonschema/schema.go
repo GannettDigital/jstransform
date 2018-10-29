@@ -10,16 +10,17 @@ import (
 
 // Instance represents a JSON Schema instance.
 type Instance struct {
-	Ref         string                     `json:"$ref,omitempty"`
-	Schema      string                     `json:"$schema,omitempty"`
-	Description string                     `json:"description,omitempty"`
-	Type        string                     `json:"type"`
-	Format      string                     `json:"format,omitempty"`
-	Items       json.RawMessage            `json:"items,omitempty"`
-	Properties  map[string]json.RawMessage `json:"properties,omitempty"`
-	AllOf       []Instance                 `json:"allOf,omitempty"`
-	OneOf       []Instance                 `json:"oneOf,omitempty"`
-	Required    []string                   `json:"Required,omitempty"`
+	Ref                  string                     `json:"$ref,omitempty"`
+	Schema               string                     `json:"$schema,omitempty"`
+	AdditionalProperties bool                       `json:"additionalProperties,omitempty"`
+	Description          string                     `json:"description,omitempty"`
+	Type                 string                     `json:"type"`
+	Format               string                     `json:"format,omitempty"`
+	Items                json.RawMessage            `json:"items,omitempty"`
+	Properties           map[string]json.RawMessage `json:"properties,omitempty"`
+	AllOf                []Instance                 `json:"allOf,omitempty"`
+	OneOf                []Instance                 `json:"oneOf,omitempty"`
+	Required             []string                   `json:"Required,omitempty"`
 }
 
 // Schema represents a JSON Schema with the AllOf and OneOf references parsed and squashed into a single representation.
@@ -68,13 +69,15 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 
 	s := Schema{
 		Instance: Instance{
-			Type:       sj.Type,
-			Format:     sj.Format,
-			Items:      sj.Items,
-			Properties: sj.Properties,
-			Required:   sj.Required,
-			AllOf:      sj.AllOf,
-			OneOf:      sj.OneOf,
+			Type:                 sj.Type,
+			Format:               sj.Format,
+			Items:                sj.Items,
+			Properties:           sj.Properties,
+			Required:             sj.Required,
+			AllOf:                sj.AllOf,
+			OneOf:                sj.OneOf,
+			Description:          sj.Description,
+			AdditionalProperties: sj.AdditionalProperties,
 		},
 		validator: v,
 	}

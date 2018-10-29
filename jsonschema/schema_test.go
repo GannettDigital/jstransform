@@ -195,6 +195,42 @@ func TestSchemaFromFile(t *testing.T) {
 	}
 }
 
+
+func TestMappings(t *testing.T){
+	tests := []struct {
+		description string
+		oneOfType   string
+		schemaPath  string
+		want        Instance
+	}{
+		{
+			description: "Simple map of top level fields",
+			schemaPath:  "./test_data/simple.json",
+			want: Instance{
+				AdditionalProperties: true,
+				Description: "missing",
+				Type: "object",
+				Required: []string{"required"},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.description, func(t *testing.T){
+			got, err := SchemaFromFile(test.schemaPath, test.oneOfType)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if !reflect.DeepEqual(got.Instance, test.want) {
+				t.Errorf("Test %q - got \n%v\n\twant\n%v", test.description, got.Instance, test.want)
+
+			}
+		})
+	}
+}
+
+
 func TestSchemaTypes(t *testing.T) {
 	tests := []struct {
 		description string

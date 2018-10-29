@@ -246,51 +246,54 @@ func TestWalkJSONSchema(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		walker := testWalker{calls: make(map[string]Instance), rawCalls: make(map[string]json.RawMessage)}
-		schema, err := SchemaFromFile(test.schemaPath, test.oneOfType)
-		if err != nil {
-			t.Fatal(err)
-		}
-		err = Walk(schema, walker.walkFn)
+		t.Run(test.description, func(t *testing.T){
+			walker := testWalker{calls: make(map[string]Instance), rawCalls: make(map[string]json.RawMessage)}
+			schema, err := SchemaFromFile(test.schemaPath, test.oneOfType)
+			if err != nil {
+				t.Fatal(err)
+			}
+			err = Walk(schema, walker.walkFn)
 
-		switch {
-		case test.wantErr && err != nil:
-			continue
-		case test.wantErr && err == nil:
-			t.Errorf("Test %q - got nil error want error", test.description)
-		case !test.wantErr && err != nil:
-			t.Errorf("Test %q - got error: %v", test.description, err)
-			continue
-		}
-		if got, want := len(walker.calls), len(test.want); got != want {
-			t.Errorf("Test %q - got %d calls, want %d", test.description, got, want)
-		}
-		for key, call := range walker.calls {
-			got, err := json.Marshal(call)
-			if err != nil {
-				t.Fatal(err)
+			switch {
+			case test.wantErr && err != nil:
+				return
+			case test.wantErr && err == nil:
+				t.Errorf("Test %q - got nil error want error", test.description)
+			case !test.wantErr && err != nil:
+				t.Errorf("Test %q - got error: %v", test.description, err)
+				return
 			}
-			want, err := json.Marshal(test.want[key])
-			if err != nil {
-				t.Fatal(err)
+			if got, want := len(walker.calls), len(test.want); got != want {
+				t.Errorf("Test %q - got %d calls, want %d", test.description, got, want)
 			}
-			if !reflect.DeepEqual(got, want) {
-				t.Errorf("Test %q - at got key %q got call\n%s\n\twant\n%s", test.description, key, call, want)
+			for key, call := range walker.calls {
+				got, err := json.Marshal(call)
+				if err != nil {
+					t.Fatal(err)
+				}
+				want, err := json.Marshal(test.want[key])
+				if err != nil {
+					t.Fatal(err)
+				}
+				if !reflect.DeepEqual(got, want) {
+					t.Errorf("Test %q - at got key %q got call\n%v\n\twant\n%v", test.description, key, call, want)
+				}
 			}
-		}
-		for key, call := range test.want {
-			got, err := json.Marshal(walker.calls[key])
-			if err != nil {
-				t.Fatal(err)
+			for key, call := range test.want {
+				got, err := json.Marshal(walker.calls[key])
+				if err != nil {
+					t.Fatal(err)
+				}
+				want, err := json.Marshal(call)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if !reflect.DeepEqual(got, want) {
+					t.Errorf("Test %q - at want key %q got call\n%s\n\twant\n%s", test.description, key, got, want)
+				}
 			}
-			want, err := json.Marshal(call)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if !reflect.DeepEqual(got, want) {
-				t.Errorf("Test %q - at want key %q got call\n%s\n\twant\n%s", test.description, key, got, want)
-			}
-		}
+		})
+
 	}
 }
 func TestWalkJSONSchemaRaw(t *testing.T) {
