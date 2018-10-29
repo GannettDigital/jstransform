@@ -10,16 +10,17 @@ import (
 
 // Instance represents a JSON Schema instance.
 type Instance struct {
-	Ref         string                     `json:"$ref,omitempty"`
-	Schema      string                     `json:"$schema,omitempty"`
-	Description string                     `json:"description,omitempty"`
-	Type        string                     `json:"type"`
-	Format      string                     `json:"format,omitempty"`
-	Items       json.RawMessage            `json:"items,omitempty"`
-	Properties  map[string]json.RawMessage `json:"properties,omitempty"`
-	AllOf       []Instance                 `json:"allOf,omitempty"`
-	OneOf       []Instance                 `json:"oneOf,omitempty"`
-	Required    []string                   `json:"Required,omitempty"`
+	Ref                  string                     `json:"$ref,omitempty"`
+	Schema               string                     `json:"$schema,omitempty"`
+	AdditionalProperties bool                       `json:"additionalProperties,omitempty"`
+	Description          string                     `json:"description,omitempty"`
+	Type                 string                     `json:"type"`
+	Format               string                     `json:"format,omitempty"`
+	Items                json.RawMessage            `json:"items,omitempty"`
+	Properties           map[string]json.RawMessage `json:"properties,omitempty"`
+	AllOf                []Instance                 `json:"allOf,omitempty"`
+	OneOf                []Instance                 `json:"oneOf,omitempty"`
+	Required             []string                   `json:"Required,omitempty"`
 }
 
 // Schema represents a JSON Schema with the AllOf and OneOf references parsed and squashed into a single representation.
@@ -61,21 +62,17 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 		return nil, fmt.Errorf("failed to Dereference Schema: %v", err)
 	}
 
-	var sj Instance
+
+	// json schema's default behavior is additionalProperties: true if the field is missing so mimic that behavior here
+	var sj = Instance {
+		AdditionalProperties: true,
+	}
 	if err := json.Unmarshal(data, &sj); err != nil {
 		return nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
 	}
 
 	s := Schema{
-		Instance: Instance{
-			Type:       sj.Type,
-			Format:     sj.Format,
-			Items:      sj.Items,
-			Properties: sj.Properties,
-			Required:   sj.Required,
-			AllOf:      sj.AllOf,
-			OneOf:      sj.OneOf,
-		},
+		Instance: sj,
 		validator: v,
 	}
 

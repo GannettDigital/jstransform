@@ -1,0 +1,5 @@
+{
+  "description": "missing",
+  "type": "object",
+  "required": ["required"]
+}
