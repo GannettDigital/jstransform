@@ -72,7 +72,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	}
 
 	s := Schema{
-		Instance: sjall the,
+		Instance: sj,
 		validator: v,
 	}
 
