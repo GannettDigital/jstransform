@@ -1,5 +1,4 @@
 {
-  "additionalProperties": false,
   "description": "missing",
   "type": "object",
   "required": ["required"]

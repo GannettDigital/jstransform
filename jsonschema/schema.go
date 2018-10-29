@@ -62,7 +62,9 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 		return nil, fmt.Errorf("failed to Dereference Schema: %v", err)
 	}
 
-	var sj Instance
+	var sj = Instance {
+		AdditionalProperties: true,
+	}
 	if err := json.Unmarshal(data, &sj); err != nil {
 		return nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
 	}

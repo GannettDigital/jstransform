@@ -207,6 +207,16 @@ func TestMappings(t *testing.T){
 			description: "Simple map of top level fields",
 			schemaPath:  "./test_data/simple.json",
 			want: Instance{
+				AdditionalProperties: false,
+				Description: "missing",
+				Type: "object",
+				Required: []string{"required"},
+			},
+		},
+		{
+			description: "Missing additional properties should default appropriately",
+			schemaPath:  "./test_data/missing-additional-properties.json",
+			want: Instance{
 				AdditionalProperties: true,
 				Description: "missing",
 				Type: "object",
