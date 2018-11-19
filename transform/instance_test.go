@@ -363,6 +363,26 @@ func TestObjectTransform(t *testing.T) {
 				"width":        1,
 			},
 		},
+		{
+			description: "with nil value after transform",
+			in:          testIn,
+			children: map[string]instanceTransformer{
+				"name": &scalarTransformer{
+					defaultValue: "name",
+					jsonType:     "string",
+					jsonPath:     "$.firstCrop.name",
+					transforms: &transformInstructions{
+						From:   []*transformInstruction{{jsonPath: "$.crops[0].name"}},
+						Method: 0,
+					},
+				},
+			},
+			path: "$.firstCrop",
+			raw:  json.RawMessage(`{"type":"object","transform":{"test":{"from":[{"jsonPath":"$.notFound"}]}}}`),
+			want: map[string]interface{}{
+				"name": "name",
+			},
+		},
 	}
 
 	for _, test := range tests {

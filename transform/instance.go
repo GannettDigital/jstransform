@@ -229,10 +229,12 @@ func (ot *objectTransformer) transform(in interface{}, modifier pathModifier) (i
 		if err != nil {
 			return nil, err
 		}
-		var ok bool
-		newValue, ok = rawValue.(map[string]interface{})
-		if !ok {
-			return nil, errors.New("transform returned non-object value")
+		if rawValue != nil {
+			var ok bool
+			newValue, ok = rawValue.(map[string]interface{})
+			if !ok {
+				return nil, errors.New("transform returned non-object value")
+			}
 		}
 	}
 	if newValue == nil {
