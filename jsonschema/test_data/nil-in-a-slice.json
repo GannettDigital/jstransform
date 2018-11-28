@@ -1,0 +1,1653 @@
+{
+  "type": "object",
+  "definitions": {},
+  "$Schema": "http://json-Schema.org/draft-06/Schema#",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "string",
+      "format": "guid",
+      "pattern": "(?i)^{?[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}}?$",
+      "title": "Id",
+      "default": "",
+      "examples": [
+        "6633dcec-b521-45f2-9514-30b3f622c79a"
+      ]
+    },
+    "name": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "Name",
+      "default": "",
+      "examples": [
+        "sports",
+        "news/pr"
+      ]
+    },
+    "displayName": {
+      "$id": "/properties/displayName",
+      "type": "string",
+      "title": "Display Name",
+      "default": "",
+      "examples": [
+        "Sports",
+        "News/Pr"
+      ]
+    },
+    "path": {
+      "$id": "/properties/path",
+      "type": "string",
+      "pattern": "^[^/]+(/[^/]+)*$",
+      "title": "Path",
+      "default": "",
+      "examples": [
+        "sports",
+        "news/pr"
+      ]
+    },
+    "vocabulary": {
+      "$id": "/properties/vocabulary",
+      "type": "string",
+      "title": "Vocabulary",
+      "default": "",
+      "examples": [
+        "UsaToday"
+      ]
+    },
+    "parentId": {
+      "$id": "/properties/parentId",
+      "type": ["string", "null"],
+      "format": "guid",
+      "pattern": "(?i)^(?:{?[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}}?)?$",
+      "title": "Parent Id",
+      "default": "",
+      "examples": [
+        "6633dcec-b521-45f2-9514-30b3f622c79a",
+        "",
+        null
+      ]
+    },
+    "isAbstract": {
+      "$id": "/properties/isAbstract",
+      "type": "boolean",
+      "title": "Is Abstract",
+      "default": false,
+      "examples": [
+        true
+      ]
+    },
+    "isAdHoc": {
+      "$id": "/properties/isAdHoc",
+      "type": "boolean",
+      "title": "Is Ad Hoc",
+      "default": false,
+      "examples": [
+        false
+      ]
+    },
+    "attributes": {
+      "$id": "/properties/attributes",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "adExclusion":{
+          "$id":"/properties/attributes/properties/adExclusion",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/adExclusion/items",
+            "type":"string",
+            "title":"adExclusion",
+            "examples":[
+              "adExclusion string"
+            ]
+          }
+        },
+        "altLabel":{
+          "$id":"/properties/attributes/properties/altLabel",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/altLabel/items",
+            "type":"string",
+            "title":"Alt Label"
+          }
+        },
+        "assignedTo":{
+          "$id":"/properties/attributes/properties/assignedTo",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/assignedTo/items",
+            "type":"string",
+            "title":"Assigned To",
+            "examples":[
+              "assignee 1",
+              "assignee 2"
+            ]
+          }
+        },
+        "associatedCity":{
+          "$id":"/properties/attributes/properties/associatedCity",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/associatedCity/items",
+            "type":"string",
+            "title":"associatedCity",
+            "examples":[
+              "associatedCity string"
+            ]
+          }
+        },
+        "associatedState":{
+          "$id":"/properties/attributes/properties/associatedState",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/associatedState/items",
+            "type":"string",
+            "title":"associatedState",
+            "examples":[
+              "associatedState string"
+            ]
+          }
+        },
+        "awsPath":{
+          "$id":"/properties/attributes/properties/awsPath",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/awsPath/items",
+            "type":"string",
+            "title":"Aws Path",
+            "examples":[
+              "news/pr"
+            ]
+          }
+        },
+        "awsPathFront":{
+          "$id":"/properties/attributes/properties/awsPathFront",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/awsPathFront/items",
+            "type":"string",
+            "title":"Aws Path Front",
+            "examples":[
+              "news/main"
+            ]
+          }
+        },
+        "birthdate":{
+          "$id":"/properties/attributes/properties/birthdate",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/birthdate/items",
+            "type":"string",
+            "format": "date-time",
+            "title":"Birthdate",
+            "examples":[
+              "2002-10-02T10:00:00-05:00"
+            ]
+          }
+        },
+        "broader":{
+          "$id":"/properties/attributes/properties/broader",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/broader/items",
+            "type":"string",
+            "title":"broader",
+            "examples":[
+              "broader string"
+            ]
+          }
+        },
+        "comment":{
+          "$id":"/properties/attributes/properties/comment",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/comment/items",
+            "type":"string",
+            "title":"Comment"
+          }
+        },
+        "Comment":{
+          "$id":"/properties/attributes/properties/Comment",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/Comment/items",
+            "type":"string",
+            "title":"Comment"
+          }
+        },
+        "contentProtectionState":{
+          "$id":"/properties/attributes/properties/contentProtectionState",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/contentProtectionState/items",
+            "type":"string",
+            "title":"Content Protection State",
+            "examples":[
+              "metered",
+              "free"
+            ]
+          }
+        },
+        "created":{
+          "$id":"/properties/attributes/properties/created",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/created/items",
+            "type":"string",
+            "format": "date-time",
+            "title":"Created",
+            "examples":[
+              "2002-10-02T10:00:00-05:00"
+            ]
+          }
+        },
+        "createdBy":{
+          "$id":"/properties/attributes/properties/createdBy",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/createdBy/items",
+            "type":"string",
+            "title":"Created By",
+            "examples":[
+              "creator"
+            ]
+          }
+        },
+        "date":{
+          "$id":"/properties/attributes/properties/date",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/date/items",
+            "type":"string",
+            "format": "date-time",
+            "title":"Date",
+            "examples":[
+              "2002-10-02T10:00:00-05:00"
+            ]
+          }
+        },
+        "deathdate":{
+          "$id":"/properties/attributes/properties/deathdate",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/deathdate/items",
+            "type":"string",
+            "format": "date-time",
+            "title":"Death Date",
+            "examples":[
+              "2002-10-02T10:00:00-05:00"
+            ]
+          }
+        },
+        "definition":{
+          "$id":"/properties/attributes/properties/definition",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/definition/items",
+            "type":"string",
+            "title":"Definition",
+            "examples":[
+              "definition string"
+            ]
+          }
+        },
+        "dependencyOf":{
+          "$id":"/properties/attributes/properties/dependencyOf",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/dependencyOf/items",
+            "type":"string",
+            "title":"dependencyOf",
+            "examples":[
+              "dependencyOf string"
+            ]
+          }
+        },
+        "doNotAutotag":{
+          "$id":"/properties/attributes/properties/doNotAutotag",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/doNotAutotag/items",
+            "type":"string",
+            "title":"Do Not Autotag",
+            "examples":[
+              "true",
+              "false"
+            ]
+          }
+        },
+        "doNotExtract":{
+          "$id":"/properties/attributes/properties/doNotExtract",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/doNotExtract/items",
+            "type":"string",
+            "title":"Do Not Extract",
+            "examples":[
+              "true",
+              "false"
+            ]
+          }
+        },
+        "doNotTag":{
+          "$id":"/properties/attributes/properties/doNotTag",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/doNotTag/items",
+            "type":"string",
+            "title":"Do Not Tag",
+            "examples":[
+              "true",
+              "false"
+            ]
+          }
+        },
+        "doNotextract":{
+          "$id":"/properties/attributes/properties/doNotextract",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/doNotextract/items",
+            "type":"string",
+            "title":"doNotextract",
+            "examples":[
+              "doNotextract string"
+            ]
+          }
+        },
+        "employeeRole":{
+          "$id":"/properties/attributes/properties/employeeRole",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/employeeRole/items",
+            "type":"string",
+            "title":"employeeRole",
+            "examples":[
+              "employeeRole string"
+            ]
+          }
+        },
+        "employerRole":{
+          "$id":"/properties/attributes/properties/employerRole",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/employerRole/items",
+            "type":"string",
+            "title":"employerRole",
+            "examples":[
+              "employerRole string"
+            ]
+          }
+        },
+        "eventType":{
+          "$id":"/properties/attributes/properties/eventType",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/eventType/items",
+            "type":"string",
+            "title":"eventType",
+            "examples":[
+              "eventType string"
+            ]
+          }
+        },
+        "excludePlanning":{
+          "$id":"/properties/attributes/properties/excludePlanning",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/excludePlanning/items",
+            "type":"string",
+            "title":"Exclude Planning",
+            "examples":[
+              "exclude planning string"
+            ]
+          }
+        },
+        "extendedFamily":{
+          "$id":"/properties/attributes/properties/extendedFamily",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/extendedFamily/items",
+            "type":"string",
+            "title":"extendedFamily",
+            "examples":[
+              "extendedFamily string"
+            ]
+          }
+        },
+        "extractionMethod":{
+          "$id":"/properties/attributes/properties/extractionMethod",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/extractionMethod/items",
+            "type":"string",
+            "title":"Extraction Method",
+            "examples":[
+              "extraction method string"
+            ]
+          }
+        },
+        "followIgnoreWhenPrimary":{
+          "$id":"/properties/attributes/properties/followIgnoreWhenPrimary",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/followIgnoreWhenPrimary/items",
+            "type":"string",
+            "title":"Follow Ignore When Primary",
+            "examples":[
+              "true",
+              "false"
+            ]
+          }
+        },
+        "forbiddenSpan":{
+          "$id":"/properties/attributes/properties/forbiddenSpan",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/forbiddenSpan/items",
+            "type":"string",
+            "title":"Forbidden Span",
+            "examples":[
+              "forbidden span string"
+            ]
+          }
+        },
+        "formerSignificantOther":{
+          "$id":"/properties/attributes/properties/formerSignificantOther",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/formerSignificantOther/items",
+            "type":"string",
+            "title":"formerSignificantOther",
+            "examples":[
+              "formerSignificantOther string"
+            ]
+          }
+        },
+        "friendRole":{
+          "$id":"/properties/attributes/properties/friendRole",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/friendRole/items",
+            "type":"string",
+            "title":"friendRole",
+            "examples":[
+              "friendRole string"
+            ]
+          }
+        },
+        "googleNewsExclude":{
+          "$id":"/properties/attributes/properties/googleNewsExclude",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/googleNewsExclude/items",
+            "type":"string",
+            "title":"Google News Exclude",
+            "examples":[
+              "true",
+              "false"
+            ]
+          }
+        },
+        "googleNewsGenre":{
+          "$id":"/properties/attributes/properties/googleNewsGenre",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/googleNewsGenre/items",
+            "type":"string",
+            "title":"Google News Genre",
+            "examples":[
+              "google news genre string"
+            ]
+          }
+        },
+        "hasChild":{
+          "$id":"/properties/attributes/properties/hasChild",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/hasChild/items",
+            "type":"string",
+            "title":"hasChild",
+            "examples":[
+              "hasChild string"
+            ]
+          }
+        },
+        "hasMember":{
+          "$id":"/properties/attributes/properties/hasMember",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/hasMember/items",
+            "type":"string",
+            "title":"hasMember",
+            "examples":[
+              "hasMember string"
+            ]
+          }
+        },
+        "hasParent":{
+          "$id":"/properties/attributes/properties/hasParent",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/hasParent/items",
+            "type":"string",
+            "title":"hasParent",
+            "examples":[
+              "hasParent string"
+            ]
+          }
+        },
+        "hasParticipantRole":{
+          "$id":"/properties/attributes/properties/hasParticipantRole",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/hasParticipantRole/items",
+            "type":"string",
+            "title":"hasParticipantRole",
+            "examples":[
+              "hasParticipantRole string"
+            ]
+          }
+        },
+        "hasPerformerRole":{
+          "$id":"/properties/attributes/properties/hasPerformerRole",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/hasPerformerRole/items",
+            "type":"string",
+            "title":"hasPerformerRole",
+            "examples":[
+              "hasPerformerRole string"
+            ]
+          }
+        },
+        "hashtag":{
+          "$id":"/properties/attributes/properties/hashtag",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/hashtag/items",
+            "type":"string",
+            "title":"Hashtag",
+            "examples":[
+              "hashtag string"
+            ]
+          }
+        },
+        "Hashtag":{
+          "$id":"/properties/attributes/properties/Hashtag",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/Hashtag/items",
+            "type":"string",
+            "title":"Hashtag",
+            "examples":[
+              "Hashtag string"
+            ]
+          }
+        },
+        "homepage":{
+          "$id":"/properties/attributes/properties/homepage",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/homepage/items",
+            "type":"string",
+            "title":"Homepage",
+            "examples":[
+              "homepage string"
+            ]
+          }
+        },
+        "hometown":{
+          "$id":"/properties/attributes/properties/hometown",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/hometown/items",
+            "type":"string",
+            "title":"Hometown",
+            "examples":[
+              "hometown string"
+            ]
+          }
+        },
+        "hometownState":{
+          "$id":"/properties/attributes/properties/hometownState",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/hometownState/items",
+            "type":"string",
+            "title":"hometownState",
+            "examples":[
+              "hometownState string"
+            ]
+          }
+        },
+        "imageAssetId":{
+          "$id":"/properties/attributes/properties/imageAssetId",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/imageAssetId/items",
+            "type":"string",
+            "title":"Image Asset Id",
+            "examples":[
+              "image asset id string"
+            ]
+          }
+        },
+        "isDefault":{
+          "$id":"/properties/attributes/properties/isDefault",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/isDefault/items",
+            "type":"string",
+            "title":"Is Default",
+            "examples":[
+              "true",
+              "false"
+            ]
+          }
+        },
+        "isMemberOf":{
+          "$id":"/properties/attributes/properties/isMemberOf",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/isMemberOf/items",
+            "type":"string",
+            "title":"isMemberOf",
+            "examples":[
+              "isMemberOf string"
+            ]
+          }
+        },
+        "isOwnedRole":{
+          "$id":"/properties/attributes/properties/isOwnedRole",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/isOwnedRole/items",
+            "type":"string",
+            "title":"isOwnedRole",
+            "examples":[
+              "isOwnedRole string"
+            ]
+          }
+        },
+        "isSmartTopic":{
+          "$id":"/properties/attributes/properties/isSmartTopic",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/isSmartTopic/items",
+            "type":"string",
+            "title":"Is Smart Topic",
+            "examples":[
+              "true",
+              "false"
+            ]
+          }
+        },
+        "iso2Code":{
+          "$id":"/properties/attributes/properties/iso2Code",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/iso2Code/items",
+            "type":"string",
+            "title":"Iso 2 Code",
+            "examples":[
+              "iso 2 code string"
+            ]
+          }
+        },
+        "iso3Code":{
+          "$id":"/properties/attributes/properties/iso3Code",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/iso3Code/items",
+            "type":"string",
+            "title":"Iso 3 Code",
+            "examples":[
+              "iso 3 code string"
+            ]
+          }
+        },
+        "lat":{
+          "$id":"/properties/attributes/properties/lat",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/lat/items",
+            "type":"string",
+            "title":"Latitude",
+            "examples":[
+              "lat string"
+            ]
+          }
+        },
+        "league":{
+          "$id":"/properties/attributes/properties/league",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/league/items",
+            "type":"string",
+            "title":"league",
+            "examples":[
+              "league string"
+            ]
+          }
+        },
+        "lexicon":{
+          "$id":"/properties/attributes/properties/lexicon",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/lexicon/items",
+            "type":"string",
+            "title":"lexicon",
+            "examples":[
+              "lexicon string"
+            ]
+          }
+        },
+        "local":{
+          "$id":"/properties/attributes/properties/local",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/local/items",
+            "type":"string",
+            "title":"Local",
+            "examples":[
+              "local string"
+            ]
+          }
+        },
+        "locationCity":{
+          "$id":"/properties/attributes/properties/locationCity",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/locationCity/items",
+            "type":"string",
+            "title":"locationCity",
+            "examples":[
+              "locationCity string"
+            ]
+          }
+        },
+        "locationCountry":{
+          "$id":"/properties/attributes/properties/locationCountry",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/locationCountry/items",
+            "type":"string",
+            "title":"locationCountry",
+            "examples":[
+              "locationCountry string"
+            ]
+          }
+        },
+        "locationState":{
+          "$id":"/properties/attributes/properties/locationState",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/locationState/items",
+            "type":"string",
+            "title":"locationState",
+            "examples":[
+              "locationState string"
+            ]
+          }
+        },
+        "locationType":{
+          "$id":"/properties/attributes/properties/locationType",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/locationType/items",
+            "type":"string",
+            "title":"Location Type",
+            "examples":[
+              "location type string"
+            ]
+          }
+        },
+        "long":{
+          "$id":"/properties/attributes/properties/long",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/long/items",
+            "type":"string",
+            "title":"Long",
+            "examples":[
+              "long string"
+            ]
+          }
+        },
+        "modified":{
+          "$id":"/properties/attributes/properties/modified",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/modified/items",
+            "type":"string",
+            "format": "date-time",
+            "title":"Modified",
+            "examples":[
+              "2002-10-02T10:00:00-05:00"
+            ]
+          }
+        },
+        "modifiedBy":{
+          "$id":"/properties/attributes/properties/modifiedBy",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/modifiedBy/items",
+            "type":"string",
+            "title":"Modified By",
+            "examples":[
+              "modified string"
+            ]
+          }
+        },
+        "narrower":{
+          "$id":"/properties/attributes/properties/narrower",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/narrower/items",
+            "type":"string",
+            "title":"narrower",
+            "examples":[
+              "narrower string"
+            ]
+          }
+        },
+        "ngcatmap":{
+          "$id":"/properties/attributes/properties/ngcatmap",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/ngcatmap/items",
+            "type":"string",
+            "title":"Ngcat Map",
+            "examples":[
+              "ngcat map string"
+            ]
+          }
+        },
+        "nickname":{
+          "$id":"/properties/attributes/properties/nickname",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/nickname/items",
+            "type":"string",
+            "title":"Nickname"
+          }
+        },
+        "opponents":{
+          "$id":"/properties/attributes/properties/opponents",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/opponents/items",
+            "type":"string",
+            "title":"opponents",
+            "examples":[
+              "opponents string"
+            ]
+          }
+        },
+        "ownerRole":{
+          "$id":"/properties/attributes/properties/ownerRole",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/ownerRole/items",
+            "type":"string",
+            "title":"ownerRole",
+            "examples":[
+              "ownerRole string"
+            ]
+          }
+        },
+        "participantRole":{
+          "$id":"/properties/attributes/properties/participantRole",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/participantRole/items",
+            "type":"string",
+            "title":"participantRole",
+            "examples":[
+              "participantRole string"
+            ]
+          }
+        },
+        "performerRole":{
+          "$id":"/properties/attributes/properties/performerRole",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/performerRole/items",
+            "type":"string",
+            "title":"performerRole",
+            "examples":[
+              "performerRole string"
+            ]
+          }
+        },
+        "placeAttempted":{
+          "$id":"/properties/attributes/properties/placeAttempted",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/placeAttempted/items",
+            "type":"string",
+            "title":"placeAttempted",
+            "examples":[
+              "placeAttempted string"
+            ]
+          }
+        },
+        "placeFormattedAddress":{
+          "$id":"/properties/attributes/properties/placeFormattedAddress",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/placeFormattedAddress/items",
+            "type":"string",
+            "title":"Place Formatted Address",
+            "examples":[
+              "place formatted address string"
+            ]
+          }
+        },
+        "placeId":{
+          "$id":"/properties/attributes/properties/placeId",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/placeId/items",
+            "type":"string",
+            "title":"Place Id",
+            "examples":[
+              "place id string"
+            ]
+          }
+        },
+        "placeLocation":{
+          "$id":"/properties/attributes/properties/placeLocation",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/placeLocation/items",
+            "type":"string",
+            "title":"Place Location",
+            "examples":[
+              "place location string"
+            ]
+          }
+        },
+        "placeType":{
+          "$id":"/properties/attributes/properties/placeType",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/placeType/items",
+            "type":"string",
+            "title":"PlaceType",
+            "examples":[
+              "place type string"
+            ]
+          }
+        },
+        "placeViewport":{
+          "$id":"/properties/attributes/properties/placeViewport",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/placeViewport/items",
+            "type":"string",
+            "title":"Place Viewport",
+            "examples":[
+              "place viewport string"
+            ]
+          }
+        },
+        "prefLabel":{
+          "$id":"/properties/attributes/properties/prefLabel",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/prefLabel/items",
+            "type":"string",
+            "title":"Preferred Label",
+            "examples":[
+              "pref label string"
+            ]
+          }
+        },
+        "publicCompany":{
+          "$id":"/properties/attributes/properties/publicCompany",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/publicCompany/items",
+            "type":"string",
+            "title":"Public Company",
+            "examples":[
+              "public company string"
+            ]
+          }
+        },
+        "publiccompany":{
+          "$id":"/properties/attributes/properties/publiccompany",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/publiccompany/items",
+            "type":"string",
+            "title":"publiccompany",
+            "examples":[
+              "publiccompany string"
+            ]
+          }
+        },
+        "related":{
+          "$id":"/properties/attributes/properties/related",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/related/items",
+            "type":"string",
+            "title":"related",
+            "examples":[
+              "related string"
+            ]
+          }
+        },
+        "relatedTerm":{
+          "$id":"/properties/attributes/properties/relatedTerm",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/relatedTerm/items",
+            "type":"string",
+            "title":"relatedTerm",
+            "examples":[
+              "relatedTerm string"
+            ]
+          }
+        },
+        "relationshipDescriptor":{
+          "$id":"/properties/attributes/properties/relationshipDescriptor",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/relationshipDescriptor/items",
+            "type":"string",
+            "title":"Relationship Descriptor",
+            "examples":[
+              "relationship descriptor string"
+            ]
+          }
+        },
+        "relativeScore":{
+          "$id":"/properties/attributes/properties/relativeScore",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/relativeScore/items",
+            "type":"string",
+            "title":"Relative Score",
+            "examples":[
+              "22"
+            ]
+          }
+        },
+        "requestor":{
+          "$id":"/properties/attributes/properties/requestor",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/requestor/items",
+            "type":"string",
+            "title":"Requestor",
+            "examples":[
+              "requestor string"
+            ]
+          }
+        },
+        "restrictor":{
+          "$id":"/properties/attributes/properties/restrictor",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/restrictor/items",
+            "type":"string",
+            "title":"Restrictor",
+            "examples":[
+              "restrictor string"
+            ]
+          }
+        },
+        "siblingOf":{
+          "$id":"/properties/attributes/properties/siblingOf",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/siblingOf/items",
+            "type":"string",
+            "title":"siblingOf",
+            "examples":[
+              "siblingOf string"
+            ]
+          }
+        },
+        "significantOther":{
+          "$id":"/properties/attributes/properties/significantOther",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/significantOther/items",
+            "type":"string",
+            "title":"significantOther",
+            "examples":[
+              "significantOther string"
+            ]
+          }
+        },
+        "siteCode":{
+          "$id":"/properties/attributes/properties/siteCode",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/siteCode/items",
+            "type":"string",
+            "title":"Site Code",
+            "examples":[
+              "site code string"
+            ]
+          }
+        },
+        "smartIncludeGalleries":{
+          "$id":"/properties/attributes/properties/smartIncludeGalleries",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/smartIncludeGalleries/items",
+            "type":"string",
+            "title":"Smart Include Galleries",
+            "examples":[
+              "true",
+              "false"
+            ]
+          }
+        },
+        "socialFacebook":{
+          "$id":"/properties/attributes/properties/socialFacebook",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/socialFacebook/items",
+            "type":"string",
+            "title":"Social Facebook",
+            "examples":[
+              "social facebook string"
+            ]
+          }
+        },
+        "socialGooglePlus":{
+          "$id":"/properties/attributes/properties/socialGooglePlus",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/socialGooglePlus/items",
+            "type":"string",
+            "title":"Social Google Plus",
+            "examples":[
+              "social google plus string"
+            ]
+          }
+        },
+        "socialInstagram":{
+          "$id":"/properties/attributes/properties/socialInstagram",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/socialInstagram/items",
+            "type":"string",
+            "title":"Social Instagram",
+            "examples":[
+              "social instagram string"
+            ]
+          }
+        },
+        "socialTwitter":{
+          "$id":"/properties/attributes/properties/socialTwitter",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/socialTwitter/items",
+            "type":"string",
+            "title":"Social Twitter",
+            "examples":[
+              "social twitter string"
+            ]
+          }
+        },
+        "sport":{
+          "$id":"/properties/attributes/properties/sport",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/sport/items",
+            "type":"string",
+            "title":"sport",
+            "examples":[
+              "sport string"
+            ]
+          }
+        },
+        "statusTerm":{
+          "$id":"/properties/attributes/properties/statusTerm",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/statusTerm/items",
+            "type":"string",
+            "title":"Status Term",
+            "examples":[
+              "status term string"
+            ]
+          }
+        },
+        "stopTerm":{
+          "$id":"/properties/attributes/properties/stopTerm",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/stopTerm/items",
+            "type":"string",
+            "title":"Stop Term",
+            "examples":[
+              "stop term string"
+            ]
+          }
+        },
+        "string":{
+          "$id":"/properties/attributes/properties/string",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/string/items",
+            "type":"string",
+            "title":"string",
+            "examples":[
+              "string string"
+            ]
+          }
+        },
+        "subjectCode":{
+          "$id":"/properties/attributes/properties/subjectCode",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/subjectCode/items",
+            "type":"string",
+            "title":"Subject Code",
+            "examples":[
+              "subject code string"
+            ]
+          }
+        },
+        "team":{
+          "$id":"/properties/attributes/properties/team",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/team/items",
+            "type":"string",
+            "title":"team",
+            "examples":[
+              "team string"
+            ]
+          }
+        },
+        "teamPosition":{
+          "$id":"/properties/attributes/properties/teamPosition",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/teamPosition/items",
+            "type":"string",
+            "title":"Team Position",
+            "examples":[
+              "team position string"
+            ]
+          }
+        },
+        "termHighlight":{
+          "$id":"/properties/attributes/properties/termHighlight",
+          "type":"array",
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/termHighlight/items",
+            "type":"string",
+            "title":"Term Highlight",
+            "examples":[
+              "term highlight string"
+            ]
+          }
+        },
+        "ticker":{
+          "$id":"/properties/attributes/properties/ticker",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/ticker/items",
+            "type":"string",
+            "title":"Ticker",
+            "examples":[
+              "ticker string"
+            ]
+          }
+        },
+        "trainingSet":{
+          "$id":"/properties/attributes/properties/trainingSet",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/trainingSet/items",
+            "type":"string",
+            "title":"Training Set",
+            "examples":[
+              "training set string"
+            ]
+          }
+        },
+        "type":{
+          "$id":"/properties/attributes/properties/type",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/type/items",
+            "type":"string",
+            "title":"Type",
+            "examples":[
+              "typestring"
+            ]
+          }
+        },
+        "uniformNumber":{
+          "$id":"/properties/attributes/properties/uniformNumber",
+          "type":"array",
+          "maxItems": 1,
+          "additionalItems": false,
+          "items":{
+            "$id":"/properties/attributes/properties/uniformNumber/items",
+            "type":"string",
+            "title":"uniformNumber",
+            "examples":[
+              "uniform number string"
+            ]
+          }
+        }
+      }
+    },
+    "relationships": {
+      "$id": "#/properties/relationships",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/properties/relationships/items",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "referencedEntityId": {
+            "$id": "/properties/relationships/items/properties/referencedEntityId",
+            "type": "string",
+            "title": "Reference Entity Id",
+            "default": "",
+            "examples": [
+              "befa8122-c9be-4cd5-99c7-1d4c50f48e6f",
+              ""
+            ]
+          },
+          "referencedEntity": {
+            "$id": "#/properties/relationships/items/properties/referencedEntity",
+            "type": ["object", "null"],
+            "title": "Referencedentity Schema",
+            "default": "",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "$id": "#/properties/relationships/items/properties/referencedEntity/properties/id",
+                "type": "string",
+                "title": "Referenced Entity Id",
+                "default": "",
+                "examples": [
+                  "05282072-f8a7-4334-b82a-49986d99adf4"
+                ]
+              },
+              "name": {
+                "$id": "#/properties/relationships/items/properties/referencedEntity/properties/name",
+                "type": "string",
+                "title": "Name",
+                "default": "",
+                "examples": [
+                  "Green Bay, WI"
+                ]
+              },
+              "displayName": {
+                "$id": "#/properties/relationships/items/properties/referencedEntity/properties/displayName",
+                "type": "string",
+                "title": "Display Name",
+                "default": "",
+                "examples": [
+                  "Green Bay, WI"
+                ]
+              },
+              "path": {
+                "$id": "#/properties/relationships/items/properties/referencedEntity/properties/path",
+                "type": "string",
+                "title": "Path",
+                "default": "",
+                "examples": [
+                  "North America/United States/Wisconsin/Green Bay, WI"
+                ]
+              },
+              "attributes": {
+                "$id": "#/properties/relationships/items/properties/referencedEntity/properties/attributes",
+                "$ref": "#/properties/attributes"
+              }
+            }
+          },
+          "referenceType": {
+            "$id": "/properties/relationships/items/properties/referenceType",
+            "type": "string",
+            "enum": [
+              "adExclusion",
+              "associatedCity",
+              "associatedMarket",
+              "associatedState",
+              "broader",
+              "dependencyOf",
+              "employeeRole",
+              "employerRole",
+              "eventType",
+              "extendedFamily",
+              "formerSignificantOther",
+              "friendRole",
+              "hasChild",
+              "hasMember",
+              "hasParent",
+              "hasParticipantRole",
+              "hasPerformerRole",
+              "hometownState",
+              "isMemberOf",
+              "isOwnedRole",
+              "league",
+              "locationCity",
+              "locationCountry",
+              "locationState",
+              "narrower",
+              "opponents",
+              "ownerRole",
+              "participantRole",
+              "performerRole",
+              "related",
+              "relatedTerm",
+              "siblingOf",
+              "significantOther",
+              "sport",
+              "string",
+              "team"
+            ],
+            "title": "Reference Type",
+            "default": "",
+            "examples": [
+              "broader",
+              "associatedMarket"
+            ]
+          }
+        }
+      }
+    },
+    "children": {
+      "$id": "/properties/children",
+      "type": "array",
+      "minItems": 0,
+      "additionalItems": false,
+      "items": {
+        "$id": "properties/children/items",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$id": "/properties/children/items/properties/id",
+            "type": "string",
+            "format": "guid",
+            "pattern": "^({{0,1}([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}}{0,1})$",
+            "title": "Child Id",
+            "examples": [
+              "6633dcec-b521-45f2-9514-30b3f622c79a",
+              ""
+            ]
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "displayName",
+    "path",
+    "vocabulary"
+  ]
+}
