@@ -100,7 +100,7 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef
 				return nil, fmt.Errorf("failed assertion of val: %q", valMap)
 			}
 			for i, item := range valMap {
-				if reflect.TypeOf(item).Kind() == reflect.Map {
+				if item != nil && reflect.TypeOf(item).Kind() == reflect.Map {
 					refs, err = walkInterface(item, append(source, key, strconv.Itoa(i)), refs)
 					if err != nil {
 						return nil, fmt.Errorf("unable to walk slice interface: %v", err)

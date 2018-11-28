@@ -1,0 +1,120 @@
+{
+    "id": "6c4113b7-9196-4fe6-af92-0c873057bfcf",
+    "name": "Iowa Star, Aurora & Quasar awards",
+    "displayName": "Iowa Star, Aurora & Quasar awards",
+    "path": "USCP topics/Des Moines IA/Iowa Star, Aurora & Quasar awards",
+    "vocabulary": "Topics",
+    "attributes": {
+        "definition": [
+            "Des Moines Register sponsored awards honoring the charitable contributions of individuals and organizations in the Central Iowa area"
+        ],
+        "prefLabel": [
+            "Iowa Star, Aurora & Quasar awards"
+        ],
+        "created": [
+            "2014-04-17"
+        ],
+        "modified": [
+            "2014-04-17"
+        ]
+    },
+    "relationships": [
+        {
+            "referencedEntityId": "55d1cfde-a412-4a2c-99dd-6dedd16b0f5e",
+            "referencedEntity": {
+                "id": "55d1cfde-a412-4a2c-99dd-6dedd16b0f5e",
+                "name": "Des Moines",
+                "displayName": "Des Moines",
+                "path": "North America/United States/Iowa/Warren County, IA/Des Moines",
+                "attributes": {
+                    "locationType": [
+                        "City"
+                    ],
+                    "prefLabel": [
+                        "Des Moines"
+                    ],
+                    "lat": [
+                        "41.60054"
+                    ],
+                    "long": [
+                        "-93.60911"
+                    ],
+                    "created": [
+                        "2012-06-06"
+                    ],
+                    "modified": [
+                        "2014-03-25"
+                    ]
+                }
+            },
+            "referenceType": "associatedCity"
+        },
+        {
+            "referencedEntityId": "28ddcbdb-ab98-43b2-9476-f93bd2d79f3d",
+            "referencedEntity": {
+                "id": "28ddcbdb-ab98-43b2-9476-f93bd2d79f3d",
+                "name": "Des Moines Register",
+                "displayName": "Des Moines Register",
+                "path": "Newspaper/Des Moines Register",
+                "attributes": {
+                    "siteCode": [
+                        "PDEM"
+                    ]
+                }
+            },
+            "referenceType": "associatedMarket"
+        },
+        {
+            "referencedEntityId": "934efa20-7956-4331-8a15-b501c43a0a83",
+            "referencedEntity": {
+                "id": "934efa20-7956-4331-8a15-b501c43a0a83",
+                "name": "Iowa",
+                "displayName": "Iowa",
+                "path": "North America/United States/Iowa",
+                "attributes": {
+                    "locationType": [
+                        "State"
+                    ],
+                    "prefLabel": [
+                        "Iowa"
+                    ],
+                    "lat": [
+                        "42.00027"
+                    ],
+                    "long": [
+                        "-93.50049"
+                    ],
+                    "created": [
+                        "2012-06-06"
+                    ],
+                    "modified": [
+                        "2014-03-25"
+                    ]
+                }
+            },
+            "referenceType": "associatedState"
+        },
+        {
+            "referencedEntityId": "7c9c3d0e-a1f1-4076-9be1-8df0d46ff4ca",
+            "referencedEntity": {
+                "id": "7c9c3d0e-a1f1-4076-9be1-8df0d46ff4ca",
+                "name": "Des Moines IA",
+                "displayName": "Des Moines IA",
+                "path": "USCP topics/Des Moines IA",
+                "attributes": {
+                    "prefLabel": [
+                        "Des Moines IA"
+                    ],
+                    "created": [
+                        "2014-03-04"
+                    ],
+                    "modified": [
+                        "2015-04-13"
+                    ]
+                }
+            },
+            "referenceType": "broader"
+        }
+    ],
+    "children": []
+}

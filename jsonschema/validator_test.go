@@ -32,9 +32,15 @@ func TestValidate(t *testing.T) {
 			wantValid:   false,
 			wantErr:     true,
 		},
+		{
+			description: "nil pointer in a JSON array doesn't crash",
+			schemaPath:  "test_data/nil-in-a-slice.json",
+			jsonPath:    "test_data/tag_Iowa_Star.json",
+			wantValid:   true,
+		},
 	}
 	for _, test := range tests {
-		v, err := NewValidator(test.schemaPath)
+		v, err := SchemaFromFile(test.schemaPath, "")
 		if err != nil {
 			t.Fatalf("Test %q - failed to load schema: %v", test.description, err)
 		}
