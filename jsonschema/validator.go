@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"sort"
 
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -59,6 +60,9 @@ func (v *validator) Validate(raw json.RawMessage) (bool, error) {
 		return false, err
 	}
 	if len(result.Errors()) > 0 {
+		sort.Slice(result.Errors(), func(i, j int) bool {
+			return result.Errors()[i].String() < result.Errors()[j].String()
+		})
 		return false, fmt.Errorf("invalid schema: %v", result.Errors())
 	}
 
