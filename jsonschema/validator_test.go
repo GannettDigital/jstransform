@@ -1,6 +1,7 @@
 package jsonschema
 
 import (
+	"errors"
 	"io/ioutil"
 	"testing"
 )
@@ -11,7 +12,7 @@ func TestValidate(t *testing.T) {
 		schemaPath  string
 		jsonPath    string
 		wantValid   bool
-		wantErr     bool
+		wantErr     error
 	}{
 		{
 			description: "valid image JSON",
@@ -30,7 +31,7 @@ func TestValidate(t *testing.T) {
 			schemaPath:  "test_data/image.json",
 			jsonPath:    "test_data/embed.json",
 			wantValid:   false,
-			wantErr:     true,
+			wantErr:     errors.New("invalid schema: [URL: URL is required caption: caption is required credit: credit is required crops: crops is required datePhotoTaken: datePhotoTaken is required orientation: orientation is required originalSize: originalSize is required type: type must be one of the following: \"image\"]"),
 		},
 		{
 			description: "nil pointer in a JSON array doesn't crash",
@@ -50,9 +51,12 @@ func TestValidate(t *testing.T) {
 		}
 
 		got, err := v.Validate(raw)
-
-		if (err != nil) != test.wantErr {
-			t.Errorf("Test %q - got error %v, want error %t", test.description, err, test.wantErr)
+		if err != nil && test.wantErr != nil {
+			if err.Error() != test.wantErr.Error() {
+				t.Errorf("Test %q - got error %s, want error %s", test.description, err.Error(), test.wantErr.Error())
+			}
+		} else if err != nil {
+			t.Errorf("Test %q - got error %s, want error %s", test.description, err.Error(), test.wantErr)
 		}
 		if got != test.wantValid {
 			t.Errorf("Test %q - got valid %t, want %t", test.description, got, test.wantValid)
