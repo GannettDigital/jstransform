@@ -14,6 +14,11 @@ import (
 	"github.com/buger/jsonparser"
 )
 
+// TransformerType - a type implemented by the jstransform.Transformer and the transformers in content-schema
+type TransformerType interface {
+	preTransform(raw json.RawMessage) (json.RawMessage, error)
+}
+
 // Transformer uses a JSON schema and the transform sections within it to take a set of JSON and transform it to
 // matching the schema.
 // More details on the transform section of the schema are found at
@@ -60,6 +65,23 @@ func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Tran
 //
 // Validation of the output against the schema is the final step in the process.
 func (tr *Transformer) Transform(raw json.RawMessage) (json.RawMessage, error) {
+	out, err := tr.preTransform(raw)
+	if err != nil {
+		return nil, err
+	}
+
+	valid, err := tr.schema.Validate(out)
+	if err != nil {
+		return nil, fmt.Errorf("transformed result validation error: %v", err)
+	}
+	if !valid {
+		return nil, errors.New("schema validation of the transformed result reports invalid")
+	}
+
+	return out, nil
+}
+
+func (tr *Transformer) preTransform(raw json.RawMessage) (json.RawMessage, error) {
 	var in interface{}
 	if err := json.Unmarshal(raw, &in); err != nil {
 		return nil, fmt.Errorf("failed to parse input JSON: %v", err)
@@ -74,15 +96,6 @@ func (tr *Transformer) Transform(raw json.RawMessage) (json.RawMessage, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to JSON marsal transformed data: %v", err)
 	}
-
-	valid, err := tr.schema.Validate(out)
-	if err != nil {
-		return nil, fmt.Errorf("transformed result validation error: %v", err)
-	}
-	if !valid {
-		return nil, errors.New("schema validation of the transformed result reports invalid")
-	}
-
 	return out, nil
 }
 
