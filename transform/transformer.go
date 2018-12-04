@@ -14,8 +14,8 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-// TransformerType - a type implemented by the jstransform.Transformer and the transformers in content-schema
-type TransformerType interface {
+// JSONTransformer - a type implemented by the jstransform.Transformer and the transformers in content-schema
+type JSONTransformer interface {
 	Transform(raw json.RawMessage) (json.RawMessage, error)
 }
 
