@@ -14,6 +14,11 @@ import (
 	"github.com/buger/jsonparser"
 )
 
+// JSONTransformer - a type implemented by the jstransform.Transformer
+type JSONTransformer interface {
+	Transform(raw json.RawMessage) (json.RawMessage, error)
+}
+
 // Transformer uses a JSON schema and the transform sections within it to take a set of JSON and transform it to
 // matching the schema.
 // More details on the transform section of the schema are found at
