@@ -3,9 +3,12 @@ package transform
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/PaesslerAG/jsonpath"
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 )
 
 type transformMethod int32
@@ -89,6 +92,7 @@ func (ti *transformInstruction) transform(in interface{}, fieldType string, modi
 	}
 	rawValue, err := jsonpath.Get(path, in)
 	if err != nil {
+		level.Debug(log.NewLogfmtLogger(os.Stderr)).Log("Error in JSONPath during transform: %v", err)
 		return nil, nil
 	}
 	if rawValue == nil {
