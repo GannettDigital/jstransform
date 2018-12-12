@@ -4,10 +4,13 @@ require (
 	github.com/PaesslerAG/gval v0.1.0 // indirect
 	github.com/PaesslerAG/jsonpath v0.1.0
 	github.com/buger/jsonparser v0.0.0-20180318095312-2cac668e8456
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/franela/goblin v0.0.0-20181003173013-ead4ad1d2727 // indirect
 	github.com/franela/goreq v0.0.0-20171204163338-bcd34c9993f8
-	github.com/go-kit/kit v0.8.0
-	github.com/go-logfmt/logfmt v0.4.0 // indirect
+	github.com/onsi/gomega v1.4.3 // indirect
 	github.com/philhofer/fwd v1.0.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/testify v1.2.2 // indirect
 	github.com/tinylib/msgp v0.0.0-20180912221530-f65876d3ea05
 	github.com/ttacon/chalk v0.0.0-20140724125006-76b3c8b611de // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
