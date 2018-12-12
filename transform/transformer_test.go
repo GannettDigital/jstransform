@@ -16,6 +16,7 @@ var (
 	doublearraySchema, _     = jsonschema.SchemaFromFile("./test_data/double-array.json", "")
 	operationsSchema, _      = jsonschema.SchemaFromFile("./test_data/operations.json", "")
 	dateTimesSchema, _       = jsonschema.SchemaFromFile("./test_data/date-times.json", "")
+	frontSchema, _           = jsonschema.SchemaFromFile("./test_data/front.json", "")
 
 	transformerTests = []struct {
 		description         string
@@ -222,6 +223,22 @@ var (
 					"optionalDate": ""
 				}`),
 			want: json.RawMessage(`{"dates":["2018-06-25T20:21:13Z","2018-06-25T20:21:13Z"],"requiredDate":"2018-06-25T20:21:13Z"}`),
+		},
+		{
+			description:         "Test special characters",
+			schema:              frontSchema,
+			transformIdentifier: "frontInput",
+			in: json.RawMessage(`
+						{
+							"attributes": [
+								{
+									"canonicalurl": "canURL",
+									"front-list-module-position": "frontlistmoduleposition"
+								}
+							],
+							"og:image": "testOGIMAGE"
+						}`),
+			want: json.RawMessage(`{"attributes":[{"canonicalURL":"canURL","frontListModulePosition":"frontlistmoduleposition"}],"ogImage":"testOGIMAGE"}`),
 		},
 	}
 
