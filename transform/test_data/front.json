@@ -1,0 +1,52 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"description": "The output schema for front data",
+	"properties": {
+		"attributes": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "canonicalURL": {
+                        "type": "string",
+                        "transform": {
+                            "frontInput": {
+                                "from": [{
+                                        "jsonPath": "@.canonicalurl"
+                                    },
+                                    {
+                                        "jsonPath": "@.canonicalUrl"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "frontListModulePosition": {
+                        "type": "string",
+                        "transform": {
+                            "frontInput": {
+                                "from": [{
+                                    "jsonPath": "@[\"front-list-module-position\"]"
+                                }]
+                            }
+                        }
+                    }
+                },
+                "required": ["canonicalURL"]
+            }
+        },
+        "ogImage": {
+            "type": "string",
+            "transform": {
+                "frontInput": {
+                    "from": [{
+                        "jsonPath": "$[\"og:image\"]"
+                    }]
+                }
+            }
+        }
+	},
+	"required": ["attributes"]
+}
