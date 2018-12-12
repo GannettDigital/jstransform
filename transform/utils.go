@@ -164,7 +164,10 @@ func extractTransformInstructions(raw json.RawMessage, transformIdentifier, path
 	if err := json.Unmarshal(rawTransformInstruction, &tis); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal instance transform: %v", err)
 	}
+	// replaces the @. format
 	tis.replaceJSONPathPrefix("@.", parentPath+".")
+	// replaces the @[] format
+	tis.replaceJSONPathPrefix("@[", parentPath+"[")
 
 	return &tis, nil
 }
