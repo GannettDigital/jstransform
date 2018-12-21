@@ -46,8 +46,8 @@ func (z *Complex) DecodeMsg(dc *msgp.Reader) (err error) {
 				z.Crops = make([]struct {
 					Height       float64 `json:"height"`
 					Name         string  `json:"name"`
-					Path         string  `json:"path"`
-					RelativePath string  `json:"relativePath"`
+					Path         string  `json:"path" description:"full path to the cropped image file"`
+					RelativePath string  `json:"relativePath" description:"a long"`
 					Width        float64 `json:"width"`
 				}, zb0002)
 			}
@@ -444,8 +444,8 @@ func (z *Complex) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				z.Crops = make([]struct {
 					Height       float64 `json:"height"`
 					Name         string  `json:"name"`
-					Path         string  `json:"path"`
-					RelativePath string  `json:"relativePath"`
+					Path         string  `json:"path" description:"full path to the cropped image file"`
+					RelativePath string  `json:"relativePath" description:"a long"`
 					Width        float64 `json:"width"`
 				}, zb0002)
 			}

@@ -129,6 +129,7 @@ func buildStructFile(schemaPath, childPath, name, packageName string, embeds []s
 // that is populated while parsing the JSON schema file then used when generating the Golang code for the struct.
 type extractedField struct {
 	array          bool
+	description    string
 	fields         extractedFields
 	jsonName       string
 	jsonType       string
@@ -140,12 +141,16 @@ type extractedField struct {
 // It handles inline structs by calling this method recursively adding a new \t to the prefix for each layer.
 // If required is set to false 'omitempty' is added in the JSON struct tag for the field
 func (ef *extractedField) write(w io.Writer, prefix string, required bool) error {
-	structTag := "`"
-	structTag = structTag + fmt.Sprintf(`json:"%s`, ef.jsonName)
+	var omitempty string
 	if !required {
-		structTag = structTag + ",omitempty"
+		omitempty = ",omitempty"
 	}
-	structTag = structTag + `"` + "`\n"
+	jsonTag := fmt.Sprintf(`json:"%s%s"`, ef.jsonName, omitempty)
+	var description string
+	if ef.description != "" {
+		description = fmt.Sprintf(`description:"%s"`, strings.Split(ef.description, "\n")[0])
+	}
+	structTag := fmt.Sprintf("`%s`\n", strings.Trim(strings.Join([]string{jsonTag, description}, " "), " "))
 
 	if ef.jsonType != "object" {
 		_, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s\t%s", prefix, ef.name, goType(ef.jsonType, ef.array), structTag)))
@@ -304,9 +309,10 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance) e
 	}
 
 	f := &extractedField{
-		name:     exportedName(tree[0]),
-		jsonName: tree[0],
-		jsonType: inst.Type,
+		description: inst.Description,
+		name:        exportedName(tree[0]),
+		jsonName:    tree[0],
+		jsonType:    inst.Type,
 	}
 	// Second processing of an array type
 	if exists, ok := fields[f.jsonName]; ok {
