@@ -213,7 +213,7 @@ func TestBuildStructs(t *testing.T) {
 			}
 
 			if string(got) != string(want) {
-				t.Errorf("Test %q - file %q got %q != want %q", test.description, test.expectedFiles[i], got, want)
+				t.Errorf("Test %q - file %q got\n%s\n!= want\n%s", test.description, test.expectedFiles[i], got, want)
 			}
 
 			if err := os.Remove(filepath.Join(testdir, test.expectedFiles[i])); err != nil {

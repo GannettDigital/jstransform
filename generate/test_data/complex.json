@@ -3,6 +3,7 @@
     "type": "object",
     "properties": {
         "type": {
+            "description": "a type",
             "type": "string",
             "enum": [
                 "image"
@@ -80,6 +81,7 @@
                         }
                     },
                     "path": {
+                        "description": "full path to the cropped image file",
                         "type": "string",
                         "transform": {
                             "cumulo": {
@@ -99,6 +101,7 @@
                         }
                     },
                     "relativePath": {
+                        "description": "a long\nmulti-line description",
                         "type": "string",
                         "transform": {
                             "cumulo": {
