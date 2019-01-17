@@ -1,6 +1,7 @@
 module github.com/GannettDigital/jstransform
 
 require (
+	github.com/GannettDigital/msgp v1.0.3-0.20180910162652-7b6c807760d7
 	github.com/PaesslerAG/gval v0.1.0 // indirect
 	github.com/PaesslerAG/jsonpath v0.1.0
 	github.com/buger/jsonparser v0.0.0-20180318095312-2cac668e8456
@@ -11,7 +12,6 @@ require (
 	github.com/philhofer/fwd v1.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.2.2 // indirect
-	github.com/tinylib/msgp v0.0.0-20180912221530-f65876d3ea05
 	github.com/ttacon/chalk v0.0.0-20140724125006-76b3c8b611de // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
