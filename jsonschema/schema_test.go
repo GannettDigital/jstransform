@@ -195,8 +195,7 @@ func TestSchemaFromFile(t *testing.T) {
 	}
 }
 
-
-func TestMappings(t *testing.T){
+func TestMappings(t *testing.T) {
 	tests := []struct {
 		description string
 		oneOfType   string
@@ -208,9 +207,9 @@ func TestMappings(t *testing.T){
 			schemaPath:  "./test_data/simple.json",
 			want: Instance{
 				AdditionalProperties: false,
-				Description: "missing",
-				Type: "object",
-				Required: []string{"required"},
+				Description:          "missing",
+				Type:                 "object",
+				Required:             []string{"required"},
 			},
 		},
 		{
@@ -218,15 +217,15 @@ func TestMappings(t *testing.T){
 			schemaPath:  "./test_data/missing-additional-properties.json",
 			want: Instance{
 				AdditionalProperties: true,
-				Description: "missing",
-				Type: "object",
-				Required: []string{"required"},
+				Description:          "missing",
+				Type:                 "object",
+				Required:             []string{"required"},
 			},
 		},
 	}
 
 	for _, test := range tests {
-		t.Run(test.description, func(t *testing.T){
+		t.Run(test.description, func(t *testing.T) {
 			got, err := SchemaFromFile(test.schemaPath, test.oneOfType)
 			if err != nil {
 				t.Fatal(err)
@@ -239,7 +238,6 @@ func TestMappings(t *testing.T){
 		})
 	}
 }
-
 
 func TestSchemaTypes(t *testing.T) {
 	tests := []struct {

@@ -246,7 +246,7 @@ func TestWalkJSONSchema(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(test.description, func(t *testing.T){
+		t.Run(test.description, func(t *testing.T) {
 			walker := testWalker{calls: make(map[string]Instance), rawCalls: make(map[string]json.RawMessage)}
 			schema, err := SchemaFromFile(test.schemaPath, test.oneOfType)
 			if err != nil {
