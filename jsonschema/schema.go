@@ -62,9 +62,8 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 		return nil, fmt.Errorf("failed to Dereference Schema: %v", err)
 	}
 
-
 	// json schema's default behavior is additionalProperties: true if the field is missing so mimic that behavior here
-	var sj = Instance {
+	var sj = Instance{
 		AdditionalProperties: true,
 	}
 	if err := json.Unmarshal(data, &sj); err != nil {
@@ -72,7 +71,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	}
 
 	s := Schema{
-		Instance: sj,
+		Instance:  sj,
 		validator: v,
 	}
 
