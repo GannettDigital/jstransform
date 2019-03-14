@@ -178,6 +178,27 @@ func TestTransformInstructions(t *testing.T) {
 			want: "outout2",
 		},
 		{
+			description: "multiple instructions - method join",
+			tis: transformInstructions{
+				From: []*transformInstruction{
+					{
+						jsonPath:   "$.group1.item1.itemA",
+						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
+					},
+					{
+						jsonPath:   "$.group3[1]",
+						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out2"}}},
+					},
+				},
+				Method: concatenate,
+				MethodOptions: methodOptions{
+					ConcatenateDelimiter: "/",
+				},
+			},
+			in:   testRaw,
+			want: "out/out2",
+		},
+		{
 			description: "all paths are missing",
 			tis: transformInstructions{
 				From: []*transformInstruction{

@@ -12,6 +12,7 @@ func TestConcat(t *testing.T) {
 		description string
 		a           interface{}
 		b           interface{}
+		delimiter   interface{}
 		want        interface{}
 		wantErr     bool
 	}{
@@ -26,6 +27,13 @@ func TestConcat(t *testing.T) {
 			a:           "con",
 			b:           "cat",
 			want:        "concat",
+		},
+		{
+			description: "string concat with delimiter",
+			a:           "con",
+			b:           "cat",
+			delimiter:   "/",
+			want:        "con/cat",
 		},
 		{
 			description: "int concat",
@@ -51,10 +59,24 @@ func TestConcat(t *testing.T) {
 			b:           nil,
 			want:        0,
 		},
+		{
+			description: "string concat with empty delimiter",
+			a:           "con",
+			b:           "cat",
+			delimiter:   "",
+			want:        "concat",
+		},
+		{
+			description: "string concat with invalid delimiter type",
+			a:           "con",
+			b:           "cat",
+			delimiter:   1,
+			wantErr:     true,
+		},
 	}
 
 	for _, test := range tests {
-		got, err := concat(test.a, test.b)
+		got, err := concat(test.a, test.b, test.delimiter)
 
 		switch {
 		case test.wantErr && err != nil:
