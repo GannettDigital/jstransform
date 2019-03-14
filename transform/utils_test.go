@@ -12,7 +12,7 @@ func TestConcat(t *testing.T) {
 		description string
 		a           interface{}
 		b           interface{}
-		delimiter   interface{}
+		delimiter   string
 		want        interface{}
 		wantErr     bool
 	}{
@@ -65,13 +65,6 @@ func TestConcat(t *testing.T) {
 			b:           "cat",
 			delimiter:   "",
 			want:        "concat",
-		},
-		{
-			description: "string concat with invalid delimiter type",
-			a:           "con",
-			b:           "cat",
-			delimiter:   1,
-			wantErr:     true,
 		},
 	}
 

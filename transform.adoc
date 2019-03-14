@@ -25,6 +25,9 @@ The transform object has the following properties:
             }
         ],
          "method": "first|last|concatenate",     // the method to be used in the event that there are more than one "from" paths. Can be one of first, last, concatenate
+         "methodOptions": {                      // options to be passed along to the chosen method.
+             "concatenateDelimiter": ""          // optional delimiter to be used when concatenating multiple jsonPath items. Must be a string
+         }
     }                  
 }   
 ```
