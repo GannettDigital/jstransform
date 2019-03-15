@@ -116,13 +116,19 @@ func (ti *transformInstruction) transform(in interface{}, fieldType string, modi
 // trransformInstructions defines a set of instructions and a method for combining their results.
 // The default method is to take the first non-nil result.
 type transformInstructions struct {
-	From   []*transformInstruction `json:"from"`
-	Method transformMethod         `json:"method"`
+	From          []*transformInstruction `json:"from"`
+	Method        transformMethod         `json:"method"`
+	MethodOptions methodOptions           `json:"methodOptions"`
 }
 
 type transformInstructionsJSON struct {
-	From   []*transformInstruction `json:"from"`
-	Method string                  `json:"method"`
+	From          []*transformInstruction `json:"from"`
+	Method        string                  `json:"method"`
+	MethodOptions methodOptions           `json:"methodOptions"`
+}
+
+type methodOptions struct {
+	concatenateDelimiter string `json:"concatenateDelimiter"`
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface, this function exists to properly map the method.
@@ -174,7 +180,8 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string, mo
 			return nil, err
 		}
 		if concatResult {
-			result, err = concat(result, value)
+			delimiter := tis.MethodOptions.concatenateDelimiter
+			result, err = concat(result, value, delimiter)
 			if err != nil {
 				return nil, fmt.Errorf("failed to concat values: %v", err)
 			}

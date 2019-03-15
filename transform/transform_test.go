@@ -178,6 +178,27 @@ func TestTransformInstructions(t *testing.T) {
 			want: "outout2",
 		},
 		{
+			description: "multiple instructions - method concat with delimiter",
+			tis: transformInstructions{
+				From: []*transformInstruction{
+					{
+						jsonPath:   "$.group1.item1.itemA",
+						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
+					},
+					{
+						jsonPath:   "$.group3[1]",
+						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out2"}}},
+					},
+				},
+				Method: concatenate,
+				MethodOptions: methodOptions{
+					concatenateDelimiter: "/",
+				},
+			},
+			in:   testRaw,
+			want: "out/out2",
+		},
+		{
 			description: "all paths are missing",
 			tis: transformInstructions{
 				From: []*transformInstruction{
@@ -319,6 +340,34 @@ func TestTransformUnmarshal(t *testing.T) {
 					{jsonPath: "$.data.type", Operations: []transformOperation{}},
 				},
 				Method: concatenate,
+			},
+			},
+		},
+		{
+			description: "Basic transform, concatenate method with delimiter",
+			value: []byte(`
+{
+	"cumulo": {
+		"from": [
+			{
+				"jsonPath": "$.data.type"
+			}
+		],
+		"method": "concatenate",
+		"methodOptions": {
+			"concatenateDelimiter": "/"
+		}
+	}
+}`,
+			),
+			want: transform{"cumulo": transformInstructions{
+				From: []*transformInstruction{
+					{jsonPath: "$.data.type", Operations: []transformOperation{}},
+				},
+				Method: concatenate,
+				MethodOptions: methodOptions{
+					concatenateDelimiter: "/",
+				},
 			},
 			},
 		},

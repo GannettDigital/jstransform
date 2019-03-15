@@ -15,7 +15,7 @@ import (
 var indexRe = regexp.MustCompile(`\[([\d]+)\]`)
 
 // Concat will combine any two arbitrary values, though only strings are supported for non-trivial concatenation.
-func concat(a, b interface{}) (interface{}, error) {
+func concat(a, b interface{}, delimiter string) (interface{}, error) {
 	switch {
 	case a == nil && b == nil:
 		return nil, nil
@@ -33,6 +33,9 @@ func concat(a, b interface{}) (interface{}, error) {
 
 	switch a.(type) {
 	case string:
+		if delimiter != "" {
+			return a.(string) + delimiter + b.(string), nil
+		}
 		return a.(string) + b.(string), nil
 	default:
 		return nil, fmt.Errorf("concatenation of types %q not supported", atype)

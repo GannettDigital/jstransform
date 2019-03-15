@@ -21,6 +21,16 @@
 						"concatenate"
 					]
 				},
+				"methodOptions": {
+					"description": "Describes options to be passed along to the chosen method",
+					"type": "object",
+					"properties": {
+						"concatenateDelimiter": {
+							"description": "Optional delimiter to use when concatenating multiple jsonPath items",
+							"type": "string"
+						}
+					}
+				},
 				"from": {
 					"description": "Describes where the input data comes from",
 					"type": "array",
