@@ -66,6 +66,20 @@ func TestConcat(t *testing.T) {
 			delimiter:   "",
 			want:        "concat",
 		},
+		{
+			description: "string concat with empty first string",
+			a:           "",
+			b:           "cat",
+			delimiter:   "/",
+			want:        "cat",
+		},
+		{
+			description: "string concat with empty second string",
+			a:           "con",
+			b:           "",
+			delimiter:   "/",
+			want:        "con",
+		},
 	}
 
 	for _, test := range tests {

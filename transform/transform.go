@@ -128,7 +128,7 @@ type transformInstructionsJSON struct {
 }
 
 type methodOptions struct {
-	concatenateDelimiter string `json:"concatenateDelimiter"`
+	ConcatenateDelimiter string `json:"concatenateDelimiter"`
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface, this function exists to properly map the method.
@@ -140,6 +140,7 @@ func (tis *transformInstructions) UnmarshalJSON(data []byte) error {
 	}
 
 	tis.From = jtis.From
+	tis.MethodOptions = jtis.MethodOptions
 
 	switch jtis.Method {
 	case "":
@@ -180,7 +181,7 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string, mo
 			return nil, err
 		}
 		if concatResult {
-			delimiter := tis.MethodOptions.concatenateDelimiter
+			delimiter := tis.MethodOptions.ConcatenateDelimiter
 			result, err = concat(result, value, delimiter)
 			if err != nil {
 				return nil, fmt.Errorf("failed to concat values: %v", err)
