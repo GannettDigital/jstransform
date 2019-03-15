@@ -33,7 +33,7 @@ func concat(a, b interface{}, delimiter string) (interface{}, error) {
 
 	switch a.(type) {
 	case string:
-		if delimiter != "" {
+		if delimiter != "" && a.(string) != "" && b.(string) != "" {
 			return a.(string) + delimiter + b.(string), nil
 		}
 		return a.(string) + b.(string), nil

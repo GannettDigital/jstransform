@@ -192,11 +192,57 @@ func TestTransformInstructions(t *testing.T) {
 				},
 				Method: concatenate,
 				MethodOptions: methodOptions{
-					concatenateDelimiter: "/",
+					ConcatenateDelimiter: "/",
 				},
 			},
 			in:   testRaw,
 			want: "out/out2",
+		},
+		{
+			description: "multiple instructions - method concat with delimiter, one path missing",
+			tis: transformInstructions{
+				From: []*transformInstruction{
+					{
+						jsonPath:   "$.group1.item1.itemA",
+						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
+					},
+					{
+						jsonPath: "$.group3[5]",
+					},
+					{
+						jsonPath:   "$.group3[1]",
+						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out2"}}},
+					},
+				},
+				Method: concatenate,
+				MethodOptions: methodOptions{
+					ConcatenateDelimiter: "/",
+				},
+			},
+			in:   testRaw,
+			want: "out/out2",
+		},
+		{
+			description: "multiple instructions - method concat with delimiter, all paths missing",
+			tis: transformInstructions{
+				From: []*transformInstruction{
+					{
+						jsonPath: "$.group1.item1.itemF",
+					},
+					{
+						jsonPath: "$.group3[5]",
+					},
+					{
+						jsonPath: "$.group3[10]",
+					},
+				},
+				Method: concatenate,
+				MethodOptions: methodOptions{
+					ConcatenateDelimiter: "/",
+				},
+			},
+			in:   testRaw,
+			want: nil,
 		},
 		{
 			description: "all paths are missing",
@@ -366,7 +412,7 @@ func TestTransformUnmarshal(t *testing.T) {
 				},
 				Method: concatenate,
 				MethodOptions: methodOptions{
-					concatenateDelimiter: "/",
+					ConcatenateDelimiter: "/",
 				},
 			},
 			},
