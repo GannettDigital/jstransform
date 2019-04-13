@@ -114,7 +114,7 @@ func TestAddField(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if err := addField(test.fields, test.tree, test.instance); err != nil {
+		if err := addField(test.fields, test.tree, test.instance, nil); err != nil {
 			t.Fatalf("Test %q - failed to add fields: %v", test.description, err)
 		}
 
@@ -302,12 +302,14 @@ func TestExtractedField_Write(t *testing.T) {
 
 func TestGeneratedStruct(t *testing.T) {
 	tests := []struct {
-		description  string
-		embeds       []string
-		schemaPath   string
-		packageName  string
-		oneOfType    string
-		wantFilePath string
+		description    string
+		embeds         []string
+		schemaPath     string
+		packageName    string
+		oneOfType      string
+		renameFieldMap map[string]string
+		wantFilePath   string
+		wantWriteError bool
 	}{
 		{
 			description:  "Simple schema",
@@ -315,6 +317,38 @@ func TestGeneratedStruct(t *testing.T) {
 			packageName:  "test",
 			oneOfType:    "simple",
 			wantFilePath: "test_data/simple.go.out",
+		},
+		{
+			description: "Simple schema with field rename",
+			schemaPath:  "test_data/test_schema.json",
+			packageName: "test",
+			oneOfType:   "simple",
+			renameFieldMap: map[string]string{
+				"type":  "typeRenamed",
+				"dates": "times",
+			},
+			wantFilePath: "test_data/simple.go.out-rename-fields",
+		},
+		{
+			description:    "valid schema with invalid go field names should fail",
+			schemaPath:     "test_data/needs_field_rename.json",
+			packageName:    "test",
+			oneOfType:      "rename",
+			wantWriteError: true,
+		},
+		{
+			description: "valid schema with invalid go field names, renamed to work",
+			schemaPath:  "test_data/needs_field_rename.json",
+			packageName: "test",
+			oneOfType:   "rename",
+			renameFieldMap: map[string]string{
+				"1_1":  "OneToOne",
+				"3_4":  "ThreeToFour",
+				"4_3":  "ThreeToFour",
+				"16_9": "SixteenToNine",
+				"9_16": "NineToSixteen",
+			},
+			wantFilePath: "test_data/needs_field_rename.go.out",
 		},
 		{
 			description:  "Complex schema",
@@ -331,14 +365,19 @@ func TestGeneratedStruct(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Test %q - SchemaFromFile failed: %v", test.description, err)
 		}
-		g, err := newGeneratedStruct(schema, test.oneOfType, test.packageName, test.embeds)
+		g, err := newGeneratedStruct(schema, test.oneOfType, test.packageName, test.embeds, test.renameFieldMap)
 		if err != nil {
 			t.Fatalf("Test %q - failed: %v", test.description, err)
 		}
 
 		buf := &bytes.Buffer{}
-		if err := g.write(buf); err != nil {
+		err = g.write(buf)
+		if !test.wantWriteError && err != nil {
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
+		} else if test.wantWriteError && err == nil {
+			t.Fatalf("Test %q - expected failure but succeded to write", test.description)
+		} else {
+			continue
 		}
 		got := buf.Bytes()
 
