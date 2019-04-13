@@ -15,6 +15,7 @@ import (
 type mapFlags struct {
 	kv map[string]string
 }
+
 // String converts the provided options into the input format.
 func (mf *mapFlags) String() string {
 	kvs := make([]string, 0, len(mf.kv))
@@ -23,6 +24,7 @@ func (mf *mapFlags) String() string {
 	}
 	return strings.Join(kvs, " ")
 }
+
 // Set stores the provided options into the data structure.
 func (mf *mapFlags) Set(value string) error {
 	kv := strings.SplitN(value, "=", 2)
@@ -35,9 +37,11 @@ func (mf *mapFlags) Set(value string) error {
 
 func main() {
 	renameStructs := mapFlags{kv: make(map[string]string)}
+	renameFields := mapFlags{kv: make(map[string]string)}
 	var useMessagePack bool
 
 	flag.Var(&renameStructs, "rename", "Override generated name of structure; use '-rename old=new'.")
+	flag.Var(&renameFields, "renameFields", "Override generated name of structure; use '-renameFields old=new'.")
 	flag.BoolVar(&useMessagePack, "msgp", false, "generate MessagePack serialization methods")
 
 	flag.Parse()
@@ -45,7 +49,8 @@ func main() {
 	args := flag.Args()
 
 	if len(args) < 1 {
-		fmt.Printf("Usage: %s [-msgp] <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
+		fmt.Printf("Usage: %s [-msgp] [-rename[ [-renameFields] <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
+		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
@@ -64,7 +69,7 @@ func main() {
 		}
 	}
 
-	if err = generate.BuildStructsRename(inputPath, outputPath, useMessagePack, renameStructs.kv); err != nil {
+	if err = generate.BuildStructsRenameFields(inputPath, outputPath, useMessagePack, renameStructs.kv, renameFields.kv); err != nil {
 		fmt.Printf("Golang Struct generation failed: %v", err)
 		os.Exit(4)
 	}
