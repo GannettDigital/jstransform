@@ -336,42 +336,44 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 		return nil
 	}
 
-	fieldName := fieldRenameMap[tree[0]]
-	if fieldName == "" {
-		fieldName = tree[0]
-	}
-	f := &extractedField{
-		description: inst.Description,
-		name:        exportedName(fieldName),
-		jsonName:    tree[0],
-		jsonType:    inst.Type,
-	}
-	// Second processing of an array type
-	if exists, ok := fields[f.jsonName]; ok {
-		f = exists
-		if f.array && f.jsonType == "" {
-			f.jsonType = inst.Type
-		} else {
-			return fmt.Errorf("field %q already exists but is not an array field", f.name)
+	if len(tree) > 0 {
+		fieldName, ok := fieldRenameMap[tree[0]]
+		if !ok {
+			fieldName = tree[0]
 		}
-	}
-	if inst.Type == "string" && inst.Format == "date-time" {
-		f.jsonType = "date-time"
-	}
-
-	switch f.jsonType {
-	case "array":
-		f.jsonType = ""
-		f.array = true
-	case "object":
-		f.requiredFields = make(map[string]bool)
-		for _, name := range inst.Required {
-			f.requiredFields[name] = true
+		f := &extractedField{
+			description: inst.Description,
+			name:        exportedName(fieldName),
+			jsonName:    tree[0],
+			jsonType:    inst.Type,
 		}
-		f.fields = make(map[string]*extractedField)
-	}
+		// Second processing of an array type
+		if exists, ok := fields[f.jsonName]; ok {
+			f = exists
+			if f.array && f.jsonType == "" {
+				f.jsonType = inst.Type
+			} else {
+				return fmt.Errorf("field %q already exists but is not an array field", f.name)
+			}
+		}
+		if inst.Type == "string" && inst.Format == "date-time" {
+			f.jsonType = "date-time"
+		}
 
-	fields[tree[0]] = f
+		switch f.jsonType {
+		case "array":
+			f.jsonType = ""
+			f.array = true
+		case "object":
+			f.requiredFields = make(map[string]bool)
+			for _, name := range inst.Required {
+				f.requiredFields[name] = true
+			}
+			f.fields = make(map[string]*extractedField)
+		}
+
+		fields[tree[0]] = f
+	}
 
 	return nil
 }
