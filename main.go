@@ -49,7 +49,7 @@ func main() {
 	args := flag.Args()
 
 	if len(args) < 1 {
-		fmt.Printf("Usage: %s [-msgp] [-rename[ [-renameFields] <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
+		fmt.Printf("Usage: %s [-msgp] [-rename k=v] [-renameFields k=v] <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
@@ -69,7 +69,12 @@ func main() {
 		}
 	}
 
-	if err = generate.BuildStructsRenameFields(inputPath, outputPath, useMessagePack, renameStructs.kv, renameFields.kv); err != nil {
+	if err = generate.BuildStructsWithArgs(generate.BuildArgs{
+		SchemaPath:     inputPath,
+		OutputDir:      outputPath,
+		UseMessagePack: useMessagePack,
+		StructNameMap:  renameStructs.kv,
+		FieldNameMap:   renameFields.kv}); err != nil {
 		fmt.Printf("Golang Struct generation failed: %v", err)
 		os.Exit(4)
 	}
