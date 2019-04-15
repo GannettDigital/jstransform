@@ -14,6 +14,14 @@ type Rename struct {
 			X            int64  `json:"x,omitempty" description:"Height"`
 			Y            int64  `json:"y,omitempty" description:"Width"`
 		} `json:"bestCrop,omitempty" description:"Best Crop"`
+		FourToThree struct {
+			Height       int64  `json:"height,omitempty" description:"Height"`
+			Path         string `json:"path,omitempty" description:"Full URL to the 4:3 ratio image"`
+			RelativePath string `json:"relativePath,omitempty" description:"Relative Path of a 4:3 ratio image"`
+			Width        int64  `json:"width,omitempty" description:"Width"`
+			X            int64  `json:"x,omitempty" description:"Height"`
+			Y            int64  `json:"y,omitempty" description:"Width"`
+		} `json:"4_3,omitempty" description:"4:3 ratio"`
 		NineToSixteen struct {
 			Height       int64  `json:"height,omitempty" description:"Height"`
 			Path         string `json:"path,omitempty" description:"Full URL to the 9:16 ratio image"`
@@ -40,20 +48,12 @@ type Rename struct {
 		} `json:"16_9,omitempty" description:"16:9 ratio"`
 		ThreeToFour struct {
 			Height       int64  `json:"height,omitempty" description:"Height"`
-			Path         string `json:"path,omitempty" description:"Full URL to the 4:3 ratio image"`
-			RelativePath string `json:"relativePath,omitempty" description:"Relative Path of a 4:3 ratio image"`
+			Path         string `json:"path,omitempty" description:"Full URL to the 3:4 ratio image"`
+			RelativePath string `json:"relativePath,omitempty" description:"Relative Path of a 3:4 ratio image"`
 			Width        int64  `json:"width,omitempty" description:"Width"`
 			X            int64  `json:"x,omitempty" description:"Height"`
 			Y            int64  `json:"y,omitempty" description:"Width"`
-		} `json:"4_3,omitempty" description:"4:3 ratio"`
-		ThreeToFour struct {
-			Height       int64  `json:"height,omitempty" description:"Height"`
-			Path         string `json:"path,omitempty" description:"Full URL to the 4:3 ratio image"`
-			RelativePath string `json:"relativePath,omitempty" description:"Relative Path of a 4:3 ratio image"`
-			Width        int64  `json:"width,omitempty" description:"Width"`
-			X            int64  `json:"x,omitempty" description:"Height"`
-			Y            int64  `json:"y,omitempty" description:"Width"`
-		} `json:"4_3,omitempty" description:"4:3 ratio"`
+		} `json:"3_4,omitempty" description:"3:4 ratio"`
 	} `json:"crops" description:"Crops"`
 	Cutline        string `json:"cutline,omitempty"`
 	DatePhotoTaken string `json:"datePhotoTaken"`

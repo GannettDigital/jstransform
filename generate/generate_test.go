@@ -344,7 +344,7 @@ func TestGeneratedStruct(t *testing.T) {
 			renameFieldMap: map[string]string{
 				"1_1":  "OneToOne",
 				"3_4":  "ThreeToFour",
-				"4_3":  "ThreeToFour",
+				"4_3":  "FourToThree",
 				"16_9": "SixteenToNine",
 				"9_16": "NineToSixteen",
 			},
@@ -376,7 +376,7 @@ func TestGeneratedStruct(t *testing.T) {
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
 		} else if test.wantWriteError && err == nil {
 			t.Fatalf("Test %q - expected failure but succeded to write", test.description)
-		} else {
+		} else if test.wantWriteError {
 			continue
 		}
 		got := buf.Bytes()
