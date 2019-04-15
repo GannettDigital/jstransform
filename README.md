@@ -32,9 +32,6 @@ or if you have compiled the tool and have it in your path rather than vendoring 
 then simply run `go generate`.
 
 ## Building/Testing
-This project uses the Go package management tool [Dep](https://github.com/golang/dep) for dependencies.
-To leverage this tool to install dependencies, run the following command from the project root:
-
-    dep ensure
+This project uses Go modules for dependency management. You need to have a working Go environment with version 1.11 or greater installed. 
 
 Testing is done using standard go tooling, ie `go test ./...`
