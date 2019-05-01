@@ -1,0 +1,1032 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sport:content xmlns:sport="http://xml.sportsdirectinc.com/sport/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.sportsdirectinc.com/sport/v2 sport.xsd">
+    <team-sport-content>
+        <sport>
+            <id>/sport/basketball</id>
+            <name>basketball</name>
+        </sport>
+        <league-content>
+            <league>
+                <id>/sport/basketball/league:403878</id>
+                <name>National Basketball Association</name>
+                <name type="nick">NBA</name>
+            </league>
+            <season-content>
+                <season>
+                    <id>/sport/basketball/season:664611</id>
+                    <name>2017-2018</name>
+                    <details>
+                        <start-date>2017-09-30</start-date>
+                        <end-date>2018-06-30</end-date>
+                    </details>
+                </season>
+                <conference-content>
+                    <conference>
+                        <id>/sport/basketball/conference:403879</id>
+                        <name>Eastern Conference</name>
+                        <name type="short">Eastern</name>
+                    </conference>
+                    <division-content>
+                        <division>
+                            <id>/sport/basketball/division:403880</id>
+                            <name>NBA Atlantic</name>
+                            <alias>Atlantic</alias>
+                            <active>true</active>
+                        </division>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404288</id>
+                                <name>New York</name>
+                                <name type="first">New York</name>
+                                <name type="nick">Knicks</name>
+                                <name type="short">NY</name>
+                                <location>
+                                    <city>New York</city>
+                                    <state>New York</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:288906</id>
+                                        <name>Madison Square Garden</name>
+                                        <name type="short">MSG</name>
+                                        <location>
+                                            <city>New York</city>
+                                            <state>New York</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19763</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404083</id>
+                                <name>Philadelphia</name>
+                                <name type="first">Philadelphia</name>
+                                <name type="nick">76ers</name>
+                                <name type="short">PHI</name>
+                                <location>
+                                    <city>Philadelphia</city>
+                                    <state>Pennsylvania</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538093</id>
+                                        <name>Wells Fargo Center</name>
+                                        <name type="short">WFC</name>
+                                        <location>
+                                            <city>Philadelphia</city>
+                                            <state>Pennsylvania</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>20328</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404117</id>
+                                <name>Brooklyn</name>
+                                <name type="first">Brooklyn</name>
+                                <name type="nick">Nets</name>
+                                <name type="short">BK</name>
+                                <location>
+                                    <city>Brooklyn</city>
+                                    <state>New York</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:635526</id>
+                                        <name>Barclays Center</name>
+                                        <name type="short">Barc</name>
+                                        <location>
+                                            <city>Brooklyn</city>
+                                            <state>New York</state>
+                                            <country>USA</country>
+                                            <timezone>America/New_York</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>17734</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404169</id>
+                                <name>Boston</name>
+                                <name type="first">Boston</name>
+                                <name type="nick">Celtics</name>
+                                <name type="short">BOS</name>
+                                <location>
+                                    <city>Boston</city>
+                                    <state>Massachusetts</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:388802</id>
+                                        <name>TD Garden</name>
+                                        <name type="short">TDG</name>
+                                        <location>
+                                            <city>Boston</city>
+                                            <state>Massachusetts</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>18624</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404330</id>
+                                <name>Toronto</name>
+                                <name type="first">Toronto</name>
+                                <name type="nick">Raptors</name>
+                                <name type="short">TOR</name>
+                                <location>
+                                    <city>Toronto</city>
+                                    <state>Ontario</state>
+                                    <country>CAN</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:388793</id>
+                                        <name>Air Canada Centre</name>
+                                        <name type="short">ACC</name>
+                                        <location>
+                                            <city>Toronto</city>
+                                            <state>Ontario</state>
+                                            <country>CAN</country>
+                                            <timezone>Canada/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19800</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                    </division-content>
+                    <division-content>
+                        <division>
+                            <id>/sport/basketball/division:664418</id>
+                            <name>NBA Southeast</name>
+                            <alias>Southeast</alias>
+                            <active>true</active>
+                        </division>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404067</id>
+                                <name>Washington</name>
+                                <name type="first">Washington</name>
+                                <name type="nick">Wizards</name>
+                                <name type="short">WAS</name>
+                                <location>
+                                    <city>Washington</city>
+                                    <state>District of Columbia</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:288198</id>
+                                        <name>Capital One Arena</name>
+                                        <name type="short">COA</name>
+                                        <location>
+                                            <city>Washington</city>
+                                            <state>District of Columbia</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>20282</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404171</id>
+                                <name>Miami</name>
+                                <name type="first">Miami</name>
+                                <name type="nick">Heat</name>
+                                <name type="short">MIA</name>
+                                <location>
+                                    <city>Miami</city>
+                                    <state>Florida</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:388795</id>
+                                        <name>American Airlines Arena</name>
+                                        <name type="short">AAA</name>
+                                        <location>
+                                            <city>Miami</city>
+                                            <state>Florida</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19600</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404013</id>
+                                <name>Orlando</name>
+                                <name type="first">Orlando</name>
+                                <name type="nick">Magic</name>
+                                <name type="short">ORL</name>
+                                <location>
+                                    <city>Orlando</city>
+                                    <state>Florida</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538091</id>
+                                        <name>Amway Center</name>
+                                        <name type="short">AC</name>
+                                        <location>
+                                            <city>Orlando</city>
+                                            <state>Florida</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>18846</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:664421</id>
+                                <name>Charlotte</name>
+                                <name type="first">Charlotte</name>
+                                <name type="nick">Hornets</name>
+                                <name type="short">CHA</name>
+                                <location>
+                                    <city>Charlotte</city>
+                                    <state>North Carolina</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:635262</id>
+                                        <name>Spectrum Center</name>
+                                        <name type="short">SPC</name>
+                                        <location>
+                                            <city>Charlotte</city>
+                                            <state>North Carolina</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19077</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404085</id>
+                                <name>Atlanta</name>
+                                <name type="first">Atlanta</name>
+                                <name type="nick">Hawks</name>
+                                <name type="short">ATL</name>
+                                <location>
+                                    <city>Atlanta</city>
+                                    <state>Georgia</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538089</id>
+                                        <name>Philips Arena</name>
+                                        <name type="short">PA</name>
+                                        <location>
+                                            <city>Atlanta</city>
+                                            <state>Georgia</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>18729</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                    </division-content>
+                    <division-content>
+                        <division>
+                            <id>/sport/basketball/division:403881</id>
+                            <name>NBA Central</name>
+                            <alias>Central</alias>
+                            <active>true</active>
+                        </division>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404011</id>
+                                <name>Milwaukee</name>
+                                <name type="first">Milwaukee</name>
+                                <name type="nick">Bucks</name>
+                                <name type="short">MIL</name>
+                                <location>
+                                    <city>Milwaukee</city>
+                                    <state>Wisconsin</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:288308</id>
+                                        <name>BMO Harris Bradley Center</name>
+                                        <name type="short">BC</name>
+                                        <location>
+                                            <city>Milwaukee</city>
+                                            <state>Wisconsin</state>
+                                            <country>USA</country>
+                                            <timezone>US/Central</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>18717</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404155</id>
+                                <name>Indiana</name>
+                                <name type="first">Indiana</name>
+                                <name type="nick">Pacers</name>
+                                <name type="short">IND</name>
+                                <location>
+                                    <city>Indianapolis</city>
+                                    <state>Indiana</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:388798</id>
+                                        <name>Bankers Life Fieldhouse</name>
+                                        <name type="short">Conse</name>
+                                        <location>
+                                            <city>Indianapolis</city>
+                                            <state>Indiana</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>18165</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404213</id>
+                                <name>Cleveland</name>
+                                <name type="first">Cleveland</name>
+                                <name type="nick">Cavaliers</name>
+                                <name type="short">CLE</name>
+                                <location>
+                                    <city>Cleveland</city>
+                                    <state>Ohio</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:388804</id>
+                                        <name>Quicken Loans Arena</name>
+                                        <name type="short">QLA</name>
+                                        <location>
+                                            <city>Cleveland</city>
+                                            <state>Ohio</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>20562</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404153</id>
+                                <name>Detroit</name>
+                                <name type="first">Detroit</name>
+                                <name type="nick">Pistons</name>
+                                <name type="short">DET</name>
+                                <location>
+                                    <city>Detroit</city>
+                                    <state>Michigan</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:635816</id>
+                                        <name>Little Caesars Arena</name>
+                                        <name type="short">LCA</name>
+                                        <location>
+                                            <city>Detroit</city>
+                                            <state>Michigan</state>
+                                            <country>USA</country>
+                                            <timezone>America/Detroit</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>21000</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404198</id>
+                                <name>Chicago</name>
+                                <name type="first">Chicago</name>
+                                <name type="nick">Bulls</name>
+                                <name type="short">CHI</name>
+                                <location>
+                                    <city>Chicago</city>
+                                    <state>Illinois</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538092</id>
+                                        <name>United Center</name>
+                                        <name type="short">UC</name>
+                                        <location>
+                                            <city>Chicago</city>
+                                            <state>Illinois</state>
+                                            <country>USA</country>
+                                            <timezone>US/Central</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>20917</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                    </division-content>
+                </conference-content>
+                <conference-content>
+                    <conference>
+                        <id>/sport/basketball/conference:403882</id>
+                        <name>Western Conference</name>
+                        <name type="short">Western</name>
+                    </conference>
+                    <division-content>
+                        <division>
+                            <id>/sport/basketball/division:403884</id>
+                            <name>NBA Pacific</name>
+                            <alias>Pacific</alias>
+                            <active>true</active>
+                        </division>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:403977</id>
+                                <name>L.A. Lakers</name>
+                                <name type="first">Los Angeles</name>
+                                <name type="nick">Lakers</name>
+                                <name type="short">LAL</name>
+                                <location>
+                                    <city>Los Angeles</city>
+                                    <state>California</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538103</id>
+                                        <name>Staples Center</name>
+                                        <name type="short">SC</name>
+                                        <location>
+                                            <city>Los Angeles</city>
+                                            <state>California</state>
+                                            <country>USA</country>
+                                            <timezone>US/Pacific</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19060</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404119</id>
+                                <name>Golden State</name>
+                                <name type="first">Golden State</name>
+                                <name type="nick">Warriors</name>
+                                <name type="short">GS</name>
+                                <location>
+                                    <city>Oakland</city>
+                                    <state>California</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538099</id>
+                                        <name>Oracle Arena</name>
+                                        <name type="short">OA</name>
+                                        <location>
+                                            <city>Oakland</city>
+                                            <state>California</state>
+                                            <country>USA</country>
+                                            <timezone>US/Pacific</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19596</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404135</id>
+                                <name>L.A. Clippers</name>
+                                <name type="first">Los Angeles</name>
+                                <name type="nick">Clippers</name>
+                                <name type="short">LAC</name>
+                                <location>
+                                    <city>Los Angeles</city>
+                                    <state>California</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538103</id>
+                                        <name>Staples Center</name>
+                                        <name type="short">SC</name>
+                                        <location>
+                                            <city>Los Angeles</city>
+                                            <state>California</state>
+                                            <country>USA</country>
+                                            <timezone>US/Pacific</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19060</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404029</id>
+                                <name>Phoenix</name>
+                                <name type="first">Phoenix</name>
+                                <name type="nick">Suns</name>
+                                <name type="short">PHO</name>
+                                <location>
+                                    <city>Phoenix</city>
+                                    <state>Arizona</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:634919</id>
+                                        <name>Talking Stick Resort Arena</name>
+                                        <name type="short">TSRA</name>
+                                        <location>
+                                            <city>Phoenix</city>
+                                            <state>Arizona</state>
+                                            <country>USA</country>
+                                            <timezone>US/Arizona</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>18422</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:403975</id>
+                                <name>Sacramento</name>
+                                <name type="first">Sacramento</name>
+                                <name type="nick">Kings</name>
+                                <name type="short">SAC</name>
+                                <location>
+                                    <city>Sacramento</city>
+                                    <state>California</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:635708</id>
+                                        <name>Golden 1 Center</name>
+                                        <name type="short">G1C</name>
+                                        <location>
+                                            <city>Sacramento</city>
+                                            <state>California</state>
+                                            <country>USA</country>
+                                            <timezone>US/Pacific</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>17500</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                    </division-content>
+                    <division-content>
+                        <division>
+                            <id>/sport/basketball/division:664419</id>
+                            <name>NBA Southwest</name>
+                            <alias>Southwest</alias>
+                            <active>true</active>
+                        </division>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404049</id>
+                                <name>Memphis</name>
+                                <name type="first">Memphis</name>
+                                <name type="nick">Grizzlies</name>
+                                <name type="short">MEM</name>
+                                <location>
+                                    <city>Memphis</city>
+                                    <state>Tennessee</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:634720</id>
+                                        <name>FedExForum</name>
+                                        <name type="short">FEF</name>
+                                        <location>
+                                            <city>Memphis</city>
+                                            <state>Tennessee</state>
+                                            <country>USA</country>
+                                            <timezone>US/Central</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>18119</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404137</id>
+                                <name>Houston</name>
+                                <name type="first">Houston</name>
+                                <name type="nick">Rockets</name>
+                                <name type="short">HOU</name>
+                                <location>
+                                    <city>Houston</city>
+                                    <state>Texas</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538105</id>
+                                        <name>Toyota Center</name>
+                                        <name type="short">TC</name>
+                                        <location>
+                                            <city>Houston</city>
+                                            <state>Texas</state>
+                                            <country>USA</country>
+                                            <timezone>US/Central</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>18043</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404101</id>
+                                <name>New Orleans</name>
+                                <name type="first">New Orleans</name>
+                                <name type="nick">Pelicans</name>
+                                <name type="short">NO</name>
+                                <location>
+                                    <city>New Orleans</city>
+                                    <state>Louisiana</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:388809</id>
+                                        <name>Smoothie King Center</name>
+                                        <name type="short">SKC</name>
+                                        <location>
+                                            <city>New Orleans</city>
+                                            <state>Louisiana</state>
+                                            <country>USA</country>
+                                            <timezone>US/Central</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>17188</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404047</id>
+                                <name>Dallas</name>
+                                <name type="first">Dallas</name>
+                                <name type="nick">Mavericks</name>
+                                <name type="short">DAL</name>
+                                <location>
+                                    <city>Dallas</city>
+                                    <state>Texas</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:562915</id>
+                                        <name>American Airlines Center</name>
+                                        <name type="short">AAC</name>
+                                        <location>
+                                            <city>Dallas</city>
+                                            <state>Texas</state>
+                                            <country>USA</country>
+                                            <timezone>US/Central</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19200</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404302</id>
+                                <name>San Antonio</name>
+                                <name type="first">San Antonio</name>
+                                <name type="nick">Spurs</name>
+                                <name type="short">SA</name>
+                                <location>
+                                    <city>San Antonio</city>
+                                    <state>Texas</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538102</id>
+                                        <name>ATT Center</name>
+                                        <name type="short">ATTC</name>
+                                        <location>
+                                            <city>San Antonio</city>
+                                            <state>Texas</state>
+                                            <country>USA</country>
+                                            <timezone>US/Central</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>18581</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                    </division-content>
+                    <division-content>
+                        <division>
+                            <id>/sport/basketball/division:664420</id>
+                            <name>NBA Northwest</name>
+                            <alias>Northwest</alias>
+                            <active>true</active>
+                        </division>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:403995</id>
+                                <name>Minnesota</name>
+                                <name type="first">Minnesota</name>
+                                <name type="nick">Timberwolves</name>
+                                <name type="short">MIN</name>
+                                <location>
+                                    <city>Minneapolis</city>
+                                    <state>Minnesota</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538104</id>
+                                        <name>Target Center</name>
+                                        <name type="short">TC</name>
+                                        <location>
+                                            <city>Minneapolis</city>
+                                            <state>Minnesota</state>
+                                            <country>USA</country>
+                                            <timezone>US/Central</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19356</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404316</id>
+                                <name>Oklahoma City</name>
+                                <name type="first">Oklahoma City</name>
+                                <name type="nick">Thunder</name>
+                                <name type="short">OKC</name>
+                                <location>
+                                    <city>Oklahoma City</city>
+                                    <state>Oklahoma</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:635449</id>
+                                        <name>Chesapeake Energy Arena</name>
+                                        <name type="short">CEA</name>
+                                        <location>
+                                            <city>Oklahoma City</city>
+                                            <state>Oklahoma</state>
+                                            <country>USA</country>
+                                            <timezone>US/Central</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>18203</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404065</id>
+                                <name>Denver</name>
+                                <name type="first">Denver</name>
+                                <name type="nick">Nuggets</name>
+                                <name type="short">DEN</name>
+                                <location>
+                                    <city>Denver</city>
+                                    <state>Colorado</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538100</id>
+                                        <name>Pepsi Center</name>
+                                        <name type="short">PC</name>
+                                        <location>
+                                            <city>Denver</city>
+                                            <state>Colorado</state>
+                                            <country>USA</country>
+                                            <timezone>US/Mountain</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19155</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:403993</id>
+                                <name>Portland</name>
+                                <name type="first">Portland</name>
+                                <name type="nick">Trail Blazers</name>
+                                <name type="short">POR</name>
+                                <location>
+                                    <city>Portland</city>
+                                    <state>Oregon</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538101</id>
+                                        <name>Moda Center</name>
+                                        <name type="short">MC</name>
+                                        <location>
+                                            <city>Portland</city>
+                                            <state>Oregon</state>
+                                            <country>USA</country>
+                                            <timezone>US/Pacific</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19980</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404031</id>
+                                <name>Utah</name>
+                                <name type="first">Utah</name>
+                                <name type="nick">Jazz</name>
+                                <name type="short">UTA</name>
+                                <location>
+                                    <city>Salt Lake City</city>
+                                    <state>Utah</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538096</id>
+                                        <name>Vivint Smart Home Arena</name>
+                                        <name type="short">VSHA</name>
+                                        <location>
+                                            <city>Salt Lake City</city>
+                                            <state>Utah</state>
+                                            <country>USA</country>
+                                            <timezone>US/Mountain</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19911</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                    </division-content>
+                </conference-content>
+                <team-content>
+                    <meta>
+                        <property name="team-type">all-star</property>
+                    </meta>
+                    <team>
+                        <id>/sport/basketball/team:676107</id>
+                        <name>Team Lebron</name>
+                        <name type="first">Team Lebron</name>
+                        <name type="short">LEBRON</name>
+                    </team>
+                </team-content>
+                <team-content>
+                    <meta>
+                        <property name="team-type">all-star</property>
+                    </meta>
+                    <team>
+                        <id>/sport/basketball/team:665880</id>
+                        <name>World</name>
+                        <name type="first">World</name>
+                        <name type="short">World</name>
+                    </team>
+                </team-content>
+                <team-content>
+                    <meta>
+                        <property name="team-type">all-star</property>
+                    </meta>
+                    <team>
+                        <id>/sport/basketball/team:665879</id>
+                        <name>U.S.</name>
+                        <name type="first">U.S.</name>
+                        <name type="short">U.S.</name>
+                    </team>
+                </team-content>
+                <team-content>
+                    <meta>
+                        <property name="team-type">all-star</property>
+                    </meta>
+                    <team>
+                        <id>/sport/basketball/team:676108</id>
+                        <name>Team Stephen</name>
+                        <name type="first">Team Stephen</name>
+                        <name type="short">STEPH</name>
+                    </team>
+                </team-content>
+            </season-content>
+        </league-content>
+    </team-sport-content>
+</sport:content>

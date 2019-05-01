@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sport:content xmlns:sport="http://xml.sportsdirectinc.com/sport/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.sportsdirectinc.com/sport/v2 sport.xsd">
+	<team-sport-content>
+		<sport>
+			<id>/sport/baseball</id>
+			<name>baseball</name>
+		</sport>
+		<league-content>
+			<league>
+				<id>/sport/baseball/league:1219</id>
+				<name>Major League Baseball</name>
+				<name type="nick">MLB</name>
+			</league>
+			<season-content>
+				<season>
+					<id>/sport/baseball/season:1091</id>
+					<name>2018</name>
+					<details>
+						<start-date>2018-02-01</start-date>
+						<end-date>2018-11-30</end-date>
+					</details>
+				</season>
+				<conference-content>
+					<conference>
+						<id>/sport/baseball/conference:136</id>
+						<name>National League</name>
+						<name type="short">NL</name>
+					</conference>
+					<division-content>
+						<division>
+							<id>/sport/baseball/division:349</id>
+							<name>National League Central</name>
+							<alias>NL Central</alias>
+							<active>true</active>
+						</division>
+						<team-content>
+							<team>
+								<id>/sport/baseball/team:2976</id>
+								<name>Milwaukee</name>
+								<name type="first">Milwaukee</name>
+								<name type="nick">Brewers</name>
+								<name type="short">MIL</name>
+								<location>
+									<city>Milwaukee</city>
+									<state>Wisconsin</state>
+									<country>USA</country>
+								</location>
+								<season-details>
+									<venue>
+										<id>/sport/baseball/venue:3005</id>
+										<name>Miller Park</name>
+										<name type="short">MP</name>
+										<location>
+											<city>Milwaukee</city>
+											<state>Wisconsin</state>
+											<country>USA</country>
+											<timezone>US/Central</timezone>
+										</location>
+										<season-details>
+											<capacity>45808</capacity>
+											<field-type>
+												<id>/sport/baseball/field-type:1</id>
+												<name>Grass</name>
+											</field-type>
+										</season-details>
+									</venue>
+								</season-details>
+							</team>
+						</team-content>
+						<team-content>
+							<team>
+								<id>/sport/baseball/team:2971</id>
+								<name>Pittsburgh</name>
+								<name type="first">Pittsburgh</name>
+								<name type="nick">Pirates</name>
+								<name type="short">PIT</name>
+								<location>
+									<city>Pittsburgh</city>
+									<state>Pennsylvania</state>
+									<country>USA</country>
+								</location>
+								<season-details>
+									<venue>
+										<id>/sport/baseball/venue:3006</id>
+										<name>PNC Park</name>
+										<name type="short">PNC</name>
+										<location>
+											<city>Pittsburgh</city>
+											<state>Pennsylvania</state>
+											<country>USA</country>
+											<timezone>US/Eastern</timezone>
+										</location>
+										<season-details>
+											<capacity>38496</capacity>
+											<field-type>
+												<id>/sport/baseball/field-type:1</id>
+												<name>Grass</name>
+											</field-type>
+										</season-details>
+									</venue>
+								</season-details>
+							</team>
+						</team-content>
+						<team-content>
+							<team>
+								<id>/sport/baseball/team:2982</id>
+								<name>Chi. Cubs</name>
+								<name type="first">Chicago</name>
+								<name type="nick">Cubs</name>
+								<name type="short">CHC</name>
+								<location>
+									<city>Chicago</city>
+									<state>Illinois</state>
+									<country>USA</country>
+								</location>
+								<season-details>
+									<venue>
+										<id>/sport/baseball/venue:2998</id>
+										<name>Wrigley Field</name>
+										<name type="short">WF</name>
+										<location>
+											<city>Chicago</city>
+											<state>Illinois</state>
+											<country>USA</country>
+											<timezone>US/Central</timezone>
+										</location>
+										<season-details>
+											<capacity>42157</capacity>
+											<field-type>
+												<id>/sport/baseball/field-type:1</id>
+												<name>Grass</name>
+											</field-type>
+										</season-details>
+									</venue>
+								</season-details>
+							</team>
+						</team-content>
+					</division-content>
+					<team-content>
+						<meta>
+							<property name="team-type">all-star</property>
+						</meta>
+						<team>
+							<id>/sport/baseball/team:3484</id>
+							<name>National League</name>
+							<name type="first">National League</name>
+							<name type="nick">All-Stars</name>
+							<name type="short">NL</name>
+						</team>
+					</team-content>
+				</conference-content>
+			</season-content>
+		</league-content>
+	</team-sport-content>
+</sport:content>

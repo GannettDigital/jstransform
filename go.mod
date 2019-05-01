@@ -4,6 +4,8 @@ require (
 	github.com/GannettDigital/msgp v1.0.3-0.20180910162652-7b6c807760d7
 	github.com/PaesslerAG/gval v0.1.1 // indirect
 	github.com/PaesslerAG/jsonpath v0.1.0
+	github.com/antchfx/xmlquery v1.0.0
+	github.com/antchfx/xpath v0.0.0-20190319080838-ce1d48779e67 // indirect
 	github.com/buger/jsonparser v0.0.0-20181115193947-bf1c66bbce23
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/franela/goblin v0.0.0-20181003173013-ead4ad1d2727 // indirect
