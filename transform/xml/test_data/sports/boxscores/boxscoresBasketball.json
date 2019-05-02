@@ -11,7 +11,16 @@
             "sport": {
               "from": [
                 {
-                  "xmlPath": "//league-content/league/id"
+                  "xmlPath": "//league-content/league/id",
+                  "operations": [
+                    {
+                      "type": "replace",
+                      "args": {
+                        "regex": "[\\D]",
+                        "new": ""
+                      }
+                    }
+                  ]
                 }
               ]
             }
@@ -52,7 +61,16 @@
             "sport": {
               "from": [
                 {
-                  "xmlPath": "//season/id"
+                  "xmlPath": "//season/id",
+                  "operations": [
+                    {
+                      "type": "replace",
+                      "args": {
+                        "regex": "[\\D]",
+                        "new": ""
+                      }
+                    }
+                  ]
                 }
               ]
             }
@@ -78,7 +96,16 @@
         "sport": {
           "from": [
             {
-              "xmlPath": "//competition/id"
+              "xmlPath": "//competition/id",
+              "operations": [
+                {
+                  "type": "replace",
+                  "args": {
+                    "regex": "[\\D]",
+                    "new": ""
+                  }
+                }
+              ]
             }
           ]
         }
@@ -165,7 +192,16 @@
             "sport": {
               "from": [
                 {
-                  "xmlPath": "//home-team-content/team/id"
+                  "xmlPath": "//home-team-content/team/id",
+                  "operations": [
+                    {
+                      "type": "replace",
+                      "args": {
+                        "regex": "[\\D]",
+                        "new": ""
+                      }
+                    }
+                  ]
                 }
               ]
             }
@@ -204,6 +240,18 @@
                     "from": [
                       {
                         "xmlPath": "key"
+                      }
+                    ]
+                  }
+                }
+              },
+              "gamesWon": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "stat[@type='games_won']/@num"
                       }
                     ]
                   }
