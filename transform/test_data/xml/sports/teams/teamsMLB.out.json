@@ -32,6 +32,7 @@
       "shortName":"MIL",
       "sport":"baseball",
       "state":"Wisconsin",
+      "team":true,
       "venue":{
         "capacity":"45808",
         "city":"Milwaukee",
@@ -75,6 +76,7 @@
       "shortName":"PIT",
       "sport":"baseball",
       "state":"Pennsylvania",
+      "team":true,
       "venue":{
         "capacity":"38496",
         "city":"Pittsburgh",
@@ -91,7 +93,8 @@
       "id":"3484",
       "name":"National League",
       "nickName":"All-Stars",
-      "shortName":"NL"
+      "shortName":"NL",
+      "team":true
     }
   ]
 }

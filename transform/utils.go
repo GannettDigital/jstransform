@@ -86,8 +86,7 @@ func convertBoolean(raw interface{}) (interface{}, error) {
 	case nil:
 		return nil, nil
 	case []*xmlquery.Node:
-		node := raw.([]*xmlquery.Node)
-		return strconv.ParseBool(node[0].InnerText())
+		return strconv.ParseBool(t[0].InnerText())
 	default:
 		return nil, fmt.Errorf("unable to convert type %q to boolean", reflect.TypeOf(raw))
 	}
@@ -114,11 +113,10 @@ func convertNumber(raw interface{}) (interface{}, error) {
 	case int, float32, float64:
 		return raw, nil
 	case []*xmlquery.Node:
-		node := raw.([]*xmlquery.Node)
-		if value, err := strconv.Atoi(node[0].InnerText()); err == nil {
+		if value, err := strconv.Atoi(t[0].InnerText()); err == nil {
 			return value, nil
 		}
-		if value, err := strconv.ParseFloat(node[0].InnerText(), 64); err == nil {
+		if value, err := strconv.ParseFloat(t[0].InnerText(), 64); err == nil {
 			return value, nil
 		}
 		return nil, fmt.Errorf("failed to convert xmlquery.Node to number")
@@ -139,8 +137,7 @@ func convertDateTime(raw interface{}) (interface{}, error) {
 	case float64:
 		return time.Unix(int64(t), 0).UTC(), nil
 	case []*xmlquery.Node:
-		node := raw.([]*xmlquery.Node)
-		return time.Parse(time.RFC3339, node[0].InnerText())
+		return time.Parse(time.RFC3339, t[0].InnerText())
 	default:
 		return nil, fmt.Errorf("unable to convert type %q to a date-time", reflect.TypeOf(raw))
 	}
@@ -162,8 +159,7 @@ func convertString(raw interface{}) (interface{}, error) {
 	case float64:
 		return strconv.FormatFloat(t, 'f', -1, 64), nil
 	case []*xmlquery.Node:
-		node := raw.([]*xmlquery.Node)
-		return node[0].InnerText(), nil
+		return t[0].InnerText(), nil
 	case nil:
 		return nil, nil
 	default:

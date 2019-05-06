@@ -1,6 +1,7 @@
 {
   "teams":[
     {
+      "team": true,
       "city":"New York",
       "conference":{
         "id":"403879",
@@ -44,6 +45,7 @@
       }
     },
     {
+      "team": true,
       "city":"Washington",
       "conference":{
         "id":"403879",
@@ -87,6 +89,7 @@
       }
     },
     {
+      "team": true,
       "city":"Miami",
       "conference":{
         "id":"403879",
@@ -130,6 +133,7 @@
       }
     },
     {
+      "team": true,
       "city":"Los Angeles",
       "conference":{
         "id":"403882",
@@ -173,6 +177,7 @@
       }
     },
     {
+      "team": true,
       "firstName":"Team Lebron",
       "id":"676107",
       "league":{

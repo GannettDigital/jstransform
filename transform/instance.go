@@ -85,11 +85,10 @@ func (at *arrayTransformer) baseValue(in interface{}, path string, modifier path
 		}
 
 		//if rawValue is an array of xml nodes we need to append them to newValue for return
-		_, isXmlNodeArray := rawValue.([]*xmlquery.Node)
-		if isXmlNodeArray {
-			xmlNodeArray := rawValue.([]*xmlquery.Node)
+		switch t := rawValue.(type) {
+		case []*xmlquery.Node:
 			var newValue []interface{}
-			for _, item := range xmlNodeArray {
+			for _, item := range t {
 				newValue = append(newValue, item)
 			}
 			return newValue, false, nil
@@ -105,9 +104,9 @@ func (at *arrayTransformer) baseValue(in interface{}, path string, modifier path
 	}
 
 	// 2. Look for the same JSONPath in the input and use directly if possible.
-	//if 'in' is an xmlNode there will never be a value at the JSONPath
-	_, isXmlNode := in.(*xmlquery.Node)
-	if !isXmlNode {
+	//if 'in' is an xmlNode there will never be a value at the JSONPath and a value from
+	//an xmlNode will always be supplied via the convert() function
+	if _, isXmlNode := in.(*xmlquery.Node); !isXmlNode {
 		rawValue, err := jsonpath.Get(path, in)
 		if err == nil && rawValue != nil {
 			newValue, ok := rawValue.([]interface{})
@@ -142,8 +141,7 @@ func (at *arrayTransformer) transform(in interface{}, modifier pathModifier) (in
 	}
 
 	//an xmlNode will never be changed
-	_, isXmlNode := in.(*xmlquery.Node)
-	if !isXmlNode {
+	if _, isXmlNode := in.(*xmlquery.Node); !isXmlNode {
 		if changed {
 			// save the array base to in as children will use the value from this for their transforms
 			if path == "$" {
@@ -171,7 +169,7 @@ func (at *arrayTransformer) transform(in interface{}, modifier pathModifier) (in
 		currentPath := path + fmt.Sprintf("[%d]", i)
 		var childValue interface{}
 		//if xmlNode only transform if the child is an xmlNode otherwise just append its value
-		if isXmlNode {
+		if _, isXmlNode := in.(*xmlquery.Node); isXmlNode {
 			childValue = base[i]
 			_, ok := childValue.(*xmlquery.Node)
 			if ok {
@@ -369,9 +367,8 @@ func (st *scalarTransformer) transform(in interface{}, modifier pathModifier) (i
 	}
 
 	// 2. Look for the same JSONPath in the input and use directly if possible.
-	_, isXmlNode := in.(*xmlquery.Node)
 	//an xmlNode will never have a JSONPath value
-	if !isXmlNode {
+	if _, isXmlNode := in.(*xmlquery.Node); !isXmlNode {
 		rawValue, err := jsonpath.Get(path, in)
 		if err == nil {
 			newValue, err := convert(rawValue, st.jsonType)

@@ -14,6 +14,10 @@
       "items": {
         "type": "object",
         "properties": {
+          "team": {
+            "type": "boolean",
+            "default": true
+          },
           "season": {
             "type": "object",
             "properties": {
