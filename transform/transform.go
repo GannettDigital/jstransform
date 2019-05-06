@@ -100,19 +100,16 @@ func (ti *transformInstruction) transform(in interface{}, fieldType string, modi
 		err      error
 	)
 
-	switch in.(type) {
+	switch t := in.(type) {
 	case *xmlquery.Node:
-		node := in.(*xmlquery.Node)
-		rawValue = xmlquery.Find(node, path)
-		if rawValue.([]*xmlquery.Node) == nil {
+		xmlNode := xmlquery.Find(t, path)
+		if xmlNode == nil {
 			return nil, nil
 		}
+		rawValue = xmlNode
 	default:
 		rawValue, err = jsonpath.Get(path, in)
-		if err != nil {
-			return nil, nil
-		}
-		if rawValue == nil {
+		if err != nil || rawValue == nil {
 			return nil, nil
 		}
 	}

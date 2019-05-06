@@ -207,10 +207,9 @@ func (s *split) init(args map[string]string) error {
 func (s *split) transform(raw interface{}) (interface{}, error) {
 	var stringToSplit string
 
-	switch raw.(type) {
+	switch t := raw.(type) {
 	case []*xmlquery.Node:
-		xmlNode := raw.([]*xmlquery.Node)
-		stringToSplit = xmlNode[0].InnerText()
+		stringToSplit = t[0].InnerText()
 	case string:
 		stringToSplit = raw.(string)
 	default:

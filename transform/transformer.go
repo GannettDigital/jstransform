@@ -24,7 +24,7 @@ type JSONTransformer interface {
 
 // XMLTransformer - a type implemented by the jstransform.Transformer
 type XMLTransformer interface {
-	Transform(raw json.RawMessage) (json.RawMessage, error)
+	Transform(raw []byte) (json.RawMessage, error)
 }
 
 // Transformer uses a JSON schema and the transform sections within it to take a set of JSON and transform it to
@@ -37,10 +37,8 @@ type Transformer struct {
 	root                instanceTransformer
 }
 
-// Transformer uses a JSON schema and the transform sections within it to take a set of JSON and transform it to
-// matching the schema.
-// More details on the transform section of the schema are found at
-// https://github.com/GannettDigital/jstransform/blob/master/transform.adoc
+// TransformerXML uses a JSON schema and the transform sections within it to take an XML file input and transform it
+// to a JSON schema
 type TransformerXML struct {
 	schema              *jsonschema.Schema
 	transformIdentifier string // Used to select the proper transform Instructions
@@ -71,7 +69,7 @@ func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Tran
 	return tr, nil
 }
 
-// NewTransformer returns a Transformer using the schema given.
+// NewTransformerXML returns a TransformerXML using the schema given.
 // The transformIdentifier is used to select the appropriate transform section from the schema.
 func NewTransformerXML(schema *jsonschema.Schema, tranformIdentifier string) (*TransformerXML, error) {
 	tr := &TransformerXML{schema: schema, transformIdentifier: tranformIdentifier}
@@ -132,7 +130,16 @@ func (tr *Transformer) Transform(raw json.RawMessage) (json.RawMessage, error) {
 	return out, nil
 }
 
-func (tr *TransformerXML) Transform(raw json.RawMessage) (json.RawMessage, error) {
+// Transform takes the providid XML and converts it to JSON to match the pre-defined JSON Schema using the
+// transform sections in the schema.
+//
+// All fields must contain transforms or default values
+//
+// Errors are returned for failures to perform operations but are not returned for empty fields which are either
+// omitted from the output or set to an empty value
+//
+// Validation of the output against the schema is the final step in the process.
+func (tr *TransformerXML) Transform(raw []byte) ([]byte, error) {
 	xmlDoc, err := xmlquery.Parse(bytes.NewReader(raw))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse input XML: %v", err)
