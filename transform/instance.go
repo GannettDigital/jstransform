@@ -87,9 +87,9 @@ func (at *arrayTransformer) baseValue(in interface{}, path string, modifier path
 		//if rawValue is an array of xml nodes we need to append them to newValue for return
 		switch t := rawValue.(type) {
 		case []*xmlquery.Node:
-			var newValue []interface{}
-			for _, item := range t {
-				newValue = append(newValue, item)
+			newValue := make([]interface{}, len(t))
+			for i, item := range t {
+				newValue[i] = item
 			}
 			return newValue, false, nil
 		}

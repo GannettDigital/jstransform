@@ -211,7 +211,7 @@ func (s *split) transform(raw interface{}) (interface{}, error) {
 	case []*xmlquery.Node:
 		stringToSplit = t[0].InnerText()
 	case string:
-		stringToSplit = raw.(string)
+		stringToSplit = t
 	default:
 		return nil, errors.New("split only supports strings or []*xmlquery.Node")
 	}
