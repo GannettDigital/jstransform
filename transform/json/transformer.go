@@ -1,6 +1,6 @@
 // Package transform implements code which can use a JSON schema with transform sections to Convert a JSON file to
 // match the schema format.
-package transform
+package json
 
 import (
 	"encoding/json"
