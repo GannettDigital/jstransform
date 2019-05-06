@@ -269,7 +269,7 @@ func TestArrayTransform(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		at, err := newArrayTransformer(test.path, "test", test.raw)
+		at, err := newArrayTransformer(test.path, "test", test.raw, "json")
 		if err != nil {
 			t.Fatalf("Test %q - failed to initialize array transformer: %v", test.description, err)
 		}
@@ -280,7 +280,7 @@ func TestArrayTransform(t *testing.T) {
 		for k, v := range testIn {
 			testInCopy[k] = v
 		}
-		got, err := at.transform(testInCopy, nil)
+		got, err := at.transform(testInCopy, nil, "json")
 		if err != nil {
 			t.Errorf("Test %q - failed transform: %v", test.description, err)
 		}
@@ -386,14 +386,14 @@ func TestObjectTransform(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		ot, err := newObjectTransformer(test.path, "test", test.raw)
+		ot, err := newObjectTransformer(test.path, "test", test.raw, "json")
 		if err != nil {
 			t.Fatalf("Test %q - failed to initialize object transformer: %v", test.description, err)
 		}
 
 		ot.children = test.children
 
-		got, err := ot.transform(test.in, nil)
+		got, err := ot.transform(test.in, nil, "json")
 		if err != nil {
 			t.Errorf("Test %q - failed transform: %v", test.description, err)
 		}
@@ -531,7 +531,7 @@ func TestScalarTransform(t *testing.T) {
 			t.Fatalf("Test %q - failed to initialize scalar transformer: %v", test.description, err)
 		}
 
-		got, err := st.transform(test.in, nil)
+		got, err := st.transform(test.in, nil, "json")
 
 		if err != nil {
 			if err.Error() == test.wantError {

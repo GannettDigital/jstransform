@@ -48,6 +48,9 @@
 				"jsonPath": {
 					"$ref": "#/definitions/jsonPath"
 				},
+				"xmlPath": {
+					"$ref": "#/definitions/xmlPath"
+				},
 				"operations": {
 					"description": "Operations allows for further mutation of data",
 					"type": "array",
@@ -77,6 +80,9 @@
 		"jsonPath": {
 			"type": "string",
 			"pattern": "^[@$](?:(?:\\.\\S+)|(?:\\['\\S+'\\]))+$"
+		},
+		"xmlPath": {
+			"type": "string"
 		},
 		"operations": {
 			"caseChange": {
