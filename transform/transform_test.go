@@ -160,7 +160,7 @@ func TestTransformInstructions(t *testing.T) {
 			want: "out2",
 		},
 		{
-			description: "multiple instructions - method concat",
+			description: "multiple instructions - method Concat",
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
@@ -178,7 +178,7 @@ func TestTransformInstructions(t *testing.T) {
 			want: "outout2",
 		},
 		{
-			description: "multiple instructions - method concat with delimiter",
+			description: "multiple instructions - method Concat with delimiter",
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
@@ -199,7 +199,7 @@ func TestTransformInstructions(t *testing.T) {
 			want: "out/out2",
 		},
 		{
-			description: "multiple instructions - method concat with delimiter, one path missing",
+			description: "multiple instructions - method Concat with delimiter, one path missing",
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
@@ -223,7 +223,7 @@ func TestTransformInstructions(t *testing.T) {
 			want: "out/out2",
 		},
 		{
-			description: "multiple instructions - method concat with delimiter, all paths missing",
+			description: "multiple instructions - method Concat with delimiter, all paths missing",
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{

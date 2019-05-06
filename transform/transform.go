@@ -95,7 +95,7 @@ func (ti *transformInstruction) transform(in interface{}, fieldType string, modi
 		return nil, nil
 	}
 
-	value, err := convert(rawValue, fieldType)
+	value, err := Convert(rawValue, fieldType)
 	if err != nil {
 		// In some cases the conversion is helpful but in others like before a max operation it isn't
 		value = rawValue
@@ -182,9 +182,9 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string, mo
 		}
 		if concatResult {
 			delimiter := tis.MethodOptions.ConcatenateDelimiter
-			result, err = concat(result, value, delimiter)
+			result, err = Concat(result, value, delimiter)
 			if err != nil {
-				return nil, fmt.Errorf("failed to concat values: %v", err)
+				return nil, fmt.Errorf("failed to Concat values: %v", err)
 			}
 			continue
 		}

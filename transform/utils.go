@@ -9,13 +9,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/antchfx/xmlquery"
 	"github.com/buger/jsonparser"
 )
 
 var indexRe = regexp.MustCompile(`\[([\d]+)\]`)
 
 // Concat will combine any two arbitrary values, though only strings are supported for non-trivial concatenation.
-func concat(a, b interface{}, delimiter string) (interface{}, error) {
+func Concat(a, b interface{}, delimiter string) (interface{}, error) {
 	switch {
 	case a == nil && b == nil:
 		return nil, nil
@@ -28,7 +29,7 @@ func concat(a, b interface{}, delimiter string) (interface{}, error) {
 	atype := reflect.TypeOf(a).String()
 	btype := reflect.TypeOf(b).String()
 	if atype != btype {
-		return nil, fmt.Errorf("can't concat types %q and %q", atype, btype)
+		return nil, fmt.Errorf("can't Concat types %q and %q", atype, btype)
 	}
 
 	switch a.(type) {
@@ -42,10 +43,10 @@ func concat(a, b interface{}, delimiter string) (interface{}, error) {
 	}
 }
 
-// convert takes the raw value and checks to see if it matches the jsonType, if not it will attempt to convert it
+// Convert takes the raw value and checks to see if it matches the jsonType, if not it will attempt to Convert it
 // to the correct type. The function does not set defaults so a nil value will be returned as nil not as the desired
 // types empty type.
-func convert(raw interface{}, jsonType string) (interface{}, error) {
+func Convert(raw interface{}, jsonType string) (interface{}, error) {
 	if raw == nil {
 		return nil, nil
 	}
@@ -82,10 +83,13 @@ func convertBoolean(raw interface{}) (interface{}, error) {
 		return t > 0, nil
 	case float64:
 		return t > 0, nil
+	case []*xmlquery.Node:
+		node := raw.([]*xmlquery.Node)
+		return strconv.ParseBool(node[0].InnerText())
 	case nil:
 		return nil, nil
 	default:
-		return nil, fmt.Errorf("unable to convert type %q to boolean", reflect.TypeOf(raw))
+		return nil, fmt.Errorf("unable to Convert type %q to boolean", reflect.TypeOf(raw))
 	}
 }
 
@@ -106,11 +110,20 @@ func convertNumber(raw interface{}) (interface{}, error) {
 		if value, err := strconv.ParseFloat(t, 64); err == nil {
 			return value, nil
 		}
-		return nil, fmt.Errorf("failed to convert string %q to number", t)
+		return nil, fmt.Errorf("failed to Convert string %q to number", t)
 	case int, float32, float64:
 		return raw, nil
+	case []*xmlquery.Node:
+		node := raw.([]*xmlquery.Node)
+		if value, err := strconv.Atoi(node[0].InnerText()); err == nil {
+			return value, nil
+		}
+		if value, err := strconv.ParseFloat(node[0].InnerText(), 64); err == nil {
+			return value, nil
+		}
+		return nil, fmt.Errorf("failed to convert xmlquery.Node to number")
 	default:
-		return nil, fmt.Errorf("unable to convert type %q to a number", reflect.TypeOf(raw))
+		return nil, fmt.Errorf("unable to Convert type %q to a number", reflect.TypeOf(raw))
 	}
 }
 
@@ -125,8 +138,11 @@ func convertDateTime(raw interface{}) (interface{}, error) {
 		return time.Unix(int64(t), 0).UTC(), nil
 	case float64:
 		return time.Unix(int64(t), 0).UTC(), nil
+	case []*xmlquery.Node:
+		node := raw.([]*xmlquery.Node)
+		return time.Parse(time.RFC3339, node[0].InnerText())
 	default:
-		return nil, fmt.Errorf("unable to convert type %q to a date-time", reflect.TypeOf(raw))
+		return nil, fmt.Errorf("unable to Convert type %q to a date-time", reflect.TypeOf(raw))
 	}
 }
 
@@ -145,10 +161,13 @@ func convertString(raw interface{}) (interface{}, error) {
 		return strconv.FormatFloat(t64, 'f', -1, 32), nil
 	case float64:
 		return strconv.FormatFloat(t, 'f', -1, 64), nil
+	case []*xmlquery.Node:
+		node := raw.([]*xmlquery.Node)
+		return node[0].InnerText(), nil
 	case nil:
 		return nil, nil
 	default:
-		return nil, fmt.Errorf("unable to convert type %q to a string", reflect.TypeOf(raw))
+		return nil, fmt.Errorf("unable to Convert type %q to a string", reflect.TypeOf(raw))
 	}
 }
 

@@ -83,7 +83,7 @@ func TestConcat(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		got, err := concat(test.a, test.b, test.delimiter)
+		got, err := Concat(test.a, test.b, test.delimiter)
 
 		switch {
 		case test.wantErr && err != nil:
@@ -307,7 +307,7 @@ func TestConvert(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		got, err := convert(test.raw, test.jsonType)
+		got, err := Convert(test.raw, test.jsonType)
 		switch {
 		case test.wantErr && err != nil:
 			continue
