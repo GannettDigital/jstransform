@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sport:content xmlns:sport="http://xml.sportsdirectinc.com/sport/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.sportsdirectinc.com/sport/v2 sport.xsd">
+    <team-sport-content>
+        <sport>
+            <id>/sport/basketball</id>
+            <name>basketball</name>
+            <player>
+                <id>1</id>
+            </player>
+            <player>
+                <id>2</id>
+            </player>
+        </sport>
+        <sport>
+            <id>/sport/baseball</id>
+            <name>baseball</name>
+            <player>
+                <id>3</id>
+            </player>
+            <player>
+                <id>4</id>
+            </player>
+        </sport>
+        <sport>
+            <id>/sport/football</id>
+            <name>football</name>
+            <player>
+                <id>5</id>
+            </player>
+            <player>
+                <id>6</id>
+            </player>
+        </sport>
+    </team-sport-content>
+</sport:content>

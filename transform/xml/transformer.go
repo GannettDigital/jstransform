@@ -14,7 +14,7 @@ import (
 	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
-// JSONTransformer - a type implemented by the jstransform.Transformer
+// XMLTransformer - a type implemented by the jstransform.Transformer
 type XMLTransformer interface {
 	Transform(raw json.RawMessage) (json.RawMessage, error)
 }

@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "hits": {
+      "type": "number",
+      "transform": {
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "//hits[@type='in']"
+            }
+          ]
+        }
+      }
+    },
+    "averageTeam": {
+      "type": "number",
+      "transform": {
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "//average/@team"
+            }
+          ]
+        }
+      }
+    },
+    "averagePlayer": {
+      "type": "number",
+      "transform": {
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "//average/@player"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

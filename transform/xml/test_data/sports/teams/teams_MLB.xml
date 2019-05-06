@@ -101,40 +101,6 @@
 								</season-details>
 							</team>
 						</team-content>
-						<team-content>
-							<team>
-								<id>/sport/baseball/team:2982</id>
-								<name>Chi. Cubs</name>
-								<name type="first">Chicago</name>
-								<name type="nick">Cubs</name>
-								<name type="short">CHC</name>
-								<location>
-									<city>Chicago</city>
-									<state>Illinois</state>
-									<country>USA</country>
-								</location>
-								<season-details>
-									<venue>
-										<id>/sport/baseball/venue:2998</id>
-										<name>Wrigley Field</name>
-										<name type="short">WF</name>
-										<location>
-											<city>Chicago</city>
-											<state>Illinois</state>
-											<country>USA</country>
-											<timezone>US/Central</timezone>
-										</location>
-										<season-details>
-											<capacity>42157</capacity>
-											<field-type>
-												<id>/sport/baseball/field-type:1</id>
-												<name>Grass</name>
-											</field-type>
-										</season-details>
-									</venue>
-								</season-details>
-							</team>
-						</team-content>
 					</division-content>
 					<team-content>
 						<meta>

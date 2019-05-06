@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sport:content xmlns:sport="http://xml.sportsdirectinc.com/sport/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.sportsdirectinc.com/sport/v2 sport.xsd">
+    <id>/sport/basketball:1234</id>
+    <lower>abc</lower>
+    <upper>DEF</upper>
+    <split>abc!:123@:c:1</split>
+</sport:content>

@@ -29,7 +29,7 @@ func concat(a, b interface{}, delimiter string) (interface{}, error) {
 	atype := reflect.TypeOf(a).String()
 	btype := reflect.TypeOf(b).String()
 	if atype != btype {
-		return nil, fmt.Errorf("can't concat types %q and %q", atype, btype)
+		return nil, fmt.Errorf("can't Concat types %q and %q", atype, btype)
 	}
 
 	switch a.(type) {
@@ -61,13 +61,9 @@ func convert(raw interface{}, jsonType string) (interface{}, error) {
 	case "number":
 		return convertNumber(raw)
 	case "string":
-		node := raw.([]*xmlquery.Node)
-		return node[0].InnerText(), nil
+		return convertString(raw)
 	case "date-time":
 		return convertDateTime(raw)
-	case "integer":
-		node := raw.([]*xmlquery.Node)
-		return strconv.Atoi(node[0].InnerText())
 	}
 	return raw, nil
 }
@@ -87,6 +83,9 @@ func convertBoolean(raw interface{}) (interface{}, error) {
 		return t > 0, nil
 	case float64:
 		return t > 0, nil
+	case []*xmlquery.Node:
+		node := raw.([]*xmlquery.Node)
+		return strconv.ParseBool(node[0].InnerText())
 	case nil:
 		return nil, nil
 	default:
@@ -114,6 +113,15 @@ func convertNumber(raw interface{}) (interface{}, error) {
 		return nil, fmt.Errorf("failed to convert string %q to number", t)
 	case int, float32, float64:
 		return raw, nil
+	case []*xmlquery.Node:
+		node := raw.([]*xmlquery.Node)
+		if value, err := strconv.Atoi(node[0].InnerText()); err == nil {
+			return value, nil
+		}
+		if value, err := strconv.ParseFloat(node[0].InnerText(), 64); err == nil {
+			return value, nil
+		}
+		return nil, fmt.Errorf("failed to convert xmlquery.Node to number")
 	default:
 		return nil, fmt.Errorf("unable to convert type %q to a number", reflect.TypeOf(raw))
 	}
@@ -130,6 +138,9 @@ func convertDateTime(raw interface{}) (interface{}, error) {
 		return time.Unix(int64(t), 0).UTC(), nil
 	case float64:
 		return time.Unix(int64(t), 0).UTC(), nil
+	case []*xmlquery.Node:
+		node := raw.([]*xmlquery.Node)
+		return time.Parse(time.RFC3339, node[0].InnerText())
 	default:
 		return nil, fmt.Errorf("unable to convert type %q to a date-time", reflect.TypeOf(raw))
 	}
@@ -150,6 +161,9 @@ func convertString(raw interface{}) (interface{}, error) {
 		return strconv.FormatFloat(t64, 'f', -1, 32), nil
 	case float64:
 		return strconv.FormatFloat(t, 'f', -1, 64), nil
+	case []*xmlquery.Node:
+		node := raw.([]*xmlquery.Node)
+		return node[0].InnerText(), nil
 	case nil:
 		return nil, nil
 	default:
@@ -180,7 +194,7 @@ func extractTransformInstructions(raw json.RawMessage, transformIdentifier, path
 	return &tis, nil
 }
 
-// schemaDefault determines the default for an instance based on the JSONSchema.
+// SchemaDefault determines the default for an instance based on the JSONSchema.
 // If no default is defined nil is returned.
 func schemaDefault(schema json.RawMessage) (interface{}, error) {
 	ifields := struct {

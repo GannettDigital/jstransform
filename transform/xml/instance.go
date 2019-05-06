@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/PaesslerAG/jsonpath"
 	"github.com/antchfx/xmlquery"
 	"github.com/buger/jsonparser"
 )
@@ -82,20 +81,23 @@ func (at *arrayTransformer) baseValue(in interface{}, path string, modifier path
 		if err != nil {
 			return nil, false, err
 		}
-		castedRaw := rawValue.([]*xmlquery.Node)
-		var newValue []interface{}
-		for _, item := range castedRaw {
-			newValue = append(newValue, item)
-		}
-		return newValue, true, nil
 
-		//if rawValue != nil {
-		//	newValue, ok := rawValue.([]interface{})
-		//	if !ok {
-		//		newValue = []interface{}{rawValue}
-		//	}
-		//	return newValue, true, nil
-		//}
+		castedRaw, ok := rawValue.([]*xmlquery.Node)
+		if ok {
+			var newValue []interface{}
+			for _, item := range castedRaw {
+				newValue = append(newValue, item)
+			}
+			return newValue, false, nil
+		}
+
+		if rawValue != nil {
+			newValue, ok := rawValue.([]interface{})
+			if !ok {
+				newValue = []interface{}{rawValue}
+			}
+			return newValue, true, nil
+		}
 	}
 
 	//// 2. Look for the same JSONPath in the input and use directly if possible.
@@ -109,9 +111,9 @@ func (at *arrayTransformer) baseValue(in interface{}, path string, modifier path
 	//}
 
 	//// 3. Fall back to the JSON Schema default value.
-	//if at.defaultValue != nil {
-	//	return at.defaultValue, true, nil
-	//}
+	if at.defaultValue != nil {
+		return at.defaultValue, true, nil
+	}
 	return nil, false, nil
 }
 
@@ -155,10 +157,13 @@ func (at *arrayTransformer) transform(in interface{}, modifier pathModifier) (in
 
 	for i := range base {
 		currentPath := path + fmt.Sprintf("[%d]", i)
-		in = base[i]
-		childValue, err := at.childTransformer.transform(in, pathReplace(oldPath, currentPath, modifier))
-		if err != nil {
-			return nil, err
+		childValue := base[i]
+		_, ok := childValue.(*xmlquery.Node)
+		if ok {
+			childValue, err = at.childTransformer.transform(childValue, pathReplace(oldPath, currentPath, modifier))
+			if err != nil {
+				return nil, err
+			}
 		}
 		if childValue != nil {
 			newArray = append(newArray, childValue)
@@ -320,9 +325,7 @@ func (st *scalarTransformer) selectChild(string) instanceTransformer { return ni
 //
 // 1. Use a Transform if it exists.
 //
-// 2. Look for the same JSONPath in the input and use directly if possible.
-//
-// 3. Fall back to the JSON Schema default value.
+// 2. Fall back to the JSON Schema default value.
 func (st *scalarTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := st.jsonPath
 	if modifier != nil {
@@ -339,16 +342,6 @@ func (st *scalarTransformer) transform(in interface{}, modifier pathModifier) (i
 		}
 	}
 
-	// 2. Look for the same JSONPath in the input and use directly if possible.
-	rawValue, err := jsonpath.Get(path, in)
-	if err == nil {
-		newValue, err := convert(rawValue, st.jsonType)
-		// if there is a conversion error fall through to the default
-		if newValue != nil {
-			return newValue, err
-		}
-	}
-
-	// 3. Fall back to the JSON Schema default value.
+	// 2. Fall back to the JSON Schema default value.
 	return st.defaultValue, nil
 }
