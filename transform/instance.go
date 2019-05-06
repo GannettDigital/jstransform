@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/PaesslerAG/jsonpath"
+	"github.com/antchfx/xmlquery"
 	"github.com/buger/jsonparser"
 )
 
@@ -75,12 +76,25 @@ func (at *arrayTransformer) addChild(child instanceTransformer) error {
 }
 
 func (at *arrayTransformer) baseValue(in interface{}, path string, modifier pathModifier) ([]interface{}, bool, error) {
+	_, isXmlNode := in.(*xmlquery.Node)
 	// 1. Use a transform if it exists
 	if at.transforms != nil {
 		rawValue, err := at.transforms.transform(in, "array", modifier)
+		_, isXmlNodeArray := rawValue.([]*xmlquery.Node)
+
 		if err != nil {
 			return nil, false, err
 		}
+
+		if isXmlNodeArray {
+			xmlNodeArray := rawValue.([]*xmlquery.Node)
+			var newValue []interface{}
+			for _, item := range xmlNodeArray {
+				newValue = append(newValue, item)
+			}
+			return newValue, false, nil
+		}
+
 		if rawValue != nil {
 			newValue, ok := rawValue.([]interface{})
 			if !ok {
@@ -91,13 +105,15 @@ func (at *arrayTransformer) baseValue(in interface{}, path string, modifier path
 	}
 
 	// 2. Look for the same JSONPath in the input and use directly if possible.
-	rawValue, err := jsonpath.Get(path, in)
-	if err == nil && rawValue != nil {
-		newValue, ok := rawValue.([]interface{})
-		if !ok {
-			newValue = []interface{}{rawValue}
+	if !isXmlNode {
+		rawValue, err := jsonpath.Get(path, in)
+		if err == nil && rawValue != nil {
+			newValue, ok := rawValue.([]interface{})
+			if !ok {
+				newValue = []interface{}{rawValue}
+			}
+			return newValue, false, nil
 		}
-		return newValue, false, nil
 	}
 
 	// 3. Fall back to the JSON Schema default value.
@@ -114,6 +130,7 @@ func (at *arrayTransformer) selectChild(key string) instanceTransformer { return
 // transform retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields.
 func (at *arrayTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
+	_, isXmlNode := in.(*xmlquery.Node)
 	path := at.jsonPath
 	if modifier != nil {
 		path = modifier(path)
@@ -123,17 +140,19 @@ func (at *arrayTransformer) transform(in interface{}, modifier pathModifier) (in
 		return nil, err
 	}
 
-	if changed {
-		// save the array base to in as children will use the value from this for their transforms
-		if path == "$" {
-			in = base
-		} else {
-			inMap, ok := in.(map[string]interface{})
-			if !ok {
-				return nil, errors.New("input is neither a JSON array nor object")
-			}
-			if err := saveInTree(inMap, path, base); err != nil {
-				return nil, fmt.Errorf("failed to save array transform to input data: %v", err)
+	if !isXmlNode {
+		if changed {
+			// save the array base to in as children will use the value from this for their transforms
+			if path == "$" {
+				in = base
+			} else {
+				inMap, ok := in.(map[string]interface{})
+				if !ok {
+					return nil, errors.New("input is neither a JSON array nor object")
+				}
+				if err := saveInTree(inMap, path, base); err != nil {
+					return nil, fmt.Errorf("failed to save array transform to input data: %v", err)
+				}
 			}
 		}
 	}
@@ -147,13 +166,27 @@ func (at *arrayTransformer) transform(in interface{}, modifier pathModifier) (in
 
 	for i := range base {
 		currentPath := path + fmt.Sprintf("[%d]", i)
-
-		childValue, err := at.childTransformer.transform(in, pathReplace(oldPath, currentPath, modifier))
-		if err != nil {
-			return nil, err
-		}
-		if childValue != nil {
-			newArray = append(newArray, childValue)
+		var childValue interface{}
+		if isXmlNode {
+			childValue = base[i]
+			_, ok := childValue.(*xmlquery.Node)
+			if ok {
+				childValue, err = at.childTransformer.transform(childValue, pathReplace(oldPath, currentPath, modifier))
+				if err != nil {
+					return nil, err
+				}
+			}
+			if childValue != nil {
+				newArray = append(newArray, childValue)
+			}
+		} else {
+			childValue, err = at.childTransformer.transform(in, pathReplace(oldPath, currentPath, modifier))
+			if err != nil {
+				return nil, err
+			}
+			if childValue != nil {
+				newArray = append(newArray, childValue)
+			}
 		}
 	}
 
@@ -316,6 +349,7 @@ func (st *scalarTransformer) selectChild(string) instanceTransformer { return ni
 //
 // 3. Fall back to the JSON Schema default value.
 func (st *scalarTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
+	_, isXmlNode := in.(*xmlquery.Node)
 	path := st.jsonPath
 	if modifier != nil {
 		path = modifier(path)
@@ -332,12 +366,14 @@ func (st *scalarTransformer) transform(in interface{}, modifier pathModifier) (i
 	}
 
 	// 2. Look for the same JSONPath in the input and use directly if possible.
-	rawValue, err := jsonpath.Get(path, in)
-	if err == nil {
-		newValue, err := convert(rawValue, st.jsonType)
-		// if there is a conversion error fall through to the default
-		if newValue != nil {
-			return newValue, err
+	if !isXmlNode {
+		rawValue, err := jsonpath.Get(path, in)
+		if err == nil {
+			newValue, err := convert(rawValue, st.jsonType)
+			// if there is a conversion error fall through to the default
+			if newValue != nil {
+				return newValue, err
+			}
 		}
 	}
 

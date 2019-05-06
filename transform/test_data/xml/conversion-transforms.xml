@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sport:content xmlns:sport="http://xml.sportsdirectinc.com/sport/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.sportsdirectinc.com/sport/v2 sport.xsd">
+    <hits>4</hits>
+    <average>1.23</average>
+    <raining>true</raining>
+    <date>2019-05-01T09:32:00.110-04:00</date>
+</sport:content>

@@ -1,0 +1,97 @@
+{
+  "teams":[
+    {
+      "city":"Milwaukee",
+      "conference":{
+        "id":"136",
+        "name":"National League",
+        "shortName":"NL"
+      },
+      "country":"USA",
+      "division":{
+        "active":"true",
+        "alias":"NL Central",
+        "id":"349",
+        "name":"National League Central"
+      },
+      "firstName":"Milwaukee",
+      "id":"2976",
+      "league":{
+        "id":"1219",
+        "name":"Major League Baseball",
+        "nickName":"MLB"
+      },
+      "name":"Milwaukee",
+      "nickName":"Brewers",
+      "season":{
+        "endDate":"2018-11-30",
+        "id":"1091",
+        "name":"2018",
+        "startDate":"2018-02-01"
+      },
+      "shortName":"MIL",
+      "sport":"baseball",
+      "state":"Wisconsin",
+      "venue":{
+        "capacity":"45808",
+        "city":"Milwaukee",
+        "country":"USA",
+        "id":"3005",
+        "name":"Miller Park",
+        "shortName":"MP",
+        "state":"Wisconsin",
+        "timezone":"US/Central"
+      }
+    },
+    {
+      "city":"Pittsburgh",
+      "conference":{
+        "id":"136",
+        "name":"National League",
+        "shortName":"NL"
+      },
+      "country":"USA",
+      "division":{
+        "active":"true",
+        "alias":"NL Central",
+        "id":"349",
+        "name":"National League Central"
+      },
+      "firstName":"Pittsburgh",
+      "id":"2971",
+      "league":{
+        "id":"1219",
+        "name":"Major League Baseball",
+        "nickName":"MLB"
+      },
+      "name":"Pittsburgh",
+      "nickName":"Pirates",
+      "season":{
+        "endDate":"2018-11-30",
+        "id":"1091",
+        "name":"2018",
+        "startDate":"2018-02-01"
+      },
+      "shortName":"PIT",
+      "sport":"baseball",
+      "state":"Pennsylvania",
+      "venue":{
+        "capacity":"38496",
+        "city":"Pittsburgh",
+        "country":"USA",
+        "id":"3006",
+        "name":"PNC Park",
+        "shortName":"PNC",
+        "state":"Pennsylvania",
+        "timezone":"US/Eastern"
+      }
+    },
+    {
+      "firstName":"National League",
+      "id":"3484",
+      "name":"National League",
+      "nickName":"All-Stars",
+      "shortName":"NL"
+    }
+  ]
+}

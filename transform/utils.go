@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/antchfx/xmlquery"
 	"github.com/buger/jsonparser"
 )
 
@@ -84,6 +85,9 @@ func convertBoolean(raw interface{}) (interface{}, error) {
 		return t > 0, nil
 	case nil:
 		return nil, nil
+	case []*xmlquery.Node:
+		node := raw.([]*xmlquery.Node)
+		return strconv.ParseBool(node[0].InnerText())
 	default:
 		return nil, fmt.Errorf("unable to convert type %q to boolean", reflect.TypeOf(raw))
 	}
@@ -109,6 +113,15 @@ func convertNumber(raw interface{}) (interface{}, error) {
 		return nil, fmt.Errorf("failed to convert string %q to number", t)
 	case int, float32, float64:
 		return raw, nil
+	case []*xmlquery.Node:
+		node := raw.([]*xmlquery.Node)
+		if value, err := strconv.Atoi(node[0].InnerText()); err == nil {
+			return value, nil
+		}
+		if value, err := strconv.ParseFloat(node[0].InnerText(), 64); err == nil {
+			return value, nil
+		}
+		return nil, fmt.Errorf("failed to convert xmlquery.Node to number")
 	default:
 		return nil, fmt.Errorf("unable to convert type %q to a number", reflect.TypeOf(raw))
 	}
@@ -125,6 +138,9 @@ func convertDateTime(raw interface{}) (interface{}, error) {
 		return time.Unix(int64(t), 0).UTC(), nil
 	case float64:
 		return time.Unix(int64(t), 0).UTC(), nil
+	case []*xmlquery.Node:
+		node := raw.([]*xmlquery.Node)
+		return time.Parse(time.RFC3339, node[0].InnerText())
 	default:
 		return nil, fmt.Errorf("unable to convert type %q to a date-time", reflect.TypeOf(raw))
 	}
@@ -145,6 +161,9 @@ func convertString(raw interface{}) (interface{}, error) {
 		return strconv.FormatFloat(t64, 'f', -1, 32), nil
 	case float64:
 		return strconv.FormatFloat(t, 'f', -1, 64), nil
+	case []*xmlquery.Node:
+		node := raw.([]*xmlquery.Node)
+		return node[0].InnerText(), nil
 	case nil:
 		return nil, nil
 	default:

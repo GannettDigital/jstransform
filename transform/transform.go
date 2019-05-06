@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/PaesslerAG/jsonpath"
+	"github.com/antchfx/xmlquery"
 )
 
 type transformMethod int32
@@ -32,11 +33,13 @@ type transformOperationJSON struct {
 type transformInstruction struct {
 	// For JSONPath format see http://goessner.net/articles/JsonPath/
 	jsonPath   string
+	xmlPath    string
 	Operations []transformOperation `json:"operations"`
 }
 
 type transformInstructionJSON struct {
 	JsonPath   string                   `json:"jsonPath"`
+	XmlPath    string                   `json:"xmlPath"`
 	Operations []transformOperationJSON `json:"operations"`
 }
 
@@ -49,6 +52,7 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 	}
 
 	ti.jsonPath = jti.JsonPath
+	ti.xmlPath = jti.XmlPath
 	ti.Operations = []transformOperation{}
 
 	for _, toj := range jti.Operations {
@@ -84,15 +88,33 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 // If a conversion or operation fails an error is returned.
 func (ti *transformInstruction) transform(in interface{}, fieldType string, modifier pathModifier) (interface{}, error) {
 	path := ti.jsonPath
+	if len(path) == 0 {
+		path = ti.xmlPath
+	}
 	if modifier != nil {
 		path = modifier(path)
 	}
-	rawValue, err := jsonpath.Get(path, in)
-	if err != nil {
-		return nil, nil
-	}
-	if rawValue == nil {
-		return nil, nil
+
+	var (
+		rawValue interface{}
+		err      error
+	)
+
+	switch in.(type) {
+	case *xmlquery.Node:
+		node := in.(*xmlquery.Node)
+		rawValue = xmlquery.Find(node, path)
+		if rawValue.([]*xmlquery.Node) == nil {
+			return nil, nil
+		}
+	default:
+		rawValue, err = jsonpath.Get(path, in)
+		if err != nil {
+			return nil, nil
+		}
+		if rawValue == nil {
+			return nil, nil
+		}
 	}
 
 	value, err := convert(rawValue, fieldType)
@@ -203,6 +225,9 @@ func (tis *transformInstructions) replaceJSONPathPrefix(old, new string) {
 	for _, instruction := range tis.From {
 		if strings.HasPrefix(instruction.jsonPath, old) {
 			instruction.jsonPath = strings.Replace(instruction.jsonPath, old, new, 1)
+		}
+		if strings.HasPrefix(instruction.xmlPath, old) {
+			instruction.xmlPath = strings.Replace(instruction.xmlPath, old, new, 1)
 		}
 	}
 }

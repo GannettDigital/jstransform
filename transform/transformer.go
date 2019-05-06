@@ -3,11 +3,14 @@
 package transform
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/antchfx/xmlquery"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
 
@@ -16,6 +19,11 @@ import (
 
 // JSONTransformer - a type implemented by the jstransform.Transformer
 type JSONTransformer interface {
+	Transform(raw json.RawMessage) (json.RawMessage, error)
+}
+
+// XMLTransformer - a type implemented by the jstransform.Transformer
+type XMLTransformer interface {
 	Transform(raw json.RawMessage) (json.RawMessage, error)
 }
 
@@ -29,11 +37,44 @@ type Transformer struct {
 	root                instanceTransformer
 }
 
+// Transformer uses a JSON schema and the transform sections within it to take a set of JSON and transform it to
+// matching the schema.
+// More details on the transform section of the schema are found at
+// https://github.com/GannettDigital/jstransform/blob/master/transform.adoc
+type TransformerXML struct {
+	schema              *jsonschema.Schema
+	transformIdentifier string // Used to select the proper transform Instructions
+	root                instanceTransformer
+}
+
 // NewTransformer returns a Transformer using the schema given.
 // The transformIdentifier is used to select the appropriate transform section from the schema.
 func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Transformer, error) {
 	tr := &Transformer{schema: schema, transformIdentifier: tranformIdentifier}
+	emptyJSON := []byte(`{}`)
+	var err error
+	if schema.Properties != nil {
+		tr.root, err = newObjectTransformer("$", tranformIdentifier, emptyJSON)
+	} else if schema.Items != nil {
+		tr.root, err = newArrayTransformer("$", tranformIdentifier, emptyJSON)
+	} else {
+		return nil, errors.New("no Properties nor Items found for schema")
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed initializing root transformer: %v", err)
+	}
 
+	if err := jsonschema.WalkRaw(schema, tr.walker); err != nil {
+		return nil, err
+	}
+
+	return tr, nil
+}
+
+// NewTransformer returns a Transformer using the schema given.
+// The transformIdentifier is used to select the appropriate transform section from the schema.
+func NewTransformerXML(schema *jsonschema.Schema, tranformIdentifier string) (*TransformerXML, error) {
+	tr := &TransformerXML{schema: schema, transformIdentifier: tranformIdentifier}
 	emptyJSON := []byte(`{}`)
 	var err error
 	if schema.Properties != nil {
@@ -91,8 +132,58 @@ func (tr *Transformer) Transform(raw json.RawMessage) (json.RawMessage, error) {
 	return out, nil
 }
 
+func (tr *TransformerXML) Transform(raw json.RawMessage) (json.RawMessage, error) {
+	xmlDoc, err := xmlquery.Parse(bytes.NewReader(raw))
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse input XML: %v", err)
+	}
+
+	transformed, err := tr.root.transform(xmlDoc, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed transformation: %v", err)
+	}
+
+	out, err := json.Marshal(transformed)
+	if err != nil {
+		return nil, fmt.Errorf("failed to JSON marsal transformed data: %v", err)
+	}
+
+	valid, err := tr.schema.Validate(out)
+	if err != nil {
+		return nil, fmt.Errorf("transformed result validation error: %v", err)
+	}
+	if !valid {
+		return nil, errors.New("schema validation of the transformed result reports invalid")
+	}
+
+	return out, nil
+}
+
 // findParent walks the instanceTransformer tree to find the parent of the given path
 func (tr *Transformer) findParent(path string) (instanceTransformer, error) {
+	path = strings.Replace(path, "[", ".[", -1)
+	splits := strings.Split(path, ".")
+	if splits[0] != "$" {
+		// TODO this will probably choke on a root level array
+		return nil, errors.New("paths must start with '$'")
+	}
+	parentSplits := splits[1 : len(splits)-1]
+
+	parent := tr.root
+	for _, sp := range parentSplits {
+		if sp == "[*]" {
+			parent = parent.child()
+			continue
+		}
+
+		parent = parent.selectChild(sp)
+	}
+
+	return parent, nil
+}
+
+// findParent walks the instanceTransformer tree to find the parent of the given path
+func (tr *TransformerXML) findParent(path string) (instanceTransformer, error) {
 	path = strings.Replace(path, "[", ".[", -1)
 	splits := strings.Split(path, ".")
 	if splits[0] != "$" {
@@ -117,6 +208,38 @@ func (tr *Transformer) findParent(path string) (instanceTransformer, error) {
 // walker is a WalkFunc for the Transformer which builds an representation of the fields and transforms in the schema.
 // This is later used to do the actual transform for incoming data
 func (tr *Transformer) walker(path string, value json.RawMessage) error {
+	instanceType, err := jsonparser.GetString(value, "type")
+	if err != nil {
+		return fmt.Errorf("failed to extract instance type: %v", err)
+	}
+
+	var iTransformer instanceTransformer
+	switch instanceType {
+	case "object":
+		iTransformer, err = newObjectTransformer(path, tr.transformIdentifier, value)
+	case "array":
+		iTransformer, err = newArrayTransformer(path, tr.transformIdentifier, value)
+	default:
+		iTransformer, err = newScalarTransformer(path, tr.transformIdentifier, value, instanceType)
+	}
+	if err != nil {
+		return fmt.Errorf("failed to initialize transformer: %v", err)
+	}
+
+	parent, err := tr.findParent(path)
+	if err != nil {
+		return err
+	}
+	if err := parent.addChild(iTransformer); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// walker is a WalkFunc for the Transformer which builds an representation of the fields and transforms in the schema.
+// This is later used to do the actual transform for incoming data
+func (tr *TransformerXML) walker(path string, value json.RawMessage) error {
 	instanceType, err := jsonparser.GetString(value, "type")
 	if err != nil {
 		return fmt.Errorf("failed to extract instance type: %v", err)

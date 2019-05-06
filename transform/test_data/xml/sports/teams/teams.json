@@ -23,7 +23,16 @@
                   "sport": {
                     "from": [
                       {
-                        "xmlPath": "../../../../season/id"
+                        "xmlPath": "../../../../season/id",
+                        "operations": [
+                          {
+                            "type": "replace",
+                            "args": {
+                              "regex": "[\\D]",
+                              "new": ""
+                            }
+                          }
+                        ]
                       }
                     ]
                   }
@@ -75,7 +84,16 @@
                 "transform": {
                   "sport": {
                     "from": [{
-                      "xmlPath": "../../../conference/id"
+                      "xmlPath": "../../../conference/id",
+                      "operations": [
+                        {
+                          "type": "replace",
+                          "args": {
+                            "regex": "[\\D]",
+                            "new": ""
+                          }
+                        }
+                      ]
                     }]
                   }
                 }
@@ -110,7 +128,16 @@
                 "transform": {
                   "sport": {
                     "from": [{
-                      "xmlPath": "../../../division-content/division/id"
+                      "xmlPath": "../../../division-content/division/id",
+                      "operations": [
+                        {
+                          "type": "replace",
+                          "args": {
+                            "regex": "[\\D]",
+                            "new": ""
+                          }
+                        }
+                      ]
                     }]
                   }
                 }
@@ -153,7 +180,16 @@
               "sport": {
                 "from": [
                   {
-                    "xmlPath": "/id"
+                    "xmlPath": "/id",
+                    "operations": [
+                      {
+                        "type": "replace",
+                        "args": {
+                          "regex": "[\\D]",
+                          "new": ""
+                        }
+                      }
+                    ]
                   }
                 ]
               }
@@ -252,7 +288,16 @@
                   "sport": {
                     "from": [
                       {
-                      "xmlPath": "season-details/venue/id"
+                      "xmlPath": "season-details/venue/id",
+                        "operations": [
+                          {
+                            "type": "replace",
+                            "args": {
+                              "regex": "[\\D]",
+                              "new": ""
+                            }
+                          }
+                        ]
                       }
                     ]
                   }
@@ -365,10 +410,28 @@
                   "sport": {
                     "from": [
                       {
-                        "xmlPath": "../../../../../league/id"
+                        "xmlPath": "../../../../../league/id",
+                        "operations": [
+                          {
+                            "type": "replace",
+                            "args": {
+                              "regex": "[\\D]",
+                              "new": ""
+                            }
+                          }
+                        ]
                       },
                       {
-                        "xmlPath": "../../../league/id"
+                        "xmlPath": "../../../league/id",
+                        "operations": [
+                          {
+                            "type": "replace",
+                            "args": {
+                              "regex": "[\\D]",
+                              "new": ""
+                            }
+                          }
+                        ]
                       }
                     ]
                   }

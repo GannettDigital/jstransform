@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/PaesslerAG/jsonpath"
+	"github.com/antchfx/xmlquery"
 )
 
 var durationRe = regexp.MustCompile(`^([\d]*?):?([\d]*):([\d]*)$`)
@@ -204,12 +205,22 @@ func (s *split) init(args map[string]string) error {
 }
 
 func (s *split) transform(raw interface{}) (interface{}, error) {
-	in, ok := raw.(string)
-	if !ok {
-		return nil, errors.New("split only supports strings")
+	var stringToSplit string
+	switch raw.(type) {
+	case []*xmlquery.Node:
+		xmlNode := raw.([]*xmlquery.Node)
+		stringToSplit = xmlNode[0].InnerText()
+	case string:
+		stringToSplit = raw.(string)
+	default:
+		return nil, errors.New("split only supports strings or []*xmlquery.Node")
 	}
+	//in, ok := raw.(string)
+	//if !ok {
+	//	return nil, errors.New("split only supports strings")
+	//}
 
-	splits := strings.Split(in, s.Args["on"])
+	splits := strings.Split(stringToSplit, s.Args["on"])
 
 	// Return []interface{} to avoid messing up type casts later in the process
 	interfaceSplits := []interface{}{}
