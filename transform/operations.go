@@ -206,6 +206,7 @@ func (s *split) init(args map[string]string) error {
 
 func (s *split) transform(raw interface{}) (interface{}, error) {
 	var stringToSplit string
+
 	switch raw.(type) {
 	case []*xmlquery.Node:
 		xmlNode := raw.([]*xmlquery.Node)
@@ -215,10 +216,6 @@ func (s *split) transform(raw interface{}) (interface{}, error) {
 	default:
 		return nil, errors.New("split only supports strings or []*xmlquery.Node")
 	}
-	//in, ok := raw.(string)
-	//if !ok {
-	//	return nil, errors.New("split only supports strings")
-	//}
 
 	splits := strings.Split(stringToSplit, s.Args["on"])
 
