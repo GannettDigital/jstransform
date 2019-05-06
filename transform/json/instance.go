@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	transform2 "github.com/GannettDigital/jstransform/transform"
 	"github.com/PaesslerAG/jsonpath"
 	"github.com/buger/jsonparser"
 )
@@ -334,7 +335,7 @@ func (st *scalarTransformer) transform(in interface{}, modifier pathModifier) (i
 	// 2. Look for the same JSONPath in the input and use directly if possible.
 	rawValue, err := jsonpath.Get(path, in)
 	if err == nil {
-		newValue, err := Convert(rawValue, st.jsonType)
+		newValue, err := transform2.Convert(rawValue, st.jsonType)
 		// if there is a conversion error fall through to the default
 		if newValue != nil {
 			return newValue, err

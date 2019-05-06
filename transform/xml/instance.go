@@ -100,16 +100,6 @@ func (at *arrayTransformer) baseValue(in interface{}, path string, modifier path
 		}
 	}
 
-	//// 2. Look for the same JSONPath in the input and use directly if possible.
-	//rawValue, err := jsonpath.Get(path, in)
-	//if err == nil && rawValue != nil {
-	//	newValue, ok := rawValue.([]interface{})
-	//	if !ok {
-	//		newValue = []interface{}{rawValue}
-	//	}
-	//	return newValue, false, nil
-	//}
-
 	//// 3. Fall back to the JSON Schema default value.
 	if at.defaultValue != nil {
 		return at.defaultValue, true, nil
@@ -132,21 +122,6 @@ func (at *arrayTransformer) transform(in interface{}, modifier pathModifier) (in
 	if err != nil {
 		return nil, err
 	}
-
-	//if changed {
-	//	// save the array base to in as children will use the value from this for their transforms
-	//	if path == "$" {
-	//		in = base
-	//	} else {
-	//		inMap, ok := in.(map[string]interface{})
-	//		if !ok {
-	//			return nil, errors.New("input is neither a JSON array nor object")
-	//		}
-	//		if err := saveInTree(inMap, path, base); err != nil {
-	//			return nil, fmt.Errorf("failed to save array transform to input data: %v", err)
-	//		}
-	//	}
-	//}
 
 	if at.childTransformer == nil {
 		return base, nil

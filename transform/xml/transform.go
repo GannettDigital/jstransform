@@ -7,7 +7,7 @@ import (
 
 	"github.com/antchfx/xmlquery"
 
-	json2 "github.com/GannettDigital/jstransform/transform/json"
+	transform2 "github.com/GannettDigital/jstransform/transform"
 )
 
 type transformMethod int32
@@ -97,7 +97,7 @@ func (ti *transformInstruction) transform(in interface{}, fieldType string, modi
 		return nil, nil
 	}
 
-	value, err := json2.Convert(rawValue, fieldType)
+	value, err := transform2.Convert(rawValue, fieldType)
 	if err != nil {
 		// In some cases the conversion is helpful but in others like before a max operation it isn't
 		value = rawValue
@@ -184,7 +184,7 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string, mo
 		}
 		if concatResult {
 			delimiter := tis.MethodOptions.ConcatenateDelimiter
-			result, err = json2.Concat(result, value, delimiter)
+			result, err = transform2.Concat(result, value, delimiter)
 			if err != nil {
 				return nil, fmt.Errorf("failed to concat values: %v", err)
 			}

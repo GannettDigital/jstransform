@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	transform2 "github.com/GannettDigital/jstransform/transform"
 	"github.com/PaesslerAG/jsonpath"
 )
 
@@ -95,7 +96,7 @@ func (ti *transformInstruction) transform(in interface{}, fieldType string, modi
 		return nil, nil
 	}
 
-	value, err := Convert(rawValue, fieldType)
+	value, err := transform2.Convert(rawValue, fieldType)
 	if err != nil {
 		// In some cases the conversion is helpful but in others like before a max operation it isn't
 		value = rawValue
@@ -182,7 +183,7 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string, mo
 		}
 		if concatResult {
 			delimiter := tis.MethodOptions.ConcatenateDelimiter
-			result, err = Concat(result, value, delimiter)
+			result, err = transform2.Concat(result, value, delimiter)
 			if err != nil {
 				return nil, fmt.Errorf("failed to Concat values: %v", err)
 			}
@@ -199,7 +200,7 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string, mo
 
 // replaceJSONPathPrefix will switch old for new in the path of the transform instructions if the path starts with
 // old.
-func (tis *transformInstructions) replaceJSONPathPrefix(old, new string) {
+func (tis *transformInstructions) replaceJSONPathPrefix(old string, new string) {
 	for _, instruction := range tis.From {
 		if strings.HasPrefix(instruction.jsonPath, old) {
 			instruction.jsonPath = strings.Replace(instruction.jsonPath, old, new, 1)
