@@ -33,6 +33,7 @@ type transformOperationJSON struct {
 // data from that path.
 type transformInstruction struct {
 	// For JSONPath format see http://goessner.net/articles/JsonPath/
+	// For XPath format see https://devhints.io/xpath
 	JSONPath   string
 	XMLPath    string
 	Operations []transformOperation `json:"operations"`
