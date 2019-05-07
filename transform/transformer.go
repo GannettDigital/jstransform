@@ -43,15 +43,40 @@ type Transformer struct {
 
 // NewTransformer returns a Transformer using the schema given.
 // The transformIdentifier is used to select the appropriate transform section from the schema.
-// The format is used to execute the correct transforms ('JSON' or 'XML')
-func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string, format inputFormat) (*Transformer, error) {
-	tr := &Transformer{schema: schema, transformIdentifier: tranformIdentifier, format: format}
+// It expects the transforms to be performed on JSON data
+func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Transformer, error) {
+	tr := &Transformer{schema: schema, transformIdentifier: tranformIdentifier, format: jsonInput}
 	emptyJSON := []byte(`{}`)
 	var err error
 	if schema.Properties != nil {
-		tr.root, err = newObjectTransformer("$", tranformIdentifier, emptyJSON, format)
+		tr.root, err = newObjectTransformer("$", tranformIdentifier, emptyJSON, jsonInput)
 	} else if schema.Items != nil {
-		tr.root, err = newArrayTransformer("$", tranformIdentifier, emptyJSON, format)
+		tr.root, err = newArrayTransformer("$", tranformIdentifier, emptyJSON, jsonInput)
+	} else {
+		return nil, errors.New("no Properties nor Items found for schema")
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed initializing root transformer: %v", err)
+	}
+
+	if err := jsonschema.WalkRaw(schema, tr.walker); err != nil {
+		return nil, err
+	}
+
+	return tr, nil
+}
+
+// NewXMLTransformer returns a Transformer using the schema given.
+// The transformIdentifier is used to select the appropriate transform section from the schema.
+// It expects the transforms to be performed on XML data
+func NewXMLTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Transformer, error) {
+	tr := &Transformer{schema: schema, transformIdentifier: tranformIdentifier, format: xmlInput}
+	emptyJSON := []byte(`{}`)
+	var err error
+	if schema.Properties != nil {
+		tr.root, err = newObjectTransformer("$", tranformIdentifier, emptyJSON, xmlInput)
+	} else if schema.Items != nil {
+		tr.root, err = newArrayTransformer("$", tranformIdentifier, emptyJSON, xmlInput)
 	} else {
 		return nil, errors.New("no Properties nor Items found for schema")
 	}
