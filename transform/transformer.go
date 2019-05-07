@@ -84,7 +84,7 @@ func (tr *Transformer) jsonTransform(raw json.RawMessage) (json.RawMessage, erro
 		return nil, fmt.Errorf("failed to parse input JSON: %v", err)
 	}
 
-	transformed, err := tr.root.transform(in, nil, "json")
+	transformed, err := tr.root.transform(in, nil, tr.transformType)
 	if err != nil {
 		return nil, fmt.Errorf("failed transformation: %v", err)
 	}
@@ -111,7 +111,7 @@ func (tr *Transformer) xmlTransform(raw []byte) ([]byte, error) {
 		return nil, fmt.Errorf("failed to parse input XML: %v", err)
 	}
 
-	transformed, err := tr.root.transform(xmlDoc, nil, "xml")
+	transformed, err := tr.root.transform(xmlDoc, nil, tr.transformType)
 	if err != nil {
 		return nil, fmt.Errorf("failed transformation: %v", err)
 	}

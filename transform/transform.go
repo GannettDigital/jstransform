@@ -2,6 +2,7 @@ package transform
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -82,45 +83,32 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// transform runs the instructions in this object returning the new transformed value or an error if unable to.
-// It handles the logic for finding the value to be transformed and chaining the Operations.
-// It will not error if the value is not found, rather it returns nil for the value.
-// If a conversion or operation fails an error is returned.
-func (ti *transformInstruction) transform(in interface{}, fieldType string, modifier pathModifier) (interface{}, error) {
-	path := ti.JSONPath
-	if len(path) == 0 {
-		path = ti.XMLPath
-	}
+func (ti *transformInstruction) xmlTransform(in interface{}, fieldType string, modifier pathModifier) (interface{}, error) {
+	path := ti.XMLPath
 	if modifier != nil {
 		path = modifier(path)
 	}
 
+	node, ok := in.(*xmlquery.Node)
+	if !ok {
+		return nil, errors.New("Error converting input to *xmlquery.Node")
+	}
+
+	xmlNode := xmlquery.Find(node, path)
+	if xmlNode == nil {
+		return nil, nil
+	}
+	rawValue := xmlNode
+
 	var (
-		rawValue interface{}
-		value    interface{}
-		err      error
+		value interface{}
+		err   error
 	)
 
-	switch t := in.(type) {
-	case *xmlquery.Node:
-		xmlNode := xmlquery.Find(t, path)
-		if xmlNode == nil {
-			return nil, nil
-		}
-		rawValue = xmlNode
-		if len(xmlNode) == 1 {
-			value, err = convert(xmlNode[0].InnerText(), fieldType)
-		} else {
-			value, err = convert(xmlNode, fieldType)
-		}
-
-	default:
-		rawValue, err = jsonpath.Get(path, in)
-		if err != nil || rawValue == nil {
-			return nil, nil
-		}
-
-		value, err = convert(rawValue, fieldType)
+	if len(xmlNode) == 1 {
+		value, err = convert(xmlNode[0].InnerText(), fieldType)
+	} else {
+		value, err = convert(xmlNode, fieldType)
 	}
 
 	if err != nil {
@@ -138,6 +126,51 @@ func (ti *transformInstruction) transform(in interface{}, fieldType string, modi
 		}
 	}
 	return value, nil
+}
+
+func (ti *transformInstruction) jsonTransform(in interface{}, fieldType string, modifier pathModifier) (interface{}, error) {
+	path := ti.JSONPath
+	if modifier != nil {
+		path = modifier(path)
+	}
+	rawValue, err := jsonpath.Get(path, in)
+	if err != nil {
+		return nil, nil
+	}
+	if rawValue == nil {
+		return nil, nil
+	}
+
+	value, err := convert(rawValue, fieldType)
+	if err != nil {
+		// In some cases the conversion is helpful but in others like before a max operation it isn't
+		value = rawValue
+	}
+	if value == nil {
+		return nil, nil
+	}
+
+	for _, op := range ti.Operations {
+		value, err = op.transform(value)
+		if err != nil {
+			return nil, fmt.Errorf("failed operation on value from JSONPath %q: %v", path, err)
+		}
+	}
+	return value, nil
+}
+
+// transform runs the instructions in this object returning the new transformed value or an error if unable to.
+// It handles the logic for finding the value to be transformed and chaining the Operations.
+// It will not error if the value is not found, rather it returns nil for the value.
+// If a conversion or operation fails an error is returned.
+func (ti *transformInstruction) transform(in interface{}, fieldType string, modifier pathModifier, transformType string) (interface{}, error) {
+	if transformType == "xml" {
+		return ti.xmlTransform(in, fieldType, modifier)
+	}
+	if transformType == "json" {
+		return ti.jsonTransform(in, fieldType, modifier)
+	}
+	return nil, errors.New("no path type specified for transform")
 }
 
 // trransformInstructions defines a set of instructions and a method for combining their results.
@@ -187,7 +220,7 @@ func (tis *transformInstructions) UnmarshalJSON(data []byte) error {
 
 // transform runs the instructions in this object returning the new transformed value or nil if none is found.
 // It handles the logic for concatenation, first or last methods.
-func (tis *transformInstructions) transform(in interface{}, fieldType string, modifier pathModifier) (interface{}, error) {
+func (tis *transformInstructions) transform(in interface{}, fieldType string, modifier pathModifier, transformType string) (interface{}, error) {
 	var concatResult bool
 	switch tis.Method {
 	case last:
@@ -203,7 +236,7 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string, mo
 	var result interface{}
 
 	for _, from := range tis.From {
-		value, err := from.transform(in, fieldType, modifier)
+		value, err := from.transform(in, fieldType, modifier, transformType)
 		if err != nil {
 			return nil, err
 		}

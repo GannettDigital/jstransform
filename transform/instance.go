@@ -36,7 +36,8 @@ type instanceTransformer interface {
 	transform(interface{}, pathModifier, string) (interface{}, error)
 }
 
-// arrayTransformer represents a JSON instance of type array.
+// arrayTransformer represents a JSON instance type array in the case of a JSON transform or an array of xmlquery.Node in the case of an XML transform.
+// in both cases the output will be JSON
 type arrayTransformer struct {
 	childTransformer instanceTransformer
 	defaultValue     []interface{}
@@ -75,10 +76,10 @@ func (at *arrayTransformer) addChild(child instanceTransformer) error {
 	return nil
 }
 
-func (at *arrayTransformer) baseValueJSON(in interface{}, path string, modifier pathModifier) ([]interface{}, bool, error) {
+func (at *arrayTransformer) baseValueJSON(in interface{}, path string, modifier pathModifier, transformType string) ([]interface{}, bool, error) {
 	// 1. Use a transform if it exists
 	if at.transforms != nil {
-		rawValue, err := at.transforms.transform(in, "array", modifier)
+		rawValue, err := at.transforms.transform(in, "array", modifier, transformType)
 		if err != nil {
 			return nil, false, err
 		}
@@ -108,19 +109,19 @@ func (at *arrayTransformer) baseValueJSON(in interface{}, path string, modifier 
 	return nil, false, nil
 }
 
-func (at *arrayTransformer) baseValueXML(in interface{}, path string, modifier pathModifier) ([]interface{}, bool, error) {
+func (at *arrayTransformer) baseValueXML(in interface{}, path string, modifier pathModifier, transformType string) ([]interface{}, bool, error) {
 	// 1. Use a transform if it exists
 	if at.transforms != nil {
-		rawValue, err := at.transforms.transform(in, "array", modifier)
+		rawValue, err := at.transforms.transform(in, "array", modifier, transformType)
 		if err != nil {
 			return nil, false, err
 		}
 
-		//if rawValue is an array of xml nodes we need to append them to newValue for return
-		switch t := rawValue.(type) {
-		case []*xmlquery.Node:
-			newValue := make([]interface{}, len(t))
-			for i, item := range t {
+		//if rawValue is an array of xml nodes we need to append them to newValue for return as []interface{}
+		xmlNodeArray, ok := rawValue.([]*xmlquery.Node)
+		if ok {
+			newValue := make([]interface{}, len(xmlNodeArray))
+			for i, item := range xmlNodeArray {
 				newValue[i] = item
 			}
 			return newValue, false, nil
@@ -145,10 +146,10 @@ func (at *arrayTransformer) baseValueXML(in interface{}, path string, modifier p
 // baseValue routes to the correct arrayTransformer.baseValue transformType
 func (at *arrayTransformer) baseValue(in interface{}, path string, modifier pathModifier, transformType string) ([]interface{}, bool, error) {
 	if transformType == "json" {
-		return at.baseValueJSON(in, path, modifier)
+		return at.baseValueJSON(in, path, modifier, transformType)
 	}
 	if transformType == "xml" {
-		return at.baseValueXML(in, path, modifier)
+		return at.baseValueXML(in, path, modifier, transformType)
 	}
 	return nil, false, errors.New("unknown transform type in arrayTransformer baseValue")
 }
@@ -323,7 +324,7 @@ func (ot *objectTransformer) transform(in interface{}, modifier pathModifier, tr
 
 	// For the object use a transform if it exists or the default or an empty map
 	if ot.transforms != nil {
-		rawValue, err := ot.transforms.transform(in, "object", modifier)
+		rawValue, err := ot.transforms.transform(in, "object", modifier, transformType)
 		if err != nil {
 			return nil, err
 		}
@@ -421,7 +422,7 @@ func (st *scalarTransformer) transformScalarJSON(in interface{}, modifier pathMo
 	}
 	// 1. Use a transform if it exists
 	if st.transforms != nil {
-		newValue, err := st.transforms.transform(in, st.jsonType, modifier)
+		newValue, err := st.transforms.transform(in, st.jsonType, modifier, transformType)
 		if err != nil {
 			return nil, err
 		}
@@ -456,7 +457,7 @@ func (st *scalarTransformer) transformScalarXML(in interface{}, modifier pathMod
 	}
 	// 1. Use a transform if it exists
 	if st.transforms != nil {
-		newValue, err := st.transforms.transform(in, st.jsonType, modifier)
+		newValue, err := st.transforms.transform(in, st.jsonType, modifier, transformType)
 		if err != nil {
 			return nil, err
 		}
