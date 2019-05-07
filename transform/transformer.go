@@ -17,6 +17,14 @@ import (
 	"github.com/buger/jsonparser"
 )
 
+// inputFormat denotes the type of transform to perfrom, the options are 'JSON' or 'XML'
+type inputFormat string
+
+const (
+	jsonInput = inputFormat("JSON")
+	xmlInput  = inputFormat("XML")
+)
+
 // JSONTransformer - a type implemented by the jstransform.Transformer
 type JSONTransformer interface {
 	Transform(raw json.RawMessage) (json.RawMessage, error)
@@ -30,20 +38,20 @@ type Transformer struct {
 	schema              *jsonschema.Schema
 	transformIdentifier string // Used to select the proper transform Instructions
 	root                instanceTransformer
-	transformType       string
+	format              inputFormat
 }
 
 // NewTransformer returns a Transformer using the schema given.
 // The transformIdentifier is used to select the appropriate transform section from the schema.
-// The transformType is used to execute the correct transforms ('json' or 'xml')
-func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string, transformType string) (*Transformer, error) {
-	tr := &Transformer{schema: schema, transformIdentifier: tranformIdentifier, transformType: transformType}
+// The format is used to execute the correct transforms ('JSON' or 'XML')
+func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string, format inputFormat) (*Transformer, error) {
+	tr := &Transformer{schema: schema, transformIdentifier: tranformIdentifier, format: format}
 	emptyJSON := []byte(`{}`)
 	var err error
 	if schema.Properties != nil {
-		tr.root, err = newObjectTransformer("$", tranformIdentifier, emptyJSON, transformType)
+		tr.root, err = newObjectTransformer("$", tranformIdentifier, emptyJSON, format)
 	} else if schema.Items != nil {
-		tr.root, err = newArrayTransformer("$", tranformIdentifier, emptyJSON, transformType)
+		tr.root, err = newArrayTransformer("$", tranformIdentifier, emptyJSON, format)
 	} else {
 		return nil, errors.New("no Properties nor Items found for schema")
 	}
@@ -69,13 +77,13 @@ func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string, transf
 //
 // Validation of the output against the schema is the final step in the process.
 func (tr *Transformer) Transform(raw json.RawMessage) (json.RawMessage, error) {
-	if tr.transformType == "json" {
+	if tr.format == jsonInput {
 		return tr.jsonTransform(raw)
 	}
-	if tr.transformType == "xml" {
+	if tr.format == xmlInput {
 		return tr.xmlTransform(raw)
 	}
-	return nil, fmt.Errorf("unknown transform type %s", tr.transformType)
+	return nil, fmt.Errorf("unknown transform type %s, must be 'JSON' or 'XML'", tr.format)
 }
 
 func (tr *Transformer) jsonTransform(raw json.RawMessage) (json.RawMessage, error) {
@@ -84,7 +92,7 @@ func (tr *Transformer) jsonTransform(raw json.RawMessage) (json.RawMessage, erro
 		return nil, fmt.Errorf("failed to parse input JSON: %v", err)
 	}
 
-	transformed, err := tr.root.transform(in, nil, tr.transformType)
+	transformed, err := tr.root.transform(in, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed transformation: %v", err)
 	}
@@ -111,7 +119,7 @@ func (tr *Transformer) xmlTransform(raw []byte) ([]byte, error) {
 		return nil, fmt.Errorf("failed to parse input XML: %v", err)
 	}
 
-	transformed, err := tr.root.transform(xmlDoc, nil, tr.transformType)
+	transformed, err := tr.root.transform(xmlDoc, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed transformation: %v", err)
 	}
@@ -166,11 +174,11 @@ func (tr *Transformer) walker(path string, value json.RawMessage) error {
 	var iTransformer instanceTransformer
 	switch instanceType {
 	case "object":
-		iTransformer, err = newObjectTransformer(path, tr.transformIdentifier, value, "json")
+		iTransformer, err = newObjectTransformer(path, tr.transformIdentifier, value, tr.format)
 	case "array":
-		iTransformer, err = newArrayTransformer(path, tr.transformIdentifier, value, "json")
+		iTransformer, err = newArrayTransformer(path, tr.transformIdentifier, value, tr.format)
 	default:
-		iTransformer, err = newScalarTransformer(path, tr.transformIdentifier, value, instanceType)
+		iTransformer, err = newScalarTransformer(path, tr.transformIdentifier, value, instanceType, tr.format)
 	}
 	if err != nil {
 		return fmt.Errorf("failed to initialize transformer: %v", err)

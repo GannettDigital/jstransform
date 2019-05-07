@@ -163,11 +163,11 @@ func (ti *transformInstruction) jsonTransform(in interface{}, fieldType string, 
 // It handles the logic for finding the value to be transformed and chaining the Operations.
 // It will not error if the value is not found, rather it returns nil for the value.
 // If a conversion or operation fails an error is returned.
-func (ti *transformInstruction) transform(in interface{}, fieldType string, modifier pathModifier, transformType string) (interface{}, error) {
-	if transformType == "xml" {
+func (ti *transformInstruction) transform(in interface{}, fieldType string, modifier pathModifier, format inputFormat) (interface{}, error) {
+	if format == xmlInput {
 		return ti.xmlTransform(in, fieldType, modifier)
 	}
-	if transformType == "json" {
+	if format == jsonInput {
 		return ti.jsonTransform(in, fieldType, modifier)
 	}
 	return nil, errors.New("no path type specified for transform")
@@ -220,7 +220,7 @@ func (tis *transformInstructions) UnmarshalJSON(data []byte) error {
 
 // transform runs the instructions in this object returning the new transformed value or nil if none is found.
 // It handles the logic for concatenation, first or last methods.
-func (tis *transformInstructions) transform(in interface{}, fieldType string, modifier pathModifier, transformType string) (interface{}, error) {
+func (tis *transformInstructions) transform(in interface{}, fieldType string, modifier pathModifier, format inputFormat) (interface{}, error) {
 	var concatResult bool
 	switch tis.Method {
 	case last:
@@ -236,7 +236,7 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string, mo
 	var result interface{}
 
 	for _, from := range tis.From {
-		value, err := from.transform(in, fieldType, modifier, transformType)
+		value, err := from.transform(in, fieldType, modifier, format)
 		if err != nil {
 			return nil, err
 		}

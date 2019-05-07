@@ -33,7 +33,7 @@ type instanceTransformer interface {
 	child() instanceTransformer // Arrays return a child object all others nil
 	path() string
 	selectChild(string) instanceTransformer // This returns nil for everything except objects
-	transform(interface{}, pathModifier, string) (interface{}, error)
+	transform(interface{}, pathModifier) (interface{}, error)
 }
 
 // arrayTransformer represents a JSON instance type array in the case of a JSON transform or an array of xmlquery.Node in the case of an XML transform.
@@ -42,12 +42,14 @@ type arrayTransformer struct {
 	childTransformer instanceTransformer
 	defaultValue     []interface{}
 	jsonPath         string
+	format           inputFormat
 	transforms       *transformInstructions
 }
 
-func newArrayTransformer(path, transformIdentifier string, raw json.RawMessage, _ string) (*arrayTransformer, error) {
+func newArrayTransformer(path, transformIdentifier string, raw json.RawMessage, format inputFormat) (*arrayTransformer, error) {
 	at := &arrayTransformer{
 		jsonPath: path,
+		format:   format,
 	}
 
 	var err error
@@ -76,10 +78,10 @@ func (at *arrayTransformer) addChild(child instanceTransformer) error {
 	return nil
 }
 
-func (at *arrayTransformer) baseValueJSON(in interface{}, path string, modifier pathModifier, transformType string) ([]interface{}, bool, error) {
+func (at *arrayTransformer) baseValueJSON(in interface{}, path string, modifier pathModifier) ([]interface{}, bool, error) {
 	// 1. Use a transform if it exists
 	if at.transforms != nil {
-		rawValue, err := at.transforms.transform(in, "array", modifier, transformType)
+		rawValue, err := at.transforms.transform(in, "array", modifier, at.format)
 		if err != nil {
 			return nil, false, err
 		}
@@ -109,10 +111,10 @@ func (at *arrayTransformer) baseValueJSON(in interface{}, path string, modifier 
 	return nil, false, nil
 }
 
-func (at *arrayTransformer) baseValueXML(in interface{}, path string, modifier pathModifier, transformType string) ([]interface{}, bool, error) {
+func (at *arrayTransformer) baseValueXML(in interface{}, path string, modifier pathModifier) ([]interface{}, bool, error) {
 	// 1. Use a transform if it exists
 	if at.transforms != nil {
-		rawValue, err := at.transforms.transform(in, "array", modifier, transformType)
+		rawValue, err := at.transforms.transform(in, "array", modifier, at.format)
 		if err != nil {
 			return nil, false, err
 		}
@@ -143,13 +145,13 @@ func (at *arrayTransformer) baseValueXML(in interface{}, path string, modifier p
 	return nil, false, nil
 }
 
-// baseValue routes to the correct arrayTransformer.baseValue transformType
-func (at *arrayTransformer) baseValue(in interface{}, path string, modifier pathModifier, transformType string) ([]interface{}, bool, error) {
-	if transformType == "json" {
-		return at.baseValueJSON(in, path, modifier, transformType)
+// baseValue routes to the correct arrayTransformer.baseValue format
+func (at *arrayTransformer) baseValue(in interface{}, path string, modifier pathModifier) ([]interface{}, bool, error) {
+	if at.format == jsonInput {
+		return at.baseValueJSON(in, path, modifier)
 	}
-	if transformType == "xml" {
-		return at.baseValueXML(in, path, modifier, transformType)
+	if at.format == xmlInput {
+		return at.baseValueXML(in, path, modifier)
 	}
 	return nil, false, errors.New("unknown transform type in arrayTransformer baseValue")
 }
@@ -160,12 +162,12 @@ func (at *arrayTransformer) selectChild(key string) instanceTransformer { return
 
 // arrayTransformJSON retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields.
-func (at *arrayTransformer) arrayTransformJSON(in interface{}, modifier pathModifier, transformType string) (interface{}, error) {
+func (at *arrayTransformer) arrayTransformJSON(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := at.jsonPath
 	if modifier != nil {
 		path = modifier(path)
 	}
-	base, changed, err := at.baseValue(in, path, modifier, transformType)
+	base, changed, err := at.baseValue(in, path, modifier)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +197,7 @@ func (at *arrayTransformer) arrayTransformJSON(in interface{}, modifier pathModi
 	for i := range base {
 		currentPath := path + fmt.Sprintf("[%d]", i)
 
-		childValue, err := at.childTransformer.transform(in, pathReplace(oldPath, currentPath, modifier), transformType)
+		childValue, err := at.childTransformer.transform(in, pathReplace(oldPath, currentPath, modifier))
 		if err != nil {
 			return nil, err
 		}
@@ -212,12 +214,12 @@ func (at *arrayTransformer) arrayTransformJSON(in interface{}, modifier pathModi
 
 // arrayTransformXML retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields.
-func (at *arrayTransformer) arrayTransformXML(in interface{}, modifier pathModifier, transformType string) (interface{}, error) {
+func (at *arrayTransformer) arrayTransformXML(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := at.jsonPath
 	if modifier != nil {
 		path = modifier(path)
 	}
-	base, _, err := at.baseValue(in, path, modifier, transformType)
+	base, _, err := at.baseValue(in, path, modifier)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +236,7 @@ func (at *arrayTransformer) arrayTransformXML(in interface{}, modifier pathModif
 		var childValue interface{}
 		childValue = base[i]
 		if _, ok := childValue.(*xmlquery.Node); ok {
-			childValue, err = at.childTransformer.transform(childValue, pathReplace(oldPath, currentPath, modifier), transformType)
+			childValue, err = at.childTransformer.transform(childValue, pathReplace(oldPath, currentPath, modifier))
 			if err != nil {
 				return nil, err
 			}
@@ -252,14 +254,14 @@ func (at *arrayTransformer) arrayTransformXML(in interface{}, modifier pathModif
 }
 
 // transform routes to the correct array transform type
-func (at *arrayTransformer) transform(in interface{}, modifier pathModifier, transformType string) (interface{}, error) {
-	if transformType == "json" {
-		return at.arrayTransformJSON(in, modifier, transformType)
+func (at *arrayTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
+	if at.format == jsonInput {
+		return at.arrayTransformJSON(in, modifier)
 	}
-	if transformType == "xml" {
-		return at.arrayTransformXML(in, modifier, transformType)
+	if at.format == xmlInput {
+		return at.arrayTransformXML(in, modifier)
 	}
-	return nil, fmt.Errorf("Unrecognized transform type %s in arraytransformer transform ", transformType)
+	return nil, fmt.Errorf("Unrecognized transform type %s in arraytransformer transform, must be 'JSON' or 'XML' ", at.format)
 }
 
 // objectTransformer represents a JSON instance of type object and associated transforms.
@@ -267,13 +269,15 @@ type objectTransformer struct {
 	children     map[string]instanceTransformer
 	defaultValue map[string]interface{}
 	jsonPath     string
+	format       inputFormat
 	transforms   *transformInstructions
 }
 
-func newObjectTransformer(path, transformIdentifier string, raw json.RawMessage, transformType string) (*objectTransformer, error) {
+func newObjectTransformer(path, transformIdentifier string, raw json.RawMessage, format inputFormat) (*objectTransformer, error) {
 	ot := &objectTransformer{
 		children: make(map[string]instanceTransformer),
 		jsonPath: path,
+		format:   format,
 	}
 
 	var err error
@@ -315,7 +319,7 @@ func (ot *objectTransformer) selectChild(key string) instanceTransformer { retur
 
 // transform retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields.
-func (ot *objectTransformer) transform(in interface{}, modifier pathModifier, transformType string) (interface{}, error) {
+func (ot *objectTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := ot.jsonPath
 	if modifier != nil {
 		path = modifier(path)
@@ -324,7 +328,7 @@ func (ot *objectTransformer) transform(in interface{}, modifier pathModifier, tr
 
 	// For the object use a transform if it exists or the default or an empty map
 	if ot.transforms != nil {
-		rawValue, err := ot.transforms.transform(in, "object", modifier, transformType)
+		rawValue, err := ot.transforms.transform(in, "object", modifier, ot.format)
 		if err != nil {
 			return nil, err
 		}
@@ -346,7 +350,7 @@ func (ot *objectTransformer) transform(in interface{}, modifier pathModifier, tr
 
 	// Add each child value to the paren
 	for _, child := range ot.children {
-		childValue, err := child.transform(in, modifier, transformType)
+		childValue, err := child.transform(in, modifier)
 		if err != nil {
 			return nil, err
 		}
@@ -370,13 +374,15 @@ type scalarTransformer struct {
 	defaultValue interface{}
 	jsonType     string
 	jsonPath     string
+	format       inputFormat
 	transforms   *transformInstructions
 }
 
-func newScalarTransformer(path, transformIdentifier string, raw json.RawMessage, instanceType string) (*scalarTransformer, error) {
+func newScalarTransformer(path, transformIdentifier string, raw json.RawMessage, instanceType string, format inputFormat) (*scalarTransformer, error) {
 	st := &scalarTransformer{
 		jsonType: instanceType,
 		jsonPath: path,
+		format:   format,
 	}
 
 	if instanceType == "string" {
@@ -415,14 +421,14 @@ func (st *scalarTransformer) selectChild(string) instanceTransformer { return ni
 // 2. Look for the same JSONPath in the input and use directly if possible.
 //
 // 3. Fall back to the JSON Schema default value.
-func (st *scalarTransformer) transformScalarJSON(in interface{}, modifier pathModifier, transformType string) (interface{}, error) {
+func (st *scalarTransformer) transformScalarJSON(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := st.jsonPath
 	if modifier != nil {
 		path = modifier(path)
 	}
 	// 1. Use a transform if it exists
 	if st.transforms != nil {
-		newValue, err := st.transforms.transform(in, st.jsonType, modifier, transformType)
+		newValue, err := st.transforms.transform(in, st.jsonType, modifier, st.format)
 		if err != nil {
 			return nil, err
 		}
@@ -450,14 +456,14 @@ func (st *scalarTransformer) transformScalarJSON(in interface{}, modifier pathMo
 // 1. Use a Transform if it exists.
 //
 // 2. Fall back to the JSON Schema default value.
-func (st *scalarTransformer) transformScalarXML(in interface{}, modifier pathModifier, transformType string) (interface{}, error) {
+func (st *scalarTransformer) transformScalarXML(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := st.jsonPath
 	if modifier != nil {
 		path = modifier(path)
 	}
 	// 1. Use a transform if it exists
 	if st.transforms != nil {
-		newValue, err := st.transforms.transform(in, st.jsonType, modifier, transformType)
+		newValue, err := st.transforms.transform(in, st.jsonType, modifier, st.format)
 		if err != nil {
 			return nil, err
 		}
@@ -471,12 +477,12 @@ func (st *scalarTransformer) transformScalarXML(in interface{}, modifier pathMod
 }
 
 // transform routes to the correct scalar transform type
-func (st *scalarTransformer) transform(in interface{}, modifier pathModifier, transformType string) (interface{}, error) {
-	if transformType == "json" {
-		return st.transformScalarJSON(in, modifier, transformType)
+func (st *scalarTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
+	if st.format == jsonInput {
+		return st.transformScalarJSON(in, modifier)
 	}
-	if transformType == "xml" {
-		return st.transformScalarXML(in, modifier, transformType)
+	if st.format == xmlInput {
+		return st.transformScalarXML(in, modifier)
 	}
-	return nil, fmt.Errorf("Unrecognized transform type %s in scalartransformer transform ", transformType)
+	return nil, fmt.Errorf("Unrecognized transform type %s in scalartransformer transform, must be 'JSON' or 'XML' ", st.format)
 }
