@@ -48,7 +48,7 @@
                   "sport": {
                     "from": [
                       {
-                        "xmlPath": "../../../../season/name"
+                        "xmlPath": "../../../../season/name[not(@*)]"
                       }
                     ]
                   }
@@ -107,7 +107,7 @@
                 "transform": {
                   "sport": {
                     "from": [{
-                      "xmlPath": "../../../conference/name"
+                      "xmlPath": "../../../conference/name[not(@*)]"
                     }]
                   }
                 }
@@ -132,7 +132,7 @@
                 "transform": {
                   "sport": {
                     "from": [{
-                      "xmlPath": "../../../division-content/division/id",
+                      "xmlPath": "../../division/id",
                       "operations": [
                         {
                           "type": "replace",
@@ -151,7 +151,7 @@
                 "transform": {
                   "sport": {
                     "from": [{
-                      "xmlPath": "../../../division-content/division/name"
+                      "xmlPath": "../../division/name"
                     }]
                   }
                 }
@@ -161,7 +161,7 @@
                 "transform": {
                   "sport": {
                     "from": [{
-                      "xmlPath": "../../../division-content/division/alias"
+                      "xmlPath": "../../division/alias"
                     }]
                   }
                 }
@@ -171,7 +171,7 @@
                 "transform": {
                   "sport": {
                     "from": [{
-                      "xmlPath": "../../../division-content/division/active"
+                      "xmlPath": "../../division/active"
                     }]
                   }
                 }
@@ -205,7 +205,7 @@
               "sport": {
                 "from": [
                   {
-                    "xmlPath": "/name"
+                    "xmlPath": "/name[not(@*)]"
                   }
                 ]
               }
@@ -313,7 +313,7 @@
                   "sport": {
                     "from": [
                       {
-                        "xmlPath": "season-details/venue/name"
+                        "xmlPath": "season-details/venue/name[not(@*)]"
                       }
                     ]
                   }
@@ -447,10 +447,10 @@
                   "sport": {
                     "from": [
                       {
-                        "xmlPath": "../../../../../league/name"
+                        "xmlPath": "../../../../../league/name[not(@*)]"
                       },
                       {
-                        "xmlPath": "../../../league/name"
+                        "xmlPath": "../../../league/name[not(@*)]"
                       }
                     ]
                   }

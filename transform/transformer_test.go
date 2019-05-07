@@ -23,6 +23,7 @@ var (
 		description         string
 		schema              *jsonschema.Schema
 		transformIdentifier string
+		transformerType     string
 		in                  json.RawMessage
 		want                json.RawMessage
 		wantErr             bool
@@ -31,6 +32,7 @@ var (
 			description:         "Use basic transforms, copy from input and default to build result",
 			schema:              imageSchema,
 			transformIdentifier: "cumulo",
+			transformerType:     "json",
 			in: json.RawMessage(`
 							{
 								"type": "image",
@@ -58,6 +60,7 @@ var (
 			description:         "Input too simple, fails validation",
 			schema:              imageSchema,
 			transformIdentifier: "cumulo",
+			transformerType:     "json",
 			in: json.RawMessage(`
 							{
 								"type": "image",
@@ -80,6 +83,7 @@ var (
 			description:         "Array transforms, tests arrays with string type and with a single object type",
 			schema:              arrayTransformsSchema,
 			transformIdentifier: "cumulo",
+			transformerType:     "json",
 			in: json.RawMessage(`
 							{
 								"type": "image",
@@ -106,6 +110,7 @@ var (
 			description:         "Test all operations",
 			schema:              operationsSchema,
 			transformIdentifier: "cumulo",
+			transformerType:     "json",
 			in: json.RawMessage(`
 						{
 							"type": "image",
@@ -131,6 +136,7 @@ var (
 			description:         "Test empty non-required object",
 			schema:              imageSchema,
 			transformIdentifier: "cumulo",
+			transformerType:     "json",
 			in: json.RawMessage(`
 						{
 							"type": "image",
@@ -156,6 +162,7 @@ var (
 			description:         "Test empty non-required array",
 			schema:              arrayTransformsSchema,
 			transformIdentifier: "cumulo",
+			transformerType:     "json",
 			in: json.RawMessage(`
 						{
 							"type": "image",
@@ -178,6 +185,7 @@ var (
 			description:         "Test nested arrays",
 			schema:              doublearraySchema,
 			transformIdentifier: "cumulo",
+			transformerType:     "json",
 			in: json.RawMessage(`
 				{
 					"data" : {
@@ -214,6 +222,7 @@ var (
 			description:         "Test format: date-time strings",
 			schema:              dateTimesSchema,
 			transformIdentifier: "cumulo",
+			transformerType:     "json",
 			in: json.RawMessage(`
 				{
 					"dates": [
@@ -229,6 +238,7 @@ var (
 			description:         "Test special characters",
 			schema:              frontSchema,
 			transformIdentifier: "frontInput",
+			transformerType:     "json",
 			in: json.RawMessage(`
 						{
 							"attributes": [
@@ -400,7 +410,7 @@ func TestSaveValue(t *testing.T) {
 func TestTransformer(t *testing.T) {
 	const parallelRuns = 4
 	for _, test := range transformerTests {
-		tr, err := NewTransformer(test.schema, test.transformIdentifier)
+		tr, err := NewTransformer(test.schema, test.transformIdentifier, test.transformerType)
 		if err != nil {
 			t.Fatalf("Test %q - failed to initialize transformer: %v", test.description, err)
 		}
@@ -427,54 +437,70 @@ func TestTransformer(t *testing.T) {
 	}
 }
 
-func TestNewTransformerXML(t *testing.T) {
+func TestNewXMLTransformer(t *testing.T) {
 	tests := []struct {
-		description    string
-		schemaFilePath string
-		xmlFilePath    string
-		wantFilePath   string
+		description         string
+		transformIdentifier string
+		transformerType     string
+		schemaFilePath      string
+		xmlFilePath         string
+		wantFilePath        string
 	}{
 		{
-			description:    "teams NBA",
-			schemaFilePath: "./test_data/xml/sports/teams/teams.json",
-			xmlFilePath:    "./test_data/xml/sports/teams/teams_NBA.xml",
-			wantFilePath:   "./test_data/xml/sports/teams/teamsNBA.out.json",
+			description:         "teams NBA",
+			transformIdentifier: "sport",
+			transformerType:     "xml",
+			schemaFilePath:      "./test_data/xml/sports/teams/teams.json",
+			xmlFilePath:         "./test_data/xml/sports/teams/teams_NBA.xml",
+			wantFilePath:        "./test_data/xml/sports/teams/teamsNBA.out.json",
 		},
 		{
-			description:    "teams MLB",
-			schemaFilePath: "./test_data/xml/sports/teams/teams.json",
-			xmlFilePath:    "./test_data/xml/sports/teams/teams_MLB.xml",
-			wantFilePath:   "./test_data/xml/sports/teams/teamsMLB.out.json",
+			description:         "teams MLB",
+			transformIdentifier: "sport",
+			transformerType:     "xml",
+			schemaFilePath:      "./test_data/xml/sports/teams/teams.json",
+			xmlFilePath:         "./test_data/xml/sports/teams/teams_MLB.xml",
+			wantFilePath:        "./test_data/xml/sports/teams/teamsMLB.out.json",
 		},
 		{
-			description:    "array-transforms",
-			schemaFilePath: "./test_data/xml/array-transforms.json",
-			xmlFilePath:    "./test_data/xml/array-transforms.xml",
-			wantFilePath:   "./test_data/xml/array-transforms.out.json",
+			description:         "array-transforms",
+			transformIdentifier: "sport",
+			transformerType:     "xml",
+			schemaFilePath:      "./test_data/xml/array-transforms.json",
+			xmlFilePath:         "./test_data/xml/array-transforms.xml",
+			wantFilePath:        "./test_data/xml/array-transforms.out.json",
 		},
 		{
-			description:    "multiple-array-transforms",
-			schemaFilePath: "./test_data/xml/multiple-arrays.json",
-			xmlFilePath:    "./test_data/xml/multiple-arrays.xml",
-			wantFilePath:   "./test_data/xml/multiple-arrays.out.json",
+			description:         "multiple-array-transforms",
+			transformIdentifier: "sport",
+			transformerType:     "xml",
+			schemaFilePath:      "./test_data/xml/multiple-arrays.json",
+			xmlFilePath:         "./test_data/xml/multiple-arrays.xml",
+			wantFilePath:        "./test_data/xml/multiple-arrays.out.json",
 		},
 		{
-			description:    "conversion-transforms",
-			schemaFilePath: "./test_data/xml/conversion-transforms.json",
-			xmlFilePath:    "./test_data/xml/conversion-transforms.xml",
-			wantFilePath:   "./test_data/xml/conversion-transforms.out.json",
+			description:         "conversion-transforms",
+			transformIdentifier: "sport",
+			transformerType:     "xml",
+			schemaFilePath:      "./test_data/xml/conversion-transforms.json",
+			xmlFilePath:         "./test_data/xml/conversion-transforms.xml",
+			wantFilePath:        "./test_data/xml/conversion-transforms.out.json",
 		},
 		{
-			description:    "attribute-selection",
-			schemaFilePath: "./test_data/xml/attribute-selection.json",
-			xmlFilePath:    "./test_data/xml/attribute-selection.xml",
-			wantFilePath:   "./test_data/xml/attribute-selection.out.json",
+			description:         "attribute-selection",
+			transformIdentifier: "sport",
+			transformerType:     "xml",
+			schemaFilePath:      "./test_data/xml/attribute-selection.json",
+			xmlFilePath:         "./test_data/xml/attribute-selection.xml",
+			wantFilePath:        "./test_data/xml/attribute-selection.out.json",
 		},
 		{
-			description:    "operations",
-			schemaFilePath: "./test_data/xml/operations.json",
-			xmlFilePath:    "./test_data/xml/operations.xml",
-			wantFilePath:   "./test_data/xml/operations.out.json",
+			description:         "operations",
+			transformIdentifier: "sport",
+			transformerType:     "xml",
+			schemaFilePath:      "./test_data/xml/operations.json",
+			xmlFilePath:         "./test_data/xml/operations.xml",
+			wantFilePath:        "./test_data/xml/operations.out.json",
 		},
 	}
 
@@ -484,7 +510,7 @@ func TestNewTransformerXML(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		tr, err := NewTransformerXML(schema, "sport")
+		tr, err := NewTransformer(schema, test.transformIdentifier, test.transformerType)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -515,7 +541,7 @@ func TestNewTransformerXML(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(outputMap, wantMap) {
-			t.Fatalf("test %s failed \n want:\n %s \n got:\n %s", test.description, want, output)
+			t.Fatalf("test %s failed \n got:\n %s \n want:\n %s", test.description, output, want)
 		}
 	}
 
@@ -527,7 +553,7 @@ func BenchmarkTransformer(b *testing.B) {
 			continue
 		}
 
-		tr, err := NewTransformer(test.schema, test.transformIdentifier)
+		tr, err := NewTransformer(test.schema, test.transformIdentifier, "json")
 		if err != nil {
 			b.Fatalf("Test %q - failed to initialize transformer: %v", test.description, err)
 		}

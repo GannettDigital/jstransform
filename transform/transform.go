@@ -28,18 +28,18 @@ type transformOperationJSON struct {
 	Args map[string]string `json:"args"`
 }
 
-// transformInstruction defines a JSONPath for a transform and an optional set of operations to be performed on the
+// transformInstruction defines a JSONPath and XMLPath for a transform and an optional set of operations to be performed on the
 // data from that path.
 type transformInstruction struct {
 	// For JSONPath format see http://goessner.net/articles/JsonPath/
-	jsonPath   string
-	xmlPath    string
+	JSONPath   string
+	XMLPath    string
 	Operations []transformOperation `json:"operations"`
 }
 
 type transformInstructionJSON struct {
-	JsonPath   string                   `json:"jsonPath"`
-	XmlPath    string                   `json:"xmlPath"`
+	JSONPath   string                   `json:"jsonPath"`
+	XMLPath    string                   `json:"xmlPath"`
 	Operations []transformOperationJSON `json:"operations"`
 }
 
@@ -51,8 +51,8 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("failed to extract transform from JSON: %v", err)
 	}
 
-	ti.jsonPath = jti.JsonPath
-	ti.xmlPath = jti.XmlPath
+	ti.JSONPath = jti.JSONPath
+	ti.XMLPath = jti.XMLPath
 	ti.Operations = []transformOperation{}
 
 	for _, toj := range jti.Operations {
@@ -87,9 +87,9 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 // It will not error if the value is not found, rather it returns nil for the value.
 // If a conversion or operation fails an error is returned.
 func (ti *transformInstruction) transform(in interface{}, fieldType string, modifier pathModifier) (interface{}, error) {
-	path := ti.jsonPath
+	path := ti.JSONPath
 	if len(path) == 0 {
-		path = ti.xmlPath
+		path = ti.XMLPath
 	}
 	if modifier != nil {
 		path = modifier(path)
@@ -97,6 +97,7 @@ func (ti *transformInstruction) transform(in interface{}, fieldType string, modi
 
 	var (
 		rawValue interface{}
+		value    interface{}
 		err      error
 	)
 
@@ -107,14 +108,21 @@ func (ti *transformInstruction) transform(in interface{}, fieldType string, modi
 			return nil, nil
 		}
 		rawValue = xmlNode
+		if len(xmlNode) == 1 {
+			value, err = convert(xmlNode[0].InnerText(), fieldType)
+		} else {
+			value, err = convert(xmlNode, fieldType)
+		}
+
 	default:
 		rawValue, err = jsonpath.Get(path, in)
 		if err != nil || rawValue == nil {
 			return nil, nil
 		}
+
+		value, err = convert(rawValue, fieldType)
 	}
 
-	value, err := convert(rawValue, fieldType)
 	if err != nil {
 		// In some cases the conversion is helpful but in others like before a max operation it isn't
 		value = rawValue
@@ -220,11 +228,11 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string, mo
 // old.
 func (tis *transformInstructions) replaceJSONPathPrefix(old, new string) {
 	for _, instruction := range tis.From {
-		if strings.HasPrefix(instruction.jsonPath, old) {
-			instruction.jsonPath = strings.Replace(instruction.jsonPath, old, new, 1)
+		if strings.HasPrefix(instruction.JSONPath, old) {
+			instruction.JSONPath = strings.Replace(instruction.JSONPath, old, new, 1)
 		}
-		if strings.HasPrefix(instruction.xmlPath, old) {
-			instruction.xmlPath = strings.Replace(instruction.xmlPath, old, new, 1)
+		if strings.HasPrefix(instruction.XMLPath, old) {
+			instruction.XMLPath = strings.Replace(instruction.XMLPath, old, new, 1)
 		}
 	}
 }

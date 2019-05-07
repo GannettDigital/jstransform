@@ -37,6 +37,8 @@ The transform object has the following properties:
 
 - The jsonPath selector is an identifier of the location of the _input_ path. All paths should start with the root object `$`. The exception here is for an Array of objects, where the relative `@` operator should be used on the leaf objects to signify the location is relative to the parent transform (more on this below)
 
+- The xPath selector is an identifier of the location of the _input_ path. All paths should start with the root object `/`. The exception here is for an Array of objects, where `//` can be used to select a node and all of its descendants. The xPath inside the array can then be relative to this node.
+
 - If a transform object exists on a property, the consumer should automatically use that. In the event a transform object does not exist on a property, the consumer should attempt to find the value in the input at the location that corresponds to the same location in the schema. In other words, if the consumer is operating on schema field `$.foo.bar` which has no `transform.<consumer>` property, the consumer should use `$.foo.bar` as the location to pull the value from the input. This provides a nice "default" for those fields that are 1:1 match.
 
 - `first` is the default method of transform

@@ -1,7 +1,6 @@
 {
   "teams":[
     {
-      "team": true,
       "city":"New York",
       "conference":{
         "id":"403879",
@@ -33,6 +32,7 @@
       "shortName":"NY",
       "sport":"basketball",
       "state":"New York",
+      "team":true,
       "venue":{
         "capacity":"19763",
         "city":"New York",
@@ -45,7 +45,6 @@
       }
     },
     {
-      "team": true,
       "city":"Washington",
       "conference":{
         "id":"403879",
@@ -55,9 +54,9 @@
       "country":"USA",
       "division":{
         "active":"true",
-        "alias":"Atlantic",
-        "id":"403880",
-        "name":"NBA Atlantic"
+        "alias":"Southeast",
+        "id":"664418",
+        "name":"NBA Southeast"
       },
       "firstName":"Washington",
       "id":"404067",
@@ -77,6 +76,7 @@
       "shortName":"WAS",
       "sport":"basketball",
       "state":"District of Columbia",
+      "team":true,
       "venue":{
         "capacity":"20282",
         "city":"Washington",
@@ -89,7 +89,6 @@
       }
     },
     {
-      "team": true,
       "city":"Miami",
       "conference":{
         "id":"403879",
@@ -99,9 +98,9 @@
       "country":"USA",
       "division":{
         "active":"true",
-        "alias":"Atlantic",
-        "id":"403880",
-        "name":"NBA Atlantic"
+        "alias":"Southeast",
+        "id":"664418",
+        "name":"NBA Southeast"
       },
       "firstName":"Miami",
       "id":"404171",
@@ -121,6 +120,7 @@
       "shortName":"MIA",
       "sport":"basketball",
       "state":"Florida",
+      "team":true,
       "venue":{
         "capacity":"19600",
         "city":"Miami",
@@ -133,7 +133,6 @@
       }
     },
     {
-      "team": true,
       "city":"Los Angeles",
       "conference":{
         "id":"403882",
@@ -165,6 +164,7 @@
       "shortName":"LAL",
       "sport":"basketball",
       "state":"California",
+      "team":true,
       "venue":{
         "capacity":"19060",
         "city":"Los Angeles",
@@ -177,7 +177,6 @@
       }
     },
     {
-      "team": true,
       "firstName":"Team Lebron",
       "id":"676107",
       "league":{
@@ -186,7 +185,8 @@
         "nickName":"NBA"
       },
       "name":"Team Lebron",
-      "shortName":"LEBRON"
+      "shortName":"LEBRON",
+      "team":true
     }
   ]
 }
