@@ -94,7 +94,7 @@ func (at *arrayTransformer) baseValueJSON(in interface{}, path string, modifier 
 		}
 	}
 
-	// 2. Look for the same JSONPath in the input and use directly if possible.
+	// 2. Look for the same jsonPath in the input and use directly if possible.
 	rawValue, err := jsonpath.Get(path, in)
 	if err == nil && rawValue != nil {
 		newValue, ok := rawValue.([]interface{})
@@ -233,8 +233,7 @@ func (at *arrayTransformer) arrayTransformXML(in interface{}, modifier pathModif
 
 	for i := range base {
 		currentPath := path + fmt.Sprintf("[%d]", i)
-		var childValue interface{}
-		childValue = base[i]
+		childValue := base[i]
 		if _, ok := childValue.(*xmlquery.Node); ok {
 			childValue, err = at.childTransformer.transform(childValue, pathReplace(oldPath, currentPath, modifier))
 			if err != nil {
@@ -244,7 +243,6 @@ func (at *arrayTransformer) arrayTransformXML(in interface{}, modifier pathModif
 		if childValue != nil {
 			newArray = append(newArray, childValue)
 		}
-
 	}
 
 	if len(newArray) == 0 {
@@ -418,7 +416,7 @@ func (st *scalarTransformer) selectChild(string) instanceTransformer { return ni
 //
 // 1. Use a Transform if it exists.
 //
-// 2. Look for the same JSONPath in the input and use directly if possible.
+// 2. Look for the same jsonPath in the input and use directly if possible.
 //
 // 3. Fall back to the JSON Schema default value.
 func (st *scalarTransformer) transformScalarJSON(in interface{}, modifier pathModifier) (interface{}, error) {
@@ -437,7 +435,7 @@ func (st *scalarTransformer) transformScalarJSON(in interface{}, modifier pathMo
 		}
 	}
 
-	// 2. Look for the same JSONPath in the input and use directly if possible.
+	// 2. Look for the same jsonPath in the input and use directly if possible.
 	rawValue, err := jsonpath.Get(path, in)
 	if err == nil {
 		newValue, err := convert(rawValue, st.jsonType)

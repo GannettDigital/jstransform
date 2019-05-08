@@ -47,7 +47,7 @@ func TestTransformInstruction(t *testing.T) {
 		{
 			description: "Simple Instruction",
 			ti: transformInstruction{
-				JSONPath:   "$.group1.item1.itemA",
+				jsonPath:   "$.group1.item1.itemA",
 				Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
 			},
 			format: jsonInput,
@@ -57,7 +57,7 @@ func TestTransformInstruction(t *testing.T) {
 		{
 			description: "Chained operations",
 			ti: transformInstruction{
-				JSONPath: "$.group1.item1.itemA",
+				jsonPath: "$.group1.item1.itemA",
 				Operations: []transformOperation{
 					&testOp{args: map[string]string{"out": "out"}},
 					&testOp{args: map[string]string{"out": "out2"}},
@@ -71,7 +71,7 @@ func TestTransformInstruction(t *testing.T) {
 			description: "Value not found",
 			in:          testRaw,
 			ti: transformInstruction{
-				JSONPath:   "$.group1.item10.itemA",
+				jsonPath:   "$.group1.item10.itemA",
 				Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
 			},
 			format: jsonInput,
@@ -81,7 +81,7 @@ func TestTransformInstruction(t *testing.T) {
 			description: "failed operation",
 			in:          testRaw,
 			ti: transformInstruction{
-				JSONPath:   "$.group1.item1.itemA",
+				jsonPath:   "$.group1.item1.itemA",
 				Operations: []transformOperation{&testOp{fail: true}},
 			},
 			format:  jsonInput,
@@ -120,7 +120,7 @@ func TestTransformInstructions(t *testing.T) {
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
-						JSONPath:   "$.group1.item1.itemA",
+						jsonPath:   "$.group1.item1.itemA",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
 					},
 				},
@@ -135,11 +135,11 @@ func TestTransformInstructions(t *testing.T) {
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
-						JSONPath:   "$.group1.item1.itemA",
+						jsonPath:   "$.group1.item1.itemA",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
 					},
 					{
-						JSONPath:   "$.group3[1]",
+						jsonPath:   "$.group3[1]",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out2"}}},
 					},
 				},
@@ -154,11 +154,11 @@ func TestTransformInstructions(t *testing.T) {
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
-						JSONPath:   "$.group1.item1.itemA",
+						jsonPath:   "$.group1.item1.itemA",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
 					},
 					{
-						JSONPath:   "$.group3[1]",
+						jsonPath:   "$.group3[1]",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out2"}}},
 					},
 				},
@@ -173,11 +173,11 @@ func TestTransformInstructions(t *testing.T) {
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
-						JSONPath:   "$.group1.item1.itemA",
+						jsonPath:   "$.group1.item1.itemA",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
 					},
 					{
-						JSONPath:   "$.group3[1]",
+						jsonPath:   "$.group3[1]",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out2"}}},
 					},
 				},
@@ -192,11 +192,11 @@ func TestTransformInstructions(t *testing.T) {
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
-						JSONPath:   "$.group1.item1.itemA",
+						jsonPath:   "$.group1.item1.itemA",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
 					},
 					{
-						JSONPath:   "$.group3[1]",
+						jsonPath:   "$.group3[1]",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out2"}}},
 					},
 				},
@@ -214,14 +214,14 @@ func TestTransformInstructions(t *testing.T) {
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
-						JSONPath:   "$.group1.item1.itemA",
+						jsonPath:   "$.group1.item1.itemA",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
 					},
 					{
-						JSONPath: "$.group3[5]",
+						jsonPath: "$.group3[5]",
 					},
 					{
-						JSONPath:   "$.group3[1]",
+						jsonPath:   "$.group3[1]",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out2"}}},
 					},
 				},
@@ -239,13 +239,13 @@ func TestTransformInstructions(t *testing.T) {
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
-						JSONPath: "$.group1.item1.itemF",
+						jsonPath: "$.group1.item1.itemF",
 					},
 					{
-						JSONPath: "$.group3[5]",
+						jsonPath: "$.group3[5]",
 					},
 					{
-						JSONPath: "$.group3[10]",
+						jsonPath: "$.group3[10]",
 					},
 				},
 				Method: concatenate,
@@ -262,11 +262,11 @@ func TestTransformInstructions(t *testing.T) {
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
-						JSONPath:   "$.group10.item1.itemA",
+						jsonPath:   "$.group10.item1.itemA",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
 					},
 					{
-						JSONPath:   "$.group30[1]",
+						jsonPath:   "$.group30[1]",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out2"}}},
 					},
 				},
@@ -281,11 +281,11 @@ func TestTransformInstructions(t *testing.T) {
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
-						JSONPath:   "$.group10.item1.itemA",
+						jsonPath:   "$.group10.item1.itemA",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
 					},
 					{
-						JSONPath:   "$.group3[1]",
+						jsonPath:   "$.group3[1]",
 						Operations: []transformOperation{&testOp{args: map[string]string{"out": "out2"}}},
 					},
 				},
@@ -300,7 +300,7 @@ func TestTransformInstructions(t *testing.T) {
 			tis: transformInstructions{
 				From: []*transformInstruction{
 					{
-						JSONPath:   "$.group1.item1.itemA",
+						jsonPath:   "$.group1.item1.itemA",
 						Operations: []transformOperation{&testOp{fail: true}},
 					},
 				},
@@ -347,7 +347,7 @@ func TestTransformUnmarshal(t *testing.T) {
 	"cumulo": {
 		"from": [
 			{
-				"JSONPath": "$.data.type"
+				"jsonPath": "$.data.type"
 			}
 		]
 	}
@@ -355,7 +355,7 @@ func TestTransformUnmarshal(t *testing.T) {
 			),
 			want: transform{"cumulo": transformInstructions{
 				From: []*transformInstruction{
-					{JSONPath: "$.data.type", Operations: []transformOperation{}},
+					{jsonPath: "$.data.type", Operations: []transformOperation{}},
 				},
 				Method: first,
 			},
@@ -368,7 +368,7 @@ func TestTransformUnmarshal(t *testing.T) {
 	"cumulo": {
 		"from": [
 			{
-				"JSONPath": "$.data.type"
+				"jsonPath": "$.data.type"
 			}
 		],
 		"method": "last"
@@ -377,7 +377,7 @@ func TestTransformUnmarshal(t *testing.T) {
 			),
 			want: transform{"cumulo": transformInstructions{
 				From: []*transformInstruction{
-					{JSONPath: "$.data.type", Operations: []transformOperation{}},
+					{jsonPath: "$.data.type", Operations: []transformOperation{}},
 				},
 				Method: last,
 			},
@@ -390,7 +390,7 @@ func TestTransformUnmarshal(t *testing.T) {
 	"cumulo": {
 		"from": [
 			{
-				"JSONPath": "$.data.type"
+				"jsonPath": "$.data.type"
 			}
 		],
 		"method": "concatenate"
@@ -399,7 +399,7 @@ func TestTransformUnmarshal(t *testing.T) {
 			),
 			want: transform{"cumulo": transformInstructions{
 				From: []*transformInstruction{
-					{JSONPath: "$.data.type", Operations: []transformOperation{}},
+					{jsonPath: "$.data.type", Operations: []transformOperation{}},
 				},
 				Method: concatenate,
 			},
@@ -412,7 +412,7 @@ func TestTransformUnmarshal(t *testing.T) {
 	"cumulo": {
 		"from": [
 			{
-				"JSONPath": "$.data.type"
+				"jsonPath": "$.data.type"
 			}
 		],
 		"method": "concatenate",
@@ -424,7 +424,7 @@ func TestTransformUnmarshal(t *testing.T) {
 			),
 			want: transform{"cumulo": transformInstructions{
 				From: []*transformInstruction{
-					{JSONPath: "$.data.type", Operations: []transformOperation{}},
+					{jsonPath: "$.data.type", Operations: []transformOperation{}},
 				},
 				Method: concatenate,
 				MethodOptions: methodOptions{
@@ -440,14 +440,14 @@ func TestTransformUnmarshal(t *testing.T) {
 	"cumulo": {
 		"from": [
 			{
-				"JSONPath": "$.data.mobileBody[*]"
+				"jsonPath": "$.data.mobileBody[*]"
 			}
 		]
 	},
 	"presentationv4": {
 		"from": [
 			{
-				"JSONPath": "$.mobileBody[*]"
+				"jsonPath": "$.mobileBody[*]"
 			}
 		]
 	}
@@ -456,13 +456,13 @@ func TestTransformUnmarshal(t *testing.T) {
 			want: transform{
 				"cumulo": transformInstructions{
 					From: []*transformInstruction{
-						{JSONPath: "$.data.mobileBody[*]", Operations: []transformOperation{}},
+						{jsonPath: "$.data.mobileBody[*]", Operations: []transformOperation{}},
 					},
 					Method: first,
 				},
 				"presentationv4": transformInstructions{
 					From: []*transformInstruction{
-						{JSONPath: "$.mobileBody[*]", Operations: []transformOperation{}},
+						{jsonPath: "$.mobileBody[*]", Operations: []transformOperation{}},
 					},
 					Method: first,
 				},
@@ -475,13 +475,13 @@ func TestTransformUnmarshal(t *testing.T) {
 	"presentationv4": {
 		"from": [
 			{
-				"JSONPath": "$.associatedAssetId"
+				"jsonPath": "$.associatedAssetId"
 			},
 			{
-				"JSONPath": "$._attributes.AssociatedAssetId"
+				"jsonPath": "$._attributes.AssociatedAssetId"
 			},
 			{
-				"JSONPath": "$._attributes.associatedassetid"
+				"jsonPath": "$._attributes.associatedassetid"
 			}
 		]
 	}
@@ -490,9 +490,9 @@ func TestTransformUnmarshal(t *testing.T) {
 			want: transform{
 				"presentationv4": transformInstructions{
 					From: []*transformInstruction{
-						{JSONPath: "$.associatedAssetId", Operations: []transformOperation{}},
-						{JSONPath: "$._attributes.AssociatedAssetId", Operations: []transformOperation{}},
-						{JSONPath: "$._attributes.associatedassetid", Operations: []transformOperation{}},
+						{jsonPath: "$.associatedAssetId", Operations: []transformOperation{}},
+						{jsonPath: "$._attributes.AssociatedAssetId", Operations: []transformOperation{}},
+						{jsonPath: "$._attributes.associatedassetid", Operations: []transformOperation{}},
 					},
 					Method: first,
 				},
@@ -505,7 +505,7 @@ func TestTransformUnmarshal(t *testing.T) {
 	"cumulo": {
 		"from": [
 			{
-				"JSONPath": "$.data.renditions[*]",
+				"jsonPath": "$.data.renditions[*]",
 			  	"operations": [
 					{
 				  		"type": "max",
@@ -528,7 +528,7 @@ func TestTransformUnmarshal(t *testing.T) {
 	"presentationv4": {
 	  	"from": [
 		  	{
-				"JSONPath": "$.renditions[*]",
+				"jsonPath": "$.renditions[*]",
 				"operations": [
 				  	{
 						"type": "changeCase",
@@ -554,7 +554,7 @@ func TestTransformUnmarshal(t *testing.T) {
 			want: transform{
 				"cumulo": transformInstructions{
 					From: []*transformInstruction{
-						{JSONPath: "$.data.renditions[*]", Operations: []transformOperation{
+						{jsonPath: "$.data.renditions[*]", Operations: []transformOperation{
 							&max{Args: map[string]string{"by": "@.encodingRate", "return": "@.url"}},
 							&replace{Args: map[string]string{"regex": `(http://.*net)/`, "new": "https://media.gannett-cdn.com"}},
 						}},
@@ -563,7 +563,7 @@ func TestTransformUnmarshal(t *testing.T) {
 				},
 				"presentationv4": transformInstructions{
 					From: []*transformInstruction{
-						{JSONPath: "$.renditions[*]", Operations: []transformOperation{
+						{jsonPath: "$.renditions[*]", Operations: []transformOperation{
 							&changeCase{Args: map[string]string{"to": "lower"}},
 							&inverse{},
 							&split{Args: map[string]string{"on": "|"}},

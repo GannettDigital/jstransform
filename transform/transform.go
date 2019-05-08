@@ -29,13 +29,13 @@ type transformOperationJSON struct {
 	Args map[string]string `json:"args"`
 }
 
-// transformInstruction defines a JSONPath and XMLPath for a transform and an optional set of operations to be performed on the
+// transformInstruction defines a jsonPath and xmlPath for a transform and an optional set of operations to be performed on the
 // data from that path.
 type transformInstruction struct {
-	// For JSONPath format see http://goessner.net/articles/JsonPath/
+	// For jsonPath format see http://goessner.net/articles/JsonPath/
+	jsonPath string
 	// For XPath format see https://devhints.io/xpath
-	JSONPath   string
-	XMLPath    string
+	xmlPath    string
 	Operations []transformOperation `json:"operations"`
 }
 
@@ -53,8 +53,8 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("failed to extract transform from JSON: %v", err)
 	}
 
-	ti.JSONPath = jti.JSONPath
-	ti.XMLPath = jti.XMLPath
+	ti.jsonPath = jti.JSONPath
+	ti.xmlPath = jti.XMLPath
 	ti.Operations = []transformOperation{}
 
 	for _, toj := range jti.Operations {
@@ -85,7 +85,7 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 }
 
 func (ti *transformInstruction) xmlTransform(in interface{}, fieldType string, modifier pathModifier) (interface{}, error) {
-	path := ti.XMLPath
+	path := ti.xmlPath
 	if modifier != nil {
 		path = modifier(path)
 	}
@@ -123,14 +123,14 @@ func (ti *transformInstruction) xmlTransform(in interface{}, fieldType string, m
 	for _, op := range ti.Operations {
 		value, err = op.transform(value)
 		if err != nil {
-			return nil, fmt.Errorf("failed operation on value from JSONPath %q: %v", path, err)
+			return nil, fmt.Errorf("failed operation on value from xmlPath %q: %v", path, err)
 		}
 	}
 	return value, nil
 }
 
 func (ti *transformInstruction) jsonTransform(in interface{}, fieldType string, modifier pathModifier) (interface{}, error) {
-	path := ti.JSONPath
+	path := ti.jsonPath
 	if modifier != nil {
 		path = modifier(path)
 	}
@@ -154,7 +154,7 @@ func (ti *transformInstruction) jsonTransform(in interface{}, fieldType string, 
 	for _, op := range ti.Operations {
 		value, err = op.transform(value)
 		if err != nil {
-			return nil, fmt.Errorf("failed operation on value from JSONPath %q: %v", path, err)
+			return nil, fmt.Errorf("failed operation on value from jsonPath %q: %v", path, err)
 		}
 	}
 	return value, nil
@@ -262,11 +262,11 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string, mo
 // old.
 func (tis *transformInstructions) replaceJSONPathPrefix(old, new string) {
 	for _, instruction := range tis.From {
-		if strings.HasPrefix(instruction.JSONPath, old) {
-			instruction.JSONPath = strings.Replace(instruction.JSONPath, old, new, 1)
+		if strings.HasPrefix(instruction.jsonPath, old) {
+			instruction.jsonPath = strings.Replace(instruction.jsonPath, old, new, 1)
 		}
-		if strings.HasPrefix(instruction.XMLPath, old) {
-			instruction.XMLPath = strings.Replace(instruction.XMLPath, old, new, 1)
+		if strings.HasPrefix(instruction.xmlPath, old) {
+			instruction.xmlPath = strings.Replace(instruction.xmlPath, old, new, 1)
 		}
 	}
 }

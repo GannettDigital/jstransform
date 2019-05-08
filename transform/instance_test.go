@@ -110,7 +110,7 @@ func TestArrayTransform(t *testing.T) {
 			description: "transform with no child",
 			format:      jsonInput,
 			path:        "$.crops",
-			raw:         json.RawMessage(`{"type":"object","transform":{"test":{"from":[{"JSONPath":"$.otherCrops[0]"}]}}}`),
+			raw:         json.RawMessage(`{"type":"object","transform":{"test":{"from":[{"jsonPath":"$.otherCrops[0]"}]}}}`),
 			want: []interface{}{
 				map[string]interface{}{
 					"height":       10,
@@ -136,7 +136,7 @@ func TestArrayTransform(t *testing.T) {
 				jsonType:     "string",
 				jsonPath:     "$.crops[*]",
 				transforms: &transformInstructions{
-					From:   []*transformInstruction{{JSONPath: "$.crops[*].name"}},
+					From:   []*transformInstruction{{jsonPath: "$.crops[*].name"}},
 					Method: 0,
 				},
 			},
@@ -157,7 +157,7 @@ func TestArrayTransform(t *testing.T) {
 						jsonPath:     "$.crops[*].name",
 						format:       jsonInput,
 						transforms: &transformInstructions{
-							From:   []*transformInstruction{{JSONPath: "$.crops[*].name"}},
+							From:   []*transformInstruction{{jsonPath: "$.crops[*].name"}},
 							Method: 0,
 						},
 					},
@@ -166,7 +166,7 @@ func TestArrayTransform(t *testing.T) {
 						jsonPath: "$.crops[*].height",
 						format:   jsonInput,
 						transforms: &transformInstructions{
-							From:   []*transformInstruction{{JSONPath: "$.crops[*].height"}},
+							From:   []*transformInstruction{{jsonPath: "$.crops[*].height"}},
 							Method: 0,
 						},
 					},
@@ -175,7 +175,7 @@ func TestArrayTransform(t *testing.T) {
 						jsonPath: "$.crops[*].path",
 						format:   jsonInput,
 						transforms: &transformInstructions{
-							From:   []*transformInstruction{{JSONPath: "$.crops[*].path"}},
+							From:   []*transformInstruction{{jsonPath: "$.crops[*].path"}},
 							Method: 0,
 						},
 					},
@@ -184,7 +184,7 @@ func TestArrayTransform(t *testing.T) {
 						jsonPath: "$.crops[*].relativePath",
 						format:   jsonInput,
 						transforms: &transformInstructions{
-							From:   []*transformInstruction{{JSONPath: "$.crops[*].relativePath"}},
+							From:   []*transformInstruction{{jsonPath: "$.crops[*].relativePath"}},
 							Method: 0,
 						},
 					},
@@ -193,7 +193,7 @@ func TestArrayTransform(t *testing.T) {
 						jsonPath: "$.crops[*].width",
 						format:   jsonInput,
 						transforms: &transformInstructions{
-							From:   []*transformInstruction{{JSONPath: "$.crops[*].width"}},
+							From:   []*transformInstruction{{jsonPath: "$.crops[*].width"}},
 							Method: 0,
 						},
 					},
@@ -340,7 +340,7 @@ func TestObjectTransform(t *testing.T) {
 					jsonPath:     "$.firstCrop.name",
 					format:       jsonInput,
 					transforms: &transformInstructions{
-						From:   []*transformInstruction{{JSONPath: "$.crops[0].name"}},
+						From:   []*transformInstruction{{jsonPath: "$.crops[0].name"}},
 						Method: 0,
 					},
 				},
@@ -349,7 +349,7 @@ func TestObjectTransform(t *testing.T) {
 					jsonPath: "$.firstCrop.height",
 					format:   jsonInput,
 					transforms: &transformInstructions{
-						From:   []*transformInstruction{{JSONPath: "$.crops[0].height"}},
+						From:   []*transformInstruction{{jsonPath: "$.crops[0].height"}},
 						Method: 0,
 					},
 				},
@@ -358,7 +358,7 @@ func TestObjectTransform(t *testing.T) {
 					jsonPath: "$.firstCrop.path",
 					format:   jsonInput,
 					transforms: &transformInstructions{
-						From:   []*transformInstruction{{JSONPath: "$.crops[0].path"}},
+						From:   []*transformInstruction{{jsonPath: "$.crops[0].path"}},
 						Method: 0,
 					},
 				},
@@ -367,7 +367,7 @@ func TestObjectTransform(t *testing.T) {
 					jsonPath: "$.firstCrop.relativePath",
 					format:   jsonInput,
 					transforms: &transformInstructions{
-						From:   []*transformInstruction{{JSONPath: "$.crops[0].relativePath"}},
+						From:   []*transformInstruction{{jsonPath: "$.crops[0].relativePath"}},
 						Method: 0,
 					},
 				},
@@ -376,7 +376,7 @@ func TestObjectTransform(t *testing.T) {
 					jsonPath: "$.firstCrop.width",
 					format:   jsonInput,
 					transforms: &transformInstructions{
-						From:   []*transformInstruction{{JSONPath: "$.crops[0].width"}},
+						From:   []*transformInstruction{{jsonPath: "$.crops[0].width"}},
 						Method: 0,
 					},
 				},
@@ -402,13 +402,13 @@ func TestObjectTransform(t *testing.T) {
 					jsonPath:     "$.firstCrop.name",
 					format:       jsonInput,
 					transforms: &transformInstructions{
-						From:   []*transformInstruction{{JSONPath: "$.crops[0].name"}},
+						From:   []*transformInstruction{{jsonPath: "$.crops[0].name"}},
 						Method: 0,
 					},
 				},
 			},
 			path: "$.firstCrop",
-			raw:  json.RawMessage(`{"type":"object","transform":{"test":{"from":[{"JSONPath":"$.notFound"}]}}}`),
+			raw:  json.RawMessage(`{"type":"object","transform":{"test":{"from":[{"jsonPath":"$.notFound"}]}}}`),
 			want: map[string]interface{}{
 				"name": "name",
 			},
@@ -528,7 +528,7 @@ func TestScalarTransform(t *testing.T) {
 			path:         "$.type",
 			instanceType: "string",
 			format:       jsonInput,
-			raw:          json.RawMessage(`{"type":"string","enum":["image"],"transform":{"test":{"from":[{"JSONPath":"$.publishUrl"}]}}}`),
+			raw:          json.RawMessage(`{"type":"string","enum":["image"],"transform":{"test":{"from":[{"jsonPath":"$.publishUrl"}]}}}`),
 			want:         "publishURL",
 		},
 		{
@@ -537,7 +537,7 @@ func TestScalarTransform(t *testing.T) {
 			path:         "$.crops[0].height",
 			instanceType: "number",
 			format:       jsonInput,
-			raw:          json.RawMessage(`{ "type": "number" ,"transform":{"test":{"from":[{"JSONPath":"$.crops[0].width"}]}}}`),
+			raw:          json.RawMessage(`{ "type": "number" ,"transform":{"test":{"from":[{"jsonPath":"$.crops[0].width"}]}}}`),
 			want:         1,
 		},
 		{
@@ -546,7 +546,7 @@ func TestScalarTransform(t *testing.T) {
 			path:         "$.anotherDate",
 			instanceType: "string",
 			format:       jsonInput,
-			raw:          json.RawMessage(`{ "type": "string", "format": "date-time" ,"transform":{"test":{"from":[{"JSONPath":"$.date"}]}}}`),
+			raw:          json.RawMessage(`{ "type": "string", "format": "date-time" ,"transform":{"test":{"from":[{"jsonPath":"$.date"}]}}}`),
 			want:         testTime,
 		},
 		{
@@ -555,7 +555,7 @@ func TestScalarTransform(t *testing.T) {
 			path:         "$.WantToPublish",
 			instanceType: "boolean",
 			format:       jsonInput,
-			raw:          json.RawMessage(`{ "type": "boolean","transform":{"test":{"from":[{"JSONPath":"$.published"}]}}}`),
+			raw:          json.RawMessage(`{ "type": "boolean","transform":{"test":{"from":[{"jsonPath":"$.published"}]}}}`),
 			want:         true,
 		},
 		{
