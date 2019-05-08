@@ -1,0 +1,192 @@
+{
+  "teams":[
+    {
+      "city":"New York",
+      "conference":{
+        "id":"403879",
+        "name":"Eastern Conference",
+        "shortName":"Eastern"
+      },
+      "country":"USA",
+      "division":{
+        "active":"true",
+        "alias":"Atlantic",
+        "id":"403880",
+        "name":"NBA Atlantic"
+      },
+      "firstName":"New York",
+      "id":"404288",
+      "league":{
+        "id":"403878",
+        "name":"National Basketball Association",
+        "nickName":"NBA"
+      },
+      "name":"New York",
+      "nickName":"Knicks",
+      "season":{
+        "endDate":"2018-06-30",
+        "id":"664611",
+        "name":"2017-2018",
+        "startDate":"2017-09-30"
+      },
+      "shortName":"NY",
+      "sport":"basketball",
+      "state":"New York",
+      "team":true,
+      "venue":{
+        "capacity":"19763",
+        "city":"New York",
+        "country":"USA",
+        "id":"288906",
+        "name":"Madison Square Garden",
+        "shortName":"MSG",
+        "state":"New York",
+        "timezone":"US/Eastern"
+      }
+    },
+    {
+      "city":"Washington",
+      "conference":{
+        "id":"403879",
+        "name":"Eastern Conference",
+        "shortName":"Eastern"
+      },
+      "country":"USA",
+      "division":{
+        "active":"true",
+        "alias":"Southeast",
+        "id":"664418",
+        "name":"NBA Southeast"
+      },
+      "firstName":"Washington",
+      "id":"404067",
+      "league":{
+        "id":"403878",
+        "name":"National Basketball Association",
+        "nickName":"NBA"
+      },
+      "name":"Washington",
+      "nickName":"Wizards",
+      "season":{
+        "endDate":"2018-06-30",
+        "id":"664611",
+        "name":"2017-2018",
+        "startDate":"2017-09-30"
+      },
+      "shortName":"WAS",
+      "sport":"basketball",
+      "state":"District of Columbia",
+      "team":true,
+      "venue":{
+        "capacity":"20282",
+        "city":"Washington",
+        "country":"USA",
+        "id":"288198",
+        "name":"Capital One Arena",
+        "shortName":"COA",
+        "state":"District of Columbia",
+        "timezone":"US/Eastern"
+      }
+    },
+    {
+      "city":"Miami",
+      "conference":{
+        "id":"403879",
+        "name":"Eastern Conference",
+        "shortName":"Eastern"
+      },
+      "country":"USA",
+      "division":{
+        "active":"true",
+        "alias":"Southeast",
+        "id":"664418",
+        "name":"NBA Southeast"
+      },
+      "firstName":"Miami",
+      "id":"404171",
+      "league":{
+        "id":"403878",
+        "name":"National Basketball Association",
+        "nickName":"NBA"
+      },
+      "name":"Miami",
+      "nickName":"Heat",
+      "season":{
+        "endDate":"2018-06-30",
+        "id":"664611",
+        "name":"2017-2018",
+        "startDate":"2017-09-30"
+      },
+      "shortName":"MIA",
+      "sport":"basketball",
+      "state":"Florida",
+      "team":true,
+      "venue":{
+        "capacity":"19600",
+        "city":"Miami",
+        "country":"USA",
+        "id":"388795",
+        "name":"American Airlines Arena",
+        "shortName":"AAA",
+        "state":"Florida",
+        "timezone":"US/Eastern"
+      }
+    },
+    {
+      "city":"Los Angeles",
+      "conference":{
+        "id":"403882",
+        "name":"Western Conference",
+        "shortName":"Western"
+      },
+      "country":"USA",
+      "division":{
+        "active":"true",
+        "alias":"Pacific",
+        "id":"403884",
+        "name":"NBA Pacific"
+      },
+      "firstName":"Los Angeles",
+      "id":"403977",
+      "league":{
+        "id":"403878",
+        "name":"National Basketball Association",
+        "nickName":"NBA"
+      },
+      "name":"L.A. Lakers",
+      "nickName":"Lakers",
+      "season":{
+        "endDate":"2018-06-30",
+        "id":"664611",
+        "name":"2017-2018",
+        "startDate":"2017-09-30"
+      },
+      "shortName":"LAL",
+      "sport":"basketball",
+      "state":"California",
+      "team":true,
+      "venue":{
+        "capacity":"19060",
+        "city":"Los Angeles",
+        "country":"USA",
+        "id":"538103",
+        "name":"Staples Center",
+        "shortName":"SC",
+        "state":"California",
+        "timezone":"US/Pacific"
+      }
+    },
+    {
+      "firstName":"Team Lebron",
+      "id":"676107",
+      "league":{
+        "id":"403878",
+        "name":"National Basketball Association",
+        "nickName":"NBA"
+      },
+      "name":"Team Lebron",
+      "shortName":"LEBRON",
+      "team":true
+    }
+  ]
+}

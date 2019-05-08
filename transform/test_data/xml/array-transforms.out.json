@@ -1,0 +1,16 @@
+{
+  "sport":[
+    {
+      "id":"/sport/basketball",
+      "name":"basketball"
+    },
+    {
+      "id":"/sport/baseball",
+      "name":"baseball"
+    },
+    {
+      "id":"/sport/football",
+      "name":"football"
+    }
+  ]
+}

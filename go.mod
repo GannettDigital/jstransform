@@ -4,14 +4,16 @@ require (
 	github.com/GannettDigital/msgp v1.0.3-0.20180910162652-7b6c807760d7
 	github.com/PaesslerAG/gval v0.1.1 // indirect
 	github.com/PaesslerAG/jsonpath v0.1.0
+	github.com/antchfx/xmlquery v1.0.0
+	github.com/antchfx/xpath v0.0.0-20190319080838-ce1d48779e67 // indirect
 	github.com/buger/jsonparser v0.0.0-20181115193947-bf1c66bbce23
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/franela/goblin v0.0.0-20181003173013-ead4ad1d2727 // indirect
 	github.com/franela/goreq v0.0.0-20171204163338-bcd34c9993f8
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/onsi/ginkgo v1.7.0 // indirect
 	github.com/onsi/gomega v1.4.3 // indirect
 	github.com/philhofer/fwd v1.0.0 // indirect
-	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/ttacon/chalk v0.0.0-20160626202418-22c06c80ed31 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect

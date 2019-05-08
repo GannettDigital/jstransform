@@ -3,6 +3,7 @@ package transform
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"reflect"
 	"testing"
 
@@ -424,6 +425,108 @@ func TestTransformer(t *testing.T) {
 			t.Run(fmt.Sprintf("%s-%d", test.description, i), testFunc(test.description, test.in, test.wantErr, test.want))
 		}
 	}
+}
+
+func TestNewXMLTransformer(t *testing.T) {
+	tests := []struct {
+		description         string
+		transformIdentifier string
+		schemaFilePath      string
+		xmlFilePath         string
+		wantFilePath        string
+	}{
+		{
+			description:         "teams NBA",
+			transformIdentifier: "sport",
+			schemaFilePath:      "./test_data/xml/sports/teams/teams.json",
+			xmlFilePath:         "./test_data/xml/sports/teams/teams_NBA.xml",
+			wantFilePath:        "./test_data/xml/sports/teams/teamsNBA.out.json",
+		},
+		{
+			description:         "teams MLB",
+			transformIdentifier: "sport",
+			schemaFilePath:      "./test_data/xml/sports/teams/teams.json",
+			xmlFilePath:         "./test_data/xml/sports/teams/teams_MLB.xml",
+			wantFilePath:        "./test_data/xml/sports/teams/teamsMLB.out.json",
+		},
+		{
+			description:         "array-transforms",
+			transformIdentifier: "sport",
+			schemaFilePath:      "./test_data/xml/array-transforms.json",
+			xmlFilePath:         "./test_data/xml/array-transforms.xml",
+			wantFilePath:        "./test_data/xml/array-transforms.out.json",
+		},
+		{
+			description:         "multiple-array-transforms",
+			transformIdentifier: "sport",
+			schemaFilePath:      "./test_data/xml/multiple-arrays.json",
+			xmlFilePath:         "./test_data/xml/multiple-arrays.xml",
+			wantFilePath:        "./test_data/xml/multiple-arrays.out.json",
+		},
+		{
+			description:         "conversion-transforms",
+			transformIdentifier: "sport",
+			schemaFilePath:      "./test_data/xml/conversion-transforms.json",
+			xmlFilePath:         "./test_data/xml/conversion-transforms.xml",
+			wantFilePath:        "./test_data/xml/conversion-transforms.out.json",
+		},
+		{
+			description:         "attribute-selection",
+			transformIdentifier: "sport",
+			schemaFilePath:      "./test_data/xml/attribute-selection.json",
+			xmlFilePath:         "./test_data/xml/attribute-selection.xml",
+			wantFilePath:        "./test_data/xml/attribute-selection.out.json",
+		},
+		{
+			description:         "operations",
+			transformIdentifier: "sport",
+			schemaFilePath:      "./test_data/xml/operations.json",
+			xmlFilePath:         "./test_data/xml/operations.xml",
+			wantFilePath:        "./test_data/xml/operations.out.json",
+		},
+	}
+
+	for _, test := range tests {
+		schema, err := jsonschema.SchemaFromFile(test.schemaFilePath, "")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		tr, err := NewXMLTransformer(schema, test.transformIdentifier)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rawXMLBytes, err := ioutil.ReadFile(test.xmlFilePath)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		output, err := tr.Transform(rawXMLBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		want, err := ioutil.ReadFile(test.wantFilePath)
+
+		var (
+			outputMap map[string]interface{}
+			wantMap   map[string]interface{}
+		)
+
+		if err := json.Unmarshal(output, &outputMap); err != nil {
+			t.Fatal(err)
+		}
+
+		if err := json.Unmarshal(want, &wantMap); err != nil {
+			t.Fatal(err)
+		}
+
+		if !reflect.DeepEqual(outputMap, wantMap) {
+			t.Fatalf("test %s failed \n got:\n %s \n want:\n %s", test.description, output, want)
+		}
+	}
+
 }
 
 func BenchmarkTransformer(b *testing.B) {

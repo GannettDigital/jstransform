@@ -6,7 +6,7 @@
 
 
 This repo provides an extension to [JSON Schema](http://json-schema.org/) which defines a `transform` section which can be added for each field.
-This transform section is then used to guide a transformation process which converts JSON input into the format defined by the schema.
+This transform section is then used to guide a transformation process which converts JSON or XML input into the format defined by the schema.
 The result is that you can write one JSON schema that defines both the desired result and how to transform a known type of data into the defined result.
 
 The code also provides some utilities for walking a JSON schema file section by section and generating Golang structs from a JSON schema file.

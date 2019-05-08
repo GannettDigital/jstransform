@@ -72,6 +72,7 @@ func TestArrayTransform(t *testing.T) {
 
 	tests := []struct {
 		description string
+		format      inputFormat
 		child       instanceTransformer
 		path        string
 		raw         json.RawMessage
@@ -79,12 +80,14 @@ func TestArrayTransform(t *testing.T) {
 	}{
 		{
 			description: "empty",
+			format:      jsonInput,
 			path:        "$.empty",
 			raw:         json.RawMessage(`{"type":"array"}`),
 			want:        nilSlice,
 		},
 		{
 			description: "default with no child",
+			format:      jsonInput,
 			path:        "$.crops",
 			raw:         json.RawMessage(`{"type":"array"}`),
 			want: []interface{}{
@@ -105,6 +108,7 @@ func TestArrayTransform(t *testing.T) {
 		},
 		{
 			description: "transform with no child",
+			format:      jsonInput,
 			path:        "$.crops",
 			raw:         json.RawMessage(`{"type":"object","transform":{"test":{"from":[{"jsonPath":"$.otherCrops[0]"}]}}}`),
 			want: []interface{}{
@@ -125,8 +129,10 @@ func TestArrayTransform(t *testing.T) {
 		},
 		{
 			description: "scalar child",
+			format:      jsonInput,
 			child: &scalarTransformer{
 				defaultValue: "name",
+				format:       jsonInput,
 				jsonType:     "string",
 				jsonPath:     "$.crops[*]",
 				transforms: &transformInstructions{
@@ -140,13 +146,16 @@ func TestArrayTransform(t *testing.T) {
 		},
 		{
 			description: "object child",
+			format:      jsonInput,
 			child: &objectTransformer{
 				jsonPath: "$.crops[*]",
+				format:   jsonInput,
 				children: map[string]instanceTransformer{
 					"name": &scalarTransformer{
 						defaultValue: "name",
 						jsonType:     "string",
 						jsonPath:     "$.crops[*].name",
+						format:       jsonInput,
 						transforms: &transformInstructions{
 							From:   []*transformInstruction{{jsonPath: "$.crops[*].name"}},
 							Method: 0,
@@ -155,6 +164,7 @@ func TestArrayTransform(t *testing.T) {
 					"height": &scalarTransformer{
 						jsonType: "number",
 						jsonPath: "$.crops[*].height",
+						format:   jsonInput,
 						transforms: &transformInstructions{
 							From:   []*transformInstruction{{jsonPath: "$.crops[*].height"}},
 							Method: 0,
@@ -163,6 +173,7 @@ func TestArrayTransform(t *testing.T) {
 					"path": &scalarTransformer{
 						jsonType: "string",
 						jsonPath: "$.crops[*].path",
+						format:   jsonInput,
 						transforms: &transformInstructions{
 							From:   []*transformInstruction{{jsonPath: "$.crops[*].path"}},
 							Method: 0,
@@ -171,6 +182,7 @@ func TestArrayTransform(t *testing.T) {
 					"relativePath": &scalarTransformer{
 						jsonType: "string",
 						jsonPath: "$.crops[*].relativePath",
+						format:   jsonInput,
 						transforms: &transformInstructions{
 							From:   []*transformInstruction{{jsonPath: "$.crops[*].relativePath"}},
 							Method: 0,
@@ -179,6 +191,7 @@ func TestArrayTransform(t *testing.T) {
 					"width": &scalarTransformer{
 						jsonType: "number",
 						jsonPath: "$.crops[*].width",
+						format:   jsonInput,
 						transforms: &transformInstructions{
 							From:   []*transformInstruction{{jsonPath: "$.crops[*].width"}},
 							Method: 0,
@@ -207,8 +220,10 @@ func TestArrayTransform(t *testing.T) {
 		},
 		{
 			description: "nested array",
+			format:      jsonInput,
 			child: &arrayTransformer{
 				jsonPath: "$.otherCrops[*]",
+				format:   jsonInput,
 				childTransformer: &objectTransformer{
 					jsonPath: "$.otherCrops[*][*]",
 					children: map[string]instanceTransformer{
@@ -216,22 +231,27 @@ func TestArrayTransform(t *testing.T) {
 							defaultValue: "name",
 							jsonType:     "string",
 							jsonPath:     "$.otherCrops[*][*].name",
+							format:       jsonInput,
 						},
 						"height": &scalarTransformer{
 							jsonType: "number",
 							jsonPath: "$.otherCrops[*][*].height",
+							format:   jsonInput,
 						},
 						"path": &scalarTransformer{
 							jsonType: "string",
 							jsonPath: "$.otherCrops[*][*].path",
+							format:   jsonInput,
 						},
 						"relativePath": &scalarTransformer{
 							jsonType: "string",
 							jsonPath: "$.otherCrops[*][*].relativePath",
+							format:   jsonInput,
 						},
 						"width": &scalarTransformer{
 							jsonType: "number",
 							jsonPath: "$.otherCrops[*][*].width",
+							format:   jsonInput,
 						},
 					},
 				},
@@ -269,7 +289,7 @@ func TestArrayTransform(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		at, err := newArrayTransformer(test.path, "test", test.raw)
+		at, err := newArrayTransformer(test.path, "test", test.raw, test.format)
 		if err != nil {
 			t.Fatalf("Test %q - failed to initialize array transformer: %v", test.description, err)
 		}
@@ -295,6 +315,7 @@ func TestObjectTransform(t *testing.T) {
 	tests := []struct {
 		description string
 		in          interface{}
+		format      inputFormat
 		children    map[string]instanceTransformer
 		path        string
 		raw         json.RawMessage
@@ -303,6 +324,7 @@ func TestObjectTransform(t *testing.T) {
 		{
 			description: "empty",
 			in:          testIn,
+			format:      jsonInput,
 			path:        "$",
 			raw:         json.RawMessage(`{"type":"object"}`),
 			want:        nil,
@@ -310,11 +332,13 @@ func TestObjectTransform(t *testing.T) {
 		{
 			description: "with scalar children",
 			in:          testIn,
+			format:      jsonInput,
 			children: map[string]instanceTransformer{
 				"name": &scalarTransformer{
 					defaultValue: "name",
 					jsonType:     "string",
 					jsonPath:     "$.firstCrop.name",
+					format:       jsonInput,
 					transforms: &transformInstructions{
 						From:   []*transformInstruction{{jsonPath: "$.crops[0].name"}},
 						Method: 0,
@@ -323,6 +347,7 @@ func TestObjectTransform(t *testing.T) {
 				"height": &scalarTransformer{
 					jsonType: "number",
 					jsonPath: "$.firstCrop.height",
+					format:   jsonInput,
 					transforms: &transformInstructions{
 						From:   []*transformInstruction{{jsonPath: "$.crops[0].height"}},
 						Method: 0,
@@ -331,6 +356,7 @@ func TestObjectTransform(t *testing.T) {
 				"path": &scalarTransformer{
 					jsonType: "string",
 					jsonPath: "$.firstCrop.path",
+					format:   jsonInput,
 					transforms: &transformInstructions{
 						From:   []*transformInstruction{{jsonPath: "$.crops[0].path"}},
 						Method: 0,
@@ -339,6 +365,7 @@ func TestObjectTransform(t *testing.T) {
 				"relativePath": &scalarTransformer{
 					jsonType: "string",
 					jsonPath: "$.firstCrop.relativePath",
+					format:   jsonInput,
 					transforms: &transformInstructions{
 						From:   []*transformInstruction{{jsonPath: "$.crops[0].relativePath"}},
 						Method: 0,
@@ -347,6 +374,7 @@ func TestObjectTransform(t *testing.T) {
 				"width": &scalarTransformer{
 					jsonType: "number",
 					jsonPath: "$.firstCrop.width",
+					format:   jsonInput,
 					transforms: &transformInstructions{
 						From:   []*transformInstruction{{jsonPath: "$.crops[0].width"}},
 						Method: 0,
@@ -366,11 +394,13 @@ func TestObjectTransform(t *testing.T) {
 		{
 			description: "with nil value after transform",
 			in:          testIn,
+			format:      jsonInput,
 			children: map[string]instanceTransformer{
 				"name": &scalarTransformer{
 					defaultValue: "name",
 					jsonType:     "string",
 					jsonPath:     "$.firstCrop.name",
+					format:       jsonInput,
 					transforms: &transformInstructions{
 						From:   []*transformInstruction{{jsonPath: "$.crops[0].name"}},
 						Method: 0,
@@ -386,7 +416,7 @@ func TestObjectTransform(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		ot, err := newObjectTransformer(test.path, "test", test.raw)
+		ot, err := newObjectTransformer(test.path, "test", test.raw, test.format)
 		if err != nil {
 			t.Fatalf("Test %q - failed to initialize object transformer: %v", test.description, err)
 		}
@@ -415,6 +445,7 @@ func TestScalarTransform(t *testing.T) {
 		in           interface{}
 		path         string
 		instanceType string
+		format       inputFormat
 		raw          json.RawMessage
 		want         interface{}
 		wantError    string
@@ -424,6 +455,7 @@ func TestScalarTransform(t *testing.T) {
 			in:           testIn,
 			path:         "$.type",
 			instanceType: "string",
+			format:       jsonInput,
 			raw:          json.RawMessage(`{"type":"string","enum":["image"]}`),
 			want:         "image",
 		},
@@ -432,6 +464,7 @@ func TestScalarTransform(t *testing.T) {
 			in:           testIn,
 			path:         "$.crops[0].height",
 			instanceType: "number",
+			format:       jsonInput,
 			raw:          json.RawMessage(`{ "type": "number" }`),
 			want:         0,
 		},
@@ -440,6 +473,7 @@ func TestScalarTransform(t *testing.T) {
 			in:           testIn,
 			path:         "$.date",
 			instanceType: "string",
+			format:       jsonInput,
 			raw:          json.RawMessage(`{ "type": "string", "format": "date-time" }`),
 			want:         testTime,
 		},
@@ -448,6 +482,7 @@ func TestScalarTransform(t *testing.T) {
 			in:           testIn,
 			path:         "$.published",
 			instanceType: "boolean",
+			format:       jsonInput,
 			raw:          json.RawMessage(`{ "type": "boolean"}`),
 			want:         true,
 		},
@@ -456,6 +491,7 @@ func TestScalarTransform(t *testing.T) {
 			in:           testIn,
 			path:         "$.type2",
 			instanceType: "string",
+			format:       jsonInput,
 			raw:          json.RawMessage(`{"type":"string","enum":["image"],"default":"type2"}`),
 			want:         "type2",
 		},
@@ -464,6 +500,7 @@ func TestScalarTransform(t *testing.T) {
 			in:           testIn,
 			path:         "$.crops[0].multiplier",
 			instanceType: "number",
+			format:       jsonInput,
 			raw:          json.RawMessage(`{ "type": "number", "default": 10 }`),
 			want:         float64(10),
 		},
@@ -472,6 +509,7 @@ func TestScalarTransform(t *testing.T) {
 			in:           testIn,
 			path:         "$.date2",
 			instanceType: "string",
+			format:       jsonInput,
 			raw:          json.RawMessage(fmt.Sprintf(`{ "type": "string", "format": "date-time", "default": "%s" }`, testTimeStr)),
 			want:         testTimeStr,
 		},
@@ -480,6 +518,7 @@ func TestScalarTransform(t *testing.T) {
 			in:           testIn,
 			path:         "$.deleted",
 			instanceType: "boolean",
+			format:       jsonInput,
 			raw:          json.RawMessage(`{ "type": "boolean", "default":true}`),
 			want:         true,
 		},
@@ -488,6 +527,7 @@ func TestScalarTransform(t *testing.T) {
 			in:           testIn,
 			path:         "$.type",
 			instanceType: "string",
+			format:       jsonInput,
 			raw:          json.RawMessage(`{"type":"string","enum":["image"],"transform":{"test":{"from":[{"jsonPath":"$.publishUrl"}]}}}`),
 			want:         "publishURL",
 		},
@@ -496,6 +536,7 @@ func TestScalarTransform(t *testing.T) {
 			in:           testIn,
 			path:         "$.crops[0].height",
 			instanceType: "number",
+			format:       jsonInput,
 			raw:          json.RawMessage(`{ "type": "number" ,"transform":{"test":{"from":[{"jsonPath":"$.crops[0].width"}]}}}`),
 			want:         1,
 		},
@@ -504,6 +545,7 @@ func TestScalarTransform(t *testing.T) {
 			in:           testIn,
 			path:         "$.anotherDate",
 			instanceType: "string",
+			format:       jsonInput,
 			raw:          json.RawMessage(`{ "type": "string", "format": "date-time" ,"transform":{"test":{"from":[{"jsonPath":"$.date"}]}}}`),
 			want:         testTime,
 		},
@@ -512,6 +554,7 @@ func TestScalarTransform(t *testing.T) {
 			in:           testIn,
 			path:         "$.WantToPublish",
 			instanceType: "boolean",
+			format:       jsonInput,
 			raw:          json.RawMessage(`{ "type": "boolean","transform":{"test":{"from":[{"jsonPath":"$.published"}]}}}`),
 			want:         true,
 		},
@@ -520,13 +563,14 @@ func TestScalarTransform(t *testing.T) {
 			in:           testInBadTime,
 			path:         "$.date",
 			instanceType: "string",
+			format:       jsonInput,
 			raw:          json.RawMessage(`{ "type": "string", "format": "date-time"}`),
 			wantError:    "parsing time \"2000-10-15\" as \"2006-01-02T15:04:05Z07:00\": cannot parse \"\" as \"T\"",
 		},
 	}
 
 	for _, test := range tests {
-		st, err := newScalarTransformer(test.path, "test", test.raw, test.instanceType)
+		st, err := newScalarTransformer(test.path, "test", test.raw, test.instanceType, test.format)
 		if err != nil {
 			t.Fatalf("Test %q - failed to initialize scalar transformer: %v", test.description, err)
 		}

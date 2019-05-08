@@ -39,6 +39,7 @@ func TestTransformInstruction(t *testing.T) {
 	tests := []struct {
 		description string
 		ti          transformInstruction
+		format      inputFormat
 		in          interface{}
 		want        interface{}
 		wantErr     bool
@@ -49,8 +50,9 @@ func TestTransformInstruction(t *testing.T) {
 				jsonPath:   "$.group1.item1.itemA",
 				Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
 			},
-			in:   testRaw,
-			want: "out",
+			format: jsonInput,
+			in:     testRaw,
+			want:   "out",
 		},
 		{
 			description: "Chained operations",
@@ -61,8 +63,9 @@ func TestTransformInstruction(t *testing.T) {
 					&testOp{args: map[string]string{"out": "out2"}},
 				},
 			},
-			in:   testRaw,
-			want: "out2",
+			format: jsonInput,
+			in:     testRaw,
+			want:   "out2",
 		},
 		{
 			description: "Value not found",
@@ -71,7 +74,8 @@ func TestTransformInstruction(t *testing.T) {
 				jsonPath:   "$.group1.item10.itemA",
 				Operations: []transformOperation{&testOp{args: map[string]string{"out": "out"}}},
 			},
-			want: nil,
+			format: jsonInput,
+			want:   nil,
 		},
 		{
 			description: "failed operation",
@@ -80,12 +84,13 @@ func TestTransformInstruction(t *testing.T) {
 				jsonPath:   "$.group1.item1.itemA",
 				Operations: []transformOperation{&testOp{fail: true}},
 			},
+			format:  jsonInput,
 			wantErr: true,
 		},
 	}
 
 	for _, test := range tests {
-		got, err := test.ti.transform(test.in, "string", nil)
+		got, err := test.ti.transform(test.in, "string", nil, test.format)
 
 		switch {
 		case test.wantErr && err != nil:
@@ -105,6 +110,7 @@ func TestTransformInstructions(t *testing.T) {
 	tests := []struct {
 		description string
 		tis         transformInstructions
+		format      inputFormat
 		in          interface{}
 		want        interface{}
 		wantErr     bool
@@ -120,8 +126,9 @@ func TestTransformInstructions(t *testing.T) {
 				},
 				Method: first,
 			},
-			in:   testRaw,
-			want: "out",
+			format: jsonInput,
+			in:     testRaw,
+			want:   "out",
 		},
 		{
 			description: "multiple instructions - method first",
@@ -138,8 +145,9 @@ func TestTransformInstructions(t *testing.T) {
 				},
 				Method: first,
 			},
-			in:   testRaw,
-			want: "out",
+			format: jsonInput,
+			in:     testRaw,
+			want:   "out",
 		},
 		{
 			description: "multiple instructions - method last",
@@ -156,8 +164,9 @@ func TestTransformInstructions(t *testing.T) {
 				},
 				Method: last,
 			},
-			in:   testRaw,
-			want: "out2",
+			format: jsonInput,
+			in:     testRaw,
+			want:   "out2",
 		},
 		{
 			description: "multiple instructions - method concat",
@@ -174,8 +183,9 @@ func TestTransformInstructions(t *testing.T) {
 				},
 				Method: concatenate,
 			},
-			in:   testRaw,
-			want: "outout2",
+			format: jsonInput,
+			in:     testRaw,
+			want:   "outout2",
 		},
 		{
 			description: "multiple instructions - method concat with delimiter",
@@ -195,8 +205,9 @@ func TestTransformInstructions(t *testing.T) {
 					ConcatenateDelimiter: "/",
 				},
 			},
-			in:   testRaw,
-			want: "out/out2",
+			format: jsonInput,
+			in:     testRaw,
+			want:   "out/out2",
 		},
 		{
 			description: "multiple instructions - method concat with delimiter, one path missing",
@@ -219,8 +230,9 @@ func TestTransformInstructions(t *testing.T) {
 					ConcatenateDelimiter: "/",
 				},
 			},
-			in:   testRaw,
-			want: "out/out2",
+			format: jsonInput,
+			in:     testRaw,
+			want:   "out/out2",
 		},
 		{
 			description: "multiple instructions - method concat with delimiter, all paths missing",
@@ -241,8 +253,9 @@ func TestTransformInstructions(t *testing.T) {
 					ConcatenateDelimiter: "/",
 				},
 			},
-			in:   testRaw,
-			want: nil,
+			format: jsonInput,
+			in:     testRaw,
+			want:   nil,
 		},
 		{
 			description: "all paths are missing",
@@ -259,8 +272,9 @@ func TestTransformInstructions(t *testing.T) {
 				},
 				Method: first,
 			},
-			in:   testRaw,
-			want: nil,
+			format: jsonInput,
+			in:     testRaw,
+			want:   nil,
 		},
 		{
 			description: "one paths is missing",
@@ -277,8 +291,9 @@ func TestTransformInstructions(t *testing.T) {
 				},
 				Method: first,
 			},
-			in:   testRaw,
-			want: "out2",
+			format: jsonInput,
+			in:     testRaw,
+			want:   "out2",
 		},
 		{
 			description: "failed operation",
@@ -291,13 +306,14 @@ func TestTransformInstructions(t *testing.T) {
 				},
 				Method: first,
 			},
+			format:  jsonInput,
 			in:      testRaw,
 			wantErr: true,
 		},
 	}
 
 	for _, test := range tests {
-		got, err := test.tis.transform(test.in, "string", nil)
+		got, err := test.tis.transform(test.in, "string", nil, test.format)
 
 		switch {
 		case test.wantErr && err != nil:

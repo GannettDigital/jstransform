@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "defaultBoolean": {
+      "type": "boolean",
+      "default": true
+    },
+    "hitsInt": {
+      "type": "number",
+      "transform": {
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "//hits"
+            }
+          ]
+        }
+      }
+    },
+    "averageFloat": {
+      "type": "number",
+      "transform": {
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "//average"
+            }
+          ]
+        }
+      }
+    },
+    "rainingBoolean": {
+      "type": "boolean",
+      "transform": {
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "//raining"
+            }
+          ]
+        }
+      }
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time",
+      "transform": {
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "//date"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

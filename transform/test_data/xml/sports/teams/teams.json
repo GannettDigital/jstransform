@@ -1,0 +1,492 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "teams": {
+      "type": "array",
+      "transform": {
+        "sport": {
+          "from": [{
+            "xmlPath": "//team"
+          }]
+        }
+      },
+      "items": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "boolean",
+            "default": true
+          },
+          "season": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "../../../../season/id",
+                        "operations": [
+                          {
+                            "type": "replace",
+                            "args": {
+                              "regex": "[\\D]",
+                              "new": ""
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              "name": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "../../../../season/name[not(@*)]"
+                      }
+                    ]
+                  }
+                }
+              },
+              "startDate": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "../../../../season/details/start-date"
+                      }
+                    ]
+                  }
+                }
+              },
+              "endDate": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "../../../../season/details/end-date"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "conference": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [{
+                      "xmlPath": "../../../conference/id",
+                      "operations": [
+                        {
+                          "type": "replace",
+                          "args": {
+                            "regex": "[\\D]",
+                            "new": ""
+                          }
+                        }
+                      ]
+                    }]
+                  }
+                }
+              },
+              "name": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [{
+                      "xmlPath": "../../../conference/name[not(@*)]"
+                    }]
+                  }
+                }
+              },
+              "shortName": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [{
+                      "xmlPath": "../../../conference/name[@type='short']"
+                    }]
+                  }
+                }
+              }
+            }
+          },
+          "division": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [{
+                      "xmlPath": "../../division/id",
+                      "operations": [
+                        {
+                          "type": "replace",
+                          "args": {
+                            "regex": "[\\D]",
+                            "new": ""
+                          }
+                        }
+                      ]
+                    }]
+                  }
+                }
+              },
+              "name": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [{
+                      "xmlPath": "../../division/name"
+                    }]
+                  }
+                }
+              },
+              "alias": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [{
+                      "xmlPath": "../../division/alias"
+                    }]
+                  }
+                }
+              },
+              "active": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [{
+                      "xmlPath": "../../division/active"
+                    }]
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "/id",
+                    "operations": [
+                      {
+                        "type": "replace",
+                        "args": {
+                          "regex": "[\\D]",
+                          "new": ""
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "name": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "/name[not(@*)]"
+                  }
+                ]
+              }
+            }
+          },
+          "firstName": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "/name[@type='first']"
+                  }
+                ]
+              }
+            }
+          },
+          "nickName": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "/name[@type='nick']"
+                  }
+                ]
+              }
+            }
+          },
+          "shortName": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "/name[@type='short']"
+                  }
+                ]
+              }
+            }
+          },
+          "city": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "/location/city"
+                  }
+                ]
+              }
+            }
+          },
+          "state": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "/location/state"
+                  }
+                ]
+              }
+            }
+          },
+          "country": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "/location/country"
+                  }
+                ]
+              }
+            }
+          },
+          "venue": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                      "xmlPath": "season-details/venue/id",
+                        "operations": [
+                          {
+                            "type": "replace",
+                            "args": {
+                              "regex": "[\\D]",
+                              "new": ""
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              "name": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "season-details/venue/name[not(@*)]"
+                      }
+                    ]
+                  }
+                }
+              },
+              "shortName": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "season-details/venue/name[@type='short']"
+                      }
+                    ]
+                  }
+                }
+              },
+              "city": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "season-details/venue/location/city"
+                      }
+                    ]
+                  }
+                }
+              },
+              "state": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "season-details/venue/location/state"
+                      }
+                    ]
+                  }
+                }
+              },
+              "country": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "season-details/venue/location/country"
+                      }
+                    ]
+                  }
+                }
+              },
+              "timezone": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "season-details/venue/location/timezone"
+                      }
+                    ]
+                  }
+                }
+              },
+              "capacity": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "season-details/venue/season-details/capacity"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "tier": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "season-details/tier"
+                  }
+                ]
+              }
+            }
+          },
+          "league": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "../../../../../league/id",
+                        "operations": [
+                          {
+                            "type": "replace",
+                            "args": {
+                              "regex": "[\\D]",
+                              "new": ""
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "xmlPath": "../../../league/id",
+                        "operations": [
+                          {
+                            "type": "replace",
+                            "args": {
+                              "regex": "[\\D]",
+                              "new": ""
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              "name": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "../../../../../league/name[not(@*)]"
+                      },
+                      {
+                        "xmlPath": "../../../league/name[not(@*)]"
+                      }
+                    ]
+                  }
+                }
+              },
+              "nickName": {
+                "type": "string",
+                "transform": {
+                  "sport": {
+                    "from": [
+                      {
+                        "xmlPath": "../../../../../league/name[@type='nick']"
+                      },
+                      {
+                        "xmlPath": "../../../league/name[@type='nick']"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "sport": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "../../../../../../sport/name"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

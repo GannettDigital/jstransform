@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sport:content xmlns:sport="http://xml.sportsdirectinc.com/sport/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.sportsdirectinc.com/sport/v2 sport.xsd">
+    <team-sport-content>
+        <sport>
+            <id>/sport/basketball</id>
+            <name>basketball</name>
+        </sport>
+        <league-content>
+            <league>
+                <id>/sport/basketball/league:403878</id>
+                <name>National Basketball Association</name>
+                <name type="nick">NBA</name>
+            </league>
+            <season-content>
+                <season>
+                    <id>/sport/basketball/season:664611</id>
+                    <name>2017-2018</name>
+                    <details>
+                        <start-date>2017-09-30</start-date>
+                        <end-date>2018-06-30</end-date>
+                    </details>
+                </season>
+                <conference-content>
+                    <conference>
+                        <id>/sport/basketball/conference:403879</id>
+                        <name>Eastern Conference</name>
+                        <name type="short">Eastern</name>
+                    </conference>
+                    <division-content>
+                        <division>
+                            <id>/sport/basketball/division:403880</id>
+                            <name>NBA Atlantic</name>
+                            <alias>Atlantic</alias>
+                            <active>true</active>
+                        </division>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404288</id>
+                                <name>New York</name>
+                                <name type="first">New York</name>
+                                <name type="nick">Knicks</name>
+                                <name type="short">NY</name>
+                                <location>
+                                    <city>New York</city>
+                                    <state>New York</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:288906</id>
+                                        <name>Madison Square Garden</name>
+                                        <name type="short">MSG</name>
+                                        <location>
+                                            <city>New York</city>
+                                            <state>New York</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19763</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                    </division-content>
+                    <division-content>
+                        <division>
+                            <id>/sport/basketball/division:664418</id>
+                            <name>NBA Southeast</name>
+                            <alias>Southeast</alias>
+                            <active>true</active>
+                        </division>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404067</id>
+                                <name>Washington</name>
+                                <name type="first">Washington</name>
+                                <name type="nick">Wizards</name>
+                                <name type="short">WAS</name>
+                                <location>
+                                    <city>Washington</city>
+                                    <state>District of Columbia</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:288198</id>
+                                        <name>Capital One Arena</name>
+                                        <name type="short">COA</name>
+                                        <location>
+                                            <city>Washington</city>
+                                            <state>District of Columbia</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>20282</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:404171</id>
+                                <name>Miami</name>
+                                <name type="first">Miami</name>
+                                <name type="nick">Heat</name>
+                                <name type="short">MIA</name>
+                                <location>
+                                    <city>Miami</city>
+                                    <state>Florida</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:388795</id>
+                                        <name>American Airlines Arena</name>
+                                        <name type="short">AAA</name>
+                                        <location>
+                                            <city>Miami</city>
+                                            <state>Florida</state>
+                                            <country>USA</country>
+                                            <timezone>US/Eastern</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19600</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                    </division-content>
+                </conference-content>
+                <conference-content>
+                    <conference>
+                        <id>/sport/basketball/conference:403882</id>
+                        <name>Western Conference</name>
+                        <name type="short">Western</name>
+                    </conference>
+                    <division-content>
+                        <division>
+                            <id>/sport/basketball/division:403884</id>
+                            <name>NBA Pacific</name>
+                            <alias>Pacific</alias>
+                            <active>true</active>
+                        </division>
+                        <team-content>
+                            <team>
+                                <id>/sport/basketball/team:403977</id>
+                                <name>L.A. Lakers</name>
+                                <name type="first">Los Angeles</name>
+                                <name type="nick">Lakers</name>
+                                <name type="short">LAL</name>
+                                <location>
+                                    <city>Los Angeles</city>
+                                    <state>California</state>
+                                    <country>USA</country>
+                                </location>
+                                <season-details>
+                                    <venue>
+                                        <id>/sport/basketball/venue:538103</id>
+                                        <name>Staples Center</name>
+                                        <name type="short">SC</name>
+                                        <location>
+                                            <city>Los Angeles</city>
+                                            <state>California</state>
+                                            <country>USA</country>
+                                            <timezone>US/Pacific</timezone>
+                                        </location>
+                                        <season-details>
+                                            <capacity>19060</capacity>
+                                        </season-details>
+                                    </venue>
+                                </season-details>
+                            </team>
+                        </team-content>
+                    </division-content>
+                </conference-content>
+                <team-content>
+                    <meta>
+                        <property name="team-type">all-star</property>
+                    </meta>
+                    <team>
+                        <id>/sport/basketball/team:676107</id>
+                        <name>Team Lebron</name>
+                        <name type="first">Team Lebron</name>
+                        <name type="short">LEBRON</name>
+                    </team>
+                </team-content>
+            </season-content>
+        </league-content>
+    </team-sport-content>
+</sport:content>
