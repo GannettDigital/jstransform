@@ -220,7 +220,7 @@ func (s *split) transform(raw interface{}) (interface{}, error) {
 	return interfaceSplits, nil
 }
 
-// split is a transformOperation which formats a date string into the layout
+// timeParse is a transformOperation which formats a date string into the layout
 type timeParse struct {
 	Args map[string]string
 }
