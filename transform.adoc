@@ -50,7 +50,7 @@ The transform object has the following properties:
 
 Operations allow further mutation of data, for mutation types that are not currently supported by jsonPath.
 
-.Opertations
+.Operations
 [options="header"]
 |===
 | Name | Input | Output | Argument Key | Argument Value
@@ -62,5 +62,7 @@ Operations allow further mutation of data, for mutation types that are not curre
 | replace | string | string | regex | Regex string that will be used to match the part of the string that will be replaced
 | | | | new | The value to replace with, this will be placed at capture group 1
 | split | string | array | on | The string to split on
+| timeParse | string | string | format | The format to parse the time from
+| | | | layout | The layout of the returned date string
 |===
 
