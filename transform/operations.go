@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/PaesslerAG/jsonpath"
 )
@@ -217,6 +218,32 @@ func (s *split) transform(raw interface{}) (interface{}, error) {
 		interfaceSplits = append(interfaceSplits, s)
 	}
 	return interfaceSplits, nil
+}
+
+// split is a transformOperation which formats a date string into the layout
+type timeParse struct {
+	Args map[string]string
+}
+
+func (t *timeParse) init(args map[string]string) error {
+	if err := requiredArgs([]string{"format", "layout"}, args); err != nil {
+		return err
+	}
+
+	t.Args = args
+	return nil
+}
+
+func (t *timeParse) transform(raw interface{}) (interface{}, error) {
+	in, ok := raw.(string)
+	if !ok {
+		return nil, errors.New("split only supports strings")
+	}
+	parsedTime, err := time.Parse(t.Args["format"], in)
+	if err != nil {
+		return nil, fmt.Errorf("time could not be parsed using supplied ")
+	}
+	return parsedTime.Format(t.Args["layout"]), nil
 }
 
 // requiredArgs checks the given args map to make sure it contains the required args and only the required args.

@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 )
 
 type testOp struct {
@@ -336,4 +337,40 @@ func TestSplit(t *testing.T) {
 	}
 
 	runOpTests(t, func() transformOperation { return &split{} }, tests)
+}
+
+func TestTimeParse(t *testing.T) {
+	tests := []opTests{
+		{
+			description: "Simple working case",
+			args:        map[string]string{"format": time.RFC3339, "layout": "2006-01-02"},
+			in:          "2019-05-16T21:00:00-04:00",
+			want:        "2019-05-16",
+		},
+		{
+			description: "Missing arg",
+			args:        map[string]string{"format": time.RFC3339},
+			in:          "2019-05-16T21:00:00-04:00",
+			wantInitErr: true,
+		},
+		{
+			description: "Too many args",
+			args:        map[string]string{"format": time.RFC3339, "layout": "2006-01-02", "cookies": "failure"},
+			in:          "2019-05-16T21:00:00-04:00",
+			wantInitErr: true,
+		},
+		{
+			description: "Non string input",
+			args:        map[string]string{"format": time.RFC3339, "layout": "2006-01-02"},
+			in:          -1,
+			wantErr:     true,
+		},
+		{
+			description: "Invalid format",
+			args:        map[string]string{"format": "foobar", "layout": "2006-01-02"},
+			in:          "2019-05-16T21:00:00-04:00",
+			wantErr:     true,
+		},
+	}
+	runOpTests(t, func() transformOperation { return &timeParse{} }, tests)
 }
