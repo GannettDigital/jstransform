@@ -237,11 +237,11 @@ func (t *timeParse) init(args map[string]string) error {
 func (t *timeParse) transform(raw interface{}) (interface{}, error) {
 	in, ok := raw.(string)
 	if !ok {
-		return nil, errors.New("split only supports strings")
+		return nil, errors.New("timeParse only supports strings")
 	}
 	parsedTime, err := time.Parse(t.Args["format"], in)
 	if err != nil {
-		return nil, fmt.Errorf("time could not be parsed using supplied ")
+		return nil, fmt.Errorf("time could not be parsed using supplied format")
 	}
 	return parsedTime.Format(t.Args["layout"]), nil
 }

@@ -115,6 +115,27 @@
           ]
         }
       }
+    },
+    "startTime": {
+      "type": "string",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.startTime",
+              "operations": [
+                {
+                  "type": "timeParse",
+                  "args": {
+                    "format": "2006-01-02T15:04:05Z07:00",
+                    "layout": "03:04"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
     }
   }
 }
