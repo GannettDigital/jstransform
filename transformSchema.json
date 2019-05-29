@@ -237,6 +237,41 @@
 						}
 					}
 				}
+			},
+			"timeParse": {
+				"description": "Accepts a time string, formats and then layouts and returns a string",
+				"type": "object",
+				"required": [
+					"type",
+					"args"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [
+							"timeParse"
+						]
+					},
+					"args": {
+						"type": "object",
+						"required": [
+							"format",
+							"layout"
+						],
+						"additionalProperties": false,
+						"properties": {
+							"format": {
+								"description": "The format to parse the time string",
+								"type": "string"
+							},
+							"layout": {
+								"description": "The layout to put the time string into",
+								"type": "string"
+							}
+						}
+					}
+				}
 			}
 		},
 		"schemaArray": {
