@@ -115,7 +115,7 @@ func (ti *transformInstruction) xmlTransform(in interface{}, fieldType string, m
 	numElementsWithoutChild := len(xmlquery.Find(node, path+"[not(*)]"))
 
 	//if only numElementsWithoutChild has results then the nodes are leaf nodes and can extract value
-	if numElementsWithChild >= 0 && numElementsWithoutChild >= 1 {
+	if numElementsWithChild == 0 && numElementsWithoutChild >= 1 {
 		value, err = convert(xmlNode[0].InnerText(), fieldType)
 	} else {
 		value, err = convert(xmlNode, fieldType)
