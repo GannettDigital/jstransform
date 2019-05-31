@@ -108,7 +108,9 @@ func (ti *transformInstruction) xmlTransform(in interface{}, fieldType string, m
 		err   error
 	)
 
-	if len(xmlNode) == 1 {
+	//check if path is of '//' so that the data returns correctly
+	firstTwoOfPath := path[0:2]
+	if len(xmlNode) == 1 && firstTwoOfPath != "//" {
 		value, err = convert(xmlNode[0].InnerText(), fieldType)
 	} else {
 		value, err = convert(xmlNode, fieldType)

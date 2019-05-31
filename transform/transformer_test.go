@@ -485,6 +485,13 @@ func TestNewXMLTransformer(t *testing.T) {
 			xmlFilePath:         "./test_data/xml/operations.xml",
 			wantFilePath:        "./test_data/xml/operations.out.json",
 		},
+		{
+			description:         "singleArrayElement",
+			transformIdentifier: "sport",
+			schemaFilePath:      "./test_data/xml/singleArrayElement.json",
+			xmlFilePath:         "./test_data/xml/singleArrayElement.xml",
+			wantFilePath:        "./test_data/xml/singleArrayElement.out.json",
+		},
 	}
 
 	for _, test := range tests {
