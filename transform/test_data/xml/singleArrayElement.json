@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "sport": {
+      "type": "array",
+      "transform": {
+        "sport": {
+          "from": [{
+            "xmlPath": "//sport"
+          }]
+        }
+      },
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "id"
+                  }
+                ]
+              }
+            }
+          },
+          "name": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "name"
+                  }
+                ]
+              }
+            }
+          },
+          "player": {
+            "type": "array",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "//player"
+                  }
+                ]
+              }
+            },
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "transform": {
+                    "sport": {
+                      "from": [
+                        {
+                          "xmlPath": "id"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
