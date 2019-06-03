@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stat-group>
+    <stat num="1" type="runs_inning_2"> test1</stat >
+    <stat num="2" type="runs_inning_2"> </stat >
+</stat-group>
