@@ -74,6 +74,7 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 			op = &split{}
 		case "timeParse":
 			op = &timeParse{}
+
 		default:
 			return fmt.Errorf("unsupported operation %q", toj.Name)
 		}
@@ -115,7 +116,7 @@ func (ti *transformInstruction) xmlTransform(in interface{}, fieldType string, m
 	numElementsWithoutChild := len(xmlquery.Find(node, path+"[not(*)]"))
 
 	//if only numElementsWithoutChild has results then the nodes are leaf nodes and can extract value
-	if numElementsWithChild == 0 && numElementsWithoutChild == 1 {
+	if numElementsWithChild == 0 && numElementsWithoutChild == 1 && fieldType != "array" || len(ti.Operations) > 0 {
 		value, err = convert(xmlNode[0].InnerText(), fieldType)
 	} else {
 		value, err = convert(xmlNode, fieldType)

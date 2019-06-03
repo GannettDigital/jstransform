@@ -8,7 +8,7 @@
         "sport": {
           "from": [
             {
-              "xmlPath": "//stat"
+              "xmlPath": "//stat-group/stat[contains(@type,'runs_inning')]"
             }
           ]
         }
