@@ -13,5 +13,19 @@
             <id>/sport/football</id>
             <name>football</name>
         </sport>
+        <stat-group>
+            <key>results</key>
+            <stat num="1" type="games_lost"/>
+            <stat num="2" type="runs"/>
+            <stat num="5" type="hits"/>
+            <stat num="2" type="runs_inning_7" />
+            <stat num="3" type="runs_inning_8" />
+        </stat-group>
+        <stat-group>
+            <key>game-stats</key>
+            <stat num="1" type="games_played"/>
+            <stat num="1" type="games_lost"/>
+            <stat num="2" type="runs_inning_7" />
+        </stat-group>
     </team-sport-content>
 </sport:content>

@@ -40,6 +40,56 @@
           }
         }
       }
+    },
+    "inning": {
+      "type": "array",
+      "transform":{
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "//stat-group/stat[contains(@type,'runs_inning')]"
+            }
+          ]
+        }
+      },
+      "items": {
+        "type": "object",
+        "properties": {
+          "runs": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath": "@num"
+                  }
+                ]
+              }
+            }
+          },
+          "inning": {
+            "type": "string",
+            "transform": {
+              "sport": {
+                "from": [
+                  {
+                    "xmlPath":"@type",
+                    "operations": [
+                      {
+                        "type": "replace",
+                        "args": {
+                          "regex": "[\\D]",
+                          "new": ""
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
