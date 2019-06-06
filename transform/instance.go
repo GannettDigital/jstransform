@@ -317,7 +317,7 @@ func (ot *objectTransformer) selectChild(key string) instanceTransformer { retur
 
 // transform retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields.
-func (ot *objectTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
+func (ot *objectTransformer) objectTransformJSON(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := ot.jsonPath
 	if modifier != nil {
 		path = modifier(path)
@@ -365,6 +365,75 @@ func (ot *objectTransformer) transform(in interface{}, modifier pathModifier) (i
 
 	return newValue, nil
 
+}
+
+func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathModifier) (interface{}, error) {
+	path := ot.jsonPath
+	if modifier != nil {
+		path = modifier(path)
+	}
+	var newValue map[string]interface{}
+
+	// For the object use a transform if it exists or the default or an empty map
+	if ot.transforms != nil {
+		rawValue, err := ot.transforms.transform(in, "object", modifier, ot.format)
+		if err != nil {
+			return nil, err
+		}
+
+		newValue = make(map[string]interface{})
+
+		for _, child := range ot.children {
+			childValue, err := child.transform(rawValue, modifier)
+			if err != nil {
+				return nil, err
+			}
+
+			savePath := strings.Replace(child.path(), ot.jsonPath, "$", 1)
+			if err := saveInTree(newValue, savePath, childValue); err != nil {
+				return nil, fmt.Errorf("path %q failed save: %v", child.path(), err)
+			}
+		}
+		return newValue, nil
+	}
+	if newValue == nil {
+		if ot.defaultValue == nil {
+			newValue = make(map[string]interface{})
+		} else {
+			newValue = ot.defaultValue
+		}
+	}
+
+	// Add each child value to the paren
+	for _, child := range ot.children {
+		childValue, err := child.transform(in, modifier)
+		if err != nil {
+			return nil, err
+		}
+
+		savePath := strings.Replace(child.path(), ot.jsonPath, "$", 1)
+		if err := saveInTree(newValue, savePath, childValue); err != nil {
+			return nil, fmt.Errorf("path %q failed save: %v", child.path(), err)
+		}
+	}
+
+	if len(newValue) == 0 {
+		return nil, nil
+	}
+
+	return newValue, nil
+
+}
+
+// transform routes to the correct object transform type
+func (ot *objectTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
+	if ot.format == jsonInput {
+		return ot.objectTransformJSON(in, modifier)
+	}
+	if ot.format == xmlInput {
+		return ot.objectTransformXML(in, modifier)
+	}
+	return nil, fmt.Errorf("Unrecognized transform type %s in objecttransformer transform, must be 'JSON' or 'XML' ", ot.format)
 }
 
 // scalarTransformer represents a JSON instance for a scalar type.

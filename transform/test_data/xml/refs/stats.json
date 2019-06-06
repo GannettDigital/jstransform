@@ -1,16 +1,31 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#/",
-  "type": "object",
-  "properties": {
-    "hits": {
-      "type": "string",
-      "transform":{
-        "sport": {
-          "from": [
-            {
-              "xmlPath": "//hits"
+  "definitions": {
+    "stats": {
+      "properties": {
+        "hits": {
+          "type": "string",
+          "transform":{
+            "sport": {
+              "from": [
+                {
+                  "xmlPath": "hits"
+                }
+              ]
             }
-          ]
+          }
+        },
+        "errors": {
+          "type": "string",
+          "transform":{
+            "sport": {
+              "from": [
+                {
+                  "xmlPath": "errors"
+                }
+              ]
+            }
+          }
         }
       }
     }

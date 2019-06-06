@@ -495,7 +495,7 @@ func TestNewXMLTransformer(t *testing.T) {
 		{
 			description:         "refs",
 			transformIdentifier: "sport",
-			schemaFilePath:      "./test_data/xml/refs/boxscores.json",
+			schemaFilePath:      "./test_data/xml/refs/baseballBoxscores.json",
 			xmlFilePath:         "./test_data/xml/refs/boxscoreBaseball.xml",
 			wantFilePath:        "./test_data/xml/refs/boxscores.out.json",
 		},

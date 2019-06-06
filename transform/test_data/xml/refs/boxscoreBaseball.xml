@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sport:content xmlns:sport="http://xml.sportsdirectinc.com/sport/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.sportsdirectinc.com/sport/v2 sport.xsd">
-    <id>baseball1234</id>
-    <hits>4</hits>
-</sport:content>
+<root>
+    <home>
+        <id>baseball1234</id>
+        <hits>4</hits>
+        <errors>1</errors>
+        <walks>3</walks>
+    </home>
+    <away>
+        <id>baseball5678</id>
+        <hits>1</hits>
+        <errors>2</errors>
+        <walks>6</walks>
+    </away>
+</root>
