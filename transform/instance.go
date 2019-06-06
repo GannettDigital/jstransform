@@ -380,22 +380,20 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 		if err != nil {
 			return nil, err
 		}
-
 		newValue = make(map[string]interface{})
 
-		for _, child := range ot.children {
-			childValue, err := child.transform(rawValue, modifier)
-			if err != nil {
-				return nil, err
+		switch v := rawValue.(type) {
+		case *xmlquery.Node:
+			in = v
+		case []*xmlquery.Node:
+			if len(v) > 0 {
+				in = v[0]
 			}
-
-			savePath := strings.Replace(child.path(), ot.jsonPath, "$", 1)
-			if err := saveInTree(newValue, savePath, childValue); err != nil {
-				return nil, fmt.Errorf("path %q failed save: %v", child.path(), err)
-			}
+		default:
+			return nil, errors.New("non xml node returned from object transform")
 		}
-		return newValue, nil
 	}
+
 	if newValue == nil {
 		if ot.defaultValue == nil {
 			newValue = make(map[string]interface{})
