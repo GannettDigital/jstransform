@@ -493,11 +493,11 @@ func TestNewXMLTransformer(t *testing.T) {
 			wantFilePath:        "./test_data/xml/singleArrayElement.out.json",
 		},
 		{
-			description:         "refs",
+			description:         "xmlRefsTest",
 			transformIdentifier: "sport",
-			schemaFilePath:      "./test_data/xml/refs/baseballBoxscores.json",
-			xmlFilePath:         "./test_data/xml/refs/boxscoreBaseball.xml",
-			wantFilePath:        "./test_data/xml/refs/boxscores.out.json",
+			schemaFilePath:      "./test_data/xml/xmlRefsTest/baseballBoxscores.json",
+			xmlFilePath:         "./test_data/xml/xmlRefsTest/boxscoreBaseball.xml",
+			wantFilePath:        "./test_data/xml/xmlRefsTest/boxscores.out.json",
 		},
 	}
 
