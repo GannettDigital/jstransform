@@ -383,7 +383,6 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 		if err != nil {
 			return nil, err
 		}
-		newValue = make(map[string]interface{})
 
 		switch v := rawValue.(type) {
 		case *xmlquery.Node:
