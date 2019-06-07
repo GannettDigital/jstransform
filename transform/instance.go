@@ -315,7 +315,7 @@ func (ot *objectTransformer) child() instanceTransformer                 { retur
 func (ot *objectTransformer) path() string                               { return ot.jsonPath }
 func (ot *objectTransformer) selectChild(key string) instanceTransformer { return ot.children[key] }
 
-// transform retrieves the value for this object by building the value for the base object and then adding in any
+// objectTransformJSON retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields.
 func (ot *objectTransformer) objectTransformJSON(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := ot.jsonPath
@@ -367,7 +367,7 @@ func (ot *objectTransformer) objectTransformJSON(in interface{}, modifier pathMo
 
 }
 
-// transform retrieves the value for this object by building the value for the base object and then adding in any
+// objectTransformXML retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields. If a transform is provided it transforms the children relative to the
 // passed in node
 func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathModifier) (interface{}, error) {
@@ -375,7 +375,6 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 	if modifier != nil {
 		path = modifier(path)
 	}
-	var newValue map[string]interface{}
 
 	// For the object use a transform if it exists or the default or an empty map
 	if ot.transforms != nil {
@@ -396,12 +395,11 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 		}
 	}
 
-	if newValue == nil {
-		if ot.defaultValue == nil {
-			newValue = make(map[string]interface{})
-		} else {
-			newValue = ot.defaultValue
-		}
+	var newValue map[string]interface{}
+	if ot.defaultValue == nil {
+		newValue = make(map[string]interface{})
+	} else {
+		newValue = ot.defaultValue
 	}
 
 	// Add each child value to the paren

@@ -37,13 +37,15 @@ The transform object has the following properties:
 
 - The jsonPath selector is an identifier of the location of the _input_ path. All paths should start with the root object `$`. The exception here is for an Array of objects, where the relative `@` operator should be used on the leaf objects to signify the location is relative to the parent transform (more on this below)
 
-- The xPath selector is an identifier of the location of the _input_ path. All paths should start with the root object `/`. The exception here is for an Array of objects, where `//` can be used to select a node and all of its descendants. The xPath inside the array can then be relative to this node. An object can also use an xPath that will result in the selection of a node in which the fields inside the object will be able to be referenced relative the base object's node.
+- The xPath selector is an identifier of the location of the _input_ path. All paths will start with the root object '/'. The exceptions here being for an Array of objects, or an object with a transform. For an array a group of nodes will be selected with '//' and all item paths in the array will be relative to that selection. For an object if a transform xPath is declared all fields inside the object will be relative to that selected node.
 
 - If a transform object exists on a property, the consumer should automatically use that. In the event a transform object does not exist on a property, the consumer should attempt to find the value in the input at the location that corresponds to the same location in the schema. In other words, if the consumer is operating on schema field `$.foo.bar` which has no `transform.<consumer>` property, the consumer should use `$.foo.bar` as the location to pull the value from the input. This provides a nice "default" for those fields that are 1:1 match.
 
 - `first` is the default method of transform
 
 - Arrays should have a transform object. The properties of the array should then use the relative `@` jsonPath selector. The consumer will then iterate over the input array and utilize the relative path to find the type specific field at that location in the array
+
+- Objects can optionally have an xmlPath transform. If an object does have this transform all fields inside of it will be relative to that selection with it now acting as the root node, meaning nodes above the selected object transform node will be inaccessible inside that object.
 
 
 === Operations
