@@ -1,0 +1,16 @@
+{
+  "properties": {
+    "capacity": {
+      "type": "string",
+      "transform":{
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "capacity"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#/",
+  "definitions": {
+    "stats": {
+      "properties": {
+        "hits": {
+          "type": "string",
+          "transform":{
+            "sport": {
+              "from": [
+                {
+                  "xmlPath": "hits"
+                }
+              ]
+            }
+          }
+        },
+        "errors": {
+          "type": "string",
+          "transform":{
+            "sport": {
+              "from": [
+                {
+                  "xmlPath": "errors"
+                }
+              ]
+            }
+          }
+        },
+        "venue": {
+          "type": "object",
+          "transform": {
+            "sport": {
+              "from": [
+                {
+                  "xmlPath": "venue"
+                }
+              ]
+            }
+          },
+          "$ref": "./venue.json"
+        }
+      }
+    }
+  }
+}

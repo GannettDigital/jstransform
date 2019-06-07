@@ -226,6 +226,7 @@ func TestArrayTransform(t *testing.T) {
 				format:   jsonInput,
 				childTransformer: &objectTransformer{
 					jsonPath: "$.otherCrops[*][*]",
+					format:   jsonInput,
 					children: map[string]instanceTransformer{
 						"name": &scalarTransformer{
 							defaultValue: "name",

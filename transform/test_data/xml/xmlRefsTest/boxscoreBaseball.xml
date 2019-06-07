@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <home>
+        <id>baseball1234</id>
+        <hits>4</hits>
+        <errors>1</errors>
+        <walks>3</walks>
+        <venue>
+            <capacity>888</capacity>
+        </venue>
+    </home>
+    <away>
+        <id>baseball5678</id>
+        <hits>1</hits>
+        <errors>2</errors>
+        <walks>6</walks>
+        <venue>
+            <capacity>999</capacity>
+        </venue>
+    </away>
+</root>

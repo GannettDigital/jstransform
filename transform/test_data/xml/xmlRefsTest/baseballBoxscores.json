@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "home": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "transform": {
+            "sport": {
+              "from": [
+                {
+                  "xmlPath": "/root/home/id"
+                }
+              ]
+            }
+          }
+        },
+        "stats": {
+          "type": "object",
+          "transform": {
+            "sport": {
+              "from": [
+                {
+                  "xmlPath": "/root/home"
+                }
+              ]
+            }
+          },
+          "$ref": "./statsDefinitions.json#/definitions/stats"
+        }
+      }
+    },
+    "away": {
+      "type": "object",
+      "properties": {
+        "id": {
+        "type": "string",
+          "transform": {
+            "sport": {
+              "from": [
+                {
+                  "xmlPath": "/root/away/id"
+                }
+              ]
+            }
+          }
+        },
+        "stats": {
+          "type": "object",
+          "transform": {
+            "sport": {
+              "from": [
+                {
+                  "xmlPath": "/root/away"
+                }
+              ]
+            }
+          },
+          "$ref": "./statsProperties.json"
+        }
+      }
+    }
+  }
+}
