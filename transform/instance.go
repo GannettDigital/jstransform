@@ -367,6 +367,9 @@ func (ot *objectTransformer) objectTransformJSON(in interface{}, modifier pathMo
 
 }
 
+// transform retrieves the value for this object by building the value for the base object and then adding in any
+// transforms for all defined child fields. If a transform is provided it transforms the children relative to the
+// passed in node
 func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := ot.jsonPath
 	if modifier != nil {

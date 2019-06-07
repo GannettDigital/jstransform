@@ -95,7 +95,7 @@ func (ti *transformInstruction) xmlTransform(in interface{}, fieldType string, m
 
 	node, ok := in.(*xmlquery.Node)
 	if !ok {
-		return nil, errors.New("unable to convert input to xmlquery node")
+		return nil, errors.New("Error converting input to *xmlquery.Node")
 	}
 
 	xmlNode := xmlquery.Find(node, path)
