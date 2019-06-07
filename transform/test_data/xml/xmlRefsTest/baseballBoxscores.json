@@ -36,7 +36,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
+        "type": "string",
           "transform": {
             "sport": {
               "from": [
@@ -58,7 +58,7 @@
               ]
             }
           },
-          "$ref": "./stats.json#/definitions/stats"
+          "$ref": "./statsObject.json"
         }
       }
     }

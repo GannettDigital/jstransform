@@ -1,0 +1,28 @@
+{
+  "properties": {
+    "hits": {
+      "type": "string",
+      "transform":{
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "hits"
+            }
+          ]
+        }
+      }
+    },
+    "errors": {
+      "type": "string",
+      "transform":{
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "errors"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
