@@ -28,7 +28,7 @@
               ]
             }
           },
-          "$ref": "./stats.json#/definitions/stats"
+          "$ref": "statsDefinitions.json#/definitions/stats"
         }
       }
     },
@@ -58,7 +58,7 @@
               ]
             }
           },
-          "$ref": "./statsObject.json"
+          "$ref": "statsProperties.json"
         }
       }
     }
