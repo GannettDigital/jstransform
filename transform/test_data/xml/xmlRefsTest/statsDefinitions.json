@@ -26,6 +26,19 @@
               ]
             }
           }
+        },
+        "venue": {
+          "type": "object",
+          "transform": {
+            "sport": {
+              "from": [
+                {
+                  "xmlPath": "venue"
+                }
+              ]
+            }
+          },
+          "$ref": "./venue.json"
         }
       }
     }
