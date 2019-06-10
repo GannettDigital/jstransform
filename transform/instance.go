@@ -376,7 +376,8 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 		path = modifier(path)
 	}
 
-	// For the object use a transform if it exists, if the transform does not find a node it will return nil
+	// For the object use a transform if it exists, if the transform does not find a node it will return nil unless a
+	// default value is specified in which case the default value will be returned
 	if ot.transforms != nil {
 		rawValue, err := ot.transforms.transform(in, "object", modifier, ot.format)
 		if err != nil {
@@ -384,7 +385,11 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 		}
 
 		if rawValue == nil {
-			return nil, nil
+			if ot.defaultValue == nil {
+				return nil, nil
+			} else {
+				return ot.defaultValue, nil
+			}
 		}
 
 		switch v := rawValue.(type) {
