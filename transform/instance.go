@@ -369,18 +369,27 @@ func (ot *objectTransformer) objectTransformJSON(in interface{}, modifier pathMo
 
 // objectTransformXML retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields. If a transform is provided it transforms the children relative to the
-// passed in node
+// passed in node. If a transform is provided and not found the children of the object are skipped.
 func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := ot.jsonPath
 	if modifier != nil {
 		path = modifier(path)
 	}
 
-	// For the object use a transform if it exists or the default or an empty map
+	// For the object use a transform if it exists, if the transform does not find a node it will return nil unless a
+	// default value is specified in which case the default value will be returned
 	if ot.transforms != nil {
 		rawValue, err := ot.transforms.transform(in, "object", modifier, ot.format)
 		if err != nil {
 			return nil, err
+		}
+
+		if rawValue == nil {
+			if ot.defaultValue == nil {
+				return nil, nil
+			} else {
+				return ot.defaultValue, nil
+			}
 		}
 
 		switch v := rawValue.(type) {
@@ -402,7 +411,7 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 		newValue = ot.defaultValue
 	}
 
-	// Add each child value to the paren
+	// Add each child value to the parent if there is no object transform or if the object transform node is found
 	for _, child := range ot.children {
 		childValue, err := child.transform(in, modifier)
 		if err != nil {
@@ -520,13 +529,14 @@ func (st *scalarTransformer) transformScalarJSON(in interface{}, modifier pathMo
 //
 // 1. Use a Transform if it exists.
 //
-// 2. Fall back to the JSON Schema default value.
+// 2. If transform does not exist or returns no value send back default
 func (st *scalarTransformer) transformScalarXML(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := st.jsonPath
 	if modifier != nil {
 		path = modifier(path)
 	}
-	// 1. Use a transform if it exists
+
+	// 1. Use a Transform if it exists.
 	if st.transforms != nil {
 		newValue, err := st.transforms.transform(in, st.jsonType, modifier, st.format)
 		if err != nil {
@@ -537,7 +547,7 @@ func (st *scalarTransformer) transformScalarXML(in interface{}, modifier pathMod
 		}
 	}
 
-	// 2. Fall back to the JSON Schema default value.
+	// 2. If transform does not exist or returns no value send back default
 	return st.defaultValue, nil
 }
 
