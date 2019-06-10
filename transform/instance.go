@@ -369,14 +369,16 @@ func (ot *objectTransformer) objectTransformJSON(in interface{}, modifier pathMo
 
 // objectTransformXML retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields. If a transform is provided it transforms the children relative to the
-// passed in node
+// passed in node. If a transform is provided and not found the children of the object are skipped.
 func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := ot.jsonPath
 	if modifier != nil {
 		path = modifier(path)
 	}
 
-	// For the object use a transform if it exists or the default or an empty map
+	// For the object use a transform if it exists, if the transform does not find a node set a flag to skip adding its
+	// children
+	foundTransformObjectNode := true
 	if ot.transforms != nil {
 		rawValue, err := ot.transforms.transform(in, "object", modifier, ot.format)
 		if err != nil {
@@ -390,8 +392,8 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 			if len(v) > 0 {
 				in = v[0]
 			}
-		default:
-			return nil, errors.New("non xml node returned from object transform")
+		case nil:
+			foundTransformObjectNode = false
 		}
 	}
 
@@ -402,16 +404,18 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 		newValue = ot.defaultValue
 	}
 
-	// Add each child value to the paren
-	for _, child := range ot.children {
-		childValue, err := child.transform(in, modifier)
-		if err != nil {
-			return nil, err
-		}
+	// Add each child value to the parent if there is no object transform or if the object transform node is found
+	if foundTransformObjectNode {
+		for _, child := range ot.children {
+			childValue, err := child.transform(in, modifier)
+			if err != nil {
+				return nil, err
+			}
 
-		savePath := strings.Replace(child.path(), ot.jsonPath, "$", 1)
-		if err := saveInTree(newValue, savePath, childValue); err != nil {
-			return nil, fmt.Errorf("path %q failed save: %v", child.path(), err)
+			savePath := strings.Replace(child.path(), ot.jsonPath, "$", 1)
+			if err := saveInTree(newValue, savePath, childValue); err != nil {
+				return nil, fmt.Errorf("path %q failed save: %v", child.path(), err)
+			}
 		}
 	}
 
@@ -520,13 +524,14 @@ func (st *scalarTransformer) transformScalarJSON(in interface{}, modifier pathMo
 //
 // 1. Use a Transform if it exists.
 //
-// 2. Fall back to the JSON Schema default value.
+// 2. If transform does not exist or returns no value send back default
 func (st *scalarTransformer) transformScalarXML(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := st.jsonPath
 	if modifier != nil {
 		path = modifier(path)
 	}
-	// 1. Use a transform if it exists
+
+	// 1. Use a Transform if it exists.
 	if st.transforms != nil {
 		newValue, err := st.transforms.transform(in, st.jsonType, modifier, st.format)
 		if err != nil {
@@ -537,7 +542,7 @@ func (st *scalarTransformer) transformScalarXML(in interface{}, modifier pathMod
 		}
 	}
 
-	// 2. Fall back to the JSON Schema default value.
+	// 2. If transform does not exist or returns no value send back default
 	return st.defaultValue, nil
 }
 

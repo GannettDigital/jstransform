@@ -61,6 +61,44 @@
           "$ref": "./statsProperties.json"
         }
       }
+    },
+    "weather": {
+      "type": "object",
+      "transform": {
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "/root/weather"
+            }
+          ]
+        }
+      },
+      "properties": {
+        "id": {
+          "type": "string",
+          "transform": {
+            "sport": {
+              "from": [
+                {
+                  "xmlPath": "/root/away/id"
+                }
+              ]
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "transform": {
+            "sport": {
+              "from": [
+                {
+                  "xmlPath": "name"
+                }
+              ]
+            }
+          }
+        }
+      }
     }
   }
 }
