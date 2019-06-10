@@ -376,9 +376,7 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 		path = modifier(path)
 	}
 
-	// For the object use a transform if it exists, if the transform does not find a node set a flag to skip adding its
-	// children
-	skipObjectChildren := false
+	// For the object use a transform if it exists, if the transform does not find a node it will return nil
 	if ot.transforms != nil {
 		rawValue, err := ot.transforms.transform(in, "object", modifier, ot.format)
 		if err != nil {
@@ -393,7 +391,7 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 				in = v[0]
 			}
 		case nil:
-			skipObjectChildren = true
+			return nil, nil
 		}
 	}
 
@@ -405,17 +403,15 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 	}
 
 	// Add each child value to the parent if there is no object transform or if the object transform node is found
-	if !skipObjectChildren {
-		for _, child := range ot.children {
-			childValue, err := child.transform(in, modifier)
-			if err != nil {
-				return nil, err
-			}
+	for _, child := range ot.children {
+		childValue, err := child.transform(in, modifier)
+		if err != nil {
+			return nil, err
+		}
 
-			savePath := strings.Replace(child.path(), ot.jsonPath, "$", 1)
-			if err := saveInTree(newValue, savePath, childValue); err != nil {
-				return nil, fmt.Errorf("path %q failed save: %v", child.path(), err)
-			}
+		savePath := strings.Replace(child.path(), ot.jsonPath, "$", 1)
+		if err := saveInTree(newValue, savePath, childValue); err != nil {
+			return nil, fmt.Errorf("path %q failed save: %v", child.path(), err)
 		}
 	}
 
