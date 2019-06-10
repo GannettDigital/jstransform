@@ -383,6 +383,10 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 			return nil, err
 		}
 
+		if rawValue == nil {
+			return nil, nil
+		}
+
 		switch v := rawValue.(type) {
 		case *xmlquery.Node:
 			in = v
@@ -390,8 +394,8 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 			if len(v) > 0 {
 				in = v[0]
 			}
-		case nil:
-			return nil, nil
+		default:
+			return nil, errors.New("non xml node returned from object transform")
 		}
 	}
 
