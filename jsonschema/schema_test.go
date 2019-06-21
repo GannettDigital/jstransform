@@ -174,6 +174,67 @@ func TestSchemaFromFile(t *testing.T) {
 			schemaPath:  "./test_data/bad-parent.json",
 			wantErr:     true,
 		},
+		{
+			description: "Nested AllOf",
+			oneOfType:   "",
+			schemaPath:  "./test_data/parent3.json",
+			want: &Schema{
+				Instance: Instance{
+					Properties: map[string]json.RawMessage{
+						"type": json.RawMessage(`{
+      "type": "string",
+      "enum": [
+        "embed"
+      ]
+    }`),
+					},
+				},
+			},
+		},
+		{
+			description: "Nested AllOf with oneOf",
+			oneOfType:   "image",
+			schemaPath:  "./test_data/parent4.json",
+			want: &Schema{
+				Instance: Instance{
+					Properties: imageProperties,
+					Required: []string{
+						"type",
+						"crops",
+						"orientation",
+						"credit",
+						"URL",
+						"caption",
+						"originalSize",
+						"datePhotoTaken",
+					},
+				},
+			},
+		},
+		{
+			description: "AllOf in referenced type",
+			oneOfType:   "",
+			schemaPath:  "./test_data/embed_embed.json",
+			want: &Schema{
+				Instance: Instance{
+					Properties: map[string]json.RawMessage{
+						"embed": json.RawMessage(`{
+      "type": "array",
+      "items": {
+        "$ref": "./embed_parent.json",
+		"type":{
+      		"type": "string",
+      		"enum": [
+				"embed"
+      		]
+		}
+      }
+    }
+  }`),
+					},
+				},
+			},
+		},
 	}
 	for _, test := range tests {
 		got, err := SchemaFromFile(test.schemaPath, test.oneOfType)

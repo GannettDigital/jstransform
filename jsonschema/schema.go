@@ -19,13 +19,14 @@ type Instance struct {
 	Items                json.RawMessage            `json:"items,omitempty"`
 	Properties           map[string]json.RawMessage `json:"properties,omitempty"`
 	AllOf                []Instance                 `json:"allOf,omitempty"`
+	AnyOf                []Instance                 `json:"anyOf,omitempty"` // TODO unsupported
 	OneOf                []Instance                 `json:"oneOf,omitempty"`
 	Required             []string                   `json:"Required,omitempty"`
 }
 
 // Schema represents a JSON Schema with the AllOf and OneOf references parsed and squashed into a single representation.
 // This is not a fully spec compatible representation but a basic representation useful for walking through the schema
-// instances within a schema.
+// instances within a schema. Also note AnyOf fields are not supported at this time.
 //
 // A fully spec compatible version of the schema is kept for validation purposes.
 type Schema struct {
@@ -57,6 +58,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 		return nil, fmt.Errorf("failed to initialize schema validator: %v", err)
 	}
 
+	// dereferencing during walking is more efficient but more complicated so all dereferencing for a file is done immediately
 	data, err = dereference(schemaPath, data, true)
 	if err != nil {
 		return nil, fmt.Errorf("failed to Dereference Schema: %v", err)
@@ -75,6 +77,9 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 		validator: v,
 	}
 
+	// TODO this behavior is not spec compatible, according to the spec it is possible to have multiple allOf instances
+	// that conflict. The legit use case for that is rare but it is in the spec. Rather than merge these the walk
+	// should go through each set of files but this makes the raw walking much more complicated.
 	for _, all := range sj.AllOf {
 		path := refPath(schemaPath, all.Ref)
 		child, err := SchemaFromFile(path, oneOfType)

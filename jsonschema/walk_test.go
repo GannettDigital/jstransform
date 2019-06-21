@@ -243,6 +243,108 @@ func TestWalkJSONSchema(t *testing.T) {
 			schemaPath:  "./test_data/bad-array.json",
 			wantErr:     true,
 		},
+		{
+			description: "Nested AllOf",
+			oneOfType:   "",
+			schemaPath:  "./test_data/parent3.json",
+			want:        map[string]Instance{"$.type": {Type: "string"}},
+		},
+		{
+			description: "Nested AllOf with oneOf",
+			oneOfType:   "image",
+			schemaPath:  "./test_data/parent4.json",
+			want: map[string]Instance{
+				"$.type": {Type: "string"},
+				"$.crops": {Type: "array", Items: []byte(`{
+			        "type": "object",
+			        "properties": {
+			          "name": {
+			            "type": "string",
+			            "default": "name"
+			          },
+			          "width": {
+			            "type": "number"
+			          },
+			          "height": {
+			            "type": "number"
+			          },
+			          "path": {
+			            "type": "string"
+			          },
+			          "relativePath": {
+			            "type": "string"
+			          }
+			        },
+			        "required":[
+			          "name",
+			          "width",
+			          "height",
+			          "path",
+			          "relativePath"
+			        ]
+			    }`)},
+				"$.crops[*]": {Type: "object", Properties: map[string]json.RawMessage{
+					"name": []byte(`{
+			            "type": "string",
+			            "default": "name"
+			          }`),
+					"width": []byte(`{
+			            "type": "number"
+			          }`),
+					"height": []byte(`{
+			            "type": "number"
+			          }`),
+					"path": []byte(`{
+			            "type": "string"
+			          }`),
+					"relativePath": []byte(`{
+			            "type": "string"
+			          }`),
+				},
+					Required: []string{"name", "width", "height", "path", "relativePath"},
+				},
+				"$.crops[*].name":         {Type: "string"},
+				"$.crops[*].width":        {Type: "number"},
+				"$.crops[*].height":       {Type: "number"},
+				"$.crops[*].path":         {Type: "string"},
+				"$.crops[*].relativePath": {Type: "string"},
+				"$.URL": {Type: "object", Properties: map[string]json.RawMessage{
+					"publish": []byte(`{
+			          "type": "string",
+			          "transform": {
+			            "cumulo": {
+			              "from" : [
+			                {
+			                  "jsonPath": "$.publishUrl"
+			                }
+			              ]
+			            }
+			          }
+			        }`),
+					"absolute": []byte(`{
+			          "type": "string",
+			          "transform": {
+			            "cumulo": {
+			              "from" : [
+			                {
+			                  "jsonPath": "$.absoluteUrl"
+			                }
+			              ]
+			            }
+			          }
+			      }`)},
+					Required: []string{"publish", "absolute"},
+				},
+				"$.URL.publish":  {Type: "string"},
+				"$.URL.absolute": {Type: "string"},
+			},
+		},
+		{
+			description: "AllOf in referenced type",
+			oneOfType:   "",
+			schemaPath:  "./test_data/embed_embed.json",
+			want:        map[string]Instance{"$.type": {Type: "string"}},
+		},
 	}
 
 	for _, test := range tests {
