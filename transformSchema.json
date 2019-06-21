@@ -74,6 +74,9 @@
 							},
 							{
 								"$ref": "#/definitions/operations/timeParse"
+							},
+							{
+								"ref": "#definitions/operations/currentTime"
 							}
 						]
 					}
@@ -276,7 +279,30 @@
 			"currentTime" : {
 				"description": "Returns the current time formatted as a string",
 				"type": "object",
+				"required": [
+					"args"
+				],
 				"additionalProperties": false,
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [
+							"currentTime"
+						]
+					},
+					"args": {
+						"type": "object",
+						"required": [
+							"format"
+						],
+						"additionalProperties": false,
+						"properties": {
+							"format": {
+								"description": "The format to parse the time string"
+							}
+						}
+					}
+				}
 			}
 		},
 		"schemaArray": {

@@ -251,12 +251,16 @@ type currentTime struct {
 }
 
 func (c *currentTime) init(args map[string]string) error {
+	if err := requiredArgs([]string{"format"}, args); err != nil {
+		return err
+	}
+	c.Args = args
 	return nil
 }
 
-//return a string or interface here? Errors to worry about?
-func (c *currentTime) transform (raw interface{}) string {
-	return time.Now().Format(time.RFC3339)
+//Errors to worry about?
+func (c *currentTime) transform (raw interface{}) (interface{}, error) {
+	return time.Now().Format(c.Args["format"]), nil
 }
 
 // requiredArgs checks the given args map to make sure it contains the required args and only the required args.

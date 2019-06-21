@@ -2,6 +2,7 @@ package transform
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strconv"
 	"testing"
@@ -373,4 +374,14 @@ func TestTimeParse(t *testing.T) {
 		},
 	}
 	runOpTests(t, func() transformOperation { return &timeParse{} }, tests)
+}
+
+func TestCurrentTime (t *testing.T) {
+	now := time.Now().Format(time.RFC3339)
+	tests := []opTests {
+		{
+			description: "Simple working case",
+			want: fmt.Printf("%s",now),
+		},
+	}
 }
