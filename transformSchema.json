@@ -272,6 +272,11 @@
 						}
 					}
 				}
+			},
+			"currentTime" : {
+				"description": "Returns the current time formatted as a string",
+				"type": "object",
+				"additionalProperties": false,
 			}
 		},
 		"schemaArray": {

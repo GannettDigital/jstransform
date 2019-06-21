@@ -246,6 +246,19 @@ func (t *timeParse) transform(raw interface{}) (interface{}, error) {
 	return parsedTime.Format(t.Args["layout"]), nil
 }
 
+type currentTime struct {
+	Args map[string]string
+}
+
+func (c *currentTime) init(args map[string]string) error {
+	return nil
+}
+
+//return a string or interface here? Errors to worry about?
+func (c *currentTime) transform (raw interface{}) string {
+	return time.Now().Format(time.RFC3339)
+}
+
 // requiredArgs checks the given args map to make sure it contains the required args and only the required args.
 func requiredArgs(required []string, args map[string]string) error {
 	if len(args) != len(required) {
