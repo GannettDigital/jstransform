@@ -2,9 +2,9 @@ package transform
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 )
@@ -63,6 +63,19 @@ func runOpTests(t *testing.T, opType func() transformOperation, tests []opTests)
 		switch {
 		case test.wantErr && err != nil:
 			continue
+		case strings.Contains(test.description,"currentTime") == true:
+			now := time.Now()
+			result, ok := test.want.(string)
+			if !ok {
+				t.Error("want must be type string")
+			}
+			wantParse, err := time.Parse(time.RFC3339, result)
+			if err != nil {
+				t.Error(err)
+			}
+			if result := compareTimeStamps(now, wantParse);result != true {
+					t.Errorf("Time returned not close enough to current time: %s", err)
+				}
 		case test.wantErr && err == nil:
 			t.Errorf("Test %q - got nil, want error", test.description)
 		case !test.wantErr && err != nil:
@@ -377,11 +390,32 @@ func TestTimeParse(t *testing.T) {
 }
 
 func TestCurrentTime (t *testing.T) {
-	now := time.Now().Format(time.RFC3339)
 	tests := []opTests {
 		{
-			description: "Simple working case",
-			want: fmt.Printf("%s",now),
+			description: "Simple working case - currentTime",
+			args: map[string]string{"format": time.RFC3339},
+			want: time.Now().Format(time.RFC3339),
 		},
+		{
+			description: "Missing arg",
+			args: map[string]string{},
+			wantInitErr: true,
+		},
+		{
+			description: "Too many args",
+			args: map[string]string{"format": time.RFC3339, "cookies": "failure"},
+			wantInitErr: true,
+		},
+	}
+	runOpTests(t, func() transformOperation { return &currentTime{} }, tests)
+}
+
+func compareTimeStamps (time1 time.Time, time2 time.Time) (bool) {
+	maxTimeDifference := time.Duration(1200) * time.Second
+	actualDiff := time1.Sub(time2)
+	if actualDiff > maxTimeDifference {
+		return false
+	} else {
+		return true
 	}
 }
