@@ -375,4 +375,33 @@ func TestTimeParse(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &timeParse{} }, tests)
 }
 
+func TestStringToInteger(t *testing.T) {
+	tests := []opTests{
 
+		{
+			description: "Simple working case",
+			in: "237754",
+			want: 237754,
+		},
+
+		{
+			description: "An alphabet input",
+			in: "a",
+			wantErr: true,
+		},
+
+		{
+			description: "Boolean input type",
+			in: true,
+			wantErr: true,
+		},
+
+		{
+			description: "Number input",
+			in: 2587,
+			wantErr: true,
+		},
+
+	}
+	runOpTests(t, func() transformOperation { return &stringToInteger{} }, tests)
+}
