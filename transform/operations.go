@@ -269,7 +269,7 @@ func (c *camelCase) transform(raw interface{}) (interface{}, error) {
 	var newString string
 
 	for i := 0; i < len(in); i++ {
-		if in[i] == 45 {
+		if string(in[i]) == "-" {
 			i++
 			newString += strings.ToUpper(string(in[i]))
 			continue
