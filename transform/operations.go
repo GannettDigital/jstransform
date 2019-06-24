@@ -248,7 +248,6 @@ func (t *timeParse) transform(raw interface{}) (interface{}, error) {
 
 // stringToInteger is a transformOperation which takes a string and converts it into an Int
 type stringToInteger struct {
-	Args map[string]string
 }
 
 func (s *stringToInteger) init(args map[string]string) error {

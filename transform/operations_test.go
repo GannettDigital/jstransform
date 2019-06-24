@@ -396,12 +396,6 @@ func TestStringToInteger(t *testing.T) {
 			wantErr: true,
 		},
 
-		{
-			description: "Number input",
-			in: 2587,
-			wantErr: true,
-		},
-
 	}
 	runOpTests(t, func() transformOperation { return &stringToInteger{} }, tests)
 }
