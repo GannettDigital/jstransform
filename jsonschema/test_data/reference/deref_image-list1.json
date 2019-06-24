@@ -35,7 +35,8 @@
                             "type": "string"
                         }
                     },
-                    "type": "object"
+                    "type": "object",
+                    "fromRef": "./jsref_image-defs.json#/definitions/imageurl"
                 },
                 {
                     "properties": {

@@ -221,15 +221,35 @@ func TestSchemaFromFile(t *testing.T) {
 						"embed": json.RawMessage(`{
       "type": "array",
       "items": {
-        "$ref": "./embed_parent.json",
-		"type":{
+        "additionalProperties": true,
+		"allOf": [
+          {
+            "additionalProperties": true,
+            "fromRef": "./embed.json",
+            "properties": {
+              "type": {
+      		    "type": "string",
+      		    "enum": [
+				  "embed"
+      		    ]
+              }
+            },
+		    "$schema": "http://json-schema.org/draft-04/schema#",
+		    "type": "object"
+          }
+		],
+        "properties": {
+		  "type":{
       		"type": "string",
       		"enum": [
 				"embed"
       		]
-		}
+          }
+        },
+		"$schema": "http://json-schema.org/draft-04/schema#",
+		"type": "object",
+	  	"fromRef": "./embed_parent.json"
       }
-    }
   }`),
 					},
 				},
@@ -239,6 +259,18 @@ func TestSchemaFromFile(t *testing.T) {
 	for _, test := range tests {
 		got, err := SchemaFromFile(test.schemaPath, test.oneOfType)
 
+		var gotProperties, wantProperties []byte
+		if !test.wantErr && got != nil {
+			gotProperties, err = json.MarshalIndent(got.Properties, "", "  ")
+			if err != nil {
+				t.Errorf("Test %q - failed to marshal got.Properties: %v", test.description, err)
+			}
+			wantProperties, err = json.MarshalIndent(test.want.Properties, "", "  ")
+			if err != nil {
+				t.Errorf("Test %q - failed to marshal test.want.Properties: %v", test.description, err)
+			}
+		}
+
 		switch {
 		case test.wantErr && err != nil:
 			continue
@@ -246,8 +278,8 @@ func TestSchemaFromFile(t *testing.T) {
 			t.Errorf("Test %q - got nil error want error", test.description)
 		case !test.wantErr && err != nil:
 			t.Errorf("Test %q - got error: %v", test.description, err)
-		case !reflect.DeepEqual(got.Properties, test.want.Properties):
-			t.Errorf("Test %q - got Properties\n%s\nwant\n%s", test.description, got.Properties, test.want.Properties)
+		case !reflect.DeepEqual(gotProperties, wantProperties):
+			t.Errorf("Test %q - got Properties\n%s\nwant\n%s", test.description, gotProperties, wantProperties)
 		case !reflect.DeepEqual(got.Items, test.want.Items):
 			t.Errorf("Test %q - got Items\n%s\nwant\n%s", test.description, got.Items, test.want.Items)
 		case !reflect.DeepEqual(got.Required, test.want.Required):

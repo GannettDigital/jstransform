@@ -10,18 +10,20 @@ import (
 
 // Instance represents a JSON Schema instance.
 type Instance struct {
-	Ref                  string                     `json:"$ref,omitempty"`
-	Schema               string                     `json:"$schema,omitempty"`
 	AdditionalProperties bool                       `json:"additionalProperties,omitempty"`
-	Description          string                     `json:"description,omitempty"`
-	Type                 string                     `json:"type"`
-	Format               string                     `json:"format,omitempty"`
-	Items                json.RawMessage            `json:"items,omitempty"`
-	Properties           map[string]json.RawMessage `json:"properties,omitempty"`
 	AllOf                []Instance                 `json:"allOf,omitempty"`
 	AnyOf                []Instance                 `json:"anyOf,omitempty"` // TODO unsupported
+	Description          string                     `json:"description,omitempty"`
+	Definitions          json.RawMessage            `json:"definitions,omitempty"`
+	Format               string                     `json:"format,omitempty"`
+	FromRef              string                     `json:"fromRef,omitempty"` // Added as a way of tracking the ref which was already expanded
+	Items                json.RawMessage            `json:"items,omitempty"`
 	OneOf                []Instance                 `json:"oneOf,omitempty"`
-	Required             []string                   `json:"Required,omitempty"`
+	Properties           map[string]json.RawMessage `json:"properties,omitempty"`
+	Ref                  string                     `json:"$ref,omitempty"`
+	Required             []string                   `json:"required,omitempty"`
+	Schema               string                     `json:"$schema,omitempty"`
+	Type                 string                     `json:"type"`
 }
 
 // Schema represents a JSON Schema with the AllOf and OneOf references parsed and squashed into a single representation.
@@ -41,13 +43,11 @@ func (s *Schema) Validate(raw json.RawMessage) (bool, error) {
 }
 
 // SchemaFromFile parses a file at the given path and returns a schema based on its contents.
-// The function traverses top level allOf fields within the schema. For oneOf fields the reference base
+// The function traverses allOf fields within the schema. For oneOf fields the reference base
 // name minus any extension is compared to the value of the oneOfType argument and if they match that file is also
-// traversed.
+// traversed. AnyOf fields are currently ignored.
 //
-// Only file references are supported.
-//
-// Note: A top level array will use the items from the first file to define them.
+// Referenced files are recursively processed. At this time only definition and file references are supported.
 func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	data, err := ioutil.ReadFile(schemaPath)
 	if err != nil {
@@ -59,7 +59,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	}
 
 	// dereferencing during walking is more efficient but more complicated so all dereferencing for a file is done immediately
-	data, err = dereference(schemaPath, data, true)
+	data, err = dereference(schemaPath, data, oneOfType)
 	if err != nil {
 		return nil, fmt.Errorf("failed to Dereference Schema: %v", err)
 	}
@@ -81,32 +81,23 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	// that conflict. The legit use case for that is rare but it is in the spec. Rather than merge these the walk
 	// should go through each set of files but this makes the raw walking much more complicated.
 	for _, all := range sj.AllOf {
-		path := refPath(schemaPath, all.Ref)
-		child, err := SchemaFromFile(path, oneOfType)
-		if err != nil {
-			return nil, fmt.Errorf("failed parsing allOf file %q: %v", path, err)
-		}
-		s.Properties = mergeProperties(s.Properties, child.Properties)
-		s.Required = append(s.Required, child.Required...)
+		s.Properties = mergeProperties(s.Properties, all.Properties)
+		s.Required = append(s.Required, all.Required...)
 		if s.Items == nil {
-			s.Items = child.Items
+			s.Items = all.Items
 		}
 	}
 
 	for _, one := range sj.OneOf {
-		subName := strings.Split(filepath.Base(one.Ref), ".")[0]
+		subName := strings.Split(filepath.Base(one.FromRef), ".")[0]
 		if subName != oneOfType {
 			continue
 		}
-		path := refPath(schemaPath, one.Ref)
-		child, err := SchemaFromFile(path, oneOfType)
-		if err != nil {
-			return nil, fmt.Errorf("failed parsing oneOf file %q: %v", path, err)
-		}
-		s.Properties = mergeProperties(s.Properties, child.Properties)
-		s.Required = append(s.Required, child.Required...)
+
+		s.Properties = mergeProperties(s.Properties, one.Properties)
+		s.Required = append(s.Required, one.Required...)
 		if s.Items == nil {
-			s.Items = child.Items
+			s.Items = one.Items
 		}
 	}
 
@@ -148,13 +139,4 @@ func mergeProperties(parent, child map[string]json.RawMessage) map[string]json.R
 		}
 	}
 	return newProperties
-}
-
-// refPath returns the reference path if absolute or the combo if it and the parent if not.
-func refPath(parent, ref string) string {
-	if filepath.IsAbs(ref) {
-		return ref
-	}
-
-	return filepath.Join(filepath.Dir(parent), ref)
 }
