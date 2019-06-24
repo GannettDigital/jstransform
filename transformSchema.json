@@ -74,6 +74,9 @@
 							},
 							{
 								"$ref": "#/definitions/operations/timeParse"
+							},
+							{
+								"$ref": "#/definitions/operations/camelCase"
 							}
 						]
 					}
@@ -270,6 +273,22 @@
 								"type": "string"
 							}
 						}
+					}
+				}
+			},
+			"toCamelCase": {
+				"description": "Accepts a string, removes the delimiter to convert and return a camel case string",
+				"type": "object",
+				"required": [
+					"type"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [
+							"toCamelCase"
+						]
 					}
 				}
 			}
