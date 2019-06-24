@@ -246,6 +246,39 @@ func (t *timeParse) transform(raw interface{}) (interface{}, error) {
 	return parsedTime.Format(t.Args["layout"]), nil
 }
 
+// camelCase is a transformOperation which converts strings with dashes to camelCase.
+type camelCase struct {
+	Args map[string]string
+}
+
+func (c *camelCase) init(args map[string]string) error {
+	if err := requiredArgs([]string{"format", "layout"}, args); err != nil {
+		return err
+	}
+
+	c.Args = args
+	return nil
+}
+
+func (c *camelCase) transform(raw interface{}) (interface{}, error) {
+	in, ok := raw.(string)
+	if !ok {
+		return nil, errors.New("camelCase only supports input of type string")
+	}
+
+	var newString string
+
+	for i := 0; i < len(in); i++ {
+		if in[i] == 45 {
+			i++
+			newString += strings.ToUpper(string(in[i]))
+			continue
+		}
+		newString += string(in[i])
+	}
+	return newString, nil
+}
+
 // requiredArgs checks the given args map to make sure it contains the required args and only the required args.
 func requiredArgs(required []string, args map[string]string) error {
 	if len(args) != len(required) {
