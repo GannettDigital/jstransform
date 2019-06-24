@@ -74,6 +74,9 @@
 							},
 							{
 								"$ref": "#/definitions/operations/timeParse"
+							},
+							{
+								"$ref": "#/definitions/operations/stringToInteger"
 							}
 						]
 					}
@@ -270,6 +273,22 @@
 								"type": "string"
 							}
 						}
+					}
+				}
+			},
+			"stringToInteger": {
+				"description": "Accepts a string, converts it into an Integer and returns that Integer",
+				"type": "object",
+				"required": [
+					"type"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [
+							"stringToInteger"
+						]
 					}
 				}
 			}
