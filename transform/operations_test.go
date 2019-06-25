@@ -2,6 +2,7 @@ package transform
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -59,21 +60,22 @@ func runOpTests(t *testing.T, opType func() transformOperation, tests []opTests)
 		}
 
 		got, err := op.transform(test.in)
+		fmt.Println(got)
 
 		switch {
 		case test.wantErr && err != nil:
 			continue
 		case strings.Contains(test.description,"currentTime") == true:
 			now := time.Now()
-			result, ok := test.want.(string)
+			result, ok := got.(string)
 			if !ok {
-				t.Error("want must be type string")
+				t.Error("function must return string")
 			}
-			wantParse, err := time.Parse(time.RFC3339, result)
+			gotParse, err := time.Parse(time.RFC3339, result)
 			if err != nil {
 				t.Error(err)
 			}
-			if result := compareTimeStamps(now, wantParse);result != true {
+			if result := compareTimeStamps(now, gotParse);result != true {
 					t.Errorf("Time returned not close enough to current time: %s", err)
 				}
 		case test.wantErr && err == nil:
@@ -411,7 +413,7 @@ func TestCurrentTime (t *testing.T) {
 }
 
 func compareTimeStamps (time1 time.Time, time2 time.Time) (bool) {
-	maxTimeDifference := time.Duration(1200) * time.Second
+	maxTimeDifference := time.Duration(300) * time.Second
 	actualDiff := time1.Sub(time2)
 	if actualDiff > maxTimeDifference {
 		return false
