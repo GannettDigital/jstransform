@@ -46,7 +46,9 @@
         },
         {
           "properties": {
-            "index": "middle"
+            "index": {
+              "description": "middle"
+            }
           }
         },
         {

@@ -437,6 +437,24 @@ func runCurrentTimeTests(t *testing.T, opType func() transformOperation, tests [
 		}
 	}
 }
+func TestStringToInteger(t *testing.T) {
+	tests := []opTests{
+
+		{
+			description: "Simple working case",
+			in: "237754",
+			want: 237754,
+		},
+
+		{
+			description: "Boolean input type",
+			in: true,
+			wantErr: true,
+		},
+
+	}
+	runOpTests(t, func() transformOperation { return &stringToInteger{} }, tests)
+}
 
 func compareTimeStamps (time1 time.Time, time2 time.Time) (bool) {
 	maxTimeDifference := time.Duration(300) * time.Second

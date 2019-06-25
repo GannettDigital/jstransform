@@ -77,6 +77,9 @@
 							},
 							{
 								"ref": "#definitions/operations/currentTime"
+              },
+              {
+								"$ref": "#/definitions/operations/stringToInteger"
 							}
 						]
 					}
@@ -276,7 +279,24 @@
 					}
 				}
 			},
-			"currentTime" : {
+			"stringToInteger": {
+				"description": "Accepts a string, converts it into an Integer and returns that Integer",
+				"type": "object",
+				"required": [
+					"type"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [
+							"stringToInteger"
+						]
+					}
+				}
+			}
+		},
+    "currentTime" : {
 				"description": "Returns the current time formatted as a string",
 				"type": "object",
 				"required": [

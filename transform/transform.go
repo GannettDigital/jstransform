@@ -76,6 +76,8 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 			op = &timeParse{}
 		case "currentTime":
 			op = &currentTime{}
+		case "stringToInteger":
+			op = &stringToInteger{}
 
 		default:
 			return fmt.Errorf("unsupported operation %q", toj.Name)

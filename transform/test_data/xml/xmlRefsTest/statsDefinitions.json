@@ -1,44 +1,53 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#/",
+  "$schema": "http://json-schema.org/draft-07/schema#/",
   "definitions": {
-    "stats": {
+    "hits": {
+      "type": "string",
+      "transform":{
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "hits"
+            }
+          ]
+        }
+      }
+    },
+    "errors": {
+      "type": "string",
+      "transform":{
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "errors"
+            }
+          ]
+        }
+      }
+    },
+    "venue": {
+      "type": "object",
+      "transform": {
+        "sport": {
+          "from": [
+            {
+              "xmlPath": "venue"
+            }
+          ]
+        }
+      },
       "properties": {
-        "hits": {
+        "capacity": {
           "type": "string",
           "transform":{
             "sport": {
               "from": [
                 {
-                  "xmlPath": "hits"
+                  "xmlPath": "capacity"
                 }
               ]
             }
           }
-        },
-        "errors": {
-          "type": "string",
-          "transform":{
-            "sport": {
-              "from": [
-                {
-                  "xmlPath": "errors"
-                }
-              ]
-            }
-          }
-        },
-        "venue": {
-          "type": "object",
-          "transform": {
-            "sport": {
-              "from": [
-                {
-                  "xmlPath": "venue"
-                }
-              ]
-            }
-          },
-          "$ref": "./venue.json"
         }
       }
     }

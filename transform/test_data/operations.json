@@ -150,6 +150,12 @@
                   "args": {
                     "format": "RFC3339"
                   }
+      "strToInt": {
+      "type": "integer",
+              "jsonPath": "$.strToInt",
+              "operations": [
+                {
+                  "type": "stringToInteger" 
                 }
               ]
             }

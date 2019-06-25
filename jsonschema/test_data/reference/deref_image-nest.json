@@ -10,6 +10,7 @@
                 },
                 {
                     "$schema": "http://json-schema.org/draft-04/schema#",
+                    "additionalProperties": true,
                     "properties": {
                         "URL": {
                             "allOf": [
@@ -40,11 +41,14 @@
                                             "type": "string"
                                         }
                                     },
-                                    "type": "object"
+                                    "type": "object",
+                                    "fromRef": "./jsref_image-defs.json#/definitions/imageurl"
                                 },
                                 {
                                     "properties": {
-                                        "index": "middle"
+                                        "index": {
+                                            "description": "middle"
+                                        }
                                     }
                                 },
                                 {
@@ -74,7 +78,8 @@
                                             "type": "string"
                                         }
                                     },
-                                    "type": "object"
+                                    "type": "object",
+                                    "fromRef": "./jsref_image-defs.json#/definitions/imageurl"
                                 }
                             ]
                         },
@@ -126,7 +131,8 @@
                         "originalSize",
                         "datePhotoTaken"
                     ],
-                    "type": "object"
+                    "type": "object",
+                    "fromRef": "./jsref_image-list2.json"
                 },
                 {
                     "properties": {
