@@ -2,7 +2,6 @@ package transform
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -60,7 +59,6 @@ func runOpTests(t *testing.T, opType func() transformOperation, tests []opTests)
 		}
 
 		got, err := op.transform(test.in)
-		fmt.Println(got)
 
 		switch {
 		case test.wantErr && err != nil:
