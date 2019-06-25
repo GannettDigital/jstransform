@@ -243,6 +243,134 @@ func TestWalkJSONSchema(t *testing.T) {
 			schemaPath:  "./test_data/bad-array.json",
 			wantErr:     true,
 		},
+		{
+			description: "Nested AllOf",
+			oneOfType:   "",
+			schemaPath:  "./test_data/parent3.json",
+			want:        map[string]Instance{"$.type": {Type: "string"}},
+		},
+		{
+			description: "Nested AllOf with oneOf",
+			oneOfType:   "image",
+			schemaPath:  "./test_data/parent4.json",
+			want: map[string]Instance{
+				"$.type": {Type: "string"},
+				"$.crops": {Type: "array", Items: []byte(`{
+			        "type": "object",
+			        "properties": {
+			          "name": {
+			            "type": "string",
+			            "default": "name"
+			          },
+			          "width": {
+			            "type": "number"
+			          },
+			          "height": {
+			            "type": "number"
+			          },
+			          "path": {
+			            "type": "string"
+			          },
+			          "relativePath": {
+			            "type": "string"
+			          }
+			        },
+			        "required":[
+			          "name",
+			          "width",
+			          "height",
+			          "path",
+			          "relativePath"
+			        ]
+			    }`)},
+				"$.crops[*]": {Type: "object", Properties: map[string]json.RawMessage{
+					"name": []byte(`{
+			            "type": "string",
+			            "default": "name"
+			          }`),
+					"width": []byte(`{
+			            "type": "number"
+			          }`),
+					"height": []byte(`{
+			            "type": "number"
+			          }`),
+					"path": []byte(`{
+			            "type": "string"
+			          }`),
+					"relativePath": []byte(`{
+			            "type": "string"
+			          }`),
+				},
+					Required: []string{"name", "width", "height", "path", "relativePath"},
+				},
+				"$.crops[*].name":         {Type: "string"},
+				"$.crops[*].width":        {Type: "number"},
+				"$.crops[*].height":       {Type: "number"},
+				"$.crops[*].path":         {Type: "string"},
+				"$.crops[*].relativePath": {Type: "string"},
+				"$.URL": {Type: "object", Properties: map[string]json.RawMessage{
+					"publish": []byte(`{
+			          "type": "string",
+			          "transform": {
+			            "cumulo": {
+			              "from" : [
+			                {
+			                  "jsonPath": "$.publishUrl"
+			                }
+			              ]
+			            }
+			          }
+			        }`),
+					"absolute": []byte(`{
+			          "type": "string",
+			          "transform": {
+			            "cumulo": {
+			              "from" : [
+			                {
+			                  "jsonPath": "$.absoluteUrl"
+			                }
+			              ]
+			            }
+			          }
+			      }`)},
+					Required: []string{"publish", "absolute"},
+				},
+				"$.URL.publish":  {Type: "string"},
+				"$.URL.absolute": {Type: "string"},
+			},
+		},
+		{
+			description: "AllOf in referenced type",
+			oneOfType:   "",
+			schemaPath:  "./test_data/embed_embed.json",
+			want: map[string]Instance{
+				"$.embed": {
+					Type:  "array",
+					Items: json.RawMessage(`{"additionalProperties":true,"allOf":[{"additionalProperties":true,"fromRef":"./embed.json","properties":{"type":{"type":"string","enum":["embed"]}},"$schema":"http://json-schema.org/draft-04/schema#","type":"object"}],"properties":{"type":{"type":"string","enum":["embed"]}},"$schema":"http://json-schema.org/draft-04/schema#","type":"object","fromRef":"./embed_parent.json"}`),
+				},
+				"$.embed[*]": {
+					Type:                 "object",
+					AdditionalProperties: true,
+					AllOf: []Instance{
+						{
+							AdditionalProperties: true,
+							FromRef:              "./embed.json",
+							Properties: map[string]json.RawMessage{
+								"type": []byte(`{"type":"string","enum":["embed"]}`),
+							},
+							Schema: "http://json-schema.org/draft-04/schema#",
+							Type:   "object",
+						},
+					},
+					FromRef: "./embed_parent.json",
+					Properties: map[string]json.RawMessage{
+						"type": json.RawMessage(`{"type":"string","enum":["embed"]}`),
+					},
+					Schema: "http://json-schema.org/draft-04/schema#",
+				},
+				"$.embed[*].type": {Type: "string"},
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -276,7 +404,7 @@ func TestWalkJSONSchema(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(got, want) {
-					t.Errorf("Test %q - at got key %q got call\n%v\n\twant\n%v", test.description, key, call, want)
+					t.Errorf("Test %q - at got key %q got call\n%s\n\twant\n%s", test.description, key, got, want)
 				}
 			}
 			for key, call := range test.want {
@@ -686,13 +814,29 @@ func TestWalkJSONSchemaRaw(t *testing.T) {
 			t.Errorf("Test %q - got %d calls, want %d", test.description, got, want)
 		}
 		for key, call := range walker.rawCalls {
-			if !reflect.DeepEqual(call, test.want[key]) {
-				t.Errorf("Test %q - at got key %q got call\n%s\n\twant\n%s", test.description, key, call, test.want[key])
+			got, err := json.MarshalIndent(call, "", "  ")
+			if err != nil {
+				t.Fatal(err)
+			}
+			want, err := json.MarshalIndent(test.want[key], "", "  ")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, want) {
+				t.Errorf("Test %q - at got key %q got call\n%s\n\twant\n%s", test.description, key, got, want)
 			}
 		}
 		for key, call := range test.want {
-			if !reflect.DeepEqual(call, walker.rawCalls[key]) {
-				t.Errorf("Test %q - at want key %q got call\n%s\n\twant\n%s", test.description, key, walker.rawCalls[key], call)
+			got, err := json.MarshalIndent(walker.rawCalls[key], "", "  ")
+			if err != nil {
+				t.Fatal(err)
+			}
+			want, err := json.MarshalIndent(call, "", "  ")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, want) {
+				t.Errorf("Test %q - at want key %q got call\n%s\n\twant\n%s", test.description, key, got, want)
 			}
 		}
 	}

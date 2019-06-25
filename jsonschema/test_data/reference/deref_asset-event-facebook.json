@@ -1,5 +1,4 @@
 {
-    "$ref": "#/definitions/asset-event-facebook",
     "$schema": "http://json-schema.org/draft-06/schema#",
     "definitions": {
         "FbiaStatus": {
@@ -8,6 +7,7 @@
                 "errors": {
                     "items": {
                         "additionalProperties": false,
+                        "fromRef": "#/definitions/FbiaStatusItem",
                         "properties": {
                             "level": {
                                 "enum": [
@@ -45,6 +45,7 @@
                 "warnings": {
                     "items": {
                         "additionalProperties": false,
+                        "fromRef": "#/definitions/FbiaStatusItem",
                         "properties": {
                             "level": {
                                 "enum": [
@@ -105,10 +106,12 @@
                 "fbiaStatus": {
                     "items": {
                         "additionalProperties": false,
+                        "fromRef": "#/definitions/FbiaStatus",
                         "properties": {
                             "errors": {
                                 "items": {
                                     "additionalProperties": false,
+                                    "fromRef": "#/definitions/FbiaStatusItem",
                                     "properties": {
                                         "level": {
                                             "enum": [
@@ -146,6 +149,7 @@
                             "warnings": {
                                 "items": {
                                     "additionalProperties": false,
+                                    "fromRef": "#/definitions/FbiaStatusItem",
                                     "properties": {
                                         "level": {
                                             "enum": [

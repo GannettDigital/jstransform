@@ -137,21 +137,38 @@
         }
       }
     },
-    "toCamelCase": {
-      "type": "string",
+    "strToInt": {
+      "type": "integer",
       "transform": {
         "cumulo": {
           "from": [
             {
-              "jsonPath": "$.toCamelCase",
+              "jsonPath": "$.strToInt",
               "operations": [
                 {
-                  "type": "toCamelCase"
+                  "type": "stringToInteger"
                 }
               ]
             }
           ]
         }
+      }
+    }
+  },
+  "toCamelCase": {
+    "type": "string",
+    "transform": {
+      "cumulo": {
+        "from": [
+          {
+            "jsonPath": "$.toCamelCase",
+            "operations": [
+              {
+                "type": "toCamelCase"
+              }
+            ]
+          }
+        ]
       }
     }
   }

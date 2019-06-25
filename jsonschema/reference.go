@@ -6,172 +6,183 @@ import (
 	"io/ioutil"
 	"path"
 	"path/filepath"
-	"reflect"
-	"strconv"
 	"strings"
 
+	"github.com/buger/jsonparser"
 	"github.com/franela/goreq"
 )
 
-// jsonRef represents a JSON Reference source and targetRef
-type jsonRef struct {
-	Source []string
-	Target string
-}
+const (
+	fromRef = "fromRef"
+	refKey  = "$ref"
+)
 
-// dereference parses JSON string and replaces all $ref with the referenced data.
-func dereference(schemaPath string, input []byte, isTop bool) ([]byte, error) {
-	if !strings.Contains(string(input), "$ref") {
-		return input, nil
-	}
-
-	var data interface{}
-	json.Unmarshal([]byte(input), &data)
-	refs, err := walkInterface(data, []string{}, []jsonRef{})
+// dereference parses JSON and replaces all $ref with the referenced data.
+// If $ref refers to a file schemaFromFile is called and in this way references in referenced files are handled
+// recursively along with other processing done by schemaFromFile.
+func dereference(schemaPath string, data json.RawMessage, oneOfType string) (json.RawMessage, error) {
+	refs, err := findRefs(data)
 	if err != nil {
-		return input, fmt.Errorf("unable to walk interface %s: %v", schemaPath, err)
+		return nil, fmt.Errorf("failed when finding refs: %v", err)
 	}
 
-	for _, ref := range refs {
-		top := data
-		for i, item := range ref.Source {
-			if isTop && (ref.Source[0] == "allOf" || ref.Source[0] == "oneOf") {
-				continue // do not dereference top-level allOf and oneOf
+	for _, refPath := range refs {
+		ref, err := jsonparser.GetString(data, refPath...)
+		if err != nil {
+			return nil, fmt.Errorf("failed to retrieve ref at path %v: %v", refPath, err)
+		}
+
+		resolved, err := resolveRef(ref, data, schemaPath, oneOfType)
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve ref %q at path %v: %v", ref, refPath, err)
+		}
+
+		pathLen := len(refPath)
+		if pathLen != 1 {
+			data, err = jsonparser.Set(data, resolved, refPath[:pathLen-1]...)
+			if err != nil {
+				return nil, fmt.Errorf("failed to update data with resolved ref %q at path %v: %v", ref, refPath, err)
 			}
-			if i < len(ref.Source)-1 { // iterate
-				if intKey, err := strconv.Atoi(item); err == nil {
-					top = top.([]interface{})[intKey]
-				} else {
-					top = top.(map[string]interface{})[item]
-				}
-			} else { // set reference
-				targetRef, err := buildReference(schemaPath, data, ref.Target)
-				if err != nil {
-					return input, fmt.Errorf("unable to build reference from %s: %v", ref.Target, err)
-				}
-				targetKeys := reflect.ValueOf(targetRef).MapKeys()
-				if len(targetKeys) > 1 {
-					// assuming integer item is slice[index] instead of map[string]
-					if intKey, err := strconv.Atoi(item); err == nil {
-						top.([]interface{})[intKey] = targetRef
-					} else {
-						top.(map[string]interface{})[item] = targetRef
-					}
-				} else {
-					// when targetRef = single KV pair, set the value using the key instead of overwriting entire map
-					key := targetKeys[0].Interface().(string)
-					// assuming integer item is slice[index] instead of map[string]
-					if intKey, err := strconv.Atoi(item); err == nil {
-						top.([]interface{})[intKey].(map[string]interface{})[key] = targetRef.(map[string]interface{})[key]
-						delete(top.([]interface{})[intKey].(map[string]interface{}), "$ref")
-					} else {
-						top.(map[string]interface{})[item].(map[string]interface{})[key] = targetRef.(map[string]interface{})[key]
-						delete(top.(map[string]interface{})[item].(map[string]interface{}), "$ref")
-					}
-				}
-			}
+		} else {
+			// It is necessary to delete the refKey reference so they are not refound
+			data = jsonparser.Delete(data, refKey)
 		}
 	}
 
-	return json.Marshal(data)
+	// TODO sometimes refs remain because of refs with refs in them and the order not being right. Getting ordering
+	// right is not easy as the info needed to order is not available until late in the process. Still something
+	// better than reprocessing would be nice
+	remaining, err := findRefs(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed checking for remaining refs: %v", err)
+	}
+	if len(remaining) > 0 {
+		return dereference(schemaPath, data, oneOfType)
+	}
+
+	return data, nil
 }
 
-// walkInterface traverses the map[string]interface{} to located json references
-func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef, error) {
-	var err error
-	nodeMap, ok := node.(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("failed assertion of node: %q", nodeMap)
-	}
-	for key, val := range nodeMap {
-		switch reflect.TypeOf(val).Kind() {
-		case reflect.String:
-			if key == "$ref" {
-				sourceRef := make([]string, len(source))
-				copy(sourceRef, source)
-				refs = append(refs, jsonRef{
-					Source: sourceRef,
-					Target: val.(string),
-				})
+// findRefs searches through the given JSON finding the location in the structure of all refKeys.
+func findRefs(data json.RawMessage) ([][]string, error) {
+	refs := make([][]string, 0)
+
+	err := jsonparser.ObjectEach(data, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
+		sKey := string(key)
+		switch dataType {
+		case jsonparser.String:
+			if sKey == refKey {
+				refs = append(refs, []string{sKey})
 			}
-		case reflect.Slice:
-			valMap, ok := val.([]interface{})
-			if !ok {
-				return nil, fmt.Errorf("failed assertion of val: %q", valMap)
-			}
-			for i, item := range valMap {
-				if item != nil && reflect.TypeOf(item).Kind() == reflect.Map {
-					refs, err = walkInterface(item, append(source, key, strconv.Itoa(i)), refs)
-					if err != nil {
-						return nil, fmt.Errorf("unable to walk slice interface: %v", err)
-					}
-				}
-			}
-		case reflect.Map:
-			refs, err = walkInterface(nodeMap[key], append(source, key), refs)
+		case jsonparser.Object:
+			childRefs, err := findRefs(value)
 			if err != nil {
-				return nil, fmt.Errorf("unable to walk map interface: %v", err)
+				return err
+			}
+			for _, r := range childRefs {
+				combined := append([]string{sKey}, r...)
+				refs = append(refs, combined)
+			}
+		case jsonparser.Array:
+			var index int
+			_, err := jsonparser.ArrayEach(value, func(avalue []byte, adataType jsonparser.ValueType, aoffset int, aerr error) {
+				currentIndex := fmt.Sprintf("[%d]", index)
+				index++
+				if adataType != jsonparser.Object {
+					return
+				}
+				cRefs, err := findRefs(avalue)
+				if err != nil {
+					return
+				}
+				for _, r := range cRefs {
+					combined := append([]string{sKey, currentIndex}, r...)
+					refs = append(refs, combined)
+				}
+			})
+			if err != nil {
+				return err
 			}
 		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
+
 	return refs, nil
 }
 
-// buildReference constructs the json reference: internal, file or http
-func buildReference(schemaPath string, top interface{}, ref string) (interface{}, error) {
-	target := strings.Split(ref, "#")
-	if len(target) < 2 {
-		target = append(target, "/")
+// resolveRef looks at the reference value passed in as ref and resolves it to a set of JSON.
+// The reference may refer to a definition withing the given data or a file reference.
+// For files schemaPath is used to resolve relative references then SchemaFromFile is used to build the file.
+// oneOfType is used by schemaFromFile to select a specific oneOfType.
+func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType string) (json.RawMessage, error) {
+	// TODO there is nothing here to stop circular references other than self references
+	var sourcePath, target string
+	splits := strings.SplitN(ref, "#", 2)
+	if len(splits) != 2 {
+		if strings.Contains(ref, "#") {
+			target = strings.Trim(ref, "#/")
+		} else {
+			sourcePath = ref
+		}
+	} else {
+		sourcePath = splits[0]
+		target = strings.Trim(splits[1], "/")
 	}
-	var source interface{}
+
+	var source json.RawMessage
 
 	switch {
-	case len(target[0]) == 0:
-		source = top
-	case strings.HasPrefix(target[0], "http"):
-		res, err := goreq.Request{Uri: target[0]}.Do()
+	case sourcePath == "":
+		source = data
+	case strings.HasPrefix(sourcePath, "http"):
+		res, err := goreq.Request{Uri: sourcePath}.Do()
 		if err != nil {
-			return nil, fmt.Errorf("unable to get reference from %s: %v", target[0], err)
+			return nil, fmt.Errorf("unable to get reference from %q: %v", sourcePath, err)
 		}
-		res.Body.FromJsonTo(&source)
-	default:
-		refPath, err := filepath.Abs(path.Dir(schemaPath) + "/" + target[0])
+		source, err = ioutil.ReadAll(res.Body)
 		if err != nil {
-			return nil, fmt.Errorf("unable to expand reference filepath %s: %v", target[0], err)
+			return nil, fmt.Errorf("failed to read body from %q: %v", sourcePath, err)
+		}
+		// TODO since SchemaFromFile does the current allOf/oneOf processing this data does not go through that processing
+	default: // Default to assuming it is a file reference
+		// TODO this could be rather inefficient if there are multiple references to the same sourcePath but a different
+		// target as it will currently reprocess the source file everytime
+		refPath, err := filepath.Abs(filepath.Join(path.Dir(schemaPath), sourcePath))
+		if err != nil {
+			return nil, fmt.Errorf("unable to expand reference filepath %q: %v", sourcePath, err)
 		}
 		if schemaPath == refPath {
-			return nil, fmt.Errorf("infinite loop detected in reference file %q: %v", refPath, err)
+			source = data
+			break
 		}
-		data, err := ioutil.ReadFile(refPath)
+		schema, err := SchemaFromFile(refPath, oneOfType)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read reference file %q: %v", refPath, err)
+			return nil, fmt.Errorf("failed to process reference file %q: %v", refPath, err)
 		}
-		data, err = dereference(refPath, data, false)
+		source, err = json.Marshal(schema)
 		if err != nil {
-			return nil, fmt.Errorf("failed to dereference refPath %s: %v", refPath, err)
+			return nil, fmt.Errorf("failed to marshal schema from file %q: %v", refPath, err)
 		}
-		json.Unmarshal([]byte(data), &source)
 	}
-	sourceMap, ok := source.(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("failed assertion of source: %q", sourceMap)
-	}
-	return parseReference(sourceMap, strings.Split(target[1], "/")[1:]), nil
-}
 
-// parseReference recursively parses the given reference path
-func parseReference(source interface{}, refPaths []string) interface{} {
-	sourceMap, ok := source.(map[string]interface{})
-	if !ok {
-		return nil
-	}
-	if len(refPaths) > 1 {
-		return parseReference(sourceMap[refPaths[0]], refPaths[1:])
+	var err error
+	if target == "" {
+		data = source
 	} else {
-		if refPaths[0] != "" {
-			return sourceMap[refPaths[0]]
-		} else {
-			return source
+		data, _, _, err = jsonparser.Get(source, strings.Split(target, "/")...)
+		if err != nil {
+			return nil, fmt.Errorf("failed to retrieve ref %q: %v", target, err)
 		}
 	}
+
+	data = []byte(strings.TrimSpace(string(data)))
+	data, err = jsonparser.Set(data, []byte(fmt.Sprintf("%q", ref)), fromRef)
+	if err != nil {
+		return nil, fmt.Errorf("failed to set fromRef for reference %q: %v", ref, err)
+	}
+
+	return data, nil
 }

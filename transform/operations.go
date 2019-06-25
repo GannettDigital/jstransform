@@ -272,6 +272,23 @@ func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
 	return strings.Join(arr, ""), nil
 }
 
+// stringToInteger is a transformOperation which takes a string and converts it into an Int
+type stringToInteger struct {
+}
+
+func (s *stringToInteger) init(args map[string]string) error {
+	return nil
+}
+
+func (s *stringToInteger) transform(raw interface{}) (interface{}, error) {
+	str, ok := raw.(string)
+	if !ok {
+		return nil, errors.New("stringToInteger only supports strings")
+	}
+
+	return strconv.Atoi(str)
+}
+
 // requiredArgs checks the given args map to make sure it contains the required args and only the required args.
 func requiredArgs(required []string, args map[string]string) error {
 	if len(args) != len(required) {

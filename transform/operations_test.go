@@ -374,7 +374,6 @@ func TestTimeParse(t *testing.T) {
 	}
 	runOpTests(t, func() transformOperation { return &timeParse{} }, tests)
 }
-
 func TestToCamelCase(t *testing.T) {
 	tests := []opTests{
 		{
@@ -395,4 +394,22 @@ func TestToCamelCase(t *testing.T) {
 	}
 
 	runOpTests(t, func() transformOperation { return &toCamelCase{} }, tests)
+}
+
+func TestStringToInteger(t *testing.T) {
+	tests := []opTests{
+
+		{
+			description: "Simple working case",
+			in:          "237754",
+			want:        237754,
+		},
+
+		{
+			description: "Boolean input type",
+			in:          true,
+			wantErr:     true,
+		},
+	}
+	runOpTests(t, func() transformOperation { return &stringToInteger{} }, tests)
 }

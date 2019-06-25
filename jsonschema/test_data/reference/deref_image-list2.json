@@ -30,11 +30,14 @@
                             "type": "string"
                         }
                     },
-                    "type": "object"
+                    "type": "object",
+                    "fromRef": "./jsref_image-defs.json#/definitions/imageurl"
                 },
                 {
                     "properties": {
-                        "index": "middle"
+                        "index": {
+                            "description": "middle"
+                        }
                     }
                 },
                 {
@@ -64,7 +67,8 @@
                             "type": "string"
                         }
                     },
-                    "type": "object"
+                    "type": "object",
+                    "fromRef": "./jsref_image-defs.json#/definitions/imageurl"
                 }
             ]
         },

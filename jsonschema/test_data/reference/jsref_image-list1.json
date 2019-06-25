@@ -40,7 +40,7 @@
       }
     },
     "URL": {
-      "allOf": [
+      "oneOf": [
         {
           "properties": {
             "index": "first"
