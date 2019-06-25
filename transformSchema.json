@@ -76,7 +76,7 @@
 								"$ref": "#/definitions/operations/timeParse"
 							},
 							{
-								"$ref": "#/definitions/operations/camelCase"
+								"$ref": "#/definitions/operations/toCamelCase"
 							}
 						]
 					}

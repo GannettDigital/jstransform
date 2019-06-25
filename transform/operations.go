@@ -246,7 +246,7 @@ func (t *timeParse) transform(raw interface{}) (interface{}, error) {
 	return parsedTime.Format(t.args["layout"]), nil
 }
 
-// camelCase is a transformOperation which converts strings with dashes to camelCase.
+// toCamelCase is a transformOperation which converts strings with dashes to camelCase.
 type toCamelCase struct {
 }
 
