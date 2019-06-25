@@ -136,6 +136,26 @@
           ]
         }
       }
+    },
+    "lastModified": {
+      "type": "string",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.lastModified",
+              "operations": [
+                {
+                  "type": "currentTime",
+                  "args": {
+                    "format": "RFC3339"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
     }
   }
 }
