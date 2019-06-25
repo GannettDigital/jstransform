@@ -379,8 +379,8 @@ func TestToCamelCase(t *testing.T) {
 	tests := []opTests{
 		{
 			description: "Simple working case",
-			in:          "test-one-with-dashes",
-			want:        "testOneWithDashes",
+			in:          "extra-base-hit",
+			want:        "extraBaseHit",
 		},
 		{
 			description: "Non-string input",
