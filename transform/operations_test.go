@@ -374,3 +374,20 @@ func TestTimeParse(t *testing.T) {
 	}
 	runOpTests(t, func() transformOperation { return &timeParse{} }, tests)
 }
+
+func TestToCamelCase(t *testing.T) {
+	tests := []opTests{
+		{
+			description: "Simple working case",
+			in:          "test-one-with-dashes",
+			want:        "testOneWithDashes",
+		},
+		{
+			description: "Non-string input",
+			in:          1234,
+			wantInitErr: true,
+		},
+	}
+
+	runOpTests(t, func() transformOperation { return &toCamelCase{} }, tests)
+}
