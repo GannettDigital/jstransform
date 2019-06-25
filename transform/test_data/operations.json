@@ -150,12 +150,23 @@
                   "args": {
                     "format": "RFC3339"
                   }
-      "strToInt": {
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "strToInt": {
       "type": "integer",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
               "jsonPath": "$.strToInt",
               "operations": [
                 {
-                  "type": "stringToInteger" 
+                  "type": "stringToInteger"
                 }
               ]
             }
@@ -165,3 +176,5 @@
     }
   }
 }
+
+
