@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "properties": {
         "URL": {
-            "allOf": [
+            "oneOf": [
                 {
                     "properties": {
                         "index": "first"
@@ -35,7 +35,8 @@
                             "type": "string"
                         }
                     },
-                    "type": "object"
+                    "type": "object",
+                    "fromRef": "./jsref_image-defs.json#/definitions/imageurl"
                 },
                 {
                     "properties": {

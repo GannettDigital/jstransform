@@ -95,7 +95,7 @@ func TestDereference(t *testing.T) {
 			t.Errorf("Test %q - failed to read json got file %q: %v", test.description, test.schemaPath, err)
 		}
 
-		gotJson, err = dereference(test.schemaPath, gotJson, true)
+		gotJson, err = dereference(test.schemaPath, gotJson, "")
 		if err != nil && !test.wantErr {
 			t.Errorf("Test %q - failed to dereference json file %q: %v", test.description, test.schemaPath, err)
 		}
@@ -106,56 +106,6 @@ func TestDereference(t *testing.T) {
 			continue
 		case !reflect.DeepEqual(got, want):
 			t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, want)
-		}
-	}
-}
-
-func TestParseReference(t *testing.T) {
-	var source interface{}
-	defPath := "./test_data/reference/jsref_image-defs.json"
-	defJson, err := ioutil.ReadFile(defPath)
-	if err != nil {
-		t.Errorf("Failed to read json file %q: %v", defPath, err)
-	}
-	json.Unmarshal(defJson, &source)
-
-	tests := []struct {
-		description string
-		refPaths    []string
-		want        json.RawMessage
-	}{
-		{
-			description: "Simple Type Reference",
-			refPaths:    []string{"definitions", "arraytype"},
-			want:        json.RawMessage(`{"type":"array"}`),
-		},
-		{
-			description: "Deeply Nested Reference",
-			refPaths:    []string{"definitions", "deeply", "nested", "objecttype"},
-			want:        json.RawMessage(`{"type":"object"}`),
-		},
-		{
-			description: "Incorrect Reference",
-			refPaths:    []string{"definitions", "deeply", "nested", "bad"},
-			want:        json.RawMessage(`null`),
-		},
-		{
-			description: "Image Url Reference",
-			refPaths:    []string{"definitions", "imageurl"},
-			want:        json.RawMessage(`{"properties":{"absolute":{"transform":{"cumulo":{"from":[{"jsonPath":"$.absoluteUrl"}]}},"type":"string"},"publish":{"transform":{"cumulo":{"from":[{"jsonPath":"$.publishUrl"}]}},"type":"string"}},"type":"object"}`),
-		},
-	}
-	for _, test := range tests {
-		var got json.RawMessage
-		var gotJson interface{}
-		gotJson = parseReference(source, test.refPaths)
-		got, err := json.Marshal(gotJson)
-
-		if err != nil {
-			t.Errorf("Test %q - error marshal got\n%s: %v", test.description, gotJson, err)
-		}
-		if !reflect.DeepEqual(got, test.want) {
-			t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, test.want)
 		}
 	}
 }

@@ -59,7 +59,8 @@
                     "type": "string"
                 }
             },
-            "type": "object"
+            "type": "object",
+            "fromRef": "#/definitions/imageurl"
         },
         "crops": {
             "items": {
