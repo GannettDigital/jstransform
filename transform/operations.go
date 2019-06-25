@@ -258,7 +258,6 @@ func (c *currentTime) init(args map[string]string) error {
 	return nil
 }
 
-//Errors to worry about?
 func (c *currentTime) transform (raw interface{}) (interface{}, error) {
 	return time.Now().Format(c.Args["format"]), nil
 }

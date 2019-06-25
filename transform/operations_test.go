@@ -415,9 +415,5 @@ func TestCurrentTime (t *testing.T) {
 func compareTimeStamps (time1 time.Time, time2 time.Time) (bool) {
 	maxTimeDifference := time.Duration(300) * time.Second
 	actualDiff := time1.Sub(time2)
-	if actualDiff > maxTimeDifference {
-		return false
-	} else {
-		return true
-	}
+	return actualDiff > maxTimeDifference
 }
