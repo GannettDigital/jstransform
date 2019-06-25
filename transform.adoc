@@ -66,5 +66,6 @@ Operations allow further mutation of data, for mutation types that are not curre
 | split | string | array | on | The string to split on
 | timeParse | string | string | format | The format to parse the time from
 | | | | layout | The layout of the returned date string
+| stringToInteger | string | integer | |
 |===
 
