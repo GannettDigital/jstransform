@@ -4,7 +4,6 @@ import (
 	"errors"
 	"reflect"
 	"strconv"
-	"strings"
 	"testing"
 	"time"
 )
@@ -63,19 +62,6 @@ func runOpTests(t *testing.T, opType func() transformOperation, tests []opTests)
 		switch {
 		case test.wantErr && err != nil:
 			continue
-		case strings.Contains(test.description,"currentTime") == true:
-			now := time.Now()
-			result, ok := got.(string)
-			if !ok {
-				t.Error("function must return string")
-			}
-			gotParse, err := time.Parse(time.RFC3339, result)
-			if err != nil {
-				t.Error(err)
-			}
-			if result := compareTimeStamps(now, gotParse);result != true {
-					t.Errorf("Time returned not close enough to current time: %s", err)
-				}
 		case test.wantErr && err == nil:
 			t.Errorf("Test %q - got nil, want error", test.description)
 		case !test.wantErr && err != nil:
@@ -392,7 +378,7 @@ func TestTimeParse(t *testing.T) {
 func TestCurrentTime (t *testing.T) {
 	tests := []opTests {
 		{
-			description: "Simple working case - currentTime",
+			description: "Simple working case",
 			args: map[string]string{"format": time.RFC3339},
 			want: time.Now().Format(time.RFC3339),
 		},
@@ -407,7 +393,49 @@ func TestCurrentTime (t *testing.T) {
 			wantInitErr: true,
 		},
 	}
-	runOpTests(t, func() transformOperation { return &currentTime{} }, tests)
+	runCurrentTimeTests(t, func() transformOperation { return &currentTime{} }, tests)
+}
+
+func runCurrentTimeTests(t *testing.T, opType func() transformOperation, tests []opTests) {
+
+	for _, test := range tests {
+		op := opType()
+		err := op.init(test.args)
+
+		switch {
+		case test.wantInitErr && err != nil:
+			continue
+		case test.wantInitErr && err == nil:
+			t.Errorf("Test %q - got init error nil, want error", test.description)
+		case !test.wantErr && err != nil:
+			t.Errorf("Test %q - got init error, want nil: %v", test.description, err)
+		}
+
+		got, err := op.transform(test.in)
+
+		switch {
+		case test.wantErr && err != nil:
+			now := time.Now()
+			result, ok := got.(string)
+			if !ok {
+				t.Error("function must return string")
+			}
+			gotParse, err := time.Parse(time.RFC3339, result)
+			if err != nil {
+				t.Error(err)
+			}
+			if result := compareTimeStamps(now, gotParse); !result {
+				t.Errorf("Time returned not close enough to current time: %s", err)
+			}
+			continue
+		case test.wantErr && err == nil:
+			t.Errorf("Test %q - got nil, want error", test.description)
+		case !test.wantErr && err != nil:
+			t.Errorf("Test %q - got error, want nil: %v", test.description, err)
+		case !reflect.DeepEqual(got, test.want):
+			t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, test.want)
+		}
+	}
 }
 
 func compareTimeStamps (time1 time.Time, time2 time.Time) (bool) {
