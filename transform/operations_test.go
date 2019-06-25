@@ -385,7 +385,12 @@ func TestToCamelCase(t *testing.T) {
 		{
 			description: "Non-string input",
 			in:          1234,
-			wantInitErr: true,
+			wantErr:     true,
+		},
+		{
+			description: "Boolean input",
+			in:          false,
+			wantErr:     true,
 		},
 	}
 
