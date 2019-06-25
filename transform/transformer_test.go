@@ -504,22 +504,22 @@ func TestNewXMLTransformer(t *testing.T) {
 	for _, test := range tests {
 		schema, err := jsonschema.SchemaFromFile(test.schemaFilePath, "")
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf("Test %q: %v", test.description, err)
 		}
 
 		tr, err := NewXMLTransformer(schema, test.transformIdentifier)
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf("Test %q: %v", test.description, err)
 		}
 
 		rawXMLBytes, err := ioutil.ReadFile(test.xmlFilePath)
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf("Test %q: %v", test.description, err)
 		}
 
 		output, err := tr.Transform(rawXMLBytes)
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf("Test %q: %v", test.description, err)
 		}
 
 		want, err := ioutil.ReadFile(test.wantFilePath)
@@ -530,15 +530,15 @@ func TestNewXMLTransformer(t *testing.T) {
 		)
 
 		if err := json.Unmarshal(output, &outputMap); err != nil {
-			t.Fatal(err)
+			t.Fatalf("Test %q: %v", test.description, err)
 		}
 
 		if err := json.Unmarshal(want, &wantMap); err != nil {
-			t.Fatal(err)
+			t.Fatalf("Test %q: %v", test.description, err)
 		}
 
 		if !reflect.DeepEqual(outputMap, wantMap) {
-			t.Fatalf("test %s failed \n got:\n %s \n want:\n %s", test.description, output, want)
+			t.Fatalf("Test %q - failed \n got:\n %s \n want:\n %s", test.description, output, want)
 		}
 	}
 
