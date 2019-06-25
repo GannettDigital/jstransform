@@ -136,6 +136,23 @@
           ]
         }
       }
+    },
+    "strToInt": {
+      "type": "string",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.strToInt",
+              "operations": [
+                {
+                  "type": "stringToInteger"
+                }
+              ]
+            }
+          ]
+        }
+      }
     }
   }
 }
