@@ -124,9 +124,10 @@ var (
 							"mixedCase": "a|B|c|D",
 							"invalid": false,
 							"url": "http://foo.com/blah",
-							"startTime": "2019-05-16T21:00:00-04:00"
+							"startTime": "2019-05-16T21:00:00-04:00",
+							"strToInt": "12345"
 						}`),
-			want: json.RawMessage(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"startTime":"09:00","url":"http://gannettdigital.com/blah","valid":true}`),
+			want: json.RawMessage(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"startTime":"09:00","strToInt":12345,"url":"http://gannettdigital.com/blah","valid":true}`),
 		},
 		{
 			description:         "Test empty non-required object",
