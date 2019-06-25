@@ -260,12 +260,7 @@ func (s *stringToInteger) transform(raw interface{}) (interface{}, error) {
 		return nil, errors.New("stringToInteger only supports strings")
 	}
 
-	result, err := strconv.Atoi(str)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("error converting to an Integer from a string: %s", err))
-	} 
-
-	return result, nil
+	return strconv.Atoi(str)
 }
 
 // requiredArgs checks the given args map to make sure it contains the required args and only the required args.

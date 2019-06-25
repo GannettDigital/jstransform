@@ -385,12 +385,6 @@ func TestStringToInteger(t *testing.T) {
 		},
 
 		{
-			description: "An alphabet input",
-			in: "a",
-			wantErr: true,
-		},
-
-		{
 			description: "Boolean input type",
 			in: true,
 			wantErr: true,
