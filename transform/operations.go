@@ -59,7 +59,7 @@ func (c *duration) transform(raw interface{}) (interface{}, error) {
 
 // changeCase is a transformOperation which changes the case of strings.
 type changeCase struct {
-	Args map[string]string
+	args map[string]string
 }
 
 func (c *changeCase) init(args map[string]string) error {
@@ -71,7 +71,7 @@ func (c *changeCase) init(args map[string]string) error {
 		return errors.New("the argument 'to' is required and must be either 'lower' or 'upper'")
 	}
 
-	c.Args = args
+	c.args = args
 	return nil
 }
 
@@ -81,7 +81,7 @@ func (c *changeCase) transform(raw interface{}) (interface{}, error) {
 		return nil, errors.New("changeCase only supports strings")
 	}
 
-	switch c.Args["to"] {
+	switch c.args["to"] {
 	case "lower":
 		return strings.ToLower(in), nil
 	case "upper":
@@ -110,14 +110,14 @@ func (i *inverse) transform(raw interface{}) (interface{}, error) {
 // max is a transformOperation which retrieves a field from the maximum item in an array.
 // The maxiumum item is determined by comparing values in a defined number field on the array items.
 type max struct {
-	Args map[string]string
+	args map[string]string
 }
 
 func (m *max) init(args map[string]string) error {
 	if err := requiredArgs([]string{"by", "return"}, args); err != nil {
 		return err
 	}
-	m.Args = args
+	m.args = args
 	return nil
 }
 
@@ -126,8 +126,8 @@ func (m *max) transform(in interface{}) (interface{}, error) {
 	if !ok {
 		return nil, errors.New("input must be an array")
 	}
-	byArg := strings.Replace(m.Args["by"], "@", "$", 1)
-	returnArg := strings.Replace(m.Args["return"], "@", "$", 1)
+	byArg := strings.Replace(m.args["by"], "@", "$", 1)
+	returnArg := strings.Replace(m.args["return"], "@", "$", 1)
 
 	var largest float64
 	var largestIndex int
@@ -160,7 +160,7 @@ func (m *max) transform(in interface{}) (interface{}, error) {
 
 // replace is a transformOperation which performs a regex based find/replace on a string value.
 type replace struct {
-	Args  map[string]string
+	args  map[string]string
 	regex *regexp.Regexp
 }
 
@@ -174,7 +174,7 @@ func (r *replace) init(args map[string]string) error {
 	}
 
 	r.regex = re
-	r.Args = args
+	r.args = args
 	return nil
 }
 
@@ -187,12 +187,12 @@ func (r *replace) transform(raw interface{}) (interface{}, error) {
 		return nil, errors.New("replace only supports strings")
 	}
 
-	return r.regex.ReplaceAllString(in, r.Args["new"]), nil
+	return r.regex.ReplaceAllString(in, r.args["new"]), nil
 }
 
 // split is a transformOperation which splits a string based on a given split string.
 type split struct {
-	Args map[string]string
+	args map[string]string
 }
 
 func (s *split) init(args map[string]string) error {
@@ -200,7 +200,7 @@ func (s *split) init(args map[string]string) error {
 		return err
 	}
 
-	s.Args = args
+	s.args = args
 	return nil
 }
 
@@ -210,7 +210,7 @@ func (s *split) transform(raw interface{}) (interface{}, error) {
 		return nil, errors.New("split only supports strings")
 	}
 
-	splits := strings.Split(in, s.Args["on"])
+	splits := strings.Split(in, s.args["on"])
 
 	// Return []interface{} to avoid messing up type casts later in the process
 	interfaceSplits := []interface{}{}
@@ -222,7 +222,7 @@ func (s *split) transform(raw interface{}) (interface{}, error) {
 
 // timeParse is a transformOperation which formats a date string into the layout
 type timeParse struct {
-	Args map[string]string
+	args map[string]string
 }
 
 func (t *timeParse) init(args map[string]string) error {
@@ -230,7 +230,7 @@ func (t *timeParse) init(args map[string]string) error {
 		return err
 	}
 
-	t.Args = args
+	t.args = args
 	return nil
 }
 
@@ -239,27 +239,27 @@ func (t *timeParse) transform(raw interface{}) (interface{}, error) {
 	if !ok {
 		return nil, errors.New("timeParse only supports strings")
 	}
-	parsedTime, err := time.Parse(t.Args["format"], in)
+	parsedTime, err := time.Parse(t.args["format"], in)
 	if err != nil {
 		return nil, fmt.Errorf("time could not be parsed using supplied format")
 	}
-	return parsedTime.Format(t.Args["layout"]), nil
+	return parsedTime.Format(t.args["layout"]), nil
 }
 
 type currentTime struct {
-	Args map[string]string
+	args map[string]string
 }
 
 func (c *currentTime) init(args map[string]string) error {
 	if err := requiredArgs([]string{"format"}, args); err != nil {
 		return err
 	}
-	c.Args = args
+	c.args = args
 	return nil
 }
 
 func (c *currentTime) transform (raw interface{}) (interface{}, error) {
-	return time.Now().Format(c.Args["format"]), nil
+	return time.Now().Format(c.args["format"]), nil
 }
 
 // requiredArgs checks the given args map to make sure it contains the required args and only the required args.
