@@ -153,22 +153,22 @@
           ]
         }
       }
-    }
-  },
-  "toCamelCase": {
-    "type": "string",
-    "transform": {
-      "cumulo": {
-        "from": [
-          {
-            "jsonPath": "$.toCamelCase",
-            "operations": [
-              {
-                "type": "toCamelCase"
-              }
-            ]
-          }
-        ]
+    },
+    "toCamelCase": {
+      "type": "string",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.toCamelCase",
+              "operations": [
+                {
+                  "type": "toCamelCase"
+                }
+              ]
+            }
+          ]
+        }
       }
     }
   }
