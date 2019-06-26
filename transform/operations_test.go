@@ -2,6 +2,7 @@ package transform
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strconv"
 	"testing"
@@ -45,51 +46,55 @@ type opTests struct {
 func runOpTests(t *testing.T, opType func() transformOperation, tests []opTests) {
 
 	for _, test := range tests {
-		op := opType()
-		err := op.init(test.args)
-
-		switch {
-		case test.wantInitErr && err != nil:
-			continue
-		case test.wantInitErr && err == nil:
-			t.Errorf("Test %q - got init error nil, want error", test.description)
-		case !test.wantErr && err != nil:
-			t.Errorf("Test %q - got init error, want nil: %v", test.description, err)
-		}
-
-		got, err := op.transform(test.in)
-
-		switch {
-		case test.wantErr && err != nil:
-			continue
-		case test.wantErr && err == nil:
-			t.Errorf("Test %q - got nil, want error", test.description)
-		case !test.wantErr && err != nil:
-			t.Errorf("Test %q - got error, want nil: %v", test.description, err)
-		case !reflect.DeepEqual(got, test.want):
-			t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, test.want)
-		}
+		runOpTest(t, opType, test)
 	}
 }
 
-// A common test runner for all the operations tests
-func runOpTestsClone(t *testing.T, initErr error, got interface{}, transformErr error, test opTests) {
-
-	switch {
-	case test.wantInitErr && initErr == nil:
-		t.Errorf("Test %q - got init error nil, want error", test.description)
-	case !test.wantErr && initErr != nil:
-		t.Errorf("Test %q - got init error, want nil: %v", test.description, initErr)
+func runOpTest(t *testing.T, opType func() transformOperation, test opTests) {
+	op, err := runOpTestInit(opType, test)
+	if test.wantInitErr && err != nil {
+		return
+	} else if err != nil {
+		t.Error(err)
 	}
 
+	_, err = runOpTestTransform(op, test)
+	if test.wantErr && err != nil {
+		return
+	} else if err != nil {
+		t.Error(err)
+	}
+}
+
+func runOpTestInit(opType func() transformOperation, test opTests) (transformOperation, error) {
+	op := opType()
+	err := op.init(test.args)
 	switch {
-	case test.wantErr && transformErr == nil:
-		t.Errorf("Test %q - got nil, want error", test.description)
-	case !test.wantErr && transformErr != nil:
-		t.Errorf("Test %q - got error, want nil: %v", test.description, transformErr)
+	case test.wantInitErr && err != nil:
+		return op, err
+	case test.wantInitErr && err == nil:
+		return op, fmt.Errorf("Test %q - got init error nil, want error", test.description)
+	case !test.wantErr && err != nil:
+		return op, fmt.Errorf("Test %q - got init error, want nil: %v", test.description, err)
+	}
+	return op, nil
+}
+
+func runOpTestTransform(op transformOperation, test opTests) (interface{}, error) {
+	got, err := op.transform(test.in)
+
+	switch {
+	case test.wantErr && err != nil:
+		return got, err
+	case test.wantErr && err == nil:
+		return got, fmt.Errorf("Test %q - got nil, want error", test.description)
+	case !test.wantErr && err != nil:
+		return got, fmt.Errorf("Test %q - got error, want nil: %v", test.description, err)
 	case !reflect.DeepEqual(got, test.want):
-		t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, test.want)
+		return got, fmt.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, test.want)
 	}
+
+	return got, nil
 }
 
 func TestDuration(t *testing.T) {
@@ -415,8 +420,18 @@ func TestCurrentTime(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		initErr, got, transformErr := runTestInit(func() transformOperation { return &currentTime{} }, test)
-		runOpTestsClone(t, initErr, got, transformErr, test)
+		op, err := runOpTestInit(func() transformOperation { return &currentTime{} }, test)
+		if test.wantInitErr && err != nil {
+			continue
+		} else if err != nil {
+			t.Error(err)
+		}
+		got, err := runOpTestTransform(op, test)
+		if test.wantErr && err != nil {
+			continue
+		} else if err != nil {
+			t.Error(err)
+		}
 
 		now := time.Now()
 		result, ok := got.(string)
@@ -451,14 +466,7 @@ func TestStringToInteger(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &stringToInteger{} }, tests)
 }
 
-func runTestInit(opType func() transformOperation, test opTests) (initErrs error, got interface{}, transformErrs error) {
-		op := opType()
-		initErrs = op.init(test.args)
-		got, transformErrs = op.transform(test.in)
-		return initErrs, got, transformErrs
-}
-
-func compareTimeStamps(time1 time.Time, time2 time.Time) (bool) {
+func compareTimeStamps(time1 time.Time, time2 time.Time) bool {
 	maxTimeDifference := time.Duration(300) * time.Second
 	actualDiff := time1.Sub(time2)
 	return actualDiff > maxTimeDifference
