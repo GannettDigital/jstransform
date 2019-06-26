@@ -443,7 +443,7 @@ func TestCurrentTime(t *testing.T) {
 			t.Error(err)
 		}
 		if result := compareTimeStamps(now, gotParse); !result {
-			t.Errorf("Time returned not close enough to current time: %s", err)
+			t.Error("time returned not close enough to current time")
 		}
 	}
 }
@@ -469,5 +469,5 @@ func TestStringToInteger(t *testing.T) {
 func compareTimeStamps(time1 time.Time, time2 time.Time) bool {
 	maxTimeDifference := time.Duration(300) * time.Second
 	actualDiff := time1.Sub(time2)
-	return actualDiff > maxTimeDifference
+	return actualDiff < maxTimeDifference
 }
