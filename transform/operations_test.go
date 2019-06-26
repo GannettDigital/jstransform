@@ -72,6 +72,26 @@ func runOpTests(t *testing.T, opType func() transformOperation, tests []opTests)
 	}
 }
 
+// A common test runner for all the operations tests
+func runOpTestsClone(t *testing.T, initErr error, got interface{}, transformErr error, test opTests) {
+
+	switch {
+	case test.wantInitErr && initErr == nil:
+		t.Errorf("Test %q - got init error nil, want error", test.description)
+	case !test.wantErr && initErr != nil:
+		t.Errorf("Test %q - got init error, want nil: %v", test.description, initErr)
+	}
+
+	switch {
+	case test.wantErr && transformErr == nil:
+		t.Errorf("Test %q - got nil, want error", test.description)
+	case !test.wantErr && transformErr != nil:
+		t.Errorf("Test %q - got error, want nil: %v", test.description, transformErr)
+	case !reflect.DeepEqual(got, test.want):
+		t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, test.want)
+	}
+}
+
 func TestDuration(t *testing.T) {
 	tests := []opTests{
 		{
@@ -375,88 +395,70 @@ func TestTimeParse(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &timeParse{} }, tests)
 }
 
-func TestCurrentTime (t *testing.T) {
-	tests := []opTests {
+func TestCurrentTime(t *testing.T) {
+	tests := []opTests{
 		{
 			description: "Simple working case",
-			args: map[string]string{"format": time.RFC3339},
-			want: time.Now().Format(time.RFC3339),
+			args:        map[string]string{"format": time.RFC3339},
+			want:        time.Now().Format(time.RFC3339),
 		},
 		{
 			description: "Missing arg",
-			args: map[string]string{},
+			args:        map[string]string{},
 			wantInitErr: true,
 		},
 		{
 			description: "Too many args",
-			args: map[string]string{"format": time.RFC3339, "cookies": "failure"},
+			args:        map[string]string{"format": time.RFC3339, "cookies": "failure"},
 			wantInitErr: true,
 		},
 	}
-	runCurrentTimeTests(t, func() transformOperation { return &currentTime{} }, tests)
-}
-
-func runCurrentTimeTests(t *testing.T, opType func() transformOperation, tests []opTests) {
 
 	for _, test := range tests {
-		op := opType()
-		err := op.init(test.args)
+		initErr, got, transformErr := runTestInit(func() transformOperation { return &currentTime{} }, test)
+		runOpTestsClone(t, initErr, got, transformErr, test)
 
-		switch {
-		case test.wantInitErr && err != nil:
-			continue
-		case test.wantInitErr && err == nil:
-			t.Errorf("Test %q - got init error nil, want error", test.description)
-		case !test.wantErr && err != nil:
-			t.Errorf("Test %q - got init error, want nil: %v", test.description, err)
+		now := time.Now()
+		result, ok := got.(string)
+		if !ok {
+			t.Error("function must return string")
 		}
-
-		got, err := op.transform(test.in)
-
-		switch {
-		case test.wantErr && err != nil:
-			now := time.Now()
-			result, ok := got.(string)
-			if !ok {
-				t.Error("function must return string")
-			}
-			gotParse, err := time.Parse(time.RFC3339, result)
-			if err != nil {
-				t.Error(err)
-			}
-			if result := compareTimeStamps(now, gotParse); !result {
-				t.Errorf("Time returned not close enough to current time: %s", err)
-			}
-			continue
-		case test.wantErr && err == nil:
-			t.Errorf("Test %q - got nil, want error", test.description)
-		case !test.wantErr && err != nil:
-			t.Errorf("Test %q - got error, want nil: %v", test.description, err)
-		case !reflect.DeepEqual(got, test.want):
-			t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, test.want)
+		gotParse, err := time.Parse(test.args["format"], result)
+		if err != nil {
+			t.Error(err)
+		}
+		if result := compareTimeStamps(now, gotParse); !result {
+			t.Errorf("Time returned not close enough to current time: %s", err)
 		}
 	}
 }
+
 func TestStringToInteger(t *testing.T) {
 	tests := []opTests{
 
 		{
 			description: "Simple working case",
-			in: "237754",
-			want: 237754,
+			in:          "237754",
+			want:        237754,
 		},
 
 		{
 			description: "Boolean input type",
-			in: true,
-			wantErr: true,
+			in:          true,
+			wantErr:     true,
 		},
-
 	}
 	runOpTests(t, func() transformOperation { return &stringToInteger{} }, tests)
 }
 
-func compareTimeStamps (time1 time.Time, time2 time.Time) (bool) {
+func runTestInit(opType func() transformOperation, test opTests) (initErrs error, got interface{}, transformErrs error) {
+		op := opType()
+		initErrs = op.init(test.args)
+		got, transformErrs = op.transform(test.in)
+		return initErrs, got, transformErrs
+}
+
+func compareTimeStamps(time1 time.Time, time2 time.Time) (bool) {
 	maxTimeDifference := time.Duration(300) * time.Second
 	actualDiff := time1.Sub(time2)
 	return actualDiff > maxTimeDifference
