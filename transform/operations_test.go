@@ -439,26 +439,34 @@ func TestCurrentTime(t *testing.T) {
 				t.Fatal(err)
 				return
 			}
-			now := time.Now()
-			result, ok := got.(string)
+
+			wantResult, ok := test.want.(string)
+			if !ok {
+				t.Fatal("want must be a string")
+			}
+
+			gotResult, ok := got.(string)
 			if !ok {
 				t.Fatal("function must return string")
 			}
 
 			var gotParse time.Time
+			var wantParse time.Time
 
 			if test.args["format"] == "RFC3339" {
-				gotParse, err = time.Parse(time.RFC3339, result)
+				gotParse, err = time.Parse(time.RFC3339, gotResult)
+				wantParse, err = time.Parse(time.RFC3339, wantResult)
 				if err != nil {
 					t.Fatal(err)
 				}
 			} else {
-				gotParse, err = time.Parse(test.args["format"], result)
+				gotParse, err = time.Parse(test.args["format"], gotResult)
+				wantParse, err = time.Parse(test.args["format"],wantResult)
 				if err != nil {
 					t.Fatal(err)
 				}
 			}
-			if result := compareTimeStamps(now, gotParse); !result {
+			if result := compareTimeStamps(wantParse, gotParse); !result {
 				t.Fatal("time returned not close enough to current time")
 			}
 		})
