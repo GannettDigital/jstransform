@@ -249,6 +249,7 @@ func (t *timeParse) transform(raw interface{}) (interface{}, error) {
 
 // toCamelCase is a transformOperation which converts strings with dashes to camelCase.
 type toCamelCase struct {
+	args map[string]string
 }
 
 func (c *toCamelCase) init(args map[string]string) error {
