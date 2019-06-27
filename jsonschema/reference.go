@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -150,7 +149,7 @@ func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType s
 	default: // Default to assuming it is a file reference
 		// TODO this could be rather inefficient if there are multiple references to the same sourcePath but a different
 		// target as it will currently reprocess the source file everytime
-		refPath, err := filepath.Abs(filepath.Join(path.Dir(schemaPath), sourcePath))
+		refPath, err := filepath.Abs(filepath.Join(filepath.Dir(schemaPath), sourcePath))
 		if err != nil {
 			return nil, fmt.Errorf("unable to expand reference filepath %q: %v", sourcePath, err)
 		}
