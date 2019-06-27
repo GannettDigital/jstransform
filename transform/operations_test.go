@@ -417,34 +417,42 @@ func TestCurrentTime(t *testing.T) {
 			args:        map[string]string{"format": time.RFC3339, "cookies": "failure"},
 			wantInitErr: true,
 		},
+		{
+			description: "Format not predefined",
+			args:		 map[string]string{"format": "Mon Jan 2 15:04:05 MST 2006"},
+			want:		time.Now().Format("Mon Jan 2 15:04:05 MST 2006")	,
+		},
 	}
 
 	for _, test := range tests {
-		op, err := runOpTestInit(func() transformOperation { return &currentTime{} }, test)
-		if test.wantInitErr && err != nil {
-			continue
-		} else if err != nil {
-			t.Error(err)
-		}
-		got, err := runOpTestTransform(op, test)
-		if test.wantErr && err != nil {
-			continue
-		} else if err != nil {
-			t.Error(err)
-		}
+		t.Run(test.description, func(t *testing.T) {
+			op, err := runOpTestInit(func() transformOperation { return &currentTime{} }, test)
+			if err != nil && test.wantInitErr {
+				return
+			}
+			if err != nil && !test.wantInitErr {
+				t.Fatal(err)
+			}
+			got, err := runOpTestTransform(op, test)
 
-		now := time.Now()
-		result, ok := got.(string)
-		if !ok {
-			t.Error("function must return string")
-		}
-		gotParse, err := time.Parse(test.args["format"], result)
-		if err != nil {
-			t.Error(err)
-		}
-		if result := compareTimeStamps(now, gotParse); !result {
-			t.Error("time returned not close enough to current time")
-		}
+			if err != nil {
+				t.Fatal(err)
+				return
+			}
+			now := time.Now()
+			result, ok := got.(string)
+			if !ok {
+				t.Fatal("function must return string")
+			}
+			gotParse, err := time.Parse(test.args["format"], result)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if result := compareTimeStamps(now, gotParse); !result {
+				t.Fatal("time returned not close enough to current time")
+			}
+		})
+
 	}
 }
 
@@ -468,6 +476,22 @@ func TestStringToInteger(t *testing.T) {
 
 func compareTimeStamps(time1 time.Time, time2 time.Time) bool {
 	maxTimeDifference := time.Duration(300) * time.Second
-	actualDiff := time1.Sub(time2)
+	actualDiff := absValue(time1.Sub(time2))
 	return actualDiff < maxTimeDifference
 }
+
+func absValue (x time.Duration) time.Duration {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+//left this here so that we can optimize the test strategy to include comparing the error to the want error
+//func compareErrs (gotErr error, wantErr error) error {
+//	if !reflect.DeepEqual(gotErr, wantErr) {
+//		return errors.New(fmt.Sprintf("Errors did not match, got %s, want %s", gotErr, wantErr))
+//	}
+//	return nil
+//}
+
