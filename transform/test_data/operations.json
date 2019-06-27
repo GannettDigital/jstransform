@@ -148,7 +148,7 @@
                 {
                   "type": "currentTime",
                   "args": {
-                    "format": "RFC3339"
+                    "format": "2006-01-02T15:04:05Z07:00"
                   }
                 }
               ]

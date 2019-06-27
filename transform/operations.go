@@ -258,8 +258,13 @@ func (c *currentTime) init(args map[string]string) error {
 	return nil
 }
 
-func (c *currentTime) transform (raw interface{}) (interface{}, error) {
-	return time.Now().Format(c.args["format"]), nil
+func (c *currentTime) transform(raw interface{}) (interface{}, error) {
+	timeFmt := c.args["format"]
+	switch c.args["format"] {
+	case "RFC3339":
+		timeFmt = time.RFC3339
+	}
+	return time.Now().Format(timeFmt), nil
 }
 
 // stringToInteger is a transformOperation which takes a string and converts it into an Int

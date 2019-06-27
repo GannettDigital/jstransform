@@ -404,7 +404,7 @@ func TestCurrentTime(t *testing.T) {
 	tests := []opTests{
 		{
 			description: "Simple working case",
-			args:        map[string]string{"format": time.RFC3339},
+			args:        map[string]string{"format": "RFC3339"},
 			want:        time.Now().Format(time.RFC3339),
 		},
 		{
@@ -414,7 +414,7 @@ func TestCurrentTime(t *testing.T) {
 		},
 		{
 			description: "Too many args",
-			args:        map[string]string{"format": time.RFC3339, "cookies": "failure"},
+			args:        map[string]string{"format": "RFC3339", "cookies": "failure"},
 			wantInitErr: true,
 		},
 		{
@@ -444,9 +444,19 @@ func TestCurrentTime(t *testing.T) {
 			if !ok {
 				t.Fatal("function must return string")
 			}
-			gotParse, err := time.Parse(test.args["format"], result)
-			if err != nil {
-				t.Fatal(err)
+
+			var gotParse time.Time
+
+			if test.args["format"] == "RFC3339" {
+				gotParse, err = time.Parse(time.RFC3339, result)
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else {
+				gotParse, err = time.Parse(test.args["format"], result)
+				if err != nil {
+					t.Fatal(err)
+				}
 			}
 			if result := compareTimeStamps(now, gotParse); !result {
 				t.Fatal("time returned not close enough to current time")
