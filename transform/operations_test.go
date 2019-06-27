@@ -55,6 +55,9 @@ func runOpTest(t *testing.T, opType func() transformOperation, test opTests) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if test.wantInitErr {
+		return
+	}
 	_, err = runOpTestTransform(op, test)
 	if err != nil {
 		t.Fatal(err)
@@ -155,28 +158,24 @@ func TestChangeCase(t *testing.T) {
 			args:        map[string]string{"to": "lower", "from": "?"},
 			in:          "MixedCase",
 			wantInitErr: true,
-			wantErr:     true,
 		},
 		{
 			description: "Missing to arg",
 			args:        map[string]string{"from": "?"},
 			in:          "MixedCase",
 			wantInitErr: true,
-			wantErr:     true,
 		},
 		{
 			description: "Missing all arg",
 			args:        map[string]string{},
 			in:          "MixedCase",
 			wantInitErr: true,
-			wantErr:     true,
 		},
 		{
 			description: "Invalid to",
 			args:        map[string]string{"to": "?"},
 			in:          "MixedCase",
 			wantInitErr: true,
-			wantErr:     true,
 		},
 		{
 			description: "Non-string input",
@@ -235,7 +234,6 @@ func TestMax(t *testing.T) {
 				map[string]interface{}{"url": "min", "encodingRate": 2},
 			},
 			wantInitErr: true,
-			wantErr:     true,
 		},
 		{
 			description: "Missing by arg",
@@ -245,7 +243,6 @@ func TestMax(t *testing.T) {
 				map[string]interface{}{"url": "min", "encodingRate": 2},
 			},
 			wantInitErr: true,
-			wantErr:     true,
 		},
 		{
 			description: "Missing return arg",
@@ -255,7 +252,6 @@ func TestMax(t *testing.T) {
 				map[string]interface{}{"url": "min", "encodingRate": 2},
 			},
 			wantInitErr: true,
-			wantErr:     true,
 		},
 		{
 			description: "by field is not a number",
@@ -299,21 +295,18 @@ func TestReplace(t *testing.T) {
 			args:        map[string]string{"new": `media.gannett-cdn.com`},
 			in:          "http://foo.com",
 			wantInitErr: true,
-			wantErr:     true,
 		},
 		{
 			description: "Missing new arg",
 			args:        map[string]string{"regex": `foo\.com`},
 			in:          "http://foo.com",
 			wantInitErr: true,
-			wantErr:     true,
 		},
 		{
 			description: "Extra args",
 			args:        map[string]string{"regex": `foo\.com`, "new": `media.gannett-cdn.com`, "alt": "a"},
 			in:          "http://foo.com",
 			wantInitErr: true,
-			wantErr:     true,
 		},
 		{
 			description: "Non string input",
@@ -370,14 +363,12 @@ func TestTimeParse(t *testing.T) {
 			args:        map[string]string{"format": time.RFC3339},
 			in:          "2019-05-16T21:00:00-04:00",
 			wantInitErr: true,
-			wantErr: true,
 		},
 		{
 			description: "Too many args",
 			args:        map[string]string{"format": time.RFC3339, "layout": "2006-01-02", "cookies": "failure"},
 			in:          "2019-05-16T21:00:00-04:00",
 			wantInitErr: true,
-			wantErr: true,
 		},
 		{
 			description: "Non string input",
@@ -466,7 +457,6 @@ func TestCurrentTime(t *testing.T) {
 				t.Fatal("time returned not close enough to current time")
 			}
 		})
-
 	}
 }
 
