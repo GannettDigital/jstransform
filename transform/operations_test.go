@@ -70,8 +70,6 @@ func runOpTestInit(opType func() transformOperation, test opTests) (transformOpe
 	op := opType()
 	err := op.init(test.args)
 	switch {
-	case test.wantInitErr && err != nil:
-		return op, err
 	case test.wantInitErr && err == nil:
 		return op, fmt.Errorf("Test %q - got init error nil, want error", test.description)
 	case !test.wantErr && err != nil:
@@ -427,11 +425,8 @@ func TestCurrentTime(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 			op, err := runOpTestInit(func() transformOperation { return &currentTime{} }, test)
-			if err != nil && test.wantInitErr {
+			if err != nil {
 				return
-			}
-			if err != nil && !test.wantInitErr {
-				t.Fatal(err)
 			}
 			got, err := runOpTestTransform(op, test)
 
