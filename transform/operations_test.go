@@ -378,7 +378,7 @@ func TestToCamelCase(t *testing.T) {
 	tests := []opTests{
 		{
 			description: "Simple working case",
-			in:          "extra-base-hit",
+			in:          "extra-base,hit.1234",
 			want:        "extraBaseHit",
 		},
 		{

@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/PaesslerAG/jsonpath"
 )
@@ -260,7 +261,10 @@ func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
 		return nil, errors.New("toCamelCase only supports input of type string")
 	}
 
-	arr := strings.Split(in, "-")
+	f := func(c rune) bool {
+		return !unicode.IsLetter(c) && !unicode.IsNumber(c)
+	}
+	arr := strings.FieldsFunc(in, f)
 
 	for i, cap := range arr {
 		if i == 0 {
