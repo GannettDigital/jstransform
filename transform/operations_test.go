@@ -3,7 +3,6 @@ package transform
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"strconv"
 	"testing"
 	"time"
@@ -44,36 +43,30 @@ type opTests struct {
 
 // A common test runner for all the operations tests
 func runOpTests(t *testing.T, opType func() transformOperation, tests []opTests) {
-
 	for _, test := range tests {
-		runOpTest(t, opType, test)
+		t.Run(test.description, func(t *testing.T) {
+			runOpTest(t, opType, test)
+		})
 	}
 }
 
 func runOpTest(t *testing.T, opType func() transformOperation, test opTests) {
 	op, err := runOpTestInit(opType, test)
-	if test.wantInitErr && err != nil {
-		return
-	} else if err != nil {
-		t.Error(err)
+	if err != nil {
+		t.Fatal(err)
 	}
-
 	_, err = runOpTestTransform(op, test)
-	if test.wantErr && err != nil {
-		return
-	} else if err != nil {
-		t.Error(err)
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 
 func runOpTestInit(opType func() transformOperation, test opTests) (transformOperation, error) {
 	op := opType()
 	err := op.init(test.args)
-	switch {
-	case test.wantInitErr && err == nil:
-		return op, fmt.Errorf("Test %q - got init error nil, want error", test.description)
-	case !test.wantErr && err != nil:
-		return op, fmt.Errorf("Test %q - got init error, want nil: %v", test.description, err)
+
+	if err := compareWantErrs(err, test.wantInitErr); err != nil {
+		return op, err
 	}
 	return op, nil
 }
@@ -81,17 +74,9 @@ func runOpTestInit(opType func() transformOperation, test opTests) (transformOpe
 func runOpTestTransform(op transformOperation, test opTests) (interface{}, error) {
 	got, err := op.transform(test.in)
 
-	switch {
-	case test.wantErr && err != nil:
+	if err := compareWantErrs(err, test.wantErr); err != nil {
 		return got, err
-	case test.wantErr && err == nil:
-		return got, fmt.Errorf("Test %q - got nil, want error", test.description)
-	case !test.wantErr && err != nil:
-		return got, fmt.Errorf("Test %q - got error, want nil: %v", test.description, err)
-	case !reflect.DeepEqual(got, test.want):
-		return got, fmt.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, test.want)
 	}
-
 	return got, nil
 }
 
@@ -170,23 +155,27 @@ func TestChangeCase(t *testing.T) {
 			args:        map[string]string{"to": "lower", "from": "?"},
 			in:          "MixedCase",
 			wantInitErr: true,
+			wantErr:     true,
 		},
 		{
 			description: "Missing to arg",
 			args:        map[string]string{"from": "?"},
 			in:          "MixedCase",
 			wantInitErr: true,
+			wantErr:     true,
 		},
 		{
 			description: "Missing all arg",
 			args:        map[string]string{},
 			in:          "MixedCase",
 			wantInitErr: true,
+			wantErr:     true,
 		},
 		{
 			description: "Invalid to",
 			args:        map[string]string{"to": "?"},
 			in:          "MixedCase",
+			wantInitErr: true,
 			wantErr:     true,
 		},
 		{
@@ -246,6 +235,7 @@ func TestMax(t *testing.T) {
 				map[string]interface{}{"url": "min", "encodingRate": 2},
 			},
 			wantInitErr: true,
+			wantErr:     true,
 		},
 		{
 			description: "Missing by arg",
@@ -255,6 +245,7 @@ func TestMax(t *testing.T) {
 				map[string]interface{}{"url": "min", "encodingRate": 2},
 			},
 			wantInitErr: true,
+			wantErr:     true,
 		},
 		{
 			description: "Missing return arg",
@@ -264,6 +255,7 @@ func TestMax(t *testing.T) {
 				map[string]interface{}{"url": "min", "encodingRate": 2},
 			},
 			wantInitErr: true,
+			wantErr:     true,
 		},
 		{
 			description: "by field is not a number",
@@ -307,18 +299,21 @@ func TestReplace(t *testing.T) {
 			args:        map[string]string{"new": `media.gannett-cdn.com`},
 			in:          "http://foo.com",
 			wantInitErr: true,
+			wantErr:     true,
 		},
 		{
 			description: "Missing new arg",
 			args:        map[string]string{"regex": `foo\.com`},
 			in:          "http://foo.com",
 			wantInitErr: true,
+			wantErr:     true,
 		},
 		{
 			description: "Extra args",
 			args:        map[string]string{"regex": `foo\.com`, "new": `media.gannett-cdn.com`, "alt": "a"},
 			in:          "http://foo.com",
 			wantInitErr: true,
+			wantErr:     true,
 		},
 		{
 			description: "Non string input",
@@ -375,12 +370,14 @@ func TestTimeParse(t *testing.T) {
 			args:        map[string]string{"format": time.RFC3339},
 			in:          "2019-05-16T21:00:00-04:00",
 			wantInitErr: true,
+			wantErr: true,
 		},
 		{
 			description: "Too many args",
 			args:        map[string]string{"format": time.RFC3339, "layout": "2006-01-02", "cookies": "failure"},
 			in:          "2019-05-16T21:00:00-04:00",
 			wantInitErr: true,
+			wantErr: true,
 		},
 		{
 			description: "Non string input",
@@ -417,8 +414,8 @@ func TestCurrentTime(t *testing.T) {
 		},
 		{
 			description: "Format not predefined",
-			args:		 map[string]string{"format": "Mon Jan 2 15:04:05 MST 2006"},
-			want:		time.Now().Format("Mon Jan 2 15:04:05 MST 2006")	,
+			args:        map[string]string{"format": "Mon Jan 2 15:04:05 MST 2006"},
+			want:        time.Now().Format("Mon Jan 2 15:04:05 MST 2006"),
 		},
 	}
 
@@ -432,6 +429,10 @@ func TestCurrentTime(t *testing.T) {
 
 			if err != nil {
 				t.Fatal(err)
+				return
+			}
+
+			if test.want == nil {
 				return
 			}
 
@@ -456,7 +457,7 @@ func TestCurrentTime(t *testing.T) {
 				}
 			} else {
 				gotParse, err = time.Parse(test.args["format"], gotResult)
-				wantParse, err = time.Parse(test.args["format"],wantResult)
+				wantParse, err = time.Parse(test.args["format"], wantResult)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -493,7 +494,7 @@ func compareTimeStamps(time1 time.Time, time2 time.Time) bool {
 	return actualDiff < maxTimeDifference
 }
 
-func absValue (x time.Duration) time.Duration {
+func absValue(x time.Duration) time.Duration {
 	if x < 0 {
 		return -x
 	}
@@ -501,10 +502,16 @@ func absValue (x time.Duration) time.Duration {
 }
 
 //left this here so that we can optimize the test strategy to include comparing the error to the want error
-//func compareErrs (gotErr error, wantErr error) error {
-//	if !reflect.DeepEqual(gotErr, wantErr) {
-//		return errors.New(fmt.Sprintf("Errors did not match, got %s, want %s", gotErr, wantErr))
-//	}
-//	return nil
-//}
-
+func compareWantErrs(gotErr error, wantErr bool) error {
+	switch {
+	case wantErr && gotErr == nil:
+		return errors.New("got nil, want error")
+	case wantErr && gotErr != nil:
+		return nil
+	case !wantErr && gotErr == nil:
+		return nil
+	case !wantErr && gotErr != nil:
+		return errors.New(fmt.Sprintf("got error, want nil: %v", gotErr))
+	}
+	return nil
+}
