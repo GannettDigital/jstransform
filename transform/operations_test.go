@@ -77,10 +77,7 @@ func runOpTestInit(opType func() transformOperation, test opTests) (transformOpe
 func runOpTestTransform(op transformOperation, test opTests) (interface{}, error) {
 	got, err := op.transform(test.in)
 
-	if err := compareWantErrs(err, test.wantErr); err != nil {
-		return got, err
-	}
-	return got, nil
+	return got, compareWantErrs(err, test.wantErr)
 }
 
 func TestDuration(t *testing.T) {
@@ -390,7 +387,7 @@ func TestCurrentTime(t *testing.T) {
 	tests := []opTests{
 		{
 			description: "Simple working case",
-			args:        map[string]string{"format": "RFC3339"},
+			args:        map[string]string{"format": time.RFC3339},
 			want:        time.Now().Format(time.RFC3339),
 		},
 		{
