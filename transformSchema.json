@@ -76,6 +76,9 @@
 								"$ref": "#/definitions/operations/timeParse"
 							},
 							{
+								"$ref": "#/definitions/operations/toCamelCase"
+							},
+							{
 								"$ref": "#/definitions/operations/stringToInteger"
 							}
 						]
@@ -289,6 +292,36 @@
 						"enum": [
 							"stringToInteger"
 						]
+					}
+				}
+			},
+			"toCamelCase": {
+				"description": "Accepts a string and delimiter, splits the string on the delimiter and returns a new camel case string",
+				"type": "object",
+				"required": [
+					"type",
+					"args"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [
+							"toCamelCase"
+						]
+					},
+					"args": {
+						"type": "object",
+						"required": [
+							"delimiter"
+						],
+						"additionalProperties": false,
+						"properties": {
+							"format": {
+								"description": "The delimiter to split the string on",
+								"type": "string"
+							}
+						}
 					}
 				}
 			}

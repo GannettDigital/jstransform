@@ -555,8 +555,8 @@ func TestTransformUnmarshal(t *testing.T) {
 				"cumulo": transformInstructions{
 					From: []*transformInstruction{
 						{jsonPath: "$.data.renditions[*]", Operations: []transformOperation{
-							&max{Args: map[string]string{"by": "@.encodingRate", "return": "@.url"}},
-							&replace{Args: map[string]string{"regex": `(http://.*net)/`, "new": "https://media.gannett-cdn.com"}},
+							&max{args: map[string]string{"by": "@.encodingRate", "return": "@.url"}},
+							&replace{args: map[string]string{"regex": `(http://.*net)/`, "new": "https://media.gannett-cdn.com"}},
 						}},
 					},
 					Method: first,
@@ -564,9 +564,9 @@ func TestTransformUnmarshal(t *testing.T) {
 				"presentationv4": transformInstructions{
 					From: []*transformInstruction{
 						{jsonPath: "$.renditions[*]", Operations: []transformOperation{
-							&changeCase{Args: map[string]string{"to": "lower"}},
+							&changeCase{args: map[string]string{"to": "lower"}},
 							&inverse{},
-							&split{Args: map[string]string{"on": "|"}},
+							&split{args: map[string]string{"on": "|"}},
 						}},
 					},
 					Method: first,
