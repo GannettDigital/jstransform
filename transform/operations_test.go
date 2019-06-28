@@ -429,13 +429,22 @@ func TestCurrentTime(t *testing.T) {
 
 			wantResult, ok := test.want.(string)
 			if !ok {
-				t.Fatal(ok)
+				t.Fatalf("want must be string. got %v", test.want)
 			}
 
 			gotResult, ok := got.(string)
+			if !ok {
+				t.Fatalf("want must be string. got %v", got)
+			}
 
 			wantTime, err := time.Parse(test.args["format"],wantResult)
+			if err != nil {
+				t.Fatal(err)
+			}
 			gotTime, err := time.Parse(test.args["format"],gotResult)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			if !compareTimeStamps(wantTime, gotTime) {
 				t.Fatal("time returned not close enough to current time")
