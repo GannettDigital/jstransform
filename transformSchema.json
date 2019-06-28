@@ -296,10 +296,11 @@
 				}
 			},
 			"toCamelCase": {
-				"description": "Accepts a string, removes the delimiter to convert and return a camel case string",
+				"description": "Accepts a string and delimiter, splits the string on the delimiter and returns a new camel case string",
 				"type": "object",
 				"required": [
-					"type"
+					"type",
+					"args"
 				],
 				"additionalProperties": false,
 				"properties": {
@@ -308,6 +309,19 @@
 						"enum": [
 							"toCamelCase"
 						]
+					},
+					"args": {
+						"type": "object",
+						"required": [
+							"delimiter"
+						],
+						"additionalProperties": false,
+						"properties": {
+							"format": {
+								"description": "The delimiter to split the string on",
+								"type": "string"
+							}
+						}
 					}
 				}
 			}

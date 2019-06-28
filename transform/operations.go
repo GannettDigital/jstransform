@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"unicode"
 
 	"github.com/PaesslerAG/jsonpath"
 )
@@ -253,37 +252,31 @@ type toCamelCase struct {
 }
 
 func (c *toCamelCase) init(args map[string]string) error {
+	if err := requiredArgs([]string{"delimiter"}, args); err != nil {
+		return err
+	}
+
+	c.args = args
 	return nil
 }
 
-func (c *toCamelCase) transform(raw interface{}, delimiter string) (interface{}, error) {
+func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("toCamelCase only supports input of type string")
 	}
 
-	var arr []string
-
-	if delimiter == "" {
-		f := func(c rune) bool {
-			return !unicode.IsLetter(c) && !unicode.IsNumber(c)
-		}
-		arr = strings.FieldsFunc(in, f)
-	} else {
-		arr = strings.Split(in, delimiter)
-	}
+	arr := strings.Split(in, c.args["delimiter"])
 
 	for i, cap := range arr {
 		if i == 0 {
+			arr[0] = strings.ToLower(cap)
 			continue
 		}
 		arr[i] = strings.Title(cap)
 	}
 
-	camelCaseString := []rune(strings.Join(arr, ""))
-	camelCaseString[0] = unicode.ToLower(camelCaseString[0])
-
-	return string(camelCaseString), nil
+	return strings.Join(arr, ""), nil
 }
 
 // stringToInteger is a transformOperation which takes a string and converts it into an Int

@@ -163,7 +163,10 @@
               "jsonPath": "$.toCamelCase",
               "operations": [
                 {
-                  "type": "toCamelCase"
+                  "type": "toCamelCase",
+                  "args": {
+                    "delimiter": "-"
+                  }
                 }
               ]
             }
