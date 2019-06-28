@@ -1,5 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
+    "additionalProperties": false,
     "definitions": {
         "FbiaStatus": {
             "additionalProperties": false,
@@ -188,5 +189,100 @@
             "title": "asset-event-facebook",
             "type": "object"
         }
-    }
+    },
+    "fromRef": "#/definitions/asset-event-facebook",
+    "properties": {
+        "assetId": {
+            "pattern": "\\d+",
+            "type": "string"
+        },
+        "contentSourceCode": {
+            "minLength": 1,
+            "pattern": "[A-Z0-9]$",
+            "type": "string"
+        },
+        "fbiaStatus": {
+            "items": {
+                "additionalProperties": false,
+                "fromRef": "#/definitions/FbiaStatus",
+                "properties": {
+                    "errors": {
+                        "items": {
+                            "additionalProperties": false,
+                            "fromRef": "#/definitions/FbiaStatusItem",
+                            "properties": {
+                                "level": {
+                                    "enum": [
+                                        "ERROR",
+                                        "WARNING"
+                                    ],
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "minLength": 1,
+                                    "type": "string"
+                                }
+                            },
+                            "title": "FbiaStatusItem",
+                            "type": "object"
+                        },
+                        "type": "array"
+                    },
+                    "providerUrl": {
+                        "format": "url",
+                        "type": "string"
+                    },
+                    "status": {
+                        "enum": [
+                            "success",
+                            "error",
+                            "disallowed"
+                        ],
+                        "type": "string"
+                    },
+                    "time": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "warnings": {
+                        "items": {
+                            "additionalProperties": false,
+                            "fromRef": "#/definitions/FbiaStatusItem",
+                            "properties": {
+                                "level": {
+                                    "enum": [
+                                        "ERROR",
+                                        "WARNING"
+                                    ],
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "minLength": 1,
+                                    "type": "string"
+                                }
+                            },
+                            "title": "FbiaStatusItem",
+                            "type": "object"
+                        },
+                        "type": "array"
+                    }
+                },
+                "required": [
+                    "providerUrl",
+                    "time",
+                    "status"
+                ],
+                "title": "FbiaStatus",
+                "type": "object"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "assetId",
+        "fbiaStatus",
+        "contentSourceCode"
+    ],
+    "title": "asset-event-facebook",
+    "type": "object"
 }
