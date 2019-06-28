@@ -451,18 +451,18 @@ func TestCurrentTimeTransform (t *testing.T) {
                                     "operations": [{
                                         "currentTime": {
                                                 "arguments": {
-                                                    "format": "RFC3339"
+                                                    "format": time.RFC3339
                                                 }
                                             }
                                         }]
                                     }
                                 }
 						}`),
-			want: json.RawMessage(fmt.Sprintf(`{"lastModified": %s,`, time.Now())),
+			want: json.RawMessage(fmt.Sprintf(`{"lastModified": %s,`, time.Now().Format(time.RFC3339))),
 		},
 	}
 
-	for _, test := range transformerTests {
+	for _, test := range currentTimeTests {
 		tr, err := NewTransformer(test.schema, test.transformIdentifier)
 		if err != nil {
 			t.Fatalf("Test %q - failed to initialize transformer: %v", test.description, err)
