@@ -256,16 +256,22 @@ func (c *toCamelCase) init(args map[string]string) error {
 	return nil
 }
 
-func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
+func (c *toCamelCase) transform(raw interface{}, delimiter string) (interface{}, error) {
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("toCamelCase only supports input of type string")
 	}
 
-	f := func(c rune) bool {
-		return !unicode.IsLetter(c) && !unicode.IsNumber(c)
+	var arr []string
+
+	if delimiter == "" {
+		f := func(c rune) bool {
+			return !unicode.IsLetter(c) && !unicode.IsNumber(c)
+		}
+		arr = strings.FieldsFunc(in, f)
+	} else {
+		arr = strings.Split(in, delimiter)
 	}
-	arr := strings.FieldsFunc(in, f)
 
 	for i, cap := range arr {
 		if i == 0 {
@@ -274,7 +280,10 @@ func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
 		arr[i] = strings.Title(cap)
 	}
 
-	return strings.Join(arr, ""), nil
+	camelCaseString := []rune(strings.Join(arr, ""))
+	camelCaseString[0] = unicode.ToLower(camelCaseString[0])
+
+	return string(camelCaseString), nil
 }
 
 // stringToInteger is a transformOperation which takes a string and converts it into an Int
