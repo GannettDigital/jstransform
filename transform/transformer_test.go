@@ -451,7 +451,7 @@ func TestCurrentTimeTransform (t *testing.T) {
                                     "operations": [{
                                         "currentTime": {
                                                 "arguments": {
-                                                    "format": "time.RFC3339"
+                                                    "format": "Mon Jan 2 15:04:05 MST 2006"
                                                 }
                                             }
                                         }]
