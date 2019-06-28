@@ -414,13 +414,13 @@ func TestCurrentTime(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			op, err := runOpTestInit(func() transformOperation { return &currentTime{} }, test)
 			if err != nil {
+				t.Fatal(err)
 				return
 			}
 			got, err := runOpTestTransform(op, test)
 
 			if err != nil {
 				t.Fatal(err)
-				return
 			}
 
 			if test.want == nil {
@@ -429,31 +429,15 @@ func TestCurrentTime(t *testing.T) {
 
 			wantResult, ok := test.want.(string)
 			if !ok {
-				t.Fatal("want must be a string")
+				t.Fatal(ok)
 			}
 
 			gotResult, ok := got.(string)
-			if !ok {
-				t.Fatal("function must return string")
-			}
 
-			var gotParse time.Time
-			var wantParse time.Time
+			wantTime, err := time.Parse(test.args["format"],wantResult)
+			gotTime, err := time.Parse(test.args["format"],gotResult)
 
-			if test.args["format"] == "RFC3339" {
-				gotParse, err = time.Parse(time.RFC3339, gotResult)
-				wantParse, err = time.Parse(time.RFC3339, wantResult)
-				if err != nil {
-					t.Fatal(err)
-				}
-			} else {
-				gotParse, err = time.Parse(test.args["format"], gotResult)
-				wantParse, err = time.Parse(test.args["format"], wantResult)
-				if err != nil {
-					t.Fatal(err)
-				}
-			}
-			if result := compareTimeStamps(wantParse, gotParse); !result {
+			if !compareTimeStamps(wantTime, gotTime) {
 				t.Fatal("time returned not close enough to current time")
 			}
 		})
@@ -501,7 +485,7 @@ func compareWantErrs(gotErr error, wantErr bool) error {
 	case !wantErr && gotErr == nil:
 		return nil
 	case !wantErr && gotErr != nil:
-		return errors.New(fmt.Sprintf("got error, want nil: %v", gotErr))
+		return fmt.Errorf("got error, want nil: %v", gotErr)
 	}
 	return nil
 }
