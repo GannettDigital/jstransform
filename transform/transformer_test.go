@@ -445,7 +445,7 @@ func TestCurrentTimeTransform (t *testing.T) {
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
 						{
-							"lastModified": "",
+							"lastModified": ""
 						}`),
 			want: json.RawMessage(fmt.Sprintf(`{"lastModified": %s,`, time.Now())),
 		},
