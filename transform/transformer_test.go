@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
 )
@@ -425,6 +426,57 @@ func TestTransformer(t *testing.T) {
 		}
 		for i := 0; i < parallelRuns; i++ {
 			t.Run(fmt.Sprintf("%s-%d", test.description, i), testFunc(test.description, test.in, test.wantErr, test.want))
+		}
+	}
+}
+
+func TestCurrentTimeTransform (t *testing.T) {
+	currentTimeTests := []struct {
+		description         string
+		schema              *jsonschema.Schema
+		transformIdentifier string
+		in                  json.RawMessage
+		want                json.RawMessage
+		wantErr             bool
+	}{
+		{
+			description:         "Test current time operations",
+			schema:              operationsSchema,
+			transformIdentifier: "cumulo",
+			in: json.RawMessage(`
+						{
+							"lastModified": "",
+						}`),
+			want: json.RawMessage(fmt.Sprintf(`{"lastModified": %s,`, time.Now())),
+		},
+	}
+
+	for _, test := range transformerTests {
+		tr, err := NewTransformer(test.schema, test.transformIdentifier)
+		if err != nil {
+			t.Fatalf("Test %q - failed to initialize transformer: %v", test.description, err)
+		}
+
+		testFunc := func(description string, in json.RawMessage, wantErr bool, want json.RawMessage) func(t *testing.T) {
+			return func(t *testing.T) {
+				t.Parallel()
+				got, err := tr.Transform(in)
+
+				switch {
+				case wantErr && err != nil:
+					return
+				case wantErr && err == nil:
+					t.Errorf("Test %q - got nil, want error", description)
+				case !wantErr && err != nil:
+					t.Errorf("Test %q - got error, want nil: %v", description, err)
+				case !reflect.DeepEqual(got, want):
+					t.Errorf("Test %q - got\n%s\nwant\n%s", description, got, want)
+				}
+			}
+		}
+
+		for i, currentTimeTest := range currentTimeTests {
+			t.Run(fmt.Sprintf("%s-%d", currentTimeTest.description, i), testFunc(currentTimeTest.description, currentTimeTest.in, currentTimeTest.wantErr, currentTimeTest.want))
 		}
 	}
 }
