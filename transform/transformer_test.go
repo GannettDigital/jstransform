@@ -458,7 +458,7 @@ func TestCurrentTimeTransform (t *testing.T) {
                                     }
                                 }
 						}`),
-			want: json.RawMessage(fmt.Sprintf(`{"lastModified": "%s"},`, time.Now().Format(time.RFC3339))),
+			want: json.RawMessage(fmt.Sprintf(`{"lastModified": "%s"}`, time.Now().Format(time.RFC3339))),
 		},
 	}
 
