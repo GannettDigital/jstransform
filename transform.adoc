@@ -67,6 +67,7 @@ Operations allow further mutation of data, for mutation types that are not curre
 | timeParse | string | string | format | The format to parse the time from
 | | | | layout | The layout of the returned date string
 | currentTime | string | string | |
+| toCamelCase | string | string | delimiter | The delimiter to split the string on
 | stringToInteger | string | integer | |
 |===
 

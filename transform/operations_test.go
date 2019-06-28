@@ -382,6 +382,36 @@ func TestTimeParse(t *testing.T) {
 	}
 	runOpTests(t, func() transformOperation { return &timeParse{} }, tests)
 }
+func TestToCamelCase(t *testing.T) {
+	tests := []opTests{
+		{
+			description: "Simple working case",
+			args:        map[string]string{"delimiter": "-"},
+			in:          "extra-base-hit",
+			want:        "extraBaseHit",
+		},
+		{
+			description: "Missing an arg",
+			args:        map[string]string{},
+			in:          "extra-base-hit",
+			wantInitErr: true,
+		},
+		{
+			description: "Non-string input",
+			args:        map[string]string{"delimiter": "-"},
+			in:          1234,
+			wantErr:     true,
+		},
+		{
+			description: "Too many args",
+			args:        map[string]string{"delimiter": "-", "otherDelimiter": ","},
+			in:          "extra-base-hit",
+			wantInitErr: true,
+		},
+	}
+
+	runOpTests(t, func() transformOperation { return &toCamelCase{} }, tests)
+}
 
 func TestCurrentTime(t *testing.T) {
 	tests := []opTests{

@@ -173,6 +173,26 @@
           ]
         }
       }
+    },
+    "toCamelCase": {
+      "type": "string",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.toCamelCase",
+              "operations": [
+                {
+                  "type": "toCamelCase",
+                  "args": {
+                    "delimiter": "-"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
     }
   }
 }

@@ -246,6 +246,7 @@ func (t *timeParse) transform(raw interface{}) (interface{}, error) {
 	return parsedTime.Format(t.args["layout"]), nil
 }
 
+// currentTime is a transformOperation which returns the current time in a specified format
 type currentTime struct {
 	args map[string]string
 }
@@ -254,7 +255,7 @@ func (c *currentTime) init(args map[string]string) error {
 	if err := requiredArgs([]string{"format"}, args); err != nil {
 		return err
 	}
-	c.args = args
+  	c.args = args
 	return nil
 }
 
@@ -267,6 +268,35 @@ func (c *currentTime) transform(raw interface{}) (interface{}, error) {
 
 	}
 	return time.Now().Format(timeFmt), nil
+  }
+
+// toCamelCase is a transformOperation which converts strings with dashes to camelCase.
+type toCamelCase struct {
+	args map[string]string
+}
+
+func (c *toCamelCase) init(args map[string]string) error {
+	if err := requiredArgs([]string{"delimiter"}, args); err != nil {
+		return err
+	}
+  
+func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
+	in, ok := raw.(string)
+	if !ok {
+		return nil, errors.New("toCamelCase only supports input of type string")
+	}
+
+	arr := strings.Split(in, c.args["delimiter"])
+
+	for i, cap := range arr {
+		if i == 0 {
+			arr[0] = strings.ToLower(cap)
+			continue
+		}
+		arr[i] = strings.Title(cap)
+	}
+
+	return strings.Join(arr, ""), nil
 }
 
 // stringToInteger is a transformOperation which takes a string and converts it into an Int
