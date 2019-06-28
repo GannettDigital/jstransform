@@ -36,15 +36,22 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string) (jso
 			return nil, fmt.Errorf("failed to resolve ref %q at path %v: %v", ref, refPath, err)
 		}
 
-		pathLen := len(refPath)
-		if pathLen != 1 {
-			data, err = jsonparser.Set(data, resolved, refPath[:pathLen-1]...)
-			if err != nil {
-				return nil, fmt.Errorf("failed to update data with resolved ref %q at path %v: %v", ref, refPath, err)
+		destPath := refPath[:len(refPath)-1]
+		// It is necessary to delete the refKey reference so they are not refound
+		data = jsonparser.Delete(data, append(destPath, refKey)...)
+
+		// Apply all of the key/value pairs from `resolved` to `data` while quoting strings if necessary
+		err = jsonparser.ObjectEach(resolved, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
+			// I wish there was a better way to do this. https://github.com/buger/jsonparser/issues/144
+			if dataType == jsonparser.String {
+				value = []byte(fmt.Sprintf("%q", value))
 			}
-		} else {
-			// It is necessary to delete the refKey reference so they are not refound
-			data = jsonparser.Delete(data, refKey)
+			data, err = jsonparser.Set(data, value, append(destPath, string(key))...)
+			return err
+		})
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to update data with resolved ref %q at path %v: %v", ref, refPath, err)
 		}
 	}
 
