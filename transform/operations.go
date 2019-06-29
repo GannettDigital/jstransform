@@ -279,6 +279,9 @@ func (c *toCamelCase) init(args map[string]string) error {
 	if err := requiredArgs([]string{"delimiter"}, args); err != nil {
 		return err
 	}
+	c.args = args
+	return nil
+}
   
 func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
 	in, ok := raw.(string)
