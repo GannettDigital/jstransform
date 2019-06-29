@@ -482,18 +482,19 @@ func TestCurrentTimeTransform(t *testing.T) {
 					t.Fatalf("unable to marshal want. want: %v", test.want)
 				}
 
-				wantParse := strings.Split(string(wantResult),`"`)[2]
+				wantParse := strings.Split(string(wantResult),`"`)
+				fmt.Println(wantParse)
 
 				gotResult, err := json.Marshal(got)
 				if err != nil {
 					t.Fatalf("unable to marshal got. got: %v", got)
 				}
 
-				wantTime, err := time.Parse(test.args["format"], string(wantParse))
+				wantTime, err := time.Parse(test.args["format"], wantParse[0])
 				if err != nil {
 					t.Fatal(err)
 				}
-				gotTime, err := time.Parse(test.args["format"], string(gotResult))
+				gotTime, err := time.Parse(test.args["format"], string(gotResult[0]))
 				if err != nil {
 					t.Fatal(err)
 				}
