@@ -264,7 +264,6 @@ func (c *currentTime) transform(raw interface{}) (interface{}, error) {
 	switch c.args["format"] {
 	case "RFC3339":
 		timeFmt = time.RFC3339
-	default:
 
 	}
 	return time.Now().Format(timeFmt), nil

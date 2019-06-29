@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
+	"github.com/buger/jsonparser"
 )
 
 // used for the Transformer test and benchmark
@@ -438,7 +439,7 @@ func TestCurrentTimeTransform(t *testing.T) {
 		schema              *jsonschema.Schema
 		transformIdentifier string
 		in                  json.RawMessage
-		args                map[string]string
+		args                string
 		want                json.RawMessage
 		wantErr             bool
 	}{
@@ -461,7 +462,7 @@ func TestCurrentTimeTransform(t *testing.T) {
                                     }
                                 }
 						}`),
-			args: map[string]string{"format": "Mon Jan 2 15:04:05 MST 2006"},
+			args: time.RFC3339,
 			want: json.RawMessage(fmt.Sprintf(`{"lastModified":"%s"}`, time.Now().Format(time.RFC3339))),
 		},
 	}
@@ -483,19 +484,22 @@ func TestCurrentTimeTransform(t *testing.T) {
 				}
 
 				wantParse := strings.Split(string(wantResult),`"`)[3]
+				gotParse, err := jsonparser.GetString(got, "lastModified")
+				if err != nil {
+					t.Fatal("Unable to parse field from got")
+				}
 
-				gotResult, err := json.Marshal(got)
-				gotResultString := string(gotResult)
-				fmt.Printf("gotResult : %v",strings.Split(gotResultString, `"'`)[0])
 				if err != nil {
 					t.Fatalf("unable to marshal got. got: %v", got)
 				}
 
-				wantTime, err := time.Parse(test.args["format"], wantParse)
+				args := test.args
+
+				wantTime, err := time.Parse(args, wantParse)
 				if err != nil {
 					t.Fatal(err)
 				}
-				gotTime, err := time.Parse(test.args["format"], string(gotResult[0]))
+				gotTime, err := time.Parse(args, gotParse)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -514,9 +518,9 @@ func TestCurrentTimeTransform(t *testing.T) {
 			}
 		}
 
-		for i, currentTimeTest := range currentTimeTests {
-			t.Run(fmt.Sprintf("%s-%d", currentTimeTest.description, i), testFunc(currentTimeTest.description, currentTimeTest.in, currentTimeTest.wantErr, currentTimeTest.want))
-		}
+		//for i, currentTimeTest := range currentTimeTests {
+			t.Run(fmt.Sprintf("%s", test.description), testFunc(test.description, test.in, test.wantErr, test.want))
+		//}
 	}
 }
 
