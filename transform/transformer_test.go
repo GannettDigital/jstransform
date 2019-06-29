@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -481,12 +482,14 @@ func TestCurrentTimeTransform(t *testing.T) {
 					t.Fatalf("unable to marshal want. want: %v", test.want)
 				}
 
+				wantParse := strings.SplitAfter(string(wantResult),`"`)[2]
+
 				gotResult, err := json.Marshal(got)
 				if err != nil {
 					t.Fatalf("unable to marshal got. got: %v", got)
 				}
 
-				wantTime, err := time.Parse(test.args["format"], string(wantResult))
+				wantTime, err := time.Parse(test.args["format"], string(wantParse))
 				if err != nil {
 					t.Fatal(err)
 				}
