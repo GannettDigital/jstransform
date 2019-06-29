@@ -437,7 +437,7 @@ func TestCurrentTimeTransform(t *testing.T) {
 		schema              *jsonschema.Schema
 		transformIdentifier string
 		in                  json.RawMessage
-		args                string
+		args                map[string]string
 		want                json.RawMessage
 		wantErr             bool
 	}{
@@ -460,7 +460,7 @@ func TestCurrentTimeTransform(t *testing.T) {
                                     }
                                 }
 						}`),
-			args: "Mon Jan 2 15:04:05 MST 2006",
+			args: map[string]string{"format": "Mon Jan 2 15:04:05 MST 2006"},
 			want: json.RawMessage(fmt.Sprintf(`{"lastModified":"%s"}`, time.Now().Format(time.RFC3339))),
 		},
 	}
@@ -486,11 +486,11 @@ func TestCurrentTimeTransform(t *testing.T) {
 					t.Fatalf("unable to marshal got. got: %v", got)
 				}
 
-				wantTime, err := time.Parse(test.args, string(wantResult))
+				wantTime, err := time.Parse(test.args["format"], string(wantResult))
 				if err != nil {
 					t.Fatal(err)
 				}
-				gotTime, err := time.Parse(test.args, string(gotResult))
+				gotTime, err := time.Parse(test.args["format"], string(gotResult))
 				if err != nil {
 					t.Fatal(err)
 				}
