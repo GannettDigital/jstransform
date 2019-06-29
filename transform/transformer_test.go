@@ -485,7 +485,7 @@ func TestCurrentTimeTransform(t *testing.T) {
 				wantParse := strings.Split(string(wantResult),`"`)[3]
 
 				gotResult, err := json.Marshal(got)
-				fmt.Printf("gotResult : %v",strings.Split(string(gotResult), `"'`)[2])
+				fmt.Printf("gotResult : %v",strings.Split(string(gotResult), `"'`)[1])
 				if err != nil {
 					t.Fatalf("unable to marshal got. got: %v", got)
 				}
