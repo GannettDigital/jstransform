@@ -431,12 +431,13 @@ func TestTransformer(t *testing.T) {
 	}
 }
 
-func TestCurrentTimeTransform (t *testing.T) {
+func TestCurrentTimeTransform(t *testing.T) {
 	currentTimeTests := []struct {
 		description         string
 		schema              *jsonschema.Schema
 		transformIdentifier string
 		in                  json.RawMessage
+		args                string
 		want                json.RawMessage
 		wantErr             bool
 	}{
@@ -459,6 +460,7 @@ func TestCurrentTimeTransform (t *testing.T) {
                                     }
                                 }
 						}`),
+			args: "Mon Jan 2 15:04:05 MST 2006",
 			want: json.RawMessage(fmt.Sprintf(`{"lastModified":"%s"}`, time.Now().Format(time.RFC3339))),
 		},
 	}
@@ -474,6 +476,24 @@ func TestCurrentTimeTransform (t *testing.T) {
 				t.Parallel()
 				got, err := tr.Transform(in)
 
+				wantResult, err := json.Marshal(test.want)
+				if err != nil {
+					t.Fatalf("unable to marshal want. want: %v", test.want)
+				}
+
+				gotResult, err := json.Marshal(got)
+				if err != nil {
+					t.Fatalf("unable to marshal got. got: %v", got)
+				}
+
+				wantTime, err := time.Parse(test.args, string(wantResult))
+				if err != nil {
+					t.Fatal(err)
+				}
+				gotTime, err := time.Parse(test.args, string(gotResult))
+				if err != nil {
+					t.Fatal(err)
+				}
 				switch {
 				case wantErr && err != nil:
 					return
@@ -481,8 +501,10 @@ func TestCurrentTimeTransform (t *testing.T) {
 					t.Errorf("Test %q - got nil, want error", description)
 				case !wantErr && err != nil:
 					t.Errorf("Test %q - got error, want nil: %v", description, err)
-				case !reflect.DeepEqual(got, want):
-					t.Errorf("Test %q - got\n%s\nwant\n%s", description, got, want)
+				case !compareTimes(wantTime, gotTime):
+					{
+						t.Fatal("time returned not close enough to current time")
+					}
 				}
 			}
 		}
@@ -491,6 +513,19 @@ func TestCurrentTimeTransform (t *testing.T) {
 			t.Run(fmt.Sprintf("%s-%d", currentTimeTest.description, i), testFunc(currentTimeTest.description, currentTimeTest.in, currentTimeTest.wantErr, currentTimeTest.want))
 		}
 	}
+}
+
+func compareTimes(time1 time.Time, time2 time.Time) bool {
+	maxTimeDifference := time.Duration(300) * time.Second
+	actualDiff := absValues(time1.Sub(time2))
+	return actualDiff < maxTimeDifference
+}
+
+func absValues(x time.Duration) time.Duration {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
 
 func TestNewXMLTransformer(t *testing.T) {
