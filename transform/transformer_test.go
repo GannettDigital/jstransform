@@ -483,7 +483,7 @@ func TestCurrentTimeTransform(t *testing.T) {
 				}
 
 				wantParse := strings.Split(string(wantResult),`"`)
-				fmt.Println(wantParse)
+				fmt.Println(wantParse[2])
 
 				gotResult, err := json.Marshal(got)
 				if err != nil {
