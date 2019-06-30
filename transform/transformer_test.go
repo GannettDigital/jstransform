@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"reflect"
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
-	"github.com/buger/jsonparser"
 )
 
 // used for the Transformer test and benchmark
@@ -124,6 +122,18 @@ var (
 									{"id": 2, "fullname": "two"}
 								]
 							},
+							"lastModified": {
+							 "type": "object",	
+							 "from": {
+                                    "operations": [{
+                                        "currentTime": {
+                                                "arguments": {
+                                                    "format": "RFC3339"
+                                                }
+                                            }
+                                        }]
+                                    }
+                                },
 							"mixedCase": "a|B|c|D",
 							"invalid": false,
 							"url": "http://foo.com/blah",
@@ -131,7 +141,7 @@ var (
 							"strToInt": "12345",
 							"toCamelCase": "extra-base-hit"
 						}`),
-			want: json.RawMessage(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"startTime":"09:00","strToInt":12345,"toCamelCase":"extraBaseHit","url":"http://gannettdigital.com/blah","valid":true}`),
+			want: json.RawMessage(fmt.Sprintf(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"lastModified":"%s","startTime":"09:00","strToInt":12345,"toCamelCase":"extraBaseHit","url":"http://gannettdigital.com/blah","valid":true}`,time.Now().Format(time.RFC3339))),
 		},
 		{
 			description:         "Test empty non-required object",
@@ -431,110 +441,6 @@ func TestTransformer(t *testing.T) {
 			t.Run(fmt.Sprintf("%s-%d", test.description, i), testFunc(test.description, test.in, test.wantErr, test.want))
 		}
 	}
-}
-
-func TestCurrentTimeTransform(t *testing.T) {
-	currentTimeTests := []struct {
-		description         string
-		schema              *jsonschema.Schema
-		transformIdentifier string
-		in                  json.RawMessage
-		args                string
-		want                json.RawMessage
-		wantErr             bool
-	}{
-		{
-			description:         "Test current time operations",
-			schema:              operationsSchema,
-			transformIdentifier: "cumulo",
-			in: json.RawMessage(`
-						{
-							 "lastModified": {
-							 "type": "object",	
-							 "from": {
-                                    "operations": [{
-                                        "currentTime": {
-                                                "arguments": {
-                                                    "format": "Mon Jan 2 15:04:05 MST 2006"
-                                                }
-                                            }
-                                        }]
-                                    }
-                                }
-						}`),
-			args: time.RFC3339,
-			want: json.RawMessage(fmt.Sprintf(`{"lastModified":"%s"}`, time.Now().Format(time.RFC3339))),
-		},
-	}
-
-	for _, test := range currentTimeTests {
-		tr, err := NewTransformer(test.schema, test.transformIdentifier)
-		if err != nil {
-			t.Fatalf("Test %q - failed to initialize transformer: %v", test.description, err)
-		}
-
-		testFunc := func(description string, in json.RawMessage, wantErr bool, want json.RawMessage) func(t *testing.T) {
-			return func(t *testing.T) {
-				t.Parallel()
-				got, err := tr.Transform(in)
-
-				wantResult, err := json.Marshal(test.want)
-				if err != nil {
-					t.Fatalf("unable to marshal want. want: %v", test.want)
-				}
-
-				wantParse := strings.Split(string(wantResult),`"`)[3]
-				gotParse, err := jsonparser.GetString(got, "lastModified")
-				if err != nil {
-					t.Fatal("Unable to parse field from got")
-				}
-
-				if err != nil {
-					t.Fatalf("unable to marshal got. got: %v", got)
-				}
-
-				args := test.args
-
-				wantTime, err := time.Parse(args, wantParse)
-				if err != nil {
-					t.Fatal(err)
-				}
-				gotTime, err := time.Parse(args, gotParse)
-				if err != nil {
-					t.Fatal(err)
-				}
-				switch {
-				case wantErr && err != nil:
-					return
-				case wantErr && err == nil:
-					t.Errorf("Test %q - got nil, want error", description)
-				case !wantErr && err != nil:
-					t.Errorf("Test %q - got error, want nil: %v", description, err)
-				case !compareTimes(wantTime, gotTime):
-					{
-						t.Fatal("time returned not close enough to current time")
-					}
-				}
-			}
-		}
-
-		//for i, currentTimeTest := range currentTimeTests {
-			t.Run(fmt.Sprintf("%s", test.description), testFunc(test.description, test.in, test.wantErr, test.want))
-		//}
-	}
-}
-
-func compareTimes(time1 time.Time, time2 time.Time) bool {
-	maxTimeDifference := time.Duration(300) * time.Second
-	actualDiff := absValues(time1.Sub(time2))
-	return actualDiff < maxTimeDifference
-}
-
-func absValues(x time.Duration) time.Duration {
-	if x < 0 {
-		return -x
-	}
-	return x
 }
 
 func TestNewXMLTransformer(t *testing.T) {
