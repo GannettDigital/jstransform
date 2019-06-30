@@ -3,6 +3,7 @@ package transform
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"strconv"
 	"testing"
 	"time"
@@ -51,33 +52,24 @@ func runOpTests(t *testing.T, opType func() transformOperation, tests []opTests)
 }
 
 func runOpTest(t *testing.T, opType func() transformOperation, test opTests) {
-	op, err := runOpTestInit(opType, test)
-	if err != nil {
+	op := opType()
+	err := op.init(test.args)
+
+	if err := compareWantErrs(err, test.wantInitErr); err != nil {
 		t.Fatal(err)
 	}
 	if test.wantInitErr {
 		return
 	}
-	_, err = runOpTestTransform(op, test)
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func runOpTestInit(opType func() transformOperation, test opTests) (transformOperation, error) {
-	op := opType()
-	err := op.init(test.args)
-
-	if err := compareWantErrs(err, test.wantInitErr); err != nil {
-		return op, err
-	}
-	return op, nil
-}
-
-func runOpTestTransform(op transformOperation, test opTests) (interface{}, error) {
 	got, err := op.transform(test.in)
 
-	return got, compareWantErrs(err, test.wantErr)
+	if err := compareWantErrs(err, test.wantErr); err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(got, test.want) {
+		t.Fatalf("got\n%s\nwant\n%s", got, test.want)
+	}
 }
 
 func TestDuration(t *testing.T) {
@@ -382,6 +374,7 @@ func TestTimeParse(t *testing.T) {
 	}
 	runOpTests(t, func() transformOperation { return &timeParse{} }, tests)
 }
+
 func TestToCamelCase(t *testing.T) {
 	tests := []opTests{
 		{
@@ -437,47 +430,7 @@ func TestCurrentTime(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.description, func(t *testing.T) {
-			op, err := runOpTestInit(func() transformOperation { return &currentTime{} }, test)
-			if err != nil {
-				t.Fatal(err)
-				return
-			}
-			got, err := runOpTestTransform(op, test)
-
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if test.want == nil {
-				return
-			}
-
-			wantResult, ok := test.want.(string)
-			if !ok {
-				t.Fatalf("want must be string. got %v", test.want)
-			}
-
-			gotResult, ok := got.(string)
-			if !ok {
-				t.Fatalf("want must be string. got %v", got)
-			}
-
-			wantTime, err := time.Parse(test.args["format"],wantResult)
-			if err != nil {
-				t.Fatal(err)
-			}
-			gotTime, err := time.Parse(test.args["format"],gotResult)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if !compareTimeStamps(wantTime, gotTime) {
-				t.Fatal("time returned not close enough to current time")
-			}
-		})
-	}
+	runOpTests(t, func() transformOperation { return &currentTime{} }, tests)
 }
 
 func TestStringToInteger(t *testing.T) {
@@ -498,30 +451,17 @@ func TestStringToInteger(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &stringToInteger{} }, tests)
 }
 
-func compareTimeStamps(time1 time.Time, time2 time.Time) bool {
-	maxTimeDifference := time.Duration(300) * time.Second
-	actualDiff := absValue(time1.Sub(time2))
-	return actualDiff < maxTimeDifference
-}
-
-func absValue(x time.Duration) time.Duration {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
 //left this here so that we can optimize the test strategy to include comparing the error to the want error
 func compareWantErrs(gotErr error, wantErr bool) error {
 	switch {
 	case wantErr && gotErr == nil:
-		return errors.New("got nil, want error")
+		return errors.New("expected error and didn't get one")
 	case wantErr && gotErr != nil:
 		return nil
 	case !wantErr && gotErr == nil:
 		return nil
 	case !wantErr && gotErr != nil:
-		return fmt.Errorf("got error, want nil: %v", gotErr)
+		return fmt.Errorf("got error unexpected error: %v", gotErr)
 	}
 	return nil
 }
