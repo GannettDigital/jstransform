@@ -62,6 +62,8 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 		switch toj.Name {
 		case "changeCase":
 			op = &changeCase{}
+    	case "currentTime":
+			op = &currentTime{}
 		case "duration":
 			op = &duration{}
 		case "inverse":

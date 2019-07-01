@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
 )
@@ -121,6 +122,18 @@ var (
 									{"id": 2, "fullname": "two"}
 								]
 							},
+							"lastModified": {
+							"type": "object",
+							"from": {
+								"operations": [{
+									"currentTime": {
+										"arguments": {
+											"format": "RFC3339"
+											}
+										}
+									}]
+								}
+							},
 							"mixedCase": "a|B|c|D",
 							"invalid": false,
 							"url": "http://foo.com/blah",
@@ -128,7 +141,7 @@ var (
 							"strToInt": "12345",
 							"toCamelCase": "extra-base-hit"
 						}`),
-			want: json.RawMessage(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"startTime":"09:00","strToInt":12345,"toCamelCase":"extraBaseHit","url":"http://gannettdigital.com/blah","valid":true}`),
+			want: json.RawMessage(fmt.Sprintf(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"lastModified":"%s","startTime":"09:00","strToInt":12345,"toCamelCase":"extraBaseHit","url":"http://gannettdigital.com/blah","valid":true}`,time.Now().Format(time.RFC3339))),
 		},
 		{
 			description:         "Test empty non-required object",

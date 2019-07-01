@@ -2,6 +2,7 @@ package transform
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strconv"
 	"testing"
@@ -43,32 +44,31 @@ type opTests struct {
 
 // A common test runner for all the operations tests
 func runOpTests(t *testing.T, opType func() transformOperation, tests []opTests) {
-
 	for _, test := range tests {
-		op := opType()
-		err := op.init(test.args)
+		t.Run(test.description, func(t *testing.T) {
+			runOpTest(t, opType, test)
+		})
+	}
+}
 
-		switch {
-		case test.wantInitErr && err != nil:
-			continue
-		case test.wantInitErr && err == nil:
-			t.Errorf("Test %q - got init error nil, want error", test.description)
-		case !test.wantErr && err != nil:
-			t.Errorf("Test %q - got init error, want nil: %v", test.description, err)
-		}
+func runOpTest(t *testing.T, opType func() transformOperation, test opTests) {
+	op := opType()
+	err := op.init(test.args)
 
-		got, err := op.transform(test.in)
+	if err := compareWantErrs(err, test.wantInitErr); err != nil {
+		t.Fatal(err)
+	}
+	if test.wantInitErr {
+		return
+	}
+	got, err := op.transform(test.in)
 
-		switch {
-		case test.wantErr && err != nil:
-			continue
-		case test.wantErr && err == nil:
-			t.Errorf("Test %q - got nil, want error", test.description)
-		case !test.wantErr && err != nil:
-			t.Errorf("Test %q - got error, want nil: %v", test.description, err)
-		case !reflect.DeepEqual(got, test.want):
-			t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, test.want)
-		}
+	if err := compareWantErrs(err, test.wantErr); err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(got, test.want) {
+		t.Fatalf("got: %s, want: %s", got, test.want)
 	}
 }
 
@@ -164,7 +164,7 @@ func TestChangeCase(t *testing.T) {
 			description: "Invalid to",
 			args:        map[string]string{"to": "?"},
 			in:          "MixedCase",
-			wantErr:     true,
+			wantInitErr: true,
 		},
 		{
 			description: "Non-string input",
@@ -374,6 +374,7 @@ func TestTimeParse(t *testing.T) {
 	}
 	runOpTests(t, func() transformOperation { return &timeParse{} }, tests)
 }
+
 func TestToCamelCase(t *testing.T) {
 	tests := []opTests{
 		{
@@ -405,6 +406,38 @@ func TestToCamelCase(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &toCamelCase{} }, tests)
 }
 
+func TestCurrentTime(t *testing.T) {
+	tests := []opTests{
+		{
+			description: "Simple working case",
+			args:        map[string]string{"format": time.RFC3339},
+			want:        time.Now().Format(time.RFC3339),
+		},
+		{
+			description: "Missing arg",
+			args:        map[string]string{},
+			wantInitErr: true,
+		},
+		{
+			description: "Too many args",
+			args:        map[string]string{"format": "RFC3339", "cookies": "failure"},
+			wantInitErr: true,
+		},
+		{
+			description: "Format not predefined",
+			args:        map[string]string{"format": "Mon Jan 2 15:04:05 MST 2006"},
+			want:        time.Now().Format("Mon Jan 2 15:04:05 MST 2006"),
+		},
+		{
+			description: "Passing only time constant as a string",
+			args:        map[string]string{"format": "RFC3339"},
+			want:        time.Now().Format(time.RFC3339),
+		},
+	}
+
+	runOpTests(t, func() transformOperation { return &currentTime{} }, tests)
+}
+
 func TestStringToInteger(t *testing.T) {
 	tests := []opTests{
 
@@ -421,4 +454,18 @@ func TestStringToInteger(t *testing.T) {
 		},
 	}
 	runOpTests(t, func() transformOperation { return &stringToInteger{} }, tests)
+}
+
+func compareWantErrs(gotErr error, wantErr bool) error {
+	switch {
+	case wantErr && gotErr == nil:
+		return errors.New("expected error and didn't get one")
+	case wantErr && gotErr != nil:
+		return nil
+	case !wantErr && gotErr == nil:
+		return nil
+	case !wantErr && gotErr != nil:
+		return fmt.Errorf("got error unexpected error: %v", gotErr)
+	}
+	return nil
 }
