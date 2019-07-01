@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	fromRef = "fromRef"
-	refKey  = "$ref"
+	fromRef      = "fromRef"
+	refKey       = "$ref"
+	transformKey = "transform"
 )
 
 // dereference parses JSON and replaces all $ref with the referenced data.
@@ -40,18 +41,32 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string) (jso
 		// It is necessary to delete the refKey reference so they are not refound
 		data = jsonparser.Delete(data, append(destPath, refKey)...)
 
-		// Apply all of the key/value pairs from `resolved` to `data` while quoting strings if necessary
-		err = jsonparser.ObjectEach(resolved, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
-			// I wish there was a better way to do this. https://github.com/buger/jsonparser/issues/144
-			if dataType == jsonparser.String {
-				value = []byte(fmt.Sprintf("%q", value))
+		if len(destPath) != 0 {
+			// Attempt to read the `transform` object from the source data so that we can apply it after the ref resolving
+			// wipes out that object in the data. Ensures that transform is an object and errors if not.
+			transformPath := append(destPath, transformKey)
+			transform, dataType, _, err := jsonparser.Get(data, transformPath...)
+			if err != nil && err != jsonparser.KeyPathNotFoundError {
+				return nil, fmt.Errorf("failed to read transform object on source data at path %v: %v", transformPath, err)
 			}
-			data, err = jsonparser.Set(data, value, append(destPath, string(key))...)
-			return err
-		})
+			if transform != nil && dataType != jsonparser.Object {
+				return nil, fmt.Errorf("transform object is wrong type %q, should be object", dataType)
+			}
 
-		if err != nil {
-			return nil, fmt.Errorf("failed to update data with resolved ref %q at path %v: %v", ref, refPath, err)
+			// Set the resolved ref contents on the data. This wipes out existing fields in that object
+			data, err = jsonparser.Set(data, resolved, destPath...)
+			if err != nil {
+				return nil, fmt.Errorf("failed to update data with resolved ref %q at path %v: %v", ref, refPath, err)
+			}
+
+			// If we found a transform inside that object in the source data, apply that back since setting of the ref
+			// would have cleared it
+			if transform != nil {
+				data, err = jsonparser.Set(data, transform, transformPath...)
+				if err != nil {
+					return nil, fmt.Errorf("failed to update data transform with resolved ref %q at path %v: %v", ref, refPath, err)
+				}
+			}
 		}
 	}
 
