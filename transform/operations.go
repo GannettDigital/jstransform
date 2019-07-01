@@ -259,7 +259,7 @@ func (c *currentTime) init(args map[string]string) error {
 	return nil
 }
 
-func (c *currentTime) transform(raw interface{}) (interface{}, error) {
+func (c *currentTime) transform(_ interface{}) (interface{}, error) {
 	timeFmt := c.args["format"]
 	switch c.args["format"] {
 	case "RFC3339":

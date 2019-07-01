@@ -123,17 +123,17 @@ var (
 								]
 							},
 							"lastModified": {
-							 "type": "object",	
-							 "from": {
-                                    "operations": [{
-                                        "currentTime": {
-                                                "arguments": {
-                                                    "format": "RFC3339"
-                                                }
-                                            }
-                                        }]
-                                    }
-                                },
+							"type": "object",
+							"from": {
+								"operations": [{
+									"currentTime": {
+										"arguments": {
+											"format": "RFC3339"
+											}
+										}
+									}]
+								}
+							},
 							"mixedCase": "a|B|c|D",
 							"invalid": false,
 							"url": "http://foo.com/blah",

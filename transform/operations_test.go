@@ -68,7 +68,7 @@ func runOpTest(t *testing.T, opType func() transformOperation, test opTests) {
 	}
 
 	if !reflect.DeepEqual(got, test.want) {
-		t.Fatalf("got\n%s\nwant\n%s", got, test.want)
+		t.Fatalf("got: %s, want: %s", got, test.want)
 	}
 }
 
@@ -428,6 +428,11 @@ func TestCurrentTime(t *testing.T) {
 			args:        map[string]string{"format": "Mon Jan 2 15:04:05 MST 2006"},
 			want:        time.Now().Format("Mon Jan 2 15:04:05 MST 2006"),
 		},
+		{
+			description: "Passing only time constant as a string",
+			args:        map[string]string{"format": "RFC3339"},
+			want:        time.Now().Format(time.RFC3339),
+		},
 	}
 
 	runOpTests(t, func() transformOperation { return &currentTime{} }, tests)
@@ -451,7 +456,6 @@ func TestStringToInteger(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &stringToInteger{} }, tests)
 }
 
-//left this here so that we can optimize the test strategy to include comparing the error to the want error
 func compareWantErrs(gotErr error, wantErr bool) error {
 	switch {
 	case wantErr && gotErr == nil:
