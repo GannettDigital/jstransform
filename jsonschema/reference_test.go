@@ -76,6 +76,10 @@ func TestDereference(t *testing.T) {
 			description: "Sports Matchup Example",
 			schemaPath:  "./test_data/reference/jsref_matchup-mlb.json",
 		},
+		{
+			description: "Keep Source Transform when Referencing",
+			schemaPath:  "./test_data/reference/jsref_keep-transform.json",
+		},
 	}
 	for _, test := range tests {
 
@@ -105,6 +109,7 @@ func TestDereference(t *testing.T) {
 		case test.wantErr && err != nil:
 			continue
 		case !reflect.DeepEqual(got, want):
+			t.Logf("%s", gotJson)
 			t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, want)
 		}
 	}
