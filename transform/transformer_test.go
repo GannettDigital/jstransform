@@ -141,7 +141,7 @@ var (
 							"strToInt": "12345",
 							"toCamelCase": "extra-base-hit"
 						}`),
-			want: json.RawMessage(fmt.Sprintf(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"lastModified":"%s","startTime":"09:00","strToInt":12345,"toCamelCase":"extraBaseHit","url":"http://gannettdigital.com/blah","valid":true}`,time.Now().Format(time.RFC3339))),
+			want: json.RawMessage(fmt.Sprintf(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"lastModified":"%s","startTime":"09:00","strToInt":12345,toCamelCase":"extraBaseHit","url":"http://gannettdigital.com/blah","valid":true}`,time.Now().Format(time.RFC3339))),
 		},
 		{
 			description:         "Test empty non-required object",

@@ -3,12 +3,11 @@ package transform
 import (
 	"errors"
 	"fmt"
+	"github.com/PaesslerAG/jsonpath"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/PaesslerAG/jsonpath"
 )
 
 var durationRe = regexp.MustCompile(`^([\d]*?):?([\d]*):([\d]*)$`)
@@ -316,6 +315,26 @@ func (s *stringToInteger) transform(raw interface{}) (interface{}, error) {
 	}
 
 	return strconv.Atoi(str)
+}
+
+// stringToFloat is a transformOperation which takes a string and converts it into a float
+type stringToFloat struct {
+}
+
+func (s *stringToFloat) init(args map[string]string) error {
+	return nil
+}
+
+func (s *stringToFloat) transform(raw interface{}) (interface{}, error) {
+	str, ok := raw.(string)
+	if !ok {
+		return nil, errors.New("stringToFloat only supports strings")
+	}
+	f, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
 }
 
 // requiredArgs checks the given args map to make sure it contains the required args and only the required args.
