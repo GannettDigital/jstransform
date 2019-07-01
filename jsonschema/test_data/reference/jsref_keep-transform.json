@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "definitions": {
+        "location": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "transform": {
+                        "sport": {
+                            "from": [
+                                {
+                                    "xmlPath": "city"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "properties": {
+        "location": {
+            "transform": {
+                "sport": {
+                    "from": [
+                        {
+                            "xmlPath": "player/location"
+                        }
+                    ]
+                }
+            },
+            "$ref": "#/definitions/location"
+        }
+    }
+}

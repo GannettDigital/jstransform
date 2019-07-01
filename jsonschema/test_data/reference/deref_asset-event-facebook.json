@@ -1,173 +1,79 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "additionalProperties": false,
     "definitions": {
-        "FbiaStatus": {
-            "additionalProperties": false,
-            "properties": {
-                "errors": {
-                    "items": {
-                        "additionalProperties": false,
-                        "fromRef": "#/definitions/FbiaStatusItem",
-                        "properties": {
-                            "level": {
-                                "enum": [
-                                    "ERROR",
-                                    "WARNING"
-                                ],
-                                "type": "string"
-                            },
-                            "message": {
-                                "minLength": 1,
-                                "type": "string"
-                            }
-                        },
-                        "title": "FbiaStatusItem",
-                        "type": "object"
-                    },
-                    "type": "array"
-                },
-                "providerUrl": {
-                    "format": "url",
-                    "type": "string"
-                },
-                "status": {
-                    "enum": [
-                        "success",
-                        "error",
-                        "disallowed"
-                    ],
-                    "type": "string"
-                },
-                "time": {
-                    "format": "date-time",
-                    "type": "string"
-                },
-                "warnings": {
-                    "items": {
-                        "additionalProperties": false,
-                        "fromRef": "#/definitions/FbiaStatusItem",
-                        "properties": {
-                            "level": {
-                                "enum": [
-                                    "ERROR",
-                                    "WARNING"
-                                ],
-                                "type": "string"
-                            },
-                            "message": {
-                                "minLength": 1,
-                                "type": "string"
-                            }
-                        },
-                        "title": "FbiaStatusItem",
-                        "type": "object"
-                    },
-                    "type": "array"
-                }
-            },
-            "required": [
-                "providerUrl",
-                "time",
-                "status"
-            ],
-            "title": "FbiaStatus",
-            "type": "object"
-        },
-        "FbiaStatusItem": {
-            "additionalProperties": false,
-            "properties": {
-                "level": {
-                    "enum": [
-                        "ERROR",
-                        "WARNING"
-                    ],
-                    "type": "string"
-                },
-                "message": {
-                    "minLength": 1,
-                    "type": "string"
-                }
-            },
-            "title": "FbiaStatusItem",
-            "type": "object"
-        },
         "asset-event-facebook": {
+            "type": "object",
             "additionalProperties": false,
             "properties": {
                 "assetId": {
-                    "pattern": "\\d+",
-                    "type": "string"
-                },
-                "contentSourceCode": {
-                    "minLength": 1,
-                    "pattern": "[A-Z0-9]$",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "\\d+"
                 },
                 "fbiaStatus": {
+                    "type": "array",
                     "items": {
+                        "type": "object",
                         "additionalProperties": false,
-                        "fromRef": "#/definitions/FbiaStatus",
                         "properties": {
+                            "time": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "providerUrl": {
+                                "type": "string",
+                                "format": "url"
+                            },
                             "errors": {
+                                "type": "array",
                                 "items": {
+                                    "type": "object",
                                     "additionalProperties": false,
-                                    "fromRef": "#/definitions/FbiaStatusItem",
+                                    "title": "FbiaStatusItem",
                                     "properties": {
                                         "level": {
+                                            "type": "string",
                                             "enum": [
                                                 "ERROR",
                                                 "WARNING"
-                                            ],
-                                            "type": "string"
+                                            ]
                                         },
                                         "message": {
-                                            "minLength": 1,
-                                            "type": "string"
+                                            "type": "string",
+                                            "minLength": 1
                                         }
                                     },
-                                    "title": "FbiaStatusItem",
-                                    "type": "object"
-                                },
-                                "type": "array"
-                            },
-                            "providerUrl": {
-                                "format": "url",
-                                "type": "string"
+                                    "fromRef": "#/definitions/FbiaStatusItem"
+                                }
                             },
                             "status": {
+                                "type": "string",
                                 "enum": [
                                     "success",
                                     "error",
                                     "disallowed"
-                                ],
-                                "type": "string"
-                            },
-                            "time": {
-                                "format": "date-time",
-                                "type": "string"
+                                ]
                             },
                             "warnings": {
+                                "type": "array",
                                 "items": {
+                                    "type": "object",
                                     "additionalProperties": false,
-                                    "fromRef": "#/definitions/FbiaStatusItem",
+                                    "title": "FbiaStatusItem",
                                     "properties": {
                                         "level": {
+                                            "type": "string",
                                             "enum": [
                                                 "ERROR",
                                                 "WARNING"
-                                            ],
-                                            "type": "string"
+                                            ]
                                         },
                                         "message": {
-                                            "minLength": 1,
-                                            "type": "string"
+                                            "type": "string",
+                                            "minLength": 1
                                         }
                                     },
-                                    "title": "FbiaStatusItem",
-                                    "type": "object"
-                                },
-                                "type": "array"
+                                    "fromRef": "#/definitions/FbiaStatusItem"
+                                }
                             }
                         },
                         "required": [
@@ -176,9 +82,13 @@
                             "status"
                         ],
                         "title": "FbiaStatus",
-                        "type": "object"
-                    },
-                    "type": "array"
+                        "fromRef": "#/definitions/FbiaStatus"
+                    }
+                },
+                "contentSourceCode": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "[A-Z0-9]$"
                 }
             },
             "required": [
@@ -186,103 +96,97 @@
                 "fbiaStatus",
                 "contentSourceCode"
             ],
-            "title": "asset-event-facebook",
-            "type": "object"
-        }
-    },
-    "fromRef": "#/definitions/asset-event-facebook",
-    "properties": {
-        "assetId": {
-            "pattern": "\\d+",
-            "type": "string"
+            "title": "asset-event-facebook"
         },
-        "contentSourceCode": {
-            "minLength": 1,
-            "pattern": "[A-Z0-9]$",
-            "type": "string"
-        },
-        "fbiaStatus": {
-            "items": {
-                "additionalProperties": false,
-                "fromRef": "#/definitions/FbiaStatus",
-                "properties": {
-                    "errors": {
-                        "items": {
-                            "additionalProperties": false,
-                            "fromRef": "#/definitions/FbiaStatusItem",
-                            "properties": {
-                                "level": {
-                                    "enum": [
-                                        "ERROR",
-                                        "WARNING"
-                                    ],
-                                    "type": "string"
-                                },
-                                "message": {
-                                    "minLength": 1,
-                                    "type": "string"
-                                }
+        "FbiaStatus": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "time": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "providerUrl": {
+                    "type": "string",
+                    "format": "url"
+                },
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "title": "FbiaStatusItem",
+                        "properties": {
+                            "level": {
+                                "type": "string",
+                                "enum": [
+                                    "ERROR",
+                                    "WARNING"
+                                ]
                             },
-                            "title": "FbiaStatusItem",
-                            "type": "object"
+                            "message": {
+                                "type": "string",
+                                "minLength": 1
+                            }
                         },
-                        "type": "array"
-                    },
-                    "providerUrl": {
-                        "format": "url",
-                        "type": "string"
-                    },
-                    "status": {
-                        "enum": [
-                            "success",
-                            "error",
-                            "disallowed"
-                        ],
-                        "type": "string"
-                    },
-                    "time": {
-                        "format": "date-time",
-                        "type": "string"
-                    },
-                    "warnings": {
-                        "items": {
-                            "additionalProperties": false,
-                            "fromRef": "#/definitions/FbiaStatusItem",
-                            "properties": {
-                                "level": {
-                                    "enum": [
-                                        "ERROR",
-                                        "WARNING"
-                                    ],
-                                    "type": "string"
-                                },
-                                "message": {
-                                    "minLength": 1,
-                                    "type": "string"
-                                }
-                            },
-                            "title": "FbiaStatusItem",
-                            "type": "object"
-                        },
-                        "type": "array"
+                        "fromRef": "#/definitions/FbiaStatusItem"
                     }
                 },
-                "required": [
-                    "providerUrl",
-                    "time",
-                    "status"
-                ],
-                "title": "FbiaStatus",
-                "type": "object"
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "success",
+                        "error",
+                        "disallowed"
+                    ]
+                },
+                "warnings": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "title": "FbiaStatusItem",
+                        "properties": {
+                            "level": {
+                                "type": "string",
+                                "enum": [
+                                    "ERROR",
+                                    "WARNING"
+                                ]
+                            },
+                            "message": {
+                                "type": "string",
+                                "minLength": 1
+                            }
+                        },
+                        "fromRef": "#/definitions/FbiaStatusItem"
+                    }
+                }
             },
-            "type": "array"
+            "required": [
+                "providerUrl",
+                "time",
+                "status"
+            ],
+            "title": "FbiaStatus"
+        },
+        "FbiaStatusItem": {
+            "type": "object",
+            "additionalProperties": false,
+            "title": "FbiaStatusItem",
+            "properties": {
+                "level": {
+                    "type": "string",
+                    "enum": [
+                        "ERROR",
+                        "WARNING"
+                    ]
+                },
+                "message": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
         }
-    },
-    "required": [
-        "assetId",
-        "fbiaStatus",
-        "contentSourceCode"
-    ],
-    "title": "asset-event-facebook",
-    "type": "object"
+    }
 }

@@ -76,6 +76,10 @@ func TestDereference(t *testing.T) {
 			description: "Sports Matchup Example",
 			schemaPath:  "./test_data/reference/jsref_matchup-mlb.json",
 		},
+		{
+			description: "Keep Source Transform when Referencing",
+			schemaPath:  "./test_data/reference/jsref_keep-transform.json",
+		},
 	}
 	for _, test := range tests {
 
