@@ -329,7 +329,7 @@ func TestConvert(t *testing.T) {
 			want:        4,
 		},
 		{
-			description: "string -> number - should error",
+			description: "string -> integer - should error",
 			raw:         "hello",
 			jsonType:    "integer",
 			wantErr:     true,
