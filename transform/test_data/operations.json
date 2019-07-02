@@ -157,40 +157,6 @@
         }
       }
     },
-    "strToFloat": {
-      "type": "number",
-      "transform": {
-        "cumulo": {
-          "from": [
-            {
-              "jsonPath": "$.strToFloat",
-              "operations": [
-                {
-                  "type": "stringToFloat"
-                }
-              ]
-            }
-          ]
-        }
-      }
-    },
-    "strToInt": {
-      "type": "integer",
-      "transform": {
-        "cumulo": {
-          "from": [
-            {
-              "jsonPath": "$.strToInt",
-              "operations": [
-                {
-                  "type": "stringToInteger"
-                }
-              ]
-            }
-          ]
-        }
-      }
-    },
     "toCamelCase": {
       "type": "string",
       "transform": {

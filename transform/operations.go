@@ -255,7 +255,7 @@ func (c *currentTime) init(args map[string]string) error {
 	if err := requiredArgs([]string{"format"}, args); err != nil {
 		return err
 	}
-  	c.args = args
+	c.args = args
 	return nil
 }
 
@@ -267,7 +267,7 @@ func (c *currentTime) transform(_ interface{}) (interface{}, error) {
 
 	}
 	return time.Now().Format(timeFmt), nil
-  }
+}
 
 // toCamelCase is a transformOperation which converts strings with dashes to camelCase.
 type toCamelCase struct {
@@ -281,7 +281,7 @@ func (c *toCamelCase) init(args map[string]string) error {
 	c.args = args
 	return nil
 }
-  
+
 func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
 	in, ok := raw.(string)
 	if !ok {
@@ -299,47 +299,6 @@ func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
 	}
 
 	return strings.Join(arr, ""), nil
-}
-
-// stringToInteger is a transformOperation which takes a string and converts it into an Int
-type stringToInteger struct {
-}
-
-func (s *stringToInteger) init(args map[string]string) error {
-	return nil
-}
-
-func (s *stringToInteger) transform(raw interface{}) (interface{}, error) {
-	str, ok := raw.(string)
-	if !ok {
-		return nil, errors.New("stringToInteger only supports strings")
-	}
-
-	return strconv.Atoi(str)
-}
-
-// stringToFloat is a transformOperation which takes a string and converts it into a float
-type stringToFloat struct {
-}
-
-func (s *stringToFloat) init(args map[string]string) error {
-	return nil
-}
-
-func (s *stringToFloat) transform(raw interface{}) (interface{}, error) {
-	_, ok := raw.(float64)
-	if ok {
-		return raw, nil
-	}
-	str, ok := raw.(string)
-	if !ok {
-		return nil, errors.New("stringToFloat only supports strings")
-	}
-	f, err := strconv.ParseFloat(str, 64)
-	if err != nil {
-		return nil, err
-	}
-	return f, nil
 }
 
 // requiredArgs checks the given args map to make sure it contains the required args and only the required args.
