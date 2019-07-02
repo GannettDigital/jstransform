@@ -340,6 +340,24 @@ func TestConvert(t *testing.T) {
 			jsonType:    "integer",
 			want:        4,
 		},
+		{
+			description: "Boolean input type -> int",
+			raw:         true,
+			jsonType:    "integer",
+			want:        1,
+		},
+		{
+			description: "str -> float zero decimal",
+			raw:         "11.0",
+			jsonType:    "number",
+			want:        float64(11),
+		},
+		{
+			description: "str -> float no decimal",
+			raw:         "13",
+			jsonType:    "number",
+			want:        13,
+		},
 	}
 
 	for _, test := range tests {
