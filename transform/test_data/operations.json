@@ -157,23 +157,6 @@
         }
       }
     },
-    "strToInt": {
-      "type": "integer",
-      "transform": {
-        "cumulo": {
-          "from": [
-            {
-              "jsonPath": "$.strToInt",
-              "operations": [
-                {
-                  "type": "stringToInteger"
-                }
-              ]
-            }
-          ]
-        }
-      }
-    },
     "strToFloat": {
       "type": "number",
       "transform": {
@@ -184,6 +167,23 @@
               "operations": [
                 {
                   "type": "stringToFloat"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "strToInt": {
+      "type": "integer",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.strToInt",
+              "operations": [
+                {
+                  "type": "stringToInteger"
                 }
               ]
             }

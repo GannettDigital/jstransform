@@ -3,11 +3,12 @@ package transform
 import (
 	"errors"
 	"fmt"
-	"github.com/PaesslerAG/jsonpath"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/PaesslerAG/jsonpath"
 )
 
 var durationRe = regexp.MustCompile(`^([\d]*?):?([\d]*):([\d]*)$`)
@@ -326,6 +327,10 @@ func (s *stringToFloat) init(args map[string]string) error {
 }
 
 func (s *stringToFloat) transform(raw interface{}) (interface{}, error) {
+	_, ok := raw.(float64)
+	if ok {
+		return raw, nil
+	}
 	str, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("stringToFloat only supports strings")
