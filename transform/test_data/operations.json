@@ -157,6 +157,23 @@
         }
       }
     },
+    "strToFloat": {
+      "type": "number",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.strToFloat",
+              "operations": [
+                {
+                  "type": "stringToFloat"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
     "strToInt": {
       "type": "integer",
       "transform": {
