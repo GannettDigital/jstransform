@@ -57,7 +57,7 @@ func convert(raw interface{}, jsonType string) (interface{}, error) {
 	switch jsonType {
 	case "boolean":
 		return convertBoolean(raw)
-	case "number":
+	case "number", "integer":
 		return convertNumber(raw)
 	case "string":
 		return convertString(raw)

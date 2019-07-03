@@ -80,12 +80,6 @@
 							},
 							{
 								"$ref": "#/definitions/operations/toCamelCase"
-							},
-							{
-								"$ref": "#/definitions/operations/stringToInteger"
-							},
-							{
-								"$ref": "#/definitions/operations/stringToFloat"
 							}
 						]
 					}
@@ -311,38 +305,6 @@
 							"type": "string"
 						}
 					}
-				}
-			}
-		},
-		"stringToInteger": {
-			"description": "Accepts a string, converts it into an Integer and returns that Integer",
-			"type": "object",
-			"required": [
-				"type"
-			],
-			"additionalProperties": false,
-			"properties": {
-				"type": {
-					"type": "string",
-					"enum": [
-						"stringToInteger"
-					]
-				}
-			}
-		},
-		"stringToFloat": {
-			"description": "Accepts a string, converts it into a Float and returns that number",
-			"type": "object",
-			"required": [
-				"type"
-			],
-			"additionalProperties": false,
-			"properties": {
-				"type": {
-					"type": "string",
-					"enum": [
-						"stringToFloat"
-					]
 				}
 			}
 		},

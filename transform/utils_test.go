@@ -304,6 +304,60 @@ func TestConvert(t *testing.T) {
 			jsonType:    "date-time",
 			wantErr:     true,
 		},
+		{
+			description: "bool -> integer, true",
+			raw:         true,
+			jsonType:    "integer",
+			want:        1,
+		},
+		{
+			description: "bool -> integer, false",
+			raw:         false,
+			jsonType:    "integer",
+			want:        0,
+		},
+		{
+			description: "int -> integer",
+			raw:         2,
+			jsonType:    "integer",
+			want:        2,
+		},
+		{
+			description: "string -> integer - int",
+			raw:         "4",
+			jsonType:    "integer",
+			want:        4,
+		},
+		{
+			description: "string -> integer - should error",
+			raw:         "hello",
+			jsonType:    "integer",
+			wantErr:     true,
+		},
+		{
+			description: "[]interface{} with a single number in it -> number",
+			raw:         []interface{}{4},
+			jsonType:    "integer",
+			want:        4,
+		},
+		{
+			description: "Boolean input type -> int",
+			raw:         true,
+			jsonType:    "integer",
+			want:        1,
+		},
+		{
+			description: "str -> float zero decimal",
+			raw:         "11.0",
+			jsonType:    "number",
+			want:        float64(11),
+		},
+		{
+			description: "str -> float no decimal",
+			raw:         "13",
+			jsonType:    "number",
+			want:        13,
+		},
 	}
 
 	for _, test := range tests {

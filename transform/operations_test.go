@@ -438,55 +438,6 @@ func TestCurrentTime(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &currentTime{} }, tests)
 }
 
-func TestStringToInteger(t *testing.T) {
-	tests := []opTests{
-
-		{
-			description: "Simple working case",
-			in:          "237754",
-			want:        237754,
-		},
-
-		{
-			description: "Boolean input type",
-			in:          true,
-			wantErr:     true,
-		},
-	}
-	runOpTests(t, func() transformOperation { return &stringToInteger{} }, tests)
-}
-
-func TestStringToFloat(t *testing.T) {
-	tests := []opTests{
-		{
-			description: "number and decimal",
-			in:          "12.5",
-			want:        12.5,
-		},
-		{
-			description: "zero decimal",
-			in:          "11.0",
-			want:        float64(11),
-		},
-		{
-			description: "no decimal",
-			in:          "13",
-			want:        float64(13),
-		},
-		{
-			description: "Boolean inpu",
-			in:          true,
-			wantErr:     true,
-		},
-		{
-			description: "string non numeric input",
-			in:          "abc",
-			wantErr:     true,
-		},
-	}
-	runOpTests(t, func() transformOperation { return &stringToFloat{} }, tests)
-}
-
 func compareWantErrs(gotErr error, wantErr bool) error {
 	switch {
 	case wantErr && gotErr == nil:

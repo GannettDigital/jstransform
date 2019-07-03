@@ -62,7 +62,7 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 		switch toj.Name {
 		case "changeCase":
 			op = &changeCase{}
-    	case "currentTime":
+		case "currentTime":
 			op = &currentTime{}
 		case "duration":
 			op = &duration{}
@@ -78,10 +78,6 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 			op = &timeParse{}
 		case "toCamelCase":
 			op = &toCamelCase{}
-		case "stringToInteger":
-			op = &stringToInteger{}
-		case "stringToFloat":
-			op = &stringToFloat{}
 		default:
 			return fmt.Errorf("unsupported operation %q", toj.Name)
 		}
