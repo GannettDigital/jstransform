@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/GannettDigital/jsonparser"
+	
 	"github.com/franela/goreq"
 )
 
