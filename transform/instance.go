@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/GannettDigital/jsonparser"
+	
 	"github.com/PaesslerAG/jsonpath"
 	"github.com/antchfx/xmlquery"
-	"github.com/buger/jsonparser"
 )
 
 // pathModifier is used to modify the JSON path of an instance to indicate

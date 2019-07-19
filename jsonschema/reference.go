@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/buger/jsonparser"
+	"github.com/GannettDigital/jsonparser"
+	
 	"github.com/franela/goreq"
 )
 

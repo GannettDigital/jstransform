@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/buger/jsonparser"
+	"github.com/GannettDigital/jsonparser"
 )
 
 // WalkFunc processes a single Instance within a JSON schema file returning an error on any problems.
