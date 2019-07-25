@@ -1,0 +1,63 @@
+{
+  "name": "Repeats",
+  "type": "record",
+  "fields": [
+    {
+      "name": "AvroWriteTime",
+      "doc": "The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.",
+      "type": "long",
+      "logicalType": "timestamp-millis"
+    },
+    {
+      "name": "AvroDeleted",
+      "doc": "This is set to true when the Avro data is recording a delete in the source data.",
+      "default": false,
+      "type": "boolean"
+    },
+    {
+      "name": "height",
+      "type": [
+        "null",
+        "long"
+      ]
+    },
+    {
+      "name": "someDateObj",
+      "type": {
+        "name": "someDateObj_record",
+        "namespace": "someDateObj",
+        "type": "record",
+        "fields": [
+          {
+            "name": "type",
+            "namespace": "someDateObj",
+            "type": "string"
+          },
+          {
+            "name": "visible",
+            "namespace": "someDateObj",
+            "type": "boolean",
+            "default": false
+          }
+        ]
+      },
+      "default": {}
+    },
+    {
+      "name": "type",
+      "type": "string"
+    },
+    {
+      "name": "visible",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "name": "width",
+      "type": [
+        "null",
+        "double"
+      ]
+    }
+  ]
+}

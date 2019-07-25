@@ -38,18 +38,18 @@ func (mf *mapFlags) Set(value string) error {
 func main() {
 	renameStructs := mapFlags{kv: make(map[string]string)}
 	renameFields := mapFlags{kv: make(map[string]string)}
-	var useMessagePack bool
 
 	flag.Var(&renameStructs, "rename", "Override generated name of structure; use '-rename old=new'.")
 	flag.Var(&renameFields, "renameFields", "Override generated name of structure; use '-renameFields old=new'.")
-	flag.BoolVar(&useMessagePack, "msgp", false, "generate MessagePack serialization methods")
+	genAvro := flag.Bool("avro", false, "generate Avro schema and serialization methods")
+	genMessagePack := flag.Bool("msgp", false, "generate MessagePack serialization methods")
 
 	flag.Parse()
 
 	args := flag.Args()
 
 	if len(args) < 1 {
-		fmt.Printf("Usage: %s [-msgp] [-rename k=v] [-renameFields k=v] <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
+		fmt.Printf("Usage: %s [-avro] [-msgp] [-rename k=v] [-renameFields k=v] <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
@@ -70,11 +70,12 @@ func main() {
 	}
 
 	if err = generate.BuildStructsWithArgs(generate.BuildArgs{
-		SchemaPath:     inputPath,
-		OutputDir:      outputPath,
-		UseMessagePack: useMessagePack,
-		StructNameMap:  renameStructs.kv,
-		FieldNameMap:   renameFields.kv}); err != nil {
+		SchemaPath:          inputPath,
+		OutputDir:           outputPath,
+		GenerateAvro:        *genAvro,
+		GenerateMessagePack: *genMessagePack,
+		StructNameMap:       renameStructs.kv,
+		FieldNameMap:        renameFields.kv}); err != nil {
 		fmt.Printf("Golang Struct generation failed: %v", err)
 		os.Exit(4)
 	}

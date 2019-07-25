@@ -5,6 +5,7 @@ require (
 	github.com/GannettDigital/msgp v1.0.3-0.20180910162652-7b6c807760d7
 	github.com/PaesslerAG/gval v0.1.1 // indirect
 	github.com/PaesslerAG/jsonpath v0.1.0
+	github.com/actgardner/gogen-avro v6.1.0+incompatible
 	github.com/antchfx/xmlquery v1.0.0
 	github.com/antchfx/xpath v0.0.0-20190319080838-ce1d48779e67 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -21,7 +22,7 @@ require (
 	github.com/xeipuuv/gojsonschema v1.1.0
 	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4 // indirect
 	golang.org/x/sys v0.0.0-20190221075227-b4e8571b14e0 // indirect
-	golang.org/x/tools v0.0.0-20190221180947-9c8c5aeafa05 // indirect
+	golang.org/x/tools v0.0.0-20190221180947-9c8c5aeafa05
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
