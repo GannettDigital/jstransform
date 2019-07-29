@@ -21,7 +21,8 @@ import (
 )
 
 const (
-	metadataFields = `{"name":"AvroWriteTime","doc":"The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.","type":"long","logicalType":"timestamp-millis"},{"name":"AvroDeleted","doc":"This is set to true when the Avro data is recording a delete in the source data.","default":false,"type":"boolean"},`
+	metadataFields  = `{"name":"AvroWriteTime","doc":"The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.","type":"long","logicalType":"timestamp-millis"},{"name":"AvroDeleted","doc":"This is set to true when the Avro data is recording a delete in the source data.","default":false,"type":"boolean"},`
+	avroPackageName = "avro"
 )
 
 type avroConfig struct {
