@@ -11,6 +11,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/franela/goblin v0.0.0-20181003173013-ead4ad1d2727 // indirect
 	github.com/franela/goreq v0.0.0-20171204163338-bcd34c9993f8
+	github.com/golang/snappy v0.0.1 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/onsi/ginkgo v1.7.0 // indirect
 	github.com/onsi/gomega v1.4.3 // indirect

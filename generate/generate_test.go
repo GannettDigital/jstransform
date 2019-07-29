@@ -29,8 +29,8 @@ func TestBuildStructsRename(t *testing.T) {
 		{
 			file:           "test_schema.json",
 			description:    "with oneOfType",
-			expectedFiles:  []string{"simple.go", "complex.go", "test_data_msgp.go", "test_data_msgp_test.go"},
-			wantFiles:      []string{"simple.go.out2", "complex.go.out2", "test_data_msgp.go.out", "test_data_msgp_test.go.out"},
+			expectedFiles:  []string{"simple.go", "complex.go", "rename_msgp.go", "rename_msgp_test.go"},
+			wantFiles:      []string{"simple.go.out2", "complex.go.out2", "rename_msgp.go.out", "rename_msgp_test.go.out"},
 			useMessagePack: true,
 			renameStructs:  nil,
 		},
@@ -47,8 +47,8 @@ func TestBuildStructsRename(t *testing.T) {
 		{
 			file:           "test_schema.json",
 			description:    "with oneOfType, renamed",
-			expectedFiles:  []string{"simple.go", "complex.go", "test_data_msgp.go", "test_data_msgp_test.go"},
-			wantFiles:      []string{"simple.go.out-rename", "complex.go.out-rename", "test_data_msgp.go.out-rename", "test_data_msgp_test.go.out-rename"},
+			expectedFiles:  []string{"simple.go", "complex.go", "rename_msgp.go", "rename_msgp_test.go"},
+			wantFiles:      []string{"simple.go.out-rename", "complex.go.out-rename", "rename_msgp.go.out-rename", "rename_msgp_test.go.out-rename"},
 			useMessagePack: true,
 			renameStructs: map[string]string{
 				"simple":  "TotallySimple",
@@ -59,13 +59,17 @@ func TestBuildStructsRename(t *testing.T) {
 		},
 	}
 
+	outDir := filepath.Join(testdir, "rename")
+	os.Mkdir(outDir, os.ModePerm|os.ModePerm)
+	defer os.RemoveAll(outDir)
+
 	for _, test := range tests {
-		if err := BuildStructsRename(filepath.Join(testdir, test.file), testdir, test.useMessagePack, test.renameStructs); err != nil {
+		if err := BuildStructsRename(filepath.Join(testdir, test.file), outDir, test.useMessagePack, test.renameStructs); err != nil {
 			t.Fatalf("Test %q - BuildStructsRename failed: %v", test.description, err)
 		}
 
 		for i := range test.expectedFiles {
-			got, err := ioutil.ReadFile(filepath.Join(testdir, test.expectedFiles[i]))
+			got, err := ioutil.ReadFile(filepath.Join(outDir, test.expectedFiles[i]))
 			if err != nil {
 				t.Errorf("Test %q - failed to read expected file %q: %v", test.description, test.expectedFiles[i], err)
 			}
@@ -77,10 +81,6 @@ func TestBuildStructsRename(t *testing.T) {
 
 			if string(got) != string(want) {
 				t.Errorf("Test %q - file %q got\n%s\n!= want\n%s", test.description, test.expectedFiles[i], got, want)
-			}
-
-			if err := os.Remove(filepath.Join(testdir, test.expectedFiles[i])); err != nil {
-				t.Errorf("Test %q - failed to remove file %q: %v", test.description, test.expectedFiles[i], err)
 			}
 		}
 	}

@@ -43,13 +43,19 @@ func main() {
 	flag.Var(&renameFields, "renameFields", "Override generated name of structure; use '-renameFields old=new'.")
 	genAvro := flag.Bool("avro", false, "generate Avro schema and serialization methods")
 	genMessagePack := flag.Bool("msgp", false, "generate MessagePack serialization methods")
+	importPath := flag.String("importPath", "", "The import path used as the base for generated code, required for Avro")
 
 	flag.Parse()
 
 	args := flag.Args()
 
 	if len(args) < 1 {
-		fmt.Printf("Usage: %s [-avro] [-msgp] [-rename k=v] [-renameFields k=v] <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
+		fmt.Printf("Usage: %s [-avro] [-importPath a/b/c] [-msgp] [-rename k=v] [-renameFields k=v] <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+	if *genAvro && *importPath == "" {
+		fmt.Printf("Avro requires specifying an import path.\n")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
@@ -74,6 +80,7 @@ func main() {
 		OutputDir:           outputPath,
 		GenerateAvro:        *genAvro,
 		GenerateMessagePack: *genMessagePack,
+		ImportPath:          *importPath,
 		StructNameMap:       renameStructs.kv,
 		FieldNameMap:        renameFields.kv}); err != nil {
 		fmt.Printf("Golang Struct generation failed: %v", err)

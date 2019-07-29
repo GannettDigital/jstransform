@@ -234,14 +234,14 @@ func TestGeneratedStruct(t *testing.T) {
 		{
 			description:  "Simple schema",
 			schemaPath:   "test_data/test_schema.json",
-			packageName:  "test",
+			packageName:  "test_data",
 			oneOfType:    "simple",
-			wantFilePath: "test_data/simple.go.out",
+			wantFilePath: "test_data/simple.go",
 		},
 		{
 			description: "Simple schema with field rename",
 			schemaPath:  "test_data/test_schema.json",
-			packageName: "test",
+			packageName: "test_data",
 			oneOfType:   "simple",
 			renameFieldMap: map[string]string{
 				"type":  "typeRenamed",
@@ -252,14 +252,14 @@ func TestGeneratedStruct(t *testing.T) {
 		{
 			description:    "valid schema with invalid go field names should fail",
 			schemaPath:     "test_data/needs_field_rename.json",
-			packageName:    "test",
+			packageName:    "test_data",
 			oneOfType:      "rename",
 			wantWriteError: true,
 		},
 		{
 			description: "valid schema with invalid go field names, renamed to work",
 			schemaPath:  "test_data/needs_field_rename.json",
-			packageName: "test",
+			packageName: "test_data",
 			oneOfType:   "rename",
 			renameFieldMap: map[string]string{
 				"1_1":  "OneToOne",
@@ -274,9 +274,9 @@ func TestGeneratedStruct(t *testing.T) {
 			description:  "Complex schema",
 			embeds:       []string{"Simple"},
 			schemaPath:   "test_data/test_schema.json",
-			packageName:  "test",
+			packageName:  "test_data",
 			oneOfType:    "complex",
-			wantFilePath: "test_data/complex.go.out",
+			wantFilePath: "test_data/complex.go",
 		},
 	}
 
