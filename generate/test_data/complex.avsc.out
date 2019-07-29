@@ -46,11 +46,6 @@
       "default": {}
     },
     {
-      "name": "type",
-      "namespace": "Simple",
-      "type": "string"
-    },
-    {
       "name": "visible",
       "namespace": "Simple",
       "type": "boolean",

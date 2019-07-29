@@ -72,6 +72,37 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 	}
 }
 
+func TestBuildAvroSerializationFunctions(t *testing.T) {
+	tests := []struct {
+		description string
+		name        string
+		path        string
+	}{
+		{
+			description: "simple avro file",
+			path:        "./test_data/simple.avsc.out",
+		},
+		{
+			description: "fields with repeated field names",
+			path:        "./test_data/repeats.avsc.out",
+		},
+		{
+			description: "complex avro file",
+			path:        "./test_data/complex.avsc.out",
+		},
+	}
+
+	defer func() {
+		os.RemoveAll("./test_data/avro")
+	}()
+
+	for _, test := range tests {
+		if err := buildAvroSerializationFunctions(test.path); err != nil {
+			t.Errorf("Test %q - failed: %v", test.description, err)
+		}
+	}
+}
+
 func TestParseGoStruct(t *testing.T) {
 	tests := []struct {
 		description string
