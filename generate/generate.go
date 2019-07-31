@@ -3,13 +3,9 @@
 package generate
 
 import (
-	"bytes"
 	"fmt"
-	"go/format"
-	"io"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
@@ -25,35 +21,37 @@ const msgpMode = gen.Encode | gen.Decode | gen.Marshal | gen.Unmarshal | gen.Siz
 // BuildArgs contains information used to build the structs for a JSONschema
 // SchemaPath is the path tot he jsonSchema file to use generate the Go struct representations
 // OutputDir is the destination for the generated files
-// UseMessagePack is a flag that defines if message pack should be fined for this model.
+// GenerateAvro is a flag that defines if Avro serializing code should be built.
+// GenerateMessagePack is a flag that defines if message pack serializing code should be built.
 // StructNameMap allows specifying the type name of the struct for each JSON file.
 // FieldNameMap is used to provide alternate names for fields in the resulting structs.
 //   The property names in the JSON tags for these structs remains the same as supplied.
 //   This can be used to accommodate names that are valid JSON but not valid Go identifiers
 type BuildArgs struct {
-	SchemaPath     string
-	OutputDir      string
-	UseMessagePack bool
-	StructNameMap  map[string]string
-	FieldNameMap   map[string]string
+	SchemaPath          string
+	OutputDir           string
+	GenerateAvro        bool
+	GenerateMessagePack bool
+	StructNameMap       map[string]string
+	FieldNameMap        map[string]string
 }
 
 // BuildStructs is a backward-compatibility wrapper for BuildStructsWithArgs.
 func BuildStructs(schemaPath string, outputDir string, useMessagePack bool) error {
 	return BuildStructsWithArgs(BuildArgs{
-		SchemaPath:     schemaPath,
-		OutputDir:      outputDir,
-		UseMessagePack: useMessagePack,
+		SchemaPath:          schemaPath,
+		OutputDir:           outputDir,
+		GenerateMessagePack: useMessagePack,
 	})
 }
 
 // BuildStructsRename is a backward-compatibility wrapper for BuildStructsWithArgs.
 func BuildStructsRename(schemaPath string, outputDir string, useMessagePack bool, nameMap map[string]string) error {
 	return BuildStructsWithArgs(BuildArgs{
-		SchemaPath:     schemaPath,
-		OutputDir:      outputDir,
-		UseMessagePack: useMessagePack,
-		StructNameMap:  nameMap,
+		SchemaPath:          schemaPath,
+		OutputDir:           outputDir,
+		GenerateMessagePack: useMessagePack,
+		StructNameMap:       nameMap,
 	})
 }
 
@@ -106,8 +104,14 @@ func BuildStructsWithArgs(args BuildArgs) error {
 		}
 		embeds = append(embeds, name)
 
-		if err := buildStructFile(args.SchemaPath, allOfPath, name, packageName, nil, args.OutputDir, args.FieldNameMap); err != nil {
+		path, err := buildStructFile(args.SchemaPath, allOfPath, name, packageName, nil, args.OutputDir, args.FieldNameMap)
+		if err != nil {
 			return fmt.Errorf("failed to build struct file for %q: %v", name, err)
+		}
+		if args.GenerateAvro {
+			if err := buildAvro(name, path); err != nil {
+				return fmt.Errorf("failed to build Avro files for %q: %v", packageName, err)
+			}
 		}
 	}
 
@@ -117,17 +121,57 @@ func BuildStructsWithArgs(args BuildArgs) error {
 			name = newName
 		}
 
-		if err := buildStructFile(args.SchemaPath, oneOfPath, name, packageName, embeds, args.OutputDir, args.FieldNameMap); err != nil {
+		path, err := buildStructFile(args.SchemaPath, oneOfPath, name, packageName, embeds, args.OutputDir, args.FieldNameMap)
+		if err != nil {
 			return fmt.Errorf("failed to build struct file for %q: %v", name, err)
+		}
+		if args.GenerateAvro {
+			if err := buildAvro(name, path); err != nil {
+				return fmt.Errorf("failed to build Avro files for %q: %v", packageName, err)
+			}
 		}
 	}
 
-	if args.UseMessagePack {
+	if args.GenerateMessagePack {
 		if err := buildMessagePackFile(args.OutputDir, msgpMode); err != nil {
 			return fmt.Errorf("failed to build MessagePack file for %q: %v", packageName, err)
 		}
 	}
 
+	return nil
+}
+
+// buildAvro creates an Avro schema file, Avro serialization functions and some helper functions which link the structs
+// used by the generated Avro serialization with those created by the BuildStructs functions.
+// The serialization methods are created with https://github.com/actgardner/gogen-avro
+func buildAvro(name, path string) error {
+	// Step 1 create the Avro Schema file
+	// there are 3 ways to approach this, walk the JSON schema, walk the AST for the go struct or load the Go struct up and do reflection
+	// reflection isn't generally clear but is probably the most compact, walking the JSON schema will likely require building a
+	// representation of the data in a new set of structs like is done for the go struct building initially.
+	// Walking the go AST is able to take advantage of all the standard library AST methods and though it has its share
+	// or complication is easier to do in one pass
+	name = exportedName(name)
+	spec, err := parseGoStruct(name, path)
+	if err != nil {
+		return err
+	}
+	outdir := filepath.Dir(path)
+
+	avroSchemaPath, err := buildAvroSchemaFile(name, outdir, spec, false)
+	if err != nil {
+		return fmt.Errorf("failed to build Avro Schema file: %v", err)
+	}
+
+	// step 2 build serialization functions from the new avro schema
+	// this step parses the just created Avro schema and by doing so acts as validation step as well
+	if err := buildAvroSerializationFunctions(avroSchemaPath); err != nil {
+		return fmt.Errorf("failed to build Avro serialization code: %v", err)
+	}
+
+	// step 3 generate helper functions
+	// TODO generateAvroHelpers - includes code to convert from the main struct to avro struct and vice versa, bulk and individual avro writers that will write out the avro to an io.writer setting the Avro metadata fields also, a AvroDeleted method
+	// TODO the helper will need to do the proper conversion for timestamps also
 	return nil
 }
 
@@ -146,257 +190,29 @@ func buildMessagePackFile(outputDir string, mode gen.Method) error {
 }
 
 // buildStructFile generates the specified struct file.
-func buildStructFile(schemaPath, childPath, name, packageName string, embeds []string, outputDir string, fieldNameMap map[string]string) error {
+func buildStructFile(schemaPath, childPath, name, packageName string, embeds []string, outputDir string, fieldNameMap map[string]string) (string, error) {
 	if !filepath.IsAbs(childPath) {
 		childPath = filepath.Join(filepath.Dir(schemaPath), childPath)
 	}
 	schema, err := jsonschema.SchemaFromFile(childPath, name)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	generated, err := newGeneratedStruct(schema, name, packageName, embeds, fieldNameMap)
 	if err != nil {
-		return fmt.Errorf("failed to build generated struct: %v", err)
+		return "", fmt.Errorf("failed to build generated struct: %v", err)
 	}
 
 	outPath := filepath.Join(outputDir, strings.Split(filepath.Base(childPath), ".")[0]+".go")
 	gfile, err := os.Create(outPath)
 	if err != nil {
-		return fmt.Errorf("failed to open file %q: %v", outPath, err)
+		return "", fmt.Errorf("failed to open file %q: %v", outPath, err)
 	}
 	defer gfile.Close()
 
-	return generated.write(gfile)
-}
-
-// extractedField represents a Golang struct field as extracted from a JSON schema file. It is an intermediate format
-// that is populated while parsing the JSON schema file then used when generating the Golang code for the struct.
-type extractedField struct {
-	array          bool
-	description    string
-	fields         extractedFields
-	jsonName       string
-	jsonType       string
-	name           string
-	requiredFields map[string]bool
-}
-
-// write outputs the Golang representation of this field to the writer with prefix before each line.
-// It handles inline structs by calling this method recursively adding a new \t to the prefix for each layer.
-// If required is set to false 'omitempty' is added in the JSON struct tag for the field
-func (ef *extractedField) write(w io.Writer, prefix string, required bool) error {
-	var omitempty string
-	if !required {
-		omitempty = ",omitempty"
-	}
-	jsonTag := fmt.Sprintf(`json:"%s%s"`, ef.jsonName, omitempty)
-	var description string
-	if ef.description != "" {
-		description = fmt.Sprintf(`description:"%s"`, strings.Split(ef.description, "\n")[0])
-	}
-	structTag := fmt.Sprintf("`%s`\n", strings.Trim(strings.Join([]string{jsonTag, description}, " "), " "))
-
-	if ef.jsonType != "object" {
-		_, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s\t%s", prefix, ef.name, goType(ef.jsonType, ef.array), structTag)))
-		return err
-	}
-
-	if _, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s {\n", prefix, ef.name, goType(ef.jsonType, ef.array)))); err != nil {
-		return err
-	}
-
-	for _, field := range ef.fields.Sorted() {
-		fieldRequired := ef.requiredFields[field.jsonName]
-		if err := field.write(w, prefix+"\t", fieldRequired); err != nil {
-			return fmt.Errorf("failed writing field %q: %v", field.name, err)
-		}
-	}
-
-	if _, err := w.Write([]byte(fmt.Sprintf("%s\t}\t%s", prefix, structTag))); err != nil {
-		return err
-	}
-	return nil
-}
-
-// extractedFields is a map of fields keyed on the field name.
-type extractedFields map[string]*extractedField
-
-// IncludeTime does a depth-first recursive search to see if any field or child field is of type "date-time"
-func (efs extractedFields) IncludeTime() bool {
-	for _, field := range efs {
-		if field.fields != nil {
-			if field.fields.IncludeTime() {
-				return true
-			}
-		}
-		if field.jsonType == "date-time" {
-			return true
-		}
-	}
-	return false
-}
-
-// Sorted will return the fields in a sorted list. The sort is a string sort on the keys
-func (efs extractedFields) Sorted() []*extractedField {
-	var sorted []*extractedField
-	var sortedKeys sort.StringSlice
-	fieldsByName := make(map[string]*extractedField)
-	for _, f := range efs {
-		sortedKeys = append(sortedKeys, f.name)
-		fieldsByName[f.name] = f
-	}
-
-	sortedKeys.Sort()
-
-	for _, key := range sortedKeys {
-		sorted = append(sorted, fieldsByName[key])
-	}
-
-	return sorted
-}
-
-type generatedStruct struct {
-	extractedField
-
-	packageName    string
-	embededStructs []string
-	fieldNameMap   map[string]string
-}
-
-func newGeneratedStruct(schema *jsonschema.Schema, name, packageName string, embeds []string, fieldNameMap map[string]string) (*generatedStruct, error) {
-	required := map[string]bool{}
-	for _, fname := range schema.Required {
-		required[fname] = true
-	}
-	generated := &generatedStruct{
-		extractedField: extractedField{
-			name:           name,
-			fields:         make(map[string]*extractedField),
-			requiredFields: required,
-		},
-		fieldNameMap:   fieldNameMap,
-		embededStructs: embeds,
-		packageName:    packageName,
-	}
-	if err := jsonschema.Walk(schema, generated.walkFunc); err != nil {
-		return nil, fmt.Errorf("failed to walk schema for %q: %v", name, err)
-	}
-
-	return generated, nil
-}
-
-// walkFunc is a jsonschema.WalkFunc which builds the fields in the generatedStructFile as the JSON schema file is
-// walked.
-func (gen *generatedStruct) walkFunc(path string, i jsonschema.Instance) error {
-	if err := addField(gen.fields, splitJSONPath(path), i, gen.fieldNameMap); err != nil {
-		return err
-	}
-	return nil
-}
-
-// write will write the generated file to the given io.Writer.
-func (gen *generatedStruct) write(w io.Writer) error {
-	buf := &bytes.Buffer{} // the formatter uses the entire output, so buffer for that
-
-	if _, err := buf.Write([]byte(fmt.Sprintf("package %s\n\n%s\n\n", gen.packageName, disclaimer))); err != nil {
-		return fmt.Errorf("failed writing struct: %v", err)
-	}
-
-	if gen.fields.IncludeTime() {
-		if _, err := buf.Write([]byte("import \"time\"\n")); err != nil {
-			return fmt.Errorf("failed writing struct: %v", err)
-		}
-	}
-
-	embeds := strings.Join(gen.embededStructs, "\n")
-	if embeds != "" {
-		embeds += "\n"
-	}
-	if _, err := buf.Write([]byte(fmt.Sprintf("type %s struct {\n%s\n", exportedName(gen.name), embeds))); err != nil {
-		return fmt.Errorf("failed writing struct: %v", err)
-	}
-
-	for _, field := range gen.fields.Sorted() {
-		req := gen.requiredFields[field.jsonName]
-		if err := field.write(buf, "\t", req); err != nil {
-			return fmt.Errorf("failed writing field %q: %v", field.name, err)
-		}
-	}
-
-	if _, err := buf.Write([]byte("}")); err != nil {
-		return fmt.Errorf("failed writing struct: %v", err)
-	}
-
-	final, err := format.Source(buf.Bytes())
-	if err != nil {
-		return fmt.Errorf("failed to format source: %v", err)
-	}
-
-	if _, err := w.Write(final); err != nil {
-		return fmt.Errorf("error writing to io.Writer: %v", err)
-	}
-	return nil
-}
-
-// addField will create a new field or add to an existing field in the extractedFields.
-// Nested fields are handled by recursively calling this function until the leaf field is reached.
-// For all fields the name and jsonType are set, for arrays the array bool is set for true and for JSON objects,
-// the fields map is created and if it exists the requiredFields section populated.
-// fields will be renamed if a matching entry is supplied in the fieldRenameMap
-func addField(fields extractedFields, tree []string, inst jsonschema.Instance, fieldRenameMap map[string]string) error {
-	if len(tree) > 1 {
-		if f, ok := fields[tree[0]]; ok {
-			return addField(f.fields, tree[1:], inst, fieldRenameMap)
-		}
-		f := &extractedField{jsonName: tree[0], jsonType: "object", name: exportedName(tree[0]), fields: make(map[string]*extractedField)}
-		fields[tree[0]] = f
-		if err := addField(f.fields, tree[1:], inst, fieldRenameMap); err != nil {
-			return fmt.Errorf("failed field %q: %v", tree[0], err)
-		}
-		return nil
-	}
-
-	if len(tree) > 0 {
-		fieldName, ok := fieldRenameMap[tree[0]]
-		if !ok {
-			fieldName = tree[0]
-		}
-		f := &extractedField{
-			description: inst.Description,
-			name:        exportedName(fieldName),
-			jsonName:    tree[0],
-			jsonType:    inst.Type,
-		}
-		// Second processing of an array type
-		if exists, ok := fields[f.jsonName]; ok {
-			f = exists
-			if f.array && f.jsonType == "" {
-				f.jsonType = inst.Type
-			} else {
-				return fmt.Errorf("field %q already exists but is not an array field", f.name)
-			}
-		}
-		if inst.Type == "string" && inst.Format == "date-time" {
-			f.jsonType = "date-time"
-		}
-
-		switch f.jsonType {
-		case "array":
-			f.jsonType = ""
-			f.array = true
-		case "object":
-			f.requiredFields = make(map[string]bool)
-			for _, name := range inst.Required {
-				f.requiredFields[name] = true
-			}
-			f.fields = make(map[string]*extractedField)
-		}
-
-		fields[tree[0]] = f
-	}
-
-	return nil
+	err = generated.write(gfile)
+	return outPath, err
 }
 
 // exportedName returns a name that is usable as an exported field in Go.

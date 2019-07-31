@@ -31,6 +31,14 @@ or if you have compiled the tool and have it in your path rather than vendoring 
 
 then simply run `go generate`.
 
+As well as generating Go structs serialization libraries for [Message Pack](https://msgpack.org/) and [Avro](https://avro.apache.org/) are available.
+For Avro the schema as well as serialization and helper functions are generated.
+The Avro schema also adds two metadata fields, `AvroWriteTime` and `AvroDeleted`.
+The generated serialization functions are based these libraries:
+
+* https://github.com/GannettDigital/msgp a fork with minor fixes from https://github.com/tinylib/msgp
+* https://github.com/actgardner/gogen-avro
+
 ## Building/Testing
 This project uses Go modules for dependency management. You need to have a working Go environment with version 1.11 or greater installed. 
 
