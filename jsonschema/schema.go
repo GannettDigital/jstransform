@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -128,6 +129,7 @@ func SchemaTypes(schemaPath string) ([]string, []string, []string, error) {
 	for prop, _ := range sj.Properties {
 		properties = append(properties, prop)
 	}
+	sort.Strings(properties)
 
 	return allOfTypes, oneOfTypes, properties, nil
 }

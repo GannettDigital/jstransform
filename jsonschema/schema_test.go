@@ -364,7 +364,7 @@ func TestSchemaTypes(t *testing.T) {
 		{
 			description:    "No oneOf or allOf",
 			path:           "test_data/image.json",
-			wantProperties: []string{"type", "crops", "URL"},
+			wantProperties: []string{"URL", "crops", "type"},
 		},
 	}
 
