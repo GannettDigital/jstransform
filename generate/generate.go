@@ -81,12 +81,12 @@ func BuildStructsWithArgs(args BuildArgs) error {
 
 	packageName := filepath.Base(args.OutputDir)
 
-	allOfTypes, oneOfTypes, err := jsonschema.SchemaTypes(args.SchemaPath)
+	allOfTypes, oneOfTypes, properties, err := jsonschema.SchemaTypes(args.SchemaPath)
 	if err != nil {
 		return fmt.Errorf("failed to discover oneOfTypes: %v", err)
 	}
 
-	if len(allOfTypes) == 0 && len(oneOfTypes) == 0 {
+	if len(allOfTypes) == 0 && len(oneOfTypes) == 0 || len(properties) > 0 {
 		path, err := filepath.Abs(args.SchemaPath)
 		if err != nil {
 			return fmt.Errorf("failed to determine absolute path of %q: %v", args.SchemaPath, err)
