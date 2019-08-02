@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -104,16 +105,16 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	return &s, nil
 }
 
-// SchemaTypes will parse the given file and report which top level allOfTypes and oneOfTypes are found in that schema.
-func SchemaTypes(schemaPath string) ([]string, []string, error) {
+// SchemaTypes will parse the given file and report which top level allOfTypes, oneOfTypes, and properties are found in the schema.
+func SchemaTypes(schemaPath string) ([]string, []string, []string, error) {
 	data, err := ioutil.ReadFile(schemaPath)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
+		return nil, nil, nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
 	}
 
 	var sj Instance
 	if err := json.Unmarshal(data, &sj); err != nil {
-		return nil, nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
+		return nil, nil, nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
 	}
 
 	var allOfTypes []string
@@ -124,8 +125,13 @@ func SchemaTypes(schemaPath string) ([]string, []string, error) {
 	for _, one := range sj.OneOf {
 		oneOfTypes = append(oneOfTypes, one.Ref)
 	}
+	var properties []string
+	for prop, _ := range sj.Properties {
+		properties = append(properties, prop)
+	}
+	sort.Strings(properties)
 
-	return allOfTypes, oneOfTypes, nil
+	return allOfTypes, oneOfTypes, properties, nil
 }
 
 func mergeProperties(parent, child map[string]json.RawMessage) map[string]json.RawMessage {

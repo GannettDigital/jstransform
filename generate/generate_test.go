@@ -57,6 +57,13 @@ func TestBuildStructsRename(t *testing.T) {
 				"Height":  "Not-Either",
 			},
 		},
+		{
+			file:          "all_of_with_properties.json",
+			description:   "one allOf with additional properties at the top level",
+			expectedFiles: []string{"all_of_with_properties.go", "simple.go"},
+			wantFiles:     []string{"all_of_with_properties.go.out", "simple.go.out2"},
+			renameStructs: nil,
+		},
 	}
 
 	for _, test := range tests {

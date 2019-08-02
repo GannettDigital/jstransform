@@ -334,10 +334,11 @@ func TestMappings(t *testing.T) {
 
 func TestSchemaTypes(t *testing.T) {
 	tests := []struct {
-		description string
-		path        string
-		wantAllOf   []string
-		wantOneOf   []string
+		description    string
+		path           string
+		wantAllOf      []string
+		wantOneOf      []string
+		wantProperties []string
 	}{
 		{
 			description: "Single AllOf",
@@ -361,13 +362,14 @@ func TestSchemaTypes(t *testing.T) {
 			wantOneOf:   []string{"./image.json", "./array-of-array.json"},
 		},
 		{
-			description: "No oneOf or allOf",
-			path:        "test_data/image.json",
+			description:    "No oneOf or allOf",
+			path:           "test_data/image.json",
+			wantProperties: []string{"URL", "crops", "type"},
 		},
 	}
 
 	for _, test := range tests {
-		gotAllOf, gotOneOf, err := SchemaTypes(test.path)
+		gotAllOf, gotOneOf, gotProperties, err := SchemaTypes(test.path)
 		if err != nil {
 			t.Fatalf("Test %q - failed: %v", test.description, err)
 		}
@@ -378,6 +380,10 @@ func TestSchemaTypes(t *testing.T) {
 
 		if !reflect.DeepEqual(gotOneOf, test.wantOneOf) {
 			t.Errorf("Test %q - got OneOf %v, want %v", test.description, gotOneOf, test.wantOneOf)
+		}
+
+		if !reflect.DeepEqual(gotProperties, test.wantProperties) {
+			t.Errorf("Test %q - got properties %v, want %v", test.description, gotProperties, test.wantProperties)
 		}
 	}
 }
