@@ -29,6 +29,45 @@ var (
 		wantErr             bool
 	}{
 		{
+			description:         "Test all operations",
+			schema:              operationsSchema,
+			transformIdentifier: "cumulo",
+			in: json.RawMessage(`
+						{
+							"type": "image",
+							"data": {
+								"attributes": [
+									{
+										"name": "length",
+										"value": "00:13"
+									}
+								],
+								"contributors": [
+									{"id": 1, "fullname": "one"},
+									{"id": 2, "fullname": "two"}
+								]
+							},
+							"lastModified": {
+							"type": "object",
+							"from": {
+								"operations": [{
+									"currentTime": {
+										"arguments": {
+											"format": "RFC3339"
+											}
+										}
+									}]
+								}
+							},
+							"mixedCase": "a|B|c|D",
+							"invalid": false,
+							"url": "http://foo.com/blah",
+							"startTime": "2019-05-16T21:00:00-04:00",
+							"toCamelCase": "extra-base-hit"
+						}`),
+			want: json.RawMessage(fmt.Sprintf(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"lastModified":"%s","startTime":"09:00","toCamelCase":"extraBaseHit","url":"http://gannettdigital.com/blah","valid":true}`, time.Now().Format(time.RFC3339))),
+		},
+		{
 			description:         "Use basic transforms, copy from input and default to build result",
 			schema:              imageSchema,
 			transformIdentifier: "cumulo",
@@ -102,45 +141,6 @@ var (
 								]
 							}`),
 			want: json.RawMessage(`{"contributors":[{"id":"1","name":"one"},{"id":"2","name":"two"}],"lines":["line1","line2"],"wasSingleObject":[{"id":"1","name":"test1"}]}`),
-		},
-		{
-			description:         "Test all operations",
-			schema:              operationsSchema,
-			transformIdentifier: "cumulo",
-			in: json.RawMessage(`
-						{
-							"type": "image",
-							"data": {
-								"attributes": [
-									{
-										"name": "length",
-										"value": "00:13"
-									}
-								],
-								"contributors": [
-									{"id": 1, "fullname": "one"},
-									{"id": 2, "fullname": "two"}
-								]
-							},
-							"lastModified": {
-							"type": "object",
-							"from": {
-								"operations": [{
-									"currentTime": {
-										"arguments": {
-											"format": "RFC3339"
-											}
-										}
-									}]
-								}
-							},
-							"mixedCase": "a|B|c|D",
-							"invalid": false,
-							"url": "http://foo.com/blah",
-							"startTime": "2019-05-16T21:00:00-04:00",
-							"toCamelCase": "extra-base-hit"
-						}`),
-			want: json.RawMessage(fmt.Sprintf(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"lastModified":"%s","startTime":"09:00","toCamelCase":"extraBaseHit","url":"http://gannettdigital.com/blah","valid":true}`, time.Now().Format(time.RFC3339))),
 		},
 		{
 			description:         "Test empty non-required object",
