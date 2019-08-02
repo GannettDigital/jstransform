@@ -105,7 +105,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	return &s, nil
 }
 
-// SchemaTypes will parse the given file and report which top level allOfTypes, oneOfTypes, and properties are found in that schema.
+// SchemaTypes will parse the given file and report which top level allOfTypes, oneOfTypes, and properties are found in the schema.
 func SchemaTypes(schemaPath string) ([]string, []string, []string, error) {
 	data, err := ioutil.ReadFile(schemaPath)
 	if err != nil {
