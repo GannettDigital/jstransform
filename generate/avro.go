@@ -73,10 +73,21 @@ func buildAvroSerializationFunctions(schemaPath string) error {
 // Note: Avro can't handle maps with a key other than a string, http://avro.apache.org/docs/current/spec.html#Maps
 // Neither can JSON schema, https://json-schema.org/understanding-json-schema/reference/object.html so this only
 // becomes relevant if it is used with go structs which weren't just generated from JSON schema
-func buildAvroSchemaFile(name, dir string, spec *ast.TypeSpec, pretty bool) (string, error) {
+func buildAvroSchemaFile(name, goSourcePath string, pretty bool) (string, error) {
+	// Step 1 create the Avro Schema file
+	// there are 3 ways to approach this, walk the JSON schema, walk the AST for the go struct or load the Go struct up and do reflection
+	// reflection isn't generally clear but is probably the most compact, walking the JSON schema will likely require building a
+	// representation of the data in a new set of structs like is done for the go struct building initially.
+	// Walking the go AST is able to take advantage of all the standard library AST methods and though it has its share
+	// or complication is easier to do in one pass
+	spec, err := parseGoStruct(name, goSourcePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse Go struct: %v", err)
+	}
 	if spec == nil {
 		return "", errors.New("type spec is nil")
 	}
+	dir := filepath.Dir(goSourcePath)
 	outPath := filepath.Join(dir, strings.ToLower(name)+".avsc")
 	specFile, err := os.Create(outPath)
 	if err != nil {
@@ -116,19 +127,26 @@ func buildAvroSchemaFile(name, dir string, spec *ast.TypeSpec, pretty bool) (str
 	return outPath, nil
 }
 
-// parseGoStruct parses the go file at path returning the named struct type definition as an *ast.TypeSpec
+// parseGoStruct parses the go file(s) at path returning the named struct type definition as an *ast.TypeSpec
 func parseGoStruct(name, path string) (*ast.TypeSpec, error) {
 	fileSet := token.NewFileSet()
-	goFile, err := parser.ParseFile(fileSet, path, nil, parser.AllErrors)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse generate go file %q: %v", path, err)
-	}
-	if !ast.FilterFile(goFile, func(itemName string) bool { return itemName == name }) {
-		return nil, fmt.Errorf("a struct named %q was not found in file %q", name, path)
-	}
 
-	if length := len(goFile.Decls); length != 1 {
-		return nil, fmt.Errorf("failed to filter declarations to a single one named %q, found %d", name, length)
+	var goFile *ast.File
+	if strings.HasSuffix(path, ".go") {
+		var err error
+		goFile, err = parser.ParseFile(fileSet, path, nil, parser.AllErrors)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse go file %q: %v", path, err)
+		}
+		if !ast.FilterFile(goFile, func(itemName string) bool { return itemName == name }) {
+			return nil, fmt.Errorf("a struct named %q was not found in file %q", name, path)
+		}
+	} else {
+		var err error
+		goFile, err = filterPackage(name, path)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	d, ok := goFile.Decls[0].(*ast.GenDecl)
@@ -143,7 +161,43 @@ func parseGoStruct(name, path string) (*ast.TypeSpec, error) {
 		return nil, errors.New("filtered type is of unknown ast type")
 	}
 
+	if t == nil {
+		return nil, errors.New("go struct not found in parsed data")
+	}
 	return t, nil
+}
+
+// filterPackage will filter all the go files found at the path returning a *ast.File containing name.
+func filterPackage(name, path string) (*ast.File, error) {
+	fileSet := token.NewFileSet()
+	pkgmap, err := parser.ParseDir(fileSet, path, nil, parser.AllErrors)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse go files at path %q: %v", path, err)
+	}
+	var pkgs []*ast.Package
+	for _, pkg := range pkgmap {
+		pkgs = append(pkgs, pkg)
+	}
+	if length := len(pkgs); length != 1 {
+		return nil, fmt.Errorf("expected 1 package for go files at path %q, found %d", path, length)
+	}
+	pkg := pkgs[0]
+	if !ast.FilterPackage(pkg, func(itemName string) bool { return itemName == name }) {
+		return nil, fmt.Errorf("a struct named %q was not found in file %q", name, path)
+	}
+	var goFile *ast.File
+	for _, f := range pkg.Files {
+		if len(f.Decls) == 1 {
+			if goFile != nil {
+				return nil, fmt.Errorf("name %q is not unique in go files at path %q", name, path)
+			}
+			goFile = f
+		}
+	}
+	if goFile == nil {
+		return nil, fmt.Errorf("failed to find %q in go files at path %q", name, path)
+	}
+	return goFile, nil
 }
 
 func parseStructTag(literal *ast.BasicLit) (name, description string, omitEmpty bool) {
@@ -172,11 +226,11 @@ func parseStructTag(literal *ast.BasicLit) (name, description string, omitEmpty 
 func writeAvroStruct(cfg avroConfig, name, defaultFields string) astutil.ApplyFunc {
 	return func(c *astutil.Cursor) bool {
 		if c.Name() == "Node" {
-			var namespace string
+			var jsonNamespace string
 			if len(cfg.namespace) != 0 {
-				namespace = fmt.Sprintf(`"namespace":%q,`, strings.Join(cfg.namespace, "."))
+				jsonNamespace = fmt.Sprintf(`"namespace":%q,`, strings.Join(cfg.namespace, "."))
 			}
-			if _, err := fmt.Fprintf(cfg.writer, `"name":%q,%s"type":"record","fields":[%s`, name, namespace, defaultFields); err != nil {
+			if _, err := fmt.Fprintf(cfg.writer, `"name":%q,%s"type":"record","fields":[%s`, name, jsonNamespace, defaultFields); err != nil {
 				return false
 			}
 			return true
@@ -315,7 +369,7 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 		if strings.HasPrefix(itemType, "{") {
 			return fmt.Sprintf(`{"type":"array","items":%s}`, itemType)
 		} else {
-			return fmt.Sprintf(`{"type":"array","items":{%s}}`, itemType)
+			return fmt.Sprintf(`{"type":"array","items":{"type": %s}}`, itemType)
 		}
 	case *ast.StructType:
 		// recursively handle this struct
@@ -333,7 +387,7 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 		return out
 	case *ast.SelectorExpr:
 		if t.Sel.Name == "Time" {
-			return `"type":"long","logicalType":"timestamp-millis"`
+			return `{"type":"long","logicalType":"timestamp-millis"}`
 		}
 		return fmt.Sprintf(`unsupported type %q`, t.Sel.Name)
 	default:

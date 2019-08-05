@@ -32,6 +32,7 @@ type BuildArgs struct {
 	OutputDir           string
 	GenerateAvro        bool
 	GenerateMessagePack bool
+	ImportPath          string
 	StructNameMap       map[string]string
 	FieldNameMap        map[string]string
 }
@@ -109,7 +110,7 @@ func BuildStructsWithArgs(args BuildArgs) error {
 			return fmt.Errorf("failed to build struct file for %q: %v", name, err)
 		}
 		if args.GenerateAvro {
-			if err := buildAvro(name, path); err != nil {
+			if err := buildAvro(name, path, args.ImportPath); err != nil {
 				return fmt.Errorf("failed to build Avro files for %q: %v", packageName, err)
 			}
 		}
@@ -126,7 +127,7 @@ func BuildStructsWithArgs(args BuildArgs) error {
 			return fmt.Errorf("failed to build struct file for %q: %v", name, err)
 		}
 		if args.GenerateAvro {
-			if err := buildAvro(name, path); err != nil {
+			if err := buildAvro(name, path, args.ImportPath); err != nil {
 				return fmt.Errorf("failed to build Avro files for %q: %v", packageName, err)
 			}
 		}
@@ -144,21 +145,10 @@ func BuildStructsWithArgs(args BuildArgs) error {
 // buildAvro creates an Avro schema file, Avro serialization functions and some helper functions which link the structs
 // used by the generated Avro serialization with those created by the BuildStructs functions.
 // The serialization methods are created with https://github.com/actgardner/gogen-avro
-func buildAvro(name, path string) error {
-	// Step 1 create the Avro Schema file
-	// there are 3 ways to approach this, walk the JSON schema, walk the AST for the go struct or load the Go struct up and do reflection
-	// reflection isn't generally clear but is probably the most compact, walking the JSON schema will likely require building a
-	// representation of the data in a new set of structs like is done for the go struct building initially.
-	// Walking the go AST is able to take advantage of all the standard library AST methods and though it has its share
-	// or complication is easier to do in one pass
+func buildAvro(name, path, importPath string) error {
 	name = exportedName(name)
-	spec, err := parseGoStruct(name, path)
-	if err != nil {
-		return err
-	}
-	outdir := filepath.Dir(path)
 
-	avroSchemaPath, err := buildAvroSchemaFile(name, outdir, spec, false)
+	avroSchemaPath, err := buildAvroSchemaFile(name, path, false)
 	if err != nil {
 		return fmt.Errorf("failed to build Avro Schema file: %v", err)
 	}
@@ -170,8 +160,9 @@ func buildAvro(name, path string) error {
 	}
 
 	// step 3 generate helper functions
-	// TODO generateAvroHelpers - includes code to convert from the main struct to avro struct and vice versa, bulk and individual avro writers that will write out the avro to an io.writer setting the Avro metadata fields also, a AvroDeleted method
-	// TODO the helper will need to do the proper conversion for timestamps also
+	if err := buildAvroHelperFunctions(name, path, importPath); err != nil {
+		return fmt.Errorf("failed to build Avro serialization code: %v", err)
+	}
 	return nil
 }
 

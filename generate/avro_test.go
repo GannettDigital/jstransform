@@ -4,7 +4,10 @@ import (
 	"go/ast"
 	"io/ioutil"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -18,37 +21,25 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 		{
 			description: "simple go struct",
 			name:        "Simple",
-			goPath:      "./test_data/simple.go.out",
+			goPath:      "./test_data/simple.go",
 			wantPath:    "./test_data/simple.avsc.out",
 		},
 		{
 			description: "fields with repeated field names",
 			name:        "Repeats",
-			goPath:      "./test_data/repeats.go.out",
+			goPath:      "./test_data/repeats.go",
 			wantPath:    "./test_data/repeats.avsc.out",
 		},
 		{
 			description: "with embedded and nested structs, fields with descriptions",
 			name:        "Complex",
-			goPath:      "./test_data/complex.go.out",
+			goPath:      "./test_data/complex.go",
 			wantPath:    "./test_data/complex.avsc.out",
 		},
 	}
 
-	// For the complex.go to find the embedded struct simple.go must exist, other tests use that filename so create
-	// and destroy it here
-	if err := os.Link("./test_data/simple.go.out", "./test_data/simple.go"); err != nil {
-		t.Fatal(err)
-	}
-	defer os.Remove("./test_data/simple.go")
-
 	for _, test := range tests {
-		spec, err := parseGoStruct(test.name, test.goPath)
-		if err != nil {
-			t.Fatalf("Test %q - failed parsing go struct: %v", test.description, err)
-		}
-
-		outpath, err := buildAvroSchemaFile(test.name, "./test_data", spec, true)
+		outpath, err := buildAvroSchemaFile(test.name, test.goPath, true)
 		if err != nil {
 			t.Errorf("Test %q - failed to build Avro schema: %v", test.description, err)
 		}
@@ -75,7 +66,6 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 func TestBuildAvroSerializationFunctions(t *testing.T) {
 	tests := []struct {
 		description string
-		name        string
 		path        string
 	}{
 		{
@@ -92,13 +82,16 @@ func TestBuildAvroSerializationFunctions(t *testing.T) {
 		},
 	}
 
-	defer func() {
-		os.RemoveAll("./test_data/avro")
-	}()
-
 	for _, test := range tests {
 		if err := buildAvroSerializationFunctions(test.path); err != nil {
 			t.Errorf("Test %q - failed: %v", test.description, err)
+		}
+
+		git := exec.Command("git", "diff", "--quiet", "*.go")
+		schemaName := strings.Split(filepath.Base(test.path), ".")[0]
+		git.Dir = filepath.Join("./test_data/avro", schemaName)
+		if err := git.Run(); err != nil {
+			t.Errorf("Test %q - Differences in generated files found", test.description)
 		}
 	}
 }
@@ -112,12 +105,17 @@ func TestParseGoStruct(t *testing.T) {
 		{
 			description: "simple struct",
 			name:        "Simple",
-			path:        "./test_data/simple.go.out",
+			path:        "./test_data/simple.go",
 		},
 		{
 			description: "a struct among many others",
 			name:        "BuildArgs",
 			path:        "./generate.go",
+		},
+		{
+			description: "a struct among many files",
+			name:        "BuildArgs",
+			path:        ".",
 		},
 	}
 
@@ -125,6 +123,7 @@ func TestParseGoStruct(t *testing.T) {
 		got, err := parseGoStruct(test.name, test.path)
 		if err != nil {
 			t.Errorf("Test %q - got err: %v", test.description, err)
+			continue
 		}
 
 		if got == nil {
