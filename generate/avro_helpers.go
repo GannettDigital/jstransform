@@ -17,7 +17,7 @@ import (
 
 // AvroItemWriter creates a Avro Container file containing the data from the struct that implements this interface
 type AvroItemWriter interface {
-	WriteAvroCF(io.Writer, time.Time)
+	WriteAvroCF(io.Writer, time.Time) error
 }
 
 // TODO
