@@ -22,6 +22,9 @@ const msgpMode = gen.Encode | gen.Decode | gen.Marshal | gen.Unmarshal | gen.Siz
 // SchemaPath is the path tot he jsonSchema file to use generate the Go struct representations
 // OutputDir is the destination for the generated files
 // GenerateAvro is a flag that defines if Avro serializing code should be built.
+//  The Avro generated code will only use a single field in the case where a field name is defined in a oneOf and
+//  elsewhere in the JSON schema. When converting the most specific version of such a field will be used. In general
+//  conflicting names like this should be avoided in the JSON schema.
 // GenerateMessagePack is a flag that defines if message pack serializing code should be built.
 // StructNameMap allows specifying the type name of the struct for each JSON file.
 // FieldNameMap is used to provide alternate names for fields in the resulting structs.

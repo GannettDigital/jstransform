@@ -57,11 +57,6 @@ func buildAvroHelperFunctions(name, goSourcePath, importPath string) error {
 		"pkgName":     filepath.Base(dir),
 	}
 
-	tmpl, err := template.New("").Parse(avroTemplate)
-	if err != nil {
-		return fmt.Errorf("failed to parse template: %v", err)
-	}
-
 	fm, err := newAvroFieldMapper(name, goSourcePath)
 	if err != nil {
 		return fmt.Errorf("failed to initialize field mapper: %v", err)
@@ -72,24 +67,12 @@ func buildAvroHelperFunctions(name, goSourcePath, importPath string) error {
 	}
 	values["preProcessing"], values["fieldMapping"] = mapped.preProcessing, mapped.fieldMapping
 
-	buf := &bytes.Buffer{}
-	if err := tmpl.Execute(buf, values); err != nil {
-		return fmt.Errorf("failed to execute code generation template: %v", err)
-	}
 	// TODO generate code for bulk avro writer
-
-	// Apply go formatting
-	final, err := format.Source(buf.Bytes())
-	if err != nil {
-		return fmt.Errorf("failed to format source: %v", err)
+	if err := writeCodeTemplate(avroTemplate, values, filepath.Join(dir, strings.ToLower(name)+"_avro.go")); err != nil {
+		return err
 	}
 
-	goPath := filepath.Join(dir, strings.ToLower(name)+"_avro.go")
-	if err := ioutil.WriteFile(goPath, final, 0644); err != nil {
-		return fmt.Errorf("failed to write file %q: %v", goPath, err)
-	}
-
-	return nil
+	return writeCodeTemplate(avroTestTemplate, values, filepath.Join(dir, strings.ToLower(name)+"_avro_test.go"))
 }
 
 // mappedFields contains the data needed to build a new avro struct.
@@ -343,7 +326,7 @@ func mapGeneratedFields(name, goSourcePath string) (map[string]*ast.Field, error
 
 // mapFields walks through the fields in the field list building a map keyed by field name. Embedded structs are
 // processed as though their fields are directly part of the fieldList. In the case of an embedded struct with a field
-// which matches the name of a field not in the embedded struct the non-embedded version is prefered.
+// which matches the name of a field not in the embedded struct the non-embedded version is preferred.
 func mapFields(list *ast.FieldList, srcDir string) (map[string]*ast.Field, error) {
 	length := list.NumFields()
 
@@ -390,12 +373,42 @@ func printFields(list *ast.FieldList) string {
 			continue
 		}
 		name := f.Names[0]
-		ident, ok := f.Type.(*ast.Ident)
-		if !ok {
-			// only idents handled right now
-			continue
+
+		switch fType := f.Type.(type) {
+		case *ast.Ident:
+			out += fmt.Sprintf("%s %s %s\n", name, fType.Name, f.Tag.Value)
+		case *ast.ArrayType:
+			ident, ok := fType.Elt.(*ast.Ident)
+			if !ok {
+				return "unknown array type"
+			}
+			out += fmt.Sprintf("%s []%s %s\n", name, ident.Name, f.Tag.Value)
 		}
-		out += fmt.Sprintf("%s %s %s\n", name, ident.Name, f.Tag.Value)
 	}
 	return out
+}
+
+// writeCodeTemplate will execute a template from src with values and write to path.
+// The assumption is this is go code so it will have standard go formatting applied.
+func writeCodeTemplate(src string, values map[string]string, path string) error {
+	buf := &bytes.Buffer{}
+	tmpl, err := template.New("").Parse(src)
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %v", err)
+	}
+	if err := tmpl.Execute(buf, values); err != nil {
+		return fmt.Errorf("failed to execute code generation template: %v", err)
+	}
+
+	// Apply go formatting
+	final, err := format.Source(buf.Bytes())
+	if err != nil {
+		return fmt.Errorf("failed to format source: %v", err)
+	}
+
+	if err := ioutil.WriteFile(path, final, 0644); err != nil {
+		return fmt.Errorf("failed to write file %q: %v", path, err)
+	}
+
+	return nil
 }

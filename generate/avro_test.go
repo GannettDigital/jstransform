@@ -36,6 +36,12 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 			goPath:      "./test_data/complex.go",
 			wantPath:    "./test_data/complex.avsc.out",
 		},
+		{
+			description: "Variations on Arrays",
+			name:        "Arrays",
+			goPath:      "./test_data/arrays.go",
+			wantPath:    "./test_data/arrays.avsc.out",
+		},
 	}
 
 	for _, test := range tests {
@@ -79,6 +85,10 @@ func TestBuildAvroSerializationFunctions(t *testing.T) {
 		{
 			description: "complex avro file",
 			path:        "./test_data/complex.avsc.out",
+		},
+		{
+			description: "Variations on Arrays",
+			path:        "./test_data/arrays.avsc.out",
 		},
 	}
 
