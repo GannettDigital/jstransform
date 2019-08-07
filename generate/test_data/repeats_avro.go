@@ -47,3 +47,38 @@ func (z *Repeats) convertToAvro(writeTime time.Time) *repeats.Repeats {
 		Width:   &repeats.UnionNullDouble{Double: z.Width, UnionType: repeats.UnionNullDoubleTypeEnumDouble},
 	}
 }
+
+// RepeatsBulkAvroWriter will begin a go routine writing an Avro Container File to the writer and add each item from the
+// request channel. If an error is encountered it will be sent on the returned error channel.
+// The given writeTime will be used for all data items written by this function.
+// When the returned request channel is closed this function will finalize the Container File and exit.
+// The returned error channel will be closed just before the go routine exits.
+func RepeatsBulkAvroWriter(writer io.Writer, writeTime time.Time, request <-chan *Repeats) <-chan error {
+	if writeTime.IsZero() {
+		writeTime = time.Now()
+	}
+	errors := make(chan error, 1)
+
+	go func() {
+		defer close(errors)
+
+		avroWriter, err := repeats.NewRepeatsWriter(writer, container.Snappy, 1)
+		if err != nil {
+			errors <- err
+			return
+		}
+
+		for item := range request {
+			if err := avroWriter.WriteRecord(item.convertToAvro(writeTime)); err != nil {
+				errors <- err
+				return
+			}
+		}
+
+		if err := avroWriter.Flush(); err != nil {
+			errors <- err
+			return
+		}
+	}()
+	return errors
+}

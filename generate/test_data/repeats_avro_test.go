@@ -2,6 +2,8 @@ package test_data
 
 import (
 	"bytes"
+	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -39,5 +41,32 @@ func TestRepeats_WriteAvroCF(t *testing.T) {
 
 	if read.AvroDeleted != false {
 		t.Error("OCF reports deleted true expected false")
+	}
+}
+
+func ExampleRepeatsBulkAvroWrite() {
+	input := []*Repeats{{}, {}, {}}
+	inputChan := make(chan *Repeats)
+
+	devnull, _ := os.Open("/dev/null")
+	defer devnull.Close()
+
+	errChan := RepeatsBulkAvroWriter(devnull, time.Now(), inputChan)
+
+	for _, item := range input {
+		select {
+		case err := <-errChan:
+			fmt.Print(err)
+			return
+		case inputChan <- item:
+		}
+	}
+
+	// Check for any final errors, the errorChan should be closed when the BulkWriter is finished processing
+	for err := range errChan {
+		if err != nil {
+			fmt.Print(err)
+			return
+		}
 	}
 }
