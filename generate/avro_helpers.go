@@ -15,20 +15,9 @@ import (
 	"time"
 )
 
-// AvroItemWriter creates a Avro Container file containing the data from the struct that implements this interface
-type AvroItemWriter interface {
-	WriteAvroCF(io.Writer, time.Time) error
-}
-
-// TODO
-// AvroBulkWriter defines the interface used for writing a set of data items to an Avro Container File.
-// type AvroBulkWriter interface {
-//
-//}
-
+// AvroCFWriter creates a Avro Container file containing the data from the struct that implements this interface.
 type AvroCFWriter interface {
-	AvroItemWriter
-	//	AvroBulkWriter
+	WriteAvroCF(io.Writer, time.Time) error
 }
 
 // AvroTime converts the given time.Time into an int64 compatible with an Avro timestamp.millis logical type.
@@ -67,7 +56,6 @@ func buildAvroHelperFunctions(name, goSourcePath, importPath string) error {
 	}
 	values["preProcessing"], values["fieldMapping"] = mapped.preProcessing, mapped.fieldMapping
 
-	// TODO generate code for bulk avro writer
 	if err := writeCodeTemplate(avroTemplate, values, filepath.Join(dir, strings.ToLower(name)+"_avro.go")); err != nil {
 		return err
 	}
