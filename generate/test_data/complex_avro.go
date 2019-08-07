@@ -67,7 +67,7 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 		Credit:         z.Credit,
 		Crops:          Crops_recordSlice(z.Crops),
 		Cutline:        &complex.UnionNullString{String: z.Cutline, UnionType: complex.UnionNullStringTypeEnumString},
-		DatePhotoTaken: z.DatePhotoTaken,
+		DatePhotoTaken: generate.AvroTime(z.DatePhotoTaken),
 		Orientation:    z.Orientation,
 		OriginalSize: &complex.OriginalSize_record{Height: z.OriginalSize.Height,
 			Width: z.OriginalSize.Width},

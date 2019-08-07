@@ -300,6 +300,7 @@
         },
         "datePhotoTaken": {
             "type": "string",
+            "format": "date-time",
             "transform": {
                 "cumulo": {
                     "from": [

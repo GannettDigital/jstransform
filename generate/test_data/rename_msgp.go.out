@@ -103,7 +103,7 @@ func (z *Complex) DecodeMsg(dc *msgp.Reader) (err error) {
 				return
 			}
 		case "DatePhotoTaken":
-			z.DatePhotoTaken, err = dc.ReadString()
+			z.DatePhotoTaken, err = dc.ReadTime()
 			if err != nil {
 				return
 			}
@@ -279,7 +279,7 @@ func (z *Complex) EncodeMsg(en *msgp.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	err = en.WriteString(z.DatePhotoTaken)
+	err = en.WriteTime(z.DatePhotoTaken)
 	if err != nil {
 		return
 	}
@@ -380,7 +380,7 @@ func (z *Complex) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.AppendString(o, z.Cutline)
 	// string "DatePhotoTaken"
 	o = append(o, 0xae, 0x44, 0x61, 0x74, 0x65, 0x50, 0x68, 0x6f, 0x74, 0x6f, 0x54, 0x61, 0x6b, 0x65, 0x6e)
-	o = msgp.AppendString(o, z.DatePhotoTaken)
+	o = msgp.AppendTime(o, z.DatePhotoTaken)
 	// string "Orientation"
 	o = append(o, 0xab, 0x4f, 0x72, 0x69, 0x65, 0x6e, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e)
 	o = msgp.AppendString(o, z.Orientation)
@@ -501,7 +501,7 @@ func (z *Complex) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				return
 			}
 		case "DatePhotoTaken":
-			z.DatePhotoTaken, bts, err = msgp.ReadStringBytes(bts)
+			z.DatePhotoTaken, bts, err = msgp.ReadTimeBytes(bts)
 			if err != nil {
 				return
 			}
@@ -592,7 +592,7 @@ func (z *Complex) Msgsize() (s int) {
 	for za0001 := range z.Crops {
 		s += 1 + 7 + msgp.Float64Size + 5 + msgp.StringPrefixSize + len(z.Crops[za0001].Name) + 5 + msgp.StringPrefixSize + len(z.Crops[za0001].Path) + 13 + msgp.StringPrefixSize + len(z.Crops[za0001].RelativePath) + 6 + msgp.Float64Size
 	}
-	s += 8 + msgp.StringPrefixSize + len(z.Cutline) + 15 + msgp.StringPrefixSize + len(z.DatePhotoTaken) + 12 + msgp.StringPrefixSize + len(z.Orientation) + 13 + 1 + 7 + msgp.Float64Size + 6 + msgp.Float64Size + 5 + msgp.StringPrefixSize + len(z.Type) + 4 + 1 + 9 + msgp.StringPrefixSize + len(z.URL.Absolute) + 8 + msgp.StringPrefixSize + len(z.URL.Publish)
+	s += 8 + msgp.StringPrefixSize + len(z.Cutline) + 15 + msgp.TimeSize + 12 + msgp.StringPrefixSize + len(z.Orientation) + 13 + 1 + 7 + msgp.Float64Size + 6 + msgp.Float64Size + 5 + msgp.StringPrefixSize + len(z.Type) + 4 + 1 + 9 + msgp.StringPrefixSize + len(z.URL.Absolute) + 8 + msgp.StringPrefixSize + len(z.URL.Publish)
 	return
 }
 

@@ -181,7 +181,7 @@ func writeComplex(r *Complex, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	err = writeString(r.DatePhotoTaken, w)
+	err = writeLong(r.DatePhotoTaken, w)
 	if err != nil {
 		return err
 	}

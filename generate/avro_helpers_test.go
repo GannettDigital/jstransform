@@ -31,6 +31,12 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 			filename:    "complex.go",
 			wantPath:    "complex_avro.go",
 		},
+		{
+			description: "variations on Arrays",
+			name:        "Arrays",
+			filename:    "arrays.go",
+			wantPath:    "arrays_avro.go",
+		},
 	}
 
 	testPath := "./test_data"

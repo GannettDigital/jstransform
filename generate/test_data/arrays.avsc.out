@@ -1,0 +1,55 @@
+{
+  "name": "Arrays",
+  "type": "record",
+  "fields": [
+    {
+      "name": "AvroWriteTime",
+      "doc": "The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.",
+      "type": "long",
+      "logicalType": "timestamp-millis"
+    },
+    {
+      "name": "AvroDeleted",
+      "doc": "This is set to true when the Avro data is recording a delete in the source data.",
+      "default": false,
+      "type": "boolean"
+    },
+    {
+      "name": "heights",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "long"
+        }
+      }
+    },
+    {
+      "name": "parents",
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "parents_record",
+          "namespace": "parents",
+          "type": "record",
+          "fields": [
+            {
+              "name": "count",
+              "namespace": "parents",
+              "type": "long"
+            },
+            {
+              "name": "children",
+              "namespace": "parents",
+              "type": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
