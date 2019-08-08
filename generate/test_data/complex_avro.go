@@ -1,6 +1,7 @@
 package test_data
 
 import (
+	"errors"
 	"io"
 	"time"
 
@@ -12,10 +13,12 @@ import (
 
 // WriteAvroCF writes an Avro Containter File to the given io.Writer using snappy compression for the data.
 // The time is used as the AvroWriteTime, if the time is the Zero value then the current time is used.
-// If z is nil then the data will be a delete as indicated by the AvroDeleted field.
 // NOTE: If the type has a field in an embedded struct with the same name as a field not in the embedded struct the
 // value will be pulled from the field not in the embedded struct.
 func (z *Complex) WriteAvroCF(writer io.Writer, writeTime time.Time) error {
+	if z == nil {
+		return errors.New("unable to write a nil pointer")
+	}
 	if writeTime.IsZero() {
 		writeTime = time.Now()
 	}
@@ -25,6 +28,28 @@ func (z *Complex) WriteAvroCF(writer io.Writer, writeTime time.Time) error {
 	}
 
 	if err := avroWriter.WriteRecord(z.convertToAvro(writeTime)); err != nil {
+		return err
+	}
+
+	return avroWriter.Flush()
+}
+
+// WriteAvroDeletedCF works nearly identically to WriteAvroCF but sets the AvroDeleted metadata field to true.
+func (z *Complex) WriteAvroDeletedCF(writer io.Writer, writeTime time.Time) error {
+	if z == nil {
+		return errors.New("unable to write a nil pointer")
+	}
+	if writeTime.IsZero() {
+		writeTime = time.Now()
+	}
+	avroWriter, err := complex.NewComplexWriter(writer, container.Snappy, 1)
+	if err != nil {
+		return err
+	}
+
+	converted := z.convertToAvro(writeTime)
+	converted.AvroDeleted = true
+	if err := avroWriter.WriteRecord(converted); err != nil {
 		return err
 	}
 
@@ -82,6 +107,8 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 // The given writeTime will be used for all data items written by this function.
 // When the returned request channel is closed this function will finalize the Container File and exit.
 // The returned error channel will be closed just before the go routine exits.
+// Note: That though a nil item will be written as delete it will also be written without an ID or other identifying
+// field and so this is of limited value. In general deletes should be done using WriteAvroDeletedCF.
 func ComplexBulkAvroWriter(writer io.Writer, writeTime time.Time, request <-chan *Complex) <-chan error {
 	if writeTime.IsZero() {
 		writeTime = time.Now()

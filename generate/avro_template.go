@@ -5,6 +5,7 @@ var (
 package {{ .pkgName }}
 
 import (
+    "errors"
 	"io"
 	"time"
 
@@ -16,10 +17,12 @@ import (
 
 // WriteAvroCF writes an Avro Containter File to the given io.Writer using snappy compression for the data.
 // The time is used as the AvroWriteTime, if the time is the Zero value then the current time is used.
-// If z is nil then the data will be a delete as indicated by the AvroDeleted field.
 // NOTE: If the type has a field in an embedded struct with the same name as a field not in the embedded struct the
 // value will be pulled from the field not in the embedded struct.
 func (z *{{ .name }}) WriteAvroCF(writer io.Writer, writeTime time.Time) error {
+	if z == nil {
+		return errors.New("unable to write a nil pointer")
+	}
 	if writeTime.IsZero() {
 		writeTime = time.Now()
 	}
@@ -29,6 +32,28 @@ func (z *{{ .name }}) WriteAvroCF(writer io.Writer, writeTime time.Time) error {
 	}
 
 	if err := avroWriter.WriteRecord(z.convertToAvro(writeTime)); err != nil {
+		return err
+	}
+
+	return avroWriter.Flush()
+}
+
+// WriteAvroDeletedCF works nearly identically to WriteAvroCF but sets the AvroDeleted metadata field to true.
+func (z *{{ .name }}) WriteAvroDeletedCF(writer io.Writer, writeTime time.Time) error {
+	if z == nil {
+		return errors.New("unable to write a nil pointer")
+	}
+	if writeTime.IsZero() {
+		writeTime = time.Now()
+	}
+	avroWriter, err := {{ .avroPackage }}.New{{ .name }}Writer(writer, container.Snappy, 1)
+	if err != nil {
+		return err
+	}
+
+	converted := z.convertToAvro(writeTime)
+	converted.AvroDeleted = true
+	if err := avroWriter.WriteRecord(converted); err != nil {
 		return err
 	}
 
@@ -54,6 +79,8 @@ func (z *{{ .name }}) convertToAvro(writeTime time.Time) *{{ .avroPackage}}.{{ .
 // The given writeTime will be used for all data items written by this function.
 // When the returned request channel is closed this function will finalize the Container File and exit.
 // The returned error channel will be closed just before the go routine exits.
+// Note: That though a nil item will be written as delete it will also be written without an ID or other identifying
+// field and so this is of limited value. In general deletes should be done using WriteAvroDeletedCF.
 func {{ .name }}BulkAvroWriter(writer io.Writer, writeTime time.Time, request <-chan *{{ .name }}) <-chan error {
 	if writeTime.IsZero() {
 		writeTime = time.Now()
@@ -128,6 +155,39 @@ func Test{{ .name }}_WriteAvroCF(t *testing.T) {
 
 	if read.AvroDeleted != false {
 		t.Error("OCF reports deleted true expected false")
+	}
+}
+
+func Test{{ .name }}_WriteAvroDeletedCF(t *testing.T) {
+	z := &{{ .name }}{} // In real usage at minimum an ID field should be populated
+
+	// compile error if for some reason z does not implement generate.AvroCFDeleter
+	var _ generate.AvroCFDeleter = z
+
+	// write to a CF file
+	now := time.Now()
+	buf := &bytes.Buffer{}
+	err := z.WriteAvroDeletedCF(buf, now)
+	if err != nil {
+		t.Fatalf("Unexpected error writing to a CF file: %v", err)
+	}
+
+	ocfReader, err := {{ .avroPackage }}.New{{ .name }}Reader(buf)
+	if err != nil {
+		t.Fatalf("Error creating OCF file reader: %v\n", err)
+	}
+
+	read, err := ocfReader.Read()
+	if err != nil {
+		t.Fatalf("Failed reading from OCF file reader: %v\n", err)
+	}
+
+	if got, want := read.AvroWriteTime, generate.AvroTime(now); got != want {
+		t.Errorf("Time is wrong, got %d, want %d", got, want)
+	}
+
+	if read.AvroDeleted != true {
+		t.Error("OCF reports deleted false expected true")
 	}
 }
 
