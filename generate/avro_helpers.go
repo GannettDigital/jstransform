@@ -20,6 +20,13 @@ type AvroCFWriter interface {
 	WriteAvroCF(io.Writer, time.Time) error
 }
 
+// AvroCFDeleter implements functionality to write an Avro Container file with the metadata field AvroDeleted set
+// to true. This is a record that a delete of the given item occurred but is writing a new Container File. This enables
+// adhering to the the Avro Schema for the given data type and tracking history of changes for any given ID.
+type AvroCFDeleter interface {
+	WriteAvroDeletedCF(io.Writer, time.Time) error
+}
+
 // AvroTime converts the given time.Time into an int64 compatible with an Avro timestamp.millis logical type.
 // http://avro.apache.org/docs/current/spec.html#Date
 func AvroTime(t time.Time) int64 {
