@@ -46,6 +46,35 @@
                   "type": "string"
                 }
               }
+            },
+            {
+              "name": "date",
+              "namespace": "parents",
+              "type": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
+              }
+            },
+            {
+              "name": "info",
+              "namespace": "parents",
+              "type": {
+                "name": "info_record",
+                "namespace": "parents.info",
+                "type": "record",
+                "fields": [
+                  {
+                    "name": "name",
+                    "namespace": "parents.info",
+                    "type": "string"
+                  },
+                  {
+                    "name": "age",
+                    "namespace": "parents.info",
+                    "type": "long"
+                  }
+                ]
+              }
             }
           ]
         }

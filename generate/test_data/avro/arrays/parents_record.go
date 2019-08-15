@@ -13,6 +13,8 @@ import (
 type Parents_record struct {
 	Count    int64
 	Children []string
+	Date     int64
+	Info     *Info_record
 }
 
 func NewParents_recordWriter(writer io.Writer, codec container.Codec, recordsPerBlock int64) (*container.Writer, error) {
@@ -37,7 +39,7 @@ func NewParents_record() *Parents_record {
 }
 
 func (r *Parents_record) Schema() string {
-	return "{\"fields\":[{\"name\":\"count\",\"namespace\":\"parents\",\"type\":\"long\"},{\"name\":\"children\",\"namespace\":\"parents\",\"type\":{\"items\":{\"type\":\"string\"},\"type\":\"array\"}}],\"name\":\"parents_record\",\"namespace\":\"parents\",\"type\":\"record\"}"
+	return "{\"fields\":[{\"name\":\"count\",\"namespace\":\"parents\",\"type\":\"long\"},{\"name\":\"children\",\"namespace\":\"parents\",\"type\":{\"items\":{\"type\":\"string\"},\"type\":\"array\"}},{\"name\":\"date\",\"namespace\":\"parents\",\"type\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"}},{\"name\":\"info\",\"namespace\":\"parents\",\"type\":{\"fields\":[{\"name\":\"name\",\"namespace\":\"parents.info\",\"type\":\"string\"},{\"name\":\"age\",\"namespace\":\"parents.info\",\"type\":\"long\"}],\"name\":\"info_record\",\"namespace\":\"parents.info\",\"type\":\"record\"}}],\"name\":\"parents_record\",\"namespace\":\"parents\",\"type\":\"record\"}"
 }
 
 func (r *Parents_record) SchemaName() string {
@@ -63,6 +65,11 @@ func (r *Parents_record) Get(i int) types.Field {
 	case 1:
 		r.Children = make([]string, 0)
 		return (*ArrayStringWrapper)(&r.Children)
+	case 2:
+		return (*types.Long)(&r.Date)
+	case 3:
+		r.Info = NewInfo_record()
+		return r.Info
 
 	}
 	panic("Unknown field index")

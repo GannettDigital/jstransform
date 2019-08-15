@@ -63,14 +63,22 @@ func (z *Arrays) convertToAvro(writeTime time.Time) *arrays.Arrays {
 	}
 
 	Parents_recordSlice := func(in []struct {
-		Count    int64    `json:"count"`
-		Children []string `json:"children"`
+		Count    int64     `json:"count"`
+		Children []string  `json:"children"`
+		Date     time.Time `json:"date"`
+		Info     struct {
+			Name string `json:"name"`
+			Age  int64  `json:"age"`
+		} `json:"info"`
 	}) []*arrays.Parents_record {
 		converted := make([]*arrays.Parents_record, len(in))
 		for i, z := range in {
 			converted[i] = &arrays.Parents_record{
 				Count:    z.Count,
 				Children: z.Children,
+				Date:     generate.AvroTime(z.Date),
+				Info: &arrays.Info_record{Name: z.Info.Name,
+					Age: z.Info.Age},
 			}
 		}
 		return converted

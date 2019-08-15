@@ -37,6 +37,7 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 			filename:    "arrays.go",
 			wantPath:    "arrays_avro.go",
 		},
+		// TODO test an array of structs within an array of structs (I think it will fail)
 	}
 
 	testPath := "./test_data"
