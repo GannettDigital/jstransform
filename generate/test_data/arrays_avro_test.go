@@ -77,7 +77,7 @@ func TestArrays_WriteAvroDeletedCF(t *testing.T) {
 	}
 }
 
-func ExampleArraysBulkAvroWrite() {
+func ExampleArraysBulkAvroWriter() {
 	input := []*Arrays{{}, {}, {}}
 	inputChan := make(chan *Arrays)
 
