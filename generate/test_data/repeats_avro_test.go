@@ -77,7 +77,7 @@ func TestRepeats_WriteAvroDeletedCF(t *testing.T) {
 	}
 }
 
-func ExampleRepeatsBulkAvroWrite() {
+func ExampleRepeatsBulkAvroWriter() {
 	input := []*Repeats{{}, {}, {}}
 	inputChan := make(chan *Repeats)
 

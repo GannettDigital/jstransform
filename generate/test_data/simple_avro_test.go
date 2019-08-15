@@ -77,7 +77,7 @@ func TestSimple_WriteAvroDeletedCF(t *testing.T) {
 	}
 }
 
-func ExampleSimpleBulkAvroWrite() {
+func ExampleSimpleBulkAvroWriter() {
 	input := []*Simple{{}, {}, {}}
 	inputChan := make(chan *Simple)
 

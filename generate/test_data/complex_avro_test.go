@@ -77,7 +77,7 @@ func TestComplex_WriteAvroDeletedCF(t *testing.T) {
 	}
 }
 
-func ExampleComplexBulkAvroWrite() {
+func ExampleComplexBulkAvroWriter() {
 	input := []*Complex{{}, {}, {}}
 	inputChan := make(chan *Complex)
 

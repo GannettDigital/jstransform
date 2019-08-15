@@ -191,7 +191,7 @@ func Test{{ .name }}_WriteAvroDeletedCF(t *testing.T) {
 	}
 }
 
-func Example{{ .name }}BulkAvroWrite() {
+func Example{{ .name }}BulkAvroWriter() {
 	input := []*{{ .name }}{ {}, {}, {} }
 	inputChan := make(chan *{{ .name }})
 
