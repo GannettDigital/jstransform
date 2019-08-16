@@ -146,6 +146,20 @@ func writeBool(r bool, w io.Writer) error {
 	return nil
 }
 
+func writeInfo_record(r *Info_record, w io.Writer) error {
+	var err error
+	err = writeString(r.Name, w)
+	if err != nil {
+		return err
+	}
+	err = writeLong(r.Age, w)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func writeLong(r int64, w io.Writer) error {
 	downShift := uint64(63)
 	encoded := uint64((r << 1) ^ (r >> downShift))
@@ -160,6 +174,14 @@ func writeParents_record(r *Parents_record, w io.Writer) error {
 		return err
 	}
 	err = writeArrayString(r.Children, w)
+	if err != nil {
+		return err
+	}
+	err = writeLong(r.Date, w)
+	if err != nil {
+		return err
+	}
+	err = writeInfo_record(r.Info, w)
 	if err != nil {
 		return err
 	}

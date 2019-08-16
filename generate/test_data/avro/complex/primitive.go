@@ -243,6 +243,20 @@ func writeLong(r int64, w io.Writer) error {
 	return encodeInt(w, maxByteSize, encoded)
 }
 
+func writeMeta_record(r *Meta_record, w io.Writer) error {
+	var err error
+	err = writeString(r.Description, w)
+	if err != nil {
+		return err
+	}
+	err = writeString(r.SiteName, w)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func writeNull(_ interface{}, _ io.Writer) error {
 	return nil
 }
@@ -286,6 +300,10 @@ func writeString(r string, w io.Writer) error {
 func writeURL_record(r *URL_record, w io.Writer) error {
 	var err error
 	err = writeString(r.Absolute, w)
+	if err != nil {
+		return err
+	}
+	err = writeMeta_record(r.Meta, w)
 	if err != nil {
 		return err
 	}

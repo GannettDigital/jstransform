@@ -235,6 +235,21 @@
                             ]
                         }
                     }
+                },
+                "meta": {
+                    "type": "object",
+                    "properties": {
+                       "siteName": {
+                           "type": "string"
+                       },
+                        "description": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "siteName",
+                        "description"
+                      ]
                 }
             },
             "required": [

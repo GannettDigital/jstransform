@@ -26,6 +26,10 @@ type Complex struct {
 	Type string `json:"type" description:"a type"`
 	URL  struct {
 		Absolute string `json:"absolute"`
-		Publish  string `json:"publish"`
+		Meta     struct {
+			Description string `json:"description"`
+			SiteName    string `json:"siteName"`
+		} `json:"meta,omitempty"`
+		Publish string `json:"publish"`
 	} `json:"URL"`
 }

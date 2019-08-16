@@ -98,6 +98,8 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 			Width: z.OriginalSize.Width},
 		Type: z.Type,
 		URL: &complex.URL_record{Absolute: z.URL.Absolute,
+			Meta: &complex.Meta_record{Description: z.URL.Meta.Description,
+				SiteName: z.URL.Meta.SiteName},
 			Publish: z.URL.Publish},
 	}
 }

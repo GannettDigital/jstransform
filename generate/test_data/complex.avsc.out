@@ -163,6 +163,28 @@
             "type": "string"
           },
           {
+            "name": "meta",
+            "namespace": "URL",
+            "type": {
+              "name": "meta_record",
+              "namespace": "URL.meta",
+              "type": "record",
+              "fields": [
+                {
+                  "name": "description",
+                  "namespace": "URL.meta",
+                  "type": "string"
+                },
+                {
+                  "name": "siteName",
+                  "namespace": "URL.meta",
+                  "type": "string"
+                }
+              ]
+            },
+            "default": {}
+          },
+          {
             "name": "publish",
             "namespace": "URL",
             "type": "string"

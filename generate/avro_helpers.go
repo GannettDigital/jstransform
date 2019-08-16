@@ -276,7 +276,7 @@ func (fm *avroFieldMapper) generateStructValue(name, prefix, typeName string, ge
 		}, nil
 	}
 
-	mappedField, _, err := fm.generateChildStruct(generatedField.Type, prefix+name, name+".", avroFields)
+	mappedField, _, err := fm.generateChildStruct(generatedField.Type, prefix+name, prefix+name+".", avroFields)
 	if err != nil {
 		return mappedFields{}, err
 	}
@@ -378,6 +378,13 @@ func printFields(list *ast.FieldList) string {
 				return "unknown array type"
 			}
 			out += fmt.Sprintf("%s []%s %s\n", name, ident.Name, f.Tag.Value)
+		case *ast.SelectorExpr:
+			if fType.Sel.Name != "Time" {
+				return fmt.Sprintf(`unsupported type %q`, fType.Sel.Name)
+			}
+			out += fmt.Sprintf("%s time.Time %s\n", name, f.Tag.Value)
+		case *ast.StructType:
+			out += fmt.Sprintf("%s struct{\n%s} %s\n", name, printFields(fType.Fields), f.Tag.Value)
 		}
 	}
 	return out
