@@ -1,5 +1,7 @@
 github.com/GannettDigital/jsonparser v0.0.0-20190715193333-bb1e1ae0441c h1:wp3ck/TAFq5r6KTscnUaMIqafFpuIiCL4ONtPOf0cH0=
 github.com/GannettDigital/jsonparser v0.0.0-20190715193333-bb1e1ae0441c/go.mod h1:/mOrxoVv3rZ29rbOXyh9khk3nAB3qTGtny8J/AdyvbE=
+github.com/GannettDigital/msgp v1.0.3-0.20180910162652-7b6c807760d7 h1:HRFbxYBjO/eQLygGyTLoR5UyLv5De6zhIRTm3PgO8Zs=
+github.com/GannettDigital/msgp v1.0.3-0.20180910162652-7b6c807760d7/go.mod h1:D98lX1KPdTzRztKc/5pDRtEE67XAHP8rfaCPz2VkRxw=
 github.com/GannettDigital/msgp v1.1.0 h1:YRruTyXqDtraJt2H7ES1OLNdNf6iX54SImP41z8KA2A=
 github.com/GannettDigital/msgp v1.1.0/go.mod h1:uk1C9EbMFzUMhKMg9s2AJ0/ZJvuJq7Shob+1thvOfuM=
 github.com/Jeffail/gabs v1.4.0/go.mod h1:6xMvQMK4k33lb7GUUpaAPh6nKMmemQeg5d4gn7/bOXc=
