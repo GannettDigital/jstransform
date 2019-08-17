@@ -2,7 +2,7 @@ module github.com/GannettDigital/jstransform
 
 require (
 	github.com/GannettDigital/jsonparser v0.0.0-20190715193333-bb1e1ae0441c
-	github.com/GannettDigital/msgp v1.0.3-0.20180910162652-7b6c807760d7
+	github.com/GannettDigital/msgp v1.1.1
 	github.com/PaesslerAG/gval v0.1.1 // indirect
 	github.com/PaesslerAG/jsonpath v0.1.0
 	github.com/actgardner/gogen-avro v6.1.0+incompatible
