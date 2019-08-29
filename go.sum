@@ -1,5 +1,7 @@
 github.com/GannettDigital/jsonparser v0.0.0-20190715193333-bb1e1ae0441c h1:wp3ck/TAFq5r6KTscnUaMIqafFpuIiCL4ONtPOf0cH0=
 github.com/GannettDigital/jsonparser v0.0.0-20190715193333-bb1e1ae0441c/go.mod h1:/mOrxoVv3rZ29rbOXyh9khk3nAB3qTGtny8J/AdyvbE=
+github.com/GannettDigital/jsonparser v0.0.0-20190829201207-fbf976767e56 h1:EYtDQEULk5HAfDhfmA+DH+Ns+pxHCg9NZOLO57y+WgE=
+github.com/GannettDigital/jsonparser v0.0.0-20190829201207-fbf976767e56/go.mod h1:VAXveR4MSguIGAhplT7AA2DlDunnoWmAVRsu9nO/Nfg=
 github.com/GannettDigital/msgp v1.1.1 h1:Dy9VQiIn4NbysnQtc1626S4MjvvUTSoz1CNlgZutJwA=
 github.com/GannettDigital/msgp v1.1.1/go.mod h1:D98lX1KPdTzRztKc/5pDRtEE67XAHP8rfaCPz2VkRxw=
 github.com/Jeffail/gabs v1.4.0/go.mod h1:6xMvQMK4k33lb7GUUpaAPh6nKMmemQeg5d4gn7/bOXc=
@@ -16,6 +18,7 @@ github.com/antchfx/xpath v0.0.0-20190319080838-ce1d48779e67 h1:uj4UuiIs53RhHSySI
 github.com/antchfx/xpath v0.0.0-20190319080838-ce1d48779e67/go.mod h1:Yee4kTMuNiPYJ7nSNorELQMr1J33uOpXDMByNYhvtNk=
 github.com/antonholmquist/jason v1.0.0/go.mod h1:+GxMEKI0Va2U8h3os6oiUAetHAlGMvxjdpAH/9uvUMA=
 github.com/bitly/go-simplejson v0.5.0/go.mod h1:cXHtHw4XUPsvGaxgjIAn8PhEWG9NfngEKAMDJEczWVA=
+github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869/go.mod h1:Ekp36dRnpXw/yCqJaO+ZrUyxD+3VXMFFr56k5XYrpB4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
