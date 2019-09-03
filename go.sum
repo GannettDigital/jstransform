@@ -10,6 +10,8 @@ github.com/PaesslerAG/jsonpath v0.1.0/go.mod h1:4BzmtoM/PI8fPO4aQGIusjGxGir2BzcV
 github.com/a8m/djson v0.0.0-20170509170705-c02c5aef757f/go.mod h1:w3s8fnedJo6LJQ7dUUf1OcetqgS1hGpIDjY5bBowg1Y=
 github.com/actgardner/gogen-avro v6.1.0+incompatible h1:RwGIia/vjSVRSJ/r4/Gfa+JIDjnWDPqWvtAXkdsF8tI=
 github.com/actgardner/gogen-avro v6.1.0+incompatible/go.mod h1:N2PzqZtS+5w9xxGp2daeykhWdTL0lBiRhbbvkVj4Yd8=
+github.com/actgardner/gogen-avro v6.1.1-0.20190817222038-0b6e4708d46d+incompatible h1:wcF9YaZx2tR1IQmVszda9vXYQwo58r7GSM3yU2/LkD4=
+github.com/actgardner/gogen-avro v6.1.1-0.20190817222038-0b6e4708d46d+incompatible/go.mod h1:N2PzqZtS+5w9xxGp2daeykhWdTL0lBiRhbbvkVj4Yd8=
 github.com/antchfx/xmlquery v1.0.0 h1:YuEPqexGG2opZKNc9JU3Zw6zFXwC47wNcy6/F8oKsrM=
 github.com/antchfx/xmlquery v1.0.0/go.mod h1:/+CnyD/DzHRnv2eRxrVbieRU/FIF6N0C+7oTtyUtCKk=
 github.com/antchfx/xpath v0.0.0-20190319080838-ce1d48779e67 h1:uj4UuiIs53RhHSySIupR1TEIouckjSfnljF3QbN1yh0=
