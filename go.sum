@@ -8,8 +8,6 @@ github.com/PaesslerAG/gval v0.1.1/go.mod h1:y/nm5yEyTeX6av0OfKJNp9rBNj2XrGhAf5+v
 github.com/PaesslerAG/jsonpath v0.1.0 h1:gADYeifvlqK3R3i2cR5B4DGgxLXIPb3TRTH1mGi0jPI=
 github.com/PaesslerAG/jsonpath v0.1.0/go.mod h1:4BzmtoM/PI8fPO4aQGIusjGxGir2BzcV0grWtFzq1Y8=
 github.com/a8m/djson v0.0.0-20170509170705-c02c5aef757f/go.mod h1:w3s8fnedJo6LJQ7dUUf1OcetqgS1hGpIDjY5bBowg1Y=
-github.com/actgardner/gogen-avro v6.1.0+incompatible h1:RwGIia/vjSVRSJ/r4/Gfa+JIDjnWDPqWvtAXkdsF8tI=
-github.com/actgardner/gogen-avro v6.1.0+incompatible/go.mod h1:N2PzqZtS+5w9xxGp2daeykhWdTL0lBiRhbbvkVj4Yd8=
 github.com/actgardner/gogen-avro v6.1.1-0.20190817222038-0b6e4708d46d+incompatible h1:wcF9YaZx2tR1IQmVszda9vXYQwo58r7GSM3yU2/LkD4=
 github.com/actgardner/gogen-avro v6.1.1-0.20190817222038-0b6e4708d46d+incompatible/go.mod h1:N2PzqZtS+5w9xxGp2daeykhWdTL0lBiRhbbvkVj4Yd8=
 github.com/antchfx/xmlquery v1.0.0 h1:YuEPqexGG2opZKNc9JU3Zw6zFXwC47wNcy6/F8oKsrM=
