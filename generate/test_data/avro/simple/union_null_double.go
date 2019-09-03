@@ -36,10 +36,8 @@ func (r *UnionNullDouble) Get(i int) types.Field {
 	switch i {
 	case 0:
 		return r.Null
-		break
 	case 1:
 		return (*types.Double)(&r.Double)
-		break
 
 	}
 	panic("Unknown field index")

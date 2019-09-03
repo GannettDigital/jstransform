@@ -5,7 +5,7 @@ require (
 	github.com/GannettDigital/msgp v1.1.1
 	github.com/PaesslerAG/gval v0.1.1 // indirect
 	github.com/PaesslerAG/jsonpath v0.1.0
-	github.com/actgardner/gogen-avro v6.1.0+incompatible
+	github.com/actgardner/gogen-avro v6.1.1-0.20190817222038-0b6e4708d46d+incompatible
 	github.com/antchfx/xmlquery v1.0.0
 	github.com/antchfx/xpath v0.0.0-20190319080838-ce1d48779e67 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
