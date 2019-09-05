@@ -79,12 +79,13 @@ type mappedFields struct {
 // avroFieldMapper provides methods to map the fields in an Avro Struct with correct fields and converted fields from
 // a generated Go struct that was the original source of the Avro struct.
 type avroFieldMapper struct {
-	avroPackagePath     string // The filesystem path to the go source directory containing the Avro structs
-	generatedSourcePath string // The path to the go source file for the generated struct
-	packageName         string
-	structName          string
-	unionTemplates      map[string]*template.Template
-	structSliceTemplate *template.Template
+	avroPackagePath         string // The filesystem path to the go source directory containing the Avro structs
+	generatedSourcePath     string // The path to the go source file for the generated struct
+	packageName             string
+	structName              string
+	unionTemplates          map[string]*template.Template
+	structSliceTemplate     *template.Template
+	unionNullStructTemplate *template.Template
 }
 
 func newAvroFieldMapper(name, goSourcePath string) (*avroFieldMapper, error) {
@@ -103,14 +104,20 @@ func newAvroFieldMapper(name, goSourcePath string) (*avroFieldMapper, error) {
 		return nil, fmt.Errorf("failed to parse avroStructSliceTemplate: %v", err)
 	}
 
+	unionNullStructTemplate, err := template.New("").Parse(unionNullStruct)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse unionNullStruct: %v", err)
+	}
+
 	lowerName := strings.ToLower(name)
 	return &avroFieldMapper{
-		avroPackagePath:     filepath.Join(filepath.Dir(goSourcePath), "avro", lowerName),
-		generatedSourcePath: goSourcePath,
-		packageName:         lowerName,
-		structName:          name,
-		structSliceTemplate: structSliceTemplate,
-		unionTemplates:      unionTemplates,
+		avroPackagePath:         filepath.Join(filepath.Dir(goSourcePath), "avro", lowerName),
+		generatedSourcePath:     goSourcePath,
+		packageName:             lowerName,
+		structName:              name,
+		structSliceTemplate:     structSliceTemplate,
+		unionTemplates:          unionTemplates,
+		unionNullStructTemplate: unionNullStructTemplate,
 	}, nil
 }
 
@@ -234,6 +241,24 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 			return mappedFields{fieldMapping: buf.String()}, nil
 		}
 
+		if strings.HasPrefix(typeName, "UnionNull") {
+			childTypeName := strings.TrimPrefix(typeName, "UnionNull")
+			mf, err := fm.generateStructValue(name, prefix, childTypeName, generatedField)
+			if err != nil {
+				return mappedFields{}, fmt.Errorf("failed generating UnionNull struct value: %v", err)
+			}
+			buf := &bytes.Buffer{}
+			templateData := map[string]string{
+				"packageName": fm.packageName,
+				"typeName":    childTypeName,
+				"value":       mf.fieldMapping,
+			}
+			if err := fm.unionNullStructTemplate.Execute(buf, templateData); err != nil {
+				return mappedFields{}, fmt.Errorf("failed generating UnionNull struct template: %v", err)
+			}
+			return mappedFields{fieldMapping: buf.String()}, nil
+		}
+
 		return fm.generateStructValue(name, prefix, typeName, generatedField)
 	}
 	return mappedFields{}, fmt.Errorf("unhandled type for field %q", prefix+name)
@@ -244,7 +269,7 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 func (fm *avroFieldMapper) generateStructValue(name, prefix, typeName string, generatedField *ast.Field) (mappedFields, error) {
 	avroStruct, err := parseGoStruct(typeName, fm.avroPackagePath)
 	if err != nil {
-		return mappedFields{}, fmt.Errorf("unknown struct type %s", typeName)
+		return mappedFields{}, fmt.Errorf("error parsing go struct type %s: %v", typeName, err)
 	}
 	avroFields := findStructFields(avroStruct)
 	if avroFields == nil {

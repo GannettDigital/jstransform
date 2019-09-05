@@ -234,4 +234,5 @@ func Example{{ .name }}BulkAvroWriter() {
 	unionNullDouble = `{{ .packageName }}.UnionNullDouble{Double: {{ .value }}, UnionType: {{ .packageName }}.UnionNullDoubleTypeEnumDouble}`
 	unionNullLong   = `{{ .packageName }}.UnionNullLong{Long: {{ .value }}, UnionType: {{ .packageName }}.UnionNullLongTypeEnumLong}`
 	unionNullString = `{{ .packageName }}.UnionNullString{String: {{ .value }}, UnionType: {{ .packageName }}.UnionNullStringTypeEnumString}`
+	unionNullStruct = `{{ .packageName }}.UnionNull{{ .typeName }} { {{ .typeName }}: &{{ .value }}, UnionType: {{ .packageName }}.UnionNull{{ .typeName }}TypeEnum{{ .typeName }}}`
 )

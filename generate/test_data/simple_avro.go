@@ -65,7 +65,7 @@ func (z *Simple) convertToAvro(writeTime time.Time) *simple.Simple {
 	return &simple.Simple{
 		AvroWriteTime: aTime,
 		Height:        &simple.UnionNullLong{Long: z.Height, UnionType: simple.UnionNullLongTypeEnumLong},
-		SomeDateObj:   &simple.SomeDateObj_record{Dates: generate.AvroTimeSlice(z.SomeDateObj.Dates)},
+		SomeDateObj:   &simple.UnionNullSomeDateObj_record{SomeDateObj_record: &simple.SomeDateObj_record{Dates: generate.AvroTimeSlice(z.SomeDateObj.Dates)}, UnionType: simple.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record},
 		Type:          z.Type,
 		Visible:       z.Visible,
 		Width:         &simple.UnionNullDouble{Double: z.Width, UnionType: simple.UnionNullDoubleTypeEnumDouble},

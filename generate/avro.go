@@ -187,11 +187,27 @@ func filterPackage(name, path string) (*ast.File, error) {
 	}
 	var goFile *ast.File
 	for _, f := range pkg.Files {
-		if len(f.Decls) == 1 {
-			if goFile != nil {
-				return nil, fmt.Errorf("name %q is not unique in go files at path %q", name, path)
+		// It's necessary to loop over all the decls and their specs to ensure the typeSpec.Name.Name matches our name
+		// because the `ast.FilterPackage` doesn't filter out declarations that only have the wanted itemName as a
+		// function argument. It breaks when we start doing UnionNull with structs since the wanted name is an argument
+		// to the NewUnionNull${type}() function.
+		for _, d := range f.Decls {
+			genDecl, ok := d.(*ast.GenDecl)
+			if !ok {
+				continue
 			}
-			goFile = f
+			for _, s := range genDecl.Specs {
+				typeSpec, ok := s.(*ast.TypeSpec)
+				if !ok {
+					continue
+				}
+				if typeSpec.Name != nil && typeSpec.Name.Name == name {
+					if goFile != nil {
+						return nil, fmt.Errorf("name %q is not unique in go files at path %q", name, path)
+					}
+					goFile = f
+				}
+			}
 		}
 	}
 	if goFile == nil {
