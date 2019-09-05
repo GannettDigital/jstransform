@@ -380,11 +380,10 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 		newcfg.excludeFields = nil
 		// nested structs get _struct appended on their name
 		astutil.Apply(t, writeAvroStruct(newcfg, name+"_record", ""), nil)
-		out := fmt.Sprintf("{%s]}", buf.String())
 		if nullable {
-			out = out + `,"default":{}`
+			return fmt.Sprintf(`["null",{%s]}]`, buf.String())
 		}
-		return out
+		return fmt.Sprintf("{%s]}", buf.String())
 	case *ast.SelectorExpr:
 		if t.Sel.Name == "Time" {
 			return `{"type":"long","logicalType":"timestamp-millis"}`

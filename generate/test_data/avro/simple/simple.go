@@ -18,7 +18,7 @@ type Simple struct {
 	// This is set to true when the Avro data is recording a delete in the source data.
 	AvroDeleted bool
 	Height      *UnionNullLong
-	SomeDateObj *SomeDateObj_record
+	SomeDateObj *UnionNullSomeDateObj_record
 	Type        string
 	Visible     bool
 	Width       *UnionNullDouble
@@ -46,7 +46,7 @@ func NewSimple() *Simple {
 }
 
 func (r *Simple) Schema() string {
-	return "{\"fields\":[{\"doc\":\"The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.\",\"logicalType\":\"timestamp-millis\",\"name\":\"AvroWriteTime\",\"type\":\"long\"},{\"default\":false,\"doc\":\"This is set to true when the Avro data is recording a delete in the source data.\",\"name\":\"AvroDeleted\",\"type\":\"boolean\"},{\"name\":\"height\",\"type\":[\"null\",\"long\"]},{\"default\":{},\"name\":\"someDateObj\",\"type\":{\"fields\":[{\"name\":\"dates\",\"namespace\":\"someDateObj\",\"type\":{\"items\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"},\"type\":\"array\"}}],\"name\":\"someDateObj_record\",\"namespace\":\"someDateObj\",\"type\":\"record\"}},{\"name\":\"type\",\"type\":\"string\"},{\"default\":false,\"name\":\"visible\",\"type\":\"boolean\"},{\"name\":\"width\",\"type\":[\"null\",\"double\"]}],\"name\":\"Simple\",\"type\":\"record\"}"
+	return "{\"fields\":[{\"doc\":\"The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.\",\"logicalType\":\"timestamp-millis\",\"name\":\"AvroWriteTime\",\"type\":\"long\"},{\"default\":false,\"doc\":\"This is set to true when the Avro data is recording a delete in the source data.\",\"name\":\"AvroDeleted\",\"type\":\"boolean\"},{\"name\":\"height\",\"type\":[\"null\",\"long\"]},{\"name\":\"someDateObj\",\"type\":[\"null\",{\"fields\":[{\"name\":\"dates\",\"namespace\":\"someDateObj\",\"type\":{\"items\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"},\"type\":\"array\"}}],\"name\":\"someDateObj_record\",\"namespace\":\"someDateObj\",\"type\":\"record\"}]},{\"name\":\"type\",\"type\":\"string\"},{\"default\":false,\"name\":\"visible\",\"type\":\"boolean\"},{\"name\":\"width\",\"type\":[\"null\",\"double\"]}],\"name\":\"Simple\",\"type\":\"record\"}"
 }
 
 func (r *Simple) SchemaName() string {
@@ -75,7 +75,7 @@ func (r *Simple) Get(i int) types.Field {
 		r.Height = NewUnionNullLong()
 		return r.Height
 	case 3:
-		r.SomeDateObj = NewSomeDateObj_record()
+		r.SomeDateObj = NewUnionNullSomeDateObj_record()
 		return r.SomeDateObj
 	case 4:
 		return (*types.String)(&r.Type)
@@ -92,9 +92,6 @@ func (r *Simple) SetDefault(i int) {
 	switch i {
 	case 1:
 		r.AvroDeleted = false
-		return
-	case 3:
-
 		return
 	case 5:
 		r.Visible = false
