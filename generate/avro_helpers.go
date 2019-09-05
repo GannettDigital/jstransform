@@ -231,7 +231,6 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 			}
 			return mappedFields{fieldMapping: "z." + prefix + name}, nil
 		}
-
 		// If not a built in type it could be a special Avro Union type
 		if tmpl, ok := fm.unionTemplates[typeName]; ok {
 			buf := &bytes.Buffer{}
@@ -256,7 +255,7 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 			if err := fm.unionNullStructTemplate.Execute(buf, templateData); err != nil {
 				return mappedFields{}, fmt.Errorf("failed generating UnionNull struct template: %v", err)
 			}
-			return mappedFields{fieldMapping: buf.String()}, nil
+			return mappedFields{fieldMapping: buf.String(), preProcessing: mf.preProcessing}, nil
 		}
 
 		return fm.generateStructValue(name, prefix, typeName, generatedField)
