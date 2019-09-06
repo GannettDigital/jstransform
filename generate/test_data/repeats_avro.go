@@ -65,8 +65,8 @@ func (z *Repeats) convertToAvro(writeTime time.Time) *repeats.Repeats {
 	return &repeats.Repeats{
 		AvroWriteTime: aTime,
 		Height:        &repeats.UnionNullLong{Long: z.Height, UnionType: repeats.UnionNullLongTypeEnumLong},
-		SomeDateObj: &repeats.SomeDateObj_record{Type: z.SomeDateObj.Type,
-			Visible: z.SomeDateObj.Visible},
+		SomeDateObj: &repeats.UnionNullSomeDateObj_record{SomeDateObj_record: &repeats.SomeDateObj_record{Type: z.SomeDateObj.Type,
+			Visible: z.SomeDateObj.Visible}, UnionType: repeats.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record},
 		Type:    z.Type,
 		Visible: z.Visible,
 		Width:   &repeats.UnionNullDouble{Double: z.Width, UnionType: repeats.UnionNullDoubleTypeEnumDouble},

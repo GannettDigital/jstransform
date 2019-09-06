@@ -12,7 +12,7 @@ import (
 
 type URL_record struct {
 	Absolute string
-	Meta     *Meta_record
+	Meta     *UnionNullMeta_record
 	Publish  string
 }
 
@@ -38,7 +38,7 @@ func NewURL_record() *URL_record {
 }
 
 func (r *URL_record) Schema() string {
-	return "{\"fields\":[{\"name\":\"absolute\",\"namespace\":\"URL\",\"type\":\"string\"},{\"default\":{},\"name\":\"meta\",\"namespace\":\"URL\",\"type\":{\"fields\":[{\"name\":\"description\",\"namespace\":\"URL.meta\",\"type\":\"string\"},{\"name\":\"siteName\",\"namespace\":\"URL.meta\",\"type\":\"string\"}],\"name\":\"meta_record\",\"namespace\":\"URL.meta\",\"type\":\"record\"}},{\"name\":\"publish\",\"namespace\":\"URL\",\"type\":\"string\"}],\"name\":\"URL_record\",\"namespace\":\"URL\",\"type\":\"record\"}"
+	return "{\"fields\":[{\"name\":\"absolute\",\"namespace\":\"URL\",\"type\":\"string\"},{\"name\":\"meta\",\"namespace\":\"URL\",\"type\":[\"null\",{\"fields\":[{\"name\":\"description\",\"namespace\":\"URL.meta\",\"type\":\"string\"},{\"name\":\"siteName\",\"namespace\":\"URL.meta\",\"type\":\"string\"}],\"name\":\"meta_record\",\"namespace\":\"URL.meta\",\"type\":\"record\"}]},{\"name\":\"publish\",\"namespace\":\"URL\",\"type\":\"string\"}],\"name\":\"URL_record\",\"namespace\":\"URL\",\"type\":\"record\"}"
 }
 
 func (r *URL_record) SchemaName() string {
@@ -62,7 +62,7 @@ func (r *URL_record) Get(i int) types.Field {
 	case 0:
 		return (*types.String)(&r.Absolute)
 	case 1:
-		r.Meta = NewMeta_record()
+		r.Meta = NewUnionNullMeta_record()
 		return r.Meta
 	case 2:
 		return (*types.String)(&r.Publish)
@@ -72,9 +72,6 @@ func (r *URL_record) Get(i int) types.Field {
 }
 func (r *URL_record) SetDefault(i int) {
 	switch i {
-	case 1:
-
-		return
 
 	}
 	panic("Unknown field index")

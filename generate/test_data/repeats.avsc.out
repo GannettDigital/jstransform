@@ -23,25 +23,27 @@
     },
     {
       "name": "someDateObj",
-      "type": {
-        "name": "someDateObj_record",
-        "namespace": "someDateObj",
-        "type": "record",
-        "fields": [
-          {
-            "name": "type",
-            "namespace": "someDateObj",
-            "type": "string"
-          },
-          {
-            "name": "visible",
-            "namespace": "someDateObj",
-            "type": "boolean",
-            "default": false
-          }
-        ]
-      },
-      "default": {}
+      "type": [
+        "null",
+        {
+          "name": "someDateObj_record",
+          "namespace": "someDateObj",
+          "type": "record",
+          "fields": [
+            {
+              "name": "type",
+              "namespace": "someDateObj",
+              "type": "string"
+            },
+            {
+              "name": "visible",
+              "namespace": "someDateObj",
+              "type": "boolean",
+              "default": false
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "type",

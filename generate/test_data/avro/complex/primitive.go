@@ -153,7 +153,7 @@ func writeComplex(r *Complex, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	err = writeSomeDateObj_record(r.SomeDateObj, w)
+	err = writeUnionNullSomeDateObj_record(r.SomeDateObj, w)
 	if err != nil {
 		return err
 	}
@@ -303,7 +303,7 @@ func writeURL_record(r *URL_record, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	err = writeMeta_record(r.Meta, w)
+	err = writeUnionNullMeta_record(r.Meta, w)
 	if err != nil {
 		return err
 	}
@@ -343,6 +343,36 @@ func writeUnionNullLong(r *UnionNullLong, w io.Writer) error {
 
 	}
 	return fmt.Errorf("invalid value for *UnionNullLong")
+}
+
+func writeUnionNullMeta_record(r *UnionNullMeta_record, w io.Writer) error {
+	err := writeLong(int64(r.UnionType), w)
+	if err != nil {
+		return err
+	}
+	switch r.UnionType {
+	case UnionNullMeta_recordTypeEnumNull:
+		return writeNull(r.Null, w)
+	case UnionNullMeta_recordTypeEnumMeta_record:
+		return writeMeta_record(r.Meta_record, w)
+
+	}
+	return fmt.Errorf("invalid value for *UnionNullMeta_record")
+}
+
+func writeUnionNullSomeDateObj_record(r *UnionNullSomeDateObj_record, w io.Writer) error {
+	err := writeLong(int64(r.UnionType), w)
+	if err != nil {
+		return err
+	}
+	switch r.UnionType {
+	case UnionNullSomeDateObj_recordTypeEnumNull:
+		return writeNull(r.Null, w)
+	case UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record:
+		return writeSomeDateObj_record(r.SomeDateObj_record, w)
+
+	}
+	return fmt.Errorf("invalid value for *UnionNullSomeDateObj_record")
 }
 
 func writeUnionNullString(r *UnionNullString, w io.Writer) error {

@@ -18,7 +18,7 @@ type Complex struct {
 	// This is set to true when the Avro data is recording a delete in the source data.
 	AvroDeleted    bool
 	Height         *UnionNullLong
-	SomeDateObj    *SomeDateObj_record
+	SomeDateObj    *UnionNullSomeDateObj_record
 	Visible        bool
 	Width          *UnionNullDouble
 	Caption        string
@@ -56,7 +56,7 @@ func NewComplex() *Complex {
 }
 
 func (r *Complex) Schema() string {
-	return "{\"fields\":[{\"doc\":\"The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.\",\"logicalType\":\"timestamp-millis\",\"name\":\"AvroWriteTime\",\"type\":\"long\"},{\"default\":false,\"doc\":\"This is set to true when the Avro data is recording a delete in the source data.\",\"name\":\"AvroDeleted\",\"type\":\"boolean\"},{\"name\":\"height\",\"namespace\":\"Simple\",\"type\":[\"null\",\"long\"]},{\"default\":{},\"name\":\"someDateObj\",\"namespace\":\"Simple\",\"type\":{\"fields\":[{\"name\":\"dates\",\"namespace\":\"Simple.someDateObj\",\"type\":{\"items\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"},\"type\":\"array\"}}],\"name\":\"someDateObj_record\",\"namespace\":\"Simple.someDateObj\",\"type\":\"record\"}},{\"default\":false,\"name\":\"visible\",\"namespace\":\"Simple\",\"type\":\"boolean\"},{\"name\":\"width\",\"namespace\":\"Simple\",\"type\":[\"null\",\"double\"]},{\"name\":\"caption\",\"type\":\"string\"},{\"name\":\"credit\",\"type\":\"string\"},{\"name\":\"crops\",\"type\":{\"items\":{\"fields\":[{\"name\":\"height\",\"namespace\":\"crops\",\"type\":\"double\"},{\"name\":\"name\",\"namespace\":\"crops\",\"type\":\"string\"},{\"doc\":\"full path to the cropped image file\",\"name\":\"path\",\"namespace\":\"crops\",\"type\":\"string\"},{\"doc\":\"a long\",\"name\":\"relativePath\",\"namespace\":\"crops\",\"type\":\"string\"},{\"name\":\"width\",\"namespace\":\"crops\",\"type\":\"double\"}],\"name\":\"crops_record\",\"namespace\":\"crops\",\"type\":\"record\"},\"type\":\"array\"}},{\"name\":\"cutline\",\"type\":[\"null\",\"string\"]},{\"name\":\"datePhotoTaken\",\"type\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"}},{\"name\":\"orientation\",\"type\":\"string\"},{\"name\":\"originalSize\",\"type\":{\"fields\":[{\"name\":\"height\",\"namespace\":\"originalSize\",\"type\":\"double\"},{\"name\":\"width\",\"namespace\":\"originalSize\",\"type\":\"double\"}],\"name\":\"originalSize_record\",\"namespace\":\"originalSize\",\"type\":\"record\"}},{\"doc\":\"a type\",\"name\":\"type\",\"type\":\"string\"},{\"name\":\"URL\",\"type\":{\"fields\":[{\"name\":\"absolute\",\"namespace\":\"URL\",\"type\":\"string\"},{\"default\":{},\"name\":\"meta\",\"namespace\":\"URL\",\"type\":{\"fields\":[{\"name\":\"description\",\"namespace\":\"URL.meta\",\"type\":\"string\"},{\"name\":\"siteName\",\"namespace\":\"URL.meta\",\"type\":\"string\"}],\"name\":\"meta_record\",\"namespace\":\"URL.meta\",\"type\":\"record\"}},{\"name\":\"publish\",\"namespace\":\"URL\",\"type\":\"string\"}],\"name\":\"URL_record\",\"namespace\":\"URL\",\"type\":\"record\"}}],\"name\":\"Complex\",\"type\":\"record\"}"
+	return "{\"fields\":[{\"doc\":\"The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.\",\"logicalType\":\"timestamp-millis\",\"name\":\"AvroWriteTime\",\"type\":\"long\"},{\"default\":false,\"doc\":\"This is set to true when the Avro data is recording a delete in the source data.\",\"name\":\"AvroDeleted\",\"type\":\"boolean\"},{\"name\":\"height\",\"namespace\":\"Simple\",\"type\":[\"null\",\"long\"]},{\"name\":\"someDateObj\",\"namespace\":\"Simple\",\"type\":[\"null\",{\"fields\":[{\"name\":\"dates\",\"namespace\":\"Simple.someDateObj\",\"type\":{\"items\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"},\"type\":\"array\"}}],\"name\":\"someDateObj_record\",\"namespace\":\"Simple.someDateObj\",\"type\":\"record\"}]},{\"default\":false,\"name\":\"visible\",\"namespace\":\"Simple\",\"type\":\"boolean\"},{\"name\":\"width\",\"namespace\":\"Simple\",\"type\":[\"null\",\"double\"]},{\"name\":\"caption\",\"type\":\"string\"},{\"name\":\"credit\",\"type\":\"string\"},{\"name\":\"crops\",\"type\":{\"items\":{\"fields\":[{\"name\":\"height\",\"namespace\":\"crops\",\"type\":\"double\"},{\"name\":\"name\",\"namespace\":\"crops\",\"type\":\"string\"},{\"doc\":\"full path to the cropped image file\",\"name\":\"path\",\"namespace\":\"crops\",\"type\":\"string\"},{\"doc\":\"a long\",\"name\":\"relativePath\",\"namespace\":\"crops\",\"type\":\"string\"},{\"name\":\"width\",\"namespace\":\"crops\",\"type\":\"double\"}],\"name\":\"crops_record\",\"namespace\":\"crops\",\"type\":\"record\"},\"type\":\"array\"}},{\"name\":\"cutline\",\"type\":[\"null\",\"string\"]},{\"name\":\"datePhotoTaken\",\"type\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"}},{\"name\":\"orientation\",\"type\":\"string\"},{\"name\":\"originalSize\",\"type\":{\"fields\":[{\"name\":\"height\",\"namespace\":\"originalSize\",\"type\":\"double\"},{\"name\":\"width\",\"namespace\":\"originalSize\",\"type\":\"double\"}],\"name\":\"originalSize_record\",\"namespace\":\"originalSize\",\"type\":\"record\"}},{\"doc\":\"a type\",\"name\":\"type\",\"type\":\"string\"},{\"name\":\"URL\",\"type\":{\"fields\":[{\"name\":\"absolute\",\"namespace\":\"URL\",\"type\":\"string\"},{\"name\":\"meta\",\"namespace\":\"URL\",\"type\":[\"null\",{\"fields\":[{\"name\":\"description\",\"namespace\":\"URL.meta\",\"type\":\"string\"},{\"name\":\"siteName\",\"namespace\":\"URL.meta\",\"type\":\"string\"}],\"name\":\"meta_record\",\"namespace\":\"URL.meta\",\"type\":\"record\"}]},{\"name\":\"publish\",\"namespace\":\"URL\",\"type\":\"string\"}],\"name\":\"URL_record\",\"namespace\":\"URL\",\"type\":\"record\"}}],\"name\":\"Complex\",\"type\":\"record\"}"
 }
 
 func (r *Complex) SchemaName() string {
@@ -85,7 +85,7 @@ func (r *Complex) Get(i int) types.Field {
 		r.Height = NewUnionNullLong()
 		return r.Height
 	case 3:
-		r.SomeDateObj = NewSomeDateObj_record()
+		r.SomeDateObj = NewUnionNullSomeDateObj_record()
 		return r.SomeDateObj
 	case 4:
 		return (*types.Boolean)(&r.Visible)
@@ -122,9 +122,6 @@ func (r *Complex) SetDefault(i int) {
 	switch i {
 	case 1:
 		r.AvroDeleted = false
-		return
-	case 3:
-
 		return
 	case 4:
 		r.Visible = false
