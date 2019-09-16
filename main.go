@@ -83,7 +83,7 @@ func main() {
 		ImportPath:          *importPath,
 		StructNameMap:       renameStructs.kv,
 		FieldNameMap:        renameFields.kv}); err != nil {
-		fmt.Printf("Golang Struct generation failed: %v", err)
+		fmt.Printf("Golang Struct generation failed: %v\n", err)
 		os.Exit(4)
 	}
 }

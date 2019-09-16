@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"path/filepath"
 	"strings"
 
 	"github.com/GannettDigital/jsonparser"
-	
-	"github.com/franela/goreq"
 )
 
 const (
@@ -160,11 +159,11 @@ func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType s
 	case sourcePath == "":
 		source = data
 	case strings.HasPrefix(sourcePath, "http"):
-		res, err := goreq.Request{Uri: sourcePath}.Do()
+		resp, err := http.Get(sourcePath)
 		if err != nil {
 			return nil, fmt.Errorf("unable to get reference from %q: %v", sourcePath, err)
 		}
-		source, err = ioutil.ReadAll(res.Body)
+		source, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read body from %q: %v", sourcePath, err)
 		}
