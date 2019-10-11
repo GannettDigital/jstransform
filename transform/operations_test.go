@@ -124,6 +124,11 @@ func TestDuration(t *testing.T) {
 			in:          "1:00:ab",
 			wantErr:     true,
 		},
+		{
+			description: "Null value in json",
+			want:        0,
+			wantErr:     false,
+		},
 	}
 	runOpTests(t, func() transformOperation { return &duration{} }, tests)
 }

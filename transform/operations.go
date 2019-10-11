@@ -29,6 +29,9 @@ func (c *duration) transform(raw interface{}) (interface{}, error) {
 		raw = array[0]
 	}
 
+	if raw == nil {
+		return 0, nil
+	}
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("duration only supports strings")
