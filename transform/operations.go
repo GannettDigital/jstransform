@@ -213,10 +213,17 @@ func (s *split) transform(raw interface{}) (interface{}, error) {
 		return nil, errors.New("split only supports strings")
 	}
 
+	// An empty string input should result in an empty array.
+	// strings.Split() will return []string{""} instead of an empty array.
+	// https://play.golang.org/p/8ySv_t37haN
+	if in == "" {
+		return []interface{}{}, nil
+	}
+
 	splits := strings.Split(in, s.args["on"])
 
 	// Return []interface{} to avoid messing up type casts later in the process
-	interfaceSplits := []interface{}{}
+	var interfaceSplits []interface{}
 	for _, s := range splits {
 		interfaceSplits = append(interfaceSplits, s)
 	}

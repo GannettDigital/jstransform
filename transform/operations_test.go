@@ -339,6 +339,12 @@ func TestSplit(t *testing.T) {
 			in:          8,
 			wantErr:     true,
 		},
+		{
+			description: "Empty input",
+			args:        map[string]string{"on": "|"},
+			in:          "",
+			want:        []interface{}{},
+		},
 	}
 
 	runOpTests(t, func() transformOperation { return &split{} }, tests)
