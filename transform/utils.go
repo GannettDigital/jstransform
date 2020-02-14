@@ -49,7 +49,7 @@ func convert(raw interface{}, jsonType string) (interface{}, error) {
 	if raw == nil {
 		return nil, nil
 	}
-	if rawArray, ok := raw.([]interface{}); ok && len(rawArray) == 1 {
+	if rawArray, ok := raw.([]interface{}); ok && len(rawArray) > 0 && jsonType != "array" {
 		raw = rawArray[0]
 	} else if ok && len(rawArray) == 0 {
 		return nil, nil
