@@ -12,8 +12,8 @@ import (
 
 	"github.com/antchfx/xmlquery"
 
-	"github.com/GannettDigital/jstransform/jsonschema"
 	"github.com/GannettDigital/jsonparser"
+	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
 // inputFormat denotes the type of transform to perfrom, the options are 'JSON' or 'XML'
@@ -114,7 +114,7 @@ func (tr *Transformer) jsonTransform(raw json.RawMessage) (json.RawMessage, erro
 
 	valid, err := tr.schema.Validate(out)
 	if err != nil {
-		return nil, fmt.Errorf("transformed result validation error: %v", err)
+		return nil, fmt.Errorf("input successfully transformed but did not match schema: %v", err)
 	}
 	if !valid {
 		return nil, errors.New("schema validation of the transformed result reports invalid")

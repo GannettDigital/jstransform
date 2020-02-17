@@ -3,12 +3,11 @@ package transform
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/GannettDigital/jstransform/jsonschema"
 	"io/ioutil"
 	"reflect"
 	"testing"
 	"time"
-
-	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
 // used for the Transformer test and benchmark
@@ -33,38 +32,38 @@ var (
 			schema:              operationsSchema,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
-						{
-							"type": "image",
-							"data": {
-								"attributes": [
-									{
-										"name": "length",
-										"value": "00:13"
-									}
-								],
-								"contributors": [
-									{"id": 1, "fullname": "one"},
-									{"id": 2, "fullname": "two"}
-								]
-							},
-							"lastModified": {
-							"type": "object",
-							"from": {
-								"operations": [{
-									"currentTime": {
-										"arguments": {
-											"format": "RFC3339"
-											}
-										}
-									}]
-								}
-							},
-							"mixedCase": "a|B|c|D",
-							"invalid": false,
-							"url": "http://foo.com/blah",
-							"startTime": "2019-05-16T21:00:00-04:00",
-							"toCamelCase": "extra-base-hit"
-						}`),
+                        {
+                            "type": "image",
+                            "data": {
+                                "attributes": [
+                                    {
+                                        "name": "length",
+                                        "value": "00:13"
+                                    }
+                                ],
+                                "contributors": [
+                                    {"id": 1, "fullname": "one"},
+                                    {"id": 2, "fullname": "two"}
+                                ]
+                            },
+                            "lastModified": {
+                            "type": "object",
+                            "from": {
+                                "operations": [{
+                                    "currentTime": {
+                                        "arguments": {
+                                            "format": "RFC3339"
+                                            }
+                                        }
+                                    }]
+                                }
+                            },
+                            "mixedCase": "a|B|c|D",
+                            "invalid": false,
+                            "url": "http://foo.com/blah",
+                            "startTime": "2019-05-16T21:00:00-04:00",
+                            "toCamelCase": "extra-base-hit"
+                        }`),
 			want: json.RawMessage(fmt.Sprintf(`{"caseSplit":["a","b","c","d"],"contributor":"two","duration":13,"lastModified":"%s","startTime":"09:00","toCamelCase":"extraBaseHit","url":"http://gannettdigital.com/blah","valid":true}`, time.Now().Format(time.RFC3339))),
 		},
 		{
@@ -72,26 +71,26 @@ var (
 			schema:              imageSchema,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
-							{
-								"type": "image",
-								"crops": [
-									{
-										"height": 0,
-										"path": "path",
-										"relativePath": "",
-										"width": 0
-									},
-									{
-										"name": "aname",
-										"height": 0,
-										"path": "empty",
-										"relativePath": "empty",
-										"width": 0
-									}
-								],
-								"publishUrl": "publishURL",
-								"absoluteUrl": "absoluteURL"
-							}`),
+                            {
+                                "type": "image",
+                                "crops": [
+                                    {
+                                        "height": 0,
+                                        "path": "path",
+                                        "relativePath": "",
+                                        "width": 0
+                                    },
+                                    {
+                                        "name": "aname",
+                                        "height": 0,
+                                        "path": "empty",
+                                        "relativePath": "empty",
+                                        "width": 0
+                                    }
+                                ],
+                                "publishUrl": "publishURL",
+                                "absoluteUrl": "absoluteURL"
+                            }`),
 			want: json.RawMessage(`{"URL":{"absolute":"absoluteURL","publish":"publishURL"},"crops":[{"height":0,"name":"name","path":"path","relativePath":"","width":0},{"height":0,"name":"aname","path":"empty","relativePath":"empty","width":0}],"type":"image"}`),
 		},
 		{
@@ -99,20 +98,20 @@ var (
 			schema:              imageSchema,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
-							{
-								"type": "image",
-								"crops": [
-									{
-										"path": "path"
-									},
-									{
-										"name": "aname",
-										"relativePath": "empty"
-									}
-								],
-								"publishUrl": "publishURL",
-								"absoluteUrl": "absoluteURL"
-							}`),
+                            {
+                                "type": "image",
+                                "crops": [
+                                    {
+                                        "path": "path"
+                                    },
+                                    {
+                                        "name": "aname",
+                                        "relativePath": "empty"
+                                    }
+                                ],
+                                "publishUrl": "publishURL",
+                                "absoluteUrl": "absoluteURL"
+                            }`),
 			want:    json.RawMessage(`{"URL":{"absolute":"absoluteURL","publish":"publishURL"},"crops":[{"name":"name","path":"path"},{"name":"aname","relativePath":"empty"}],"type":"image"}`),
 			wantErr: true,
 		},
@@ -121,25 +120,25 @@ var (
 			schema:              arrayTransformsSchema,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
-							{
-								"type": "image",
-								"data": {
-									"contributors": [
-										{"id": 1, "fullname": "one"},
-										{"id": 2, "fullname": "two"}
-									],
-									"lines": [
-										"line1",
-										"line2"
-									]
-								},
-								"aSingleObject": [
-									{
-										"id": 1,
-										"name": "test1"
-									}
-								]
-							}`),
+                            {
+                                "type": "image",
+                                "data": {
+                                    "contributors": [
+                                        {"id": 1, "fullname": "one"},
+                                        {"id": 2, "fullname": "two"}
+                                    ],
+                                    "lines": [
+                                        "line1",
+                                        "line2"
+                                    ]
+                                },
+                                "aSingleObject": [
+                                    {
+                                        "id": 1,
+                                        "name": "test1"
+                                    }
+                                ]
+                            }`),
 			want: json.RawMessage(`{"contributors":[{"id":"1","name":"one"},{"id":"2","name":"two"}],"lines":["line1","line2"],"wasSingleObject":[{"id":"1","name":"test1"}]}`),
 		},
 		{
@@ -147,24 +146,24 @@ var (
 			schema:              imageSchema,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
-						{
-							"type": "image",
-							"crops": [
-								{
-									"height": 0,
-									"path": "path",
-									"relativePath": "",
-									"width": 0
-								},
-								{
-									"name": "aname",
-									"height": 0,
-									"path": "empty",
-									"relativePath": "empty",
-									"width": 0
-								}
-							]
-						}`),
+                        {
+                            "type": "image",
+                            "crops": [
+                                {
+                                    "height": 0,
+                                    "path": "path",
+                                    "relativePath": "",
+                                    "width": 0
+                                },
+                                {
+                                    "name": "aname",
+                                    "height": 0,
+                                    "path": "empty",
+                                    "relativePath": "empty",
+                                    "width": 0
+                                }
+                            ]
+                        }`),
 			want: json.RawMessage(`{"crops":[{"height":0,"name":"name","path":"path","relativePath":"","width":0},{"height":0,"name":"aname","path":"empty","relativePath":"empty","width":0}],"type":"image"}`),
 		},
 		{
@@ -172,21 +171,21 @@ var (
 			schema:              arrayTransformsSchema,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
-						{
-							"type": "image",
-							"data": {
-								"lines": [
-									"line1",
-									"line2"
-								]
-							},
-							"aSingleObject": [
-								{
-									"id": 1,
-									"name": "test1"
-								}
-							]
-						}`),
+                        {
+                            "type": "image",
+                            "data": {
+                                "lines": [
+                                    "line1",
+                                    "line2"
+                                ]
+                            },
+                            "aSingleObject": [
+                                {
+                                    "id": 1,
+                                    "name": "test1"
+                                }
+                            ]
+                        }`),
 			want: json.RawMessage(`{"lines":["line1","line2"],"wasSingleObject":[{"id":"1","name":"test1"}]}`),
 		},
 		{
@@ -194,35 +193,35 @@ var (
 			schema:              doublearraySchema,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
-				{
-					"data" : {
-						"double": [
-							["1-1", "1-2"],
-							["2-1", "2-2"]
-						]
-					},
-					"array1": [
-						{
-							"name": "array1-1",
-							"array2": [
-								{
-									"name": "array1-1-1"
-								},
-								{
-									"name": "array1-1-2"
-								}
-							]
-						},
-						{
-							"name": "array1-2",
-							"array2": [
-								{
-									"name": "array1-2-1"
-								}
-							]
-						}
-					]
-				}`),
+                {
+                    "data" : {
+                        "double": [
+                            ["1-1", "1-2"],
+                            ["2-1", "2-2"]
+                        ]
+                    },
+                    "array1": [
+                        {
+                            "name": "array1-1",
+                            "array2": [
+                                {
+                                    "name": "array1-1-1"
+                                },
+                                {
+                                    "name": "array1-1-2"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "array1-2",
+                            "array2": [
+                                {
+                                    "name": "array1-2-1"
+                                }
+                            ]
+                        }
+                    ]
+                }`),
 			want: json.RawMessage(`{"array1":[{"array2":[{"level2Name":"array1-1-1"},{"level2Name":"array1-1-2"}],"level1Name":"array1-1"},{"array2":[{"level2Name":"array1-2-1"}],"level1Name":"array1-2"}],"double":[["1-1","1-2"],["2-1","2-2"]]}`),
 		},
 		{
@@ -230,14 +229,14 @@ var (
 			schema:              dateTimesSchema,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
-				{
-					"dates": [
-						1529958073,
-						"2018-06-25T20:21:13Z"
-					],
-					"requiredDate": "2018-06-25T20:21:13Z",
-					"optionalDate": ""
-				}`),
+                {
+                    "dates": [
+                        1529958073,
+                        "2018-06-25T20:21:13Z"
+                    ],
+                    "requiredDate": "2018-06-25T20:21:13Z",
+                    "optionalDate": ""
+                }`),
 			want: json.RawMessage(`{"dates":["2018-06-25T20:21:13Z","2018-06-25T20:21:13Z"],"requiredDate":"2018-06-25T20:21:13Z"}`),
 		},
 		{
@@ -245,16 +244,55 @@ var (
 			schema:              frontSchema,
 			transformIdentifier: "frontInput",
 			in: json.RawMessage(`
-						{
-							"attributes": [
-								{
-									"canonicalurl": "canURL",
-									"front-list-module-position": "frontlistmoduleposition"
-								}
-							],
-							"og:image": "testOGIMAGE"
-						}`),
+                        {
+                            "attributes": [
+                                {
+                                    "canonicalurl": "canURL",
+                                    "front-list-module-position": "frontlistmoduleposition"
+                                }
+                            ],
+                            "og:image": "testOGIMAGE"
+                        }`),
 			want: json.RawMessage(`{"attributes":[{"canonicalURL":"canURL","frontListModulePosition":"frontlistmoduleposition"}],"ogImage":"testOGIMAGE"}`),
+		},
+		{
+			description:         "Test duplicate attributes",
+			schema:              arrayTransformsSchema,
+			transformIdentifier: "cumulo",
+			in: json.RawMessage(`
+                        {
+                            "attributes": [
+                                {
+                                    "name": "Keywords",
+                                    "value": "Cosmopolis"
+                                },
+                                {
+                                    "name": "Keywords",
+                                    "value": "money"
+                                }
+                            ]
+                        }`),
+			want: json.RawMessage(`{"keywords":"Cosmopolis"}`),
+		},
+		{
+			description:         "Test Width number error type",
+			schema:              arrayTransformsSchema,
+			transformIdentifier: "cumulo",
+			in: json.RawMessage(`
+                        {
+                            "attributes": [
+                                {
+                                    "name": "height",
+                                    "value": 500
+                                },
+                                {
+                                    "name": "width",
+                                    "value": "100%"
+                                }
+                            ]
+                        }`),
+			want:    json.RawMessage("width: Expected: number Given: string"),
+			wantErr: true,
 		},
 	}
 

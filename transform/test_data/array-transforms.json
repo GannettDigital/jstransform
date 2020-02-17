@@ -127,6 +127,33 @@
           ]
         }
       }
+    },
+    "keywords": {
+      "type": "string",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.attributes[?(@.name==\"keywords\")].value"
+            },
+            {
+              "jsonPath": "$.attributes[?(@.name==\"Keywords\")].value"
+            }
+          ]
+        }
+      }
+    },
+    "width": {
+      "type": "number",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.attributes[?(@.name==\"width\")].value"
+            }
+          ]
+        }
+      }
     }
   }
 }
