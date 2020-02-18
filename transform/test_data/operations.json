@@ -176,6 +176,30 @@
           ]
         }
       }
+    },
+    "storyHighlights": {
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "type": "string"
+      },
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.attributes[?(@.name==\"storyhighlights\")].value",
+              "operations": [
+                {
+                  "type": "split",
+                  "args": {
+                    "on": "|"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
     }
   }
 }
