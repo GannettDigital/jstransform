@@ -64,6 +64,14 @@ func TestBuildStructsRename(t *testing.T) {
 			wantFiles:     []string{"all_of_with_properties.go.out", "simple.go.out2"},
 			renameStructs: nil,
 		},
+		{
+			file:           "times.json",
+			description:    "test formatting of times",
+			expectedFiles:  []string{"times.go"},
+			wantFiles:      []string{"times.go.out"},
+			useMessagePack: false,
+			renameStructs:  nil,
+		},
 	}
 
 	outDir := filepath.Join(testdir, "rename")

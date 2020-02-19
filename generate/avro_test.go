@@ -42,6 +42,12 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 			goPath:      "./test_data/arrays.go",
 			wantPath:    "./test_data/arrays.avsc.out",
 		},
+		{
+			description: "Time fields",
+			name:        "Times",
+			goPath:      "./test_data/times.go",
+			wantPath:    "./test_data/times.avsc.out",
+		},
 	}
 
 	for _, test := range tests {
@@ -89,6 +95,10 @@ func TestBuildAvroSerializationFunctions(t *testing.T) {
 		{
 			description: "Variations on Arrays",
 			path:        "./test_data/arrays.avsc.out",
+		},
+		{
+			description: "Variations on time",
+			path:        "./test_data/times.avsc.out",
 		},
 	}
 

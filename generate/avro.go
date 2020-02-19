@@ -402,6 +402,9 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 		return fmt.Sprintf("{%s]}", buf.String())
 	case *ast.SelectorExpr:
 		if t.Sel.Name == "Time" {
+			if nullable {
+				return `["null",{"type":"long","logicalType":"timestamp-millis"}]`
+			}
 			return `{"type":"long","logicalType":"timestamp-millis"}`
 		}
 		return fmt.Sprintf(`unsupported type %q`, t.Sel.Name)
