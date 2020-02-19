@@ -49,8 +49,15 @@ func convert(raw interface{}, jsonType string) (interface{}, error) {
 	if raw == nil {
 		return nil, nil
 	}
-	if rawArray, ok := raw.([]interface{}); ok && len(rawArray) > 0 && jsonType != "array" {
+
+	// Since jsonpath returns an array from filters, we want to check if there's a single element that should be extracted
+	// for non-array return types being used.
+	// We also want to recursively handle nested arrays at the same time during this extraction
+	if rawArray, ok := raw.([]interface{}); ok && (len(rawArray) == 1 || (len(rawArray) > 0 && jsonType != "array")) {
 		raw = rawArray[0]
+		if nestedArray, ok := raw.([]interface{}); ok && len(nestedArray) > 0 {
+			return convert(nestedArray[0], jsonType)
+		}
 	} else if ok && len(rawArray) == 0 {
 		return nil, nil
 	}
