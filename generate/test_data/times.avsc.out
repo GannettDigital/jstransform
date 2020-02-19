@@ -1,0 +1,35 @@
+{
+  "name": "Times",
+  "type": "record",
+  "fields": [
+    {
+      "name": "AvroWriteTime",
+      "doc": "The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.",
+      "type": "long",
+      "logicalType": "timestamp-millis"
+    },
+    {
+      "name": "AvroDeleted",
+      "doc": "This is set to true when the Avro data is recording a delete in the source data.",
+      "default": false,
+      "type": "boolean"
+    },
+    {
+      "name": "nonRequiredDate",
+      "type": [
+        "null",
+        {
+          "type": "long",
+          "logicalType": "timestamp-millis"
+        }
+      ]
+    },
+    {
+      "name": "requiredDate",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    }
+  ]
+}
