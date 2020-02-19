@@ -234,7 +234,12 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 		// If not a built in type it could be a special Avro Union type
 		if tmpl, ok := fm.unionTemplates[typeName]; ok {
 			buf := &bytes.Buffer{}
-			if err := tmpl.Execute(buf, map[string]string{"packageName": fm.packageName, "value": "z." + prefix + name}); err != nil {
+			format := map[string]string{"packageName": fm.packageName, "value": "z." + prefix + name}
+			// special case for converting time fields
+			if selector, ok := generatedField.Type.(*ast.SelectorExpr); ok && selector.Sel.Name == "Time" {
+				format = map[string]string{"packageName": fm.packageName, "value": fmt.Sprintf("generate.AvroTime(z.%s)", prefix+name)}
+			}
+			if err := tmpl.Execute(buf, format); err != nil {
 				return mappedFields{}, fmt.Errorf("failed union template: %v", err)
 			}
 			return mappedFields{fieldMapping: buf.String()}, nil

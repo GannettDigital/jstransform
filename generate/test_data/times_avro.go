@@ -64,7 +64,7 @@ func (z *Times) convertToAvro(writeTime time.Time) *times.Times {
 
 	return &times.Times{
 		AvroWriteTime:   aTime,
-		NonRequiredDate: &times.UnionNullLong{Long: z.NonRequiredDate, UnionType: times.UnionNullLongTypeEnumLong},
+		NonRequiredDate: &times.UnionNullLong{Long: generate.AvroTime(z.NonRequiredDate), UnionType: times.UnionNullLongTypeEnumLong},
 		RequiredDate:    generate.AvroTime(z.RequiredDate),
 	}
 }
