@@ -3,11 +3,12 @@ package transform
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/GannettDigital/jstransform/jsonschema"
 	"io/ioutil"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
 // used for the Transformer test and benchmark
@@ -18,7 +19,7 @@ var (
 	operationsSchema, _      = jsonschema.SchemaFromFile("./test_data/operations.json", "")
 	dateTimesSchema, _       = jsonschema.SchemaFromFile("./test_data/date-times.json", "")
 	frontSchema, _           = jsonschema.SchemaFromFile("./test_data/front.json", "")
-	htmlSchema, _                  = jsonschema.SchemaFromFile("./test_data/html.json", "")
+	htmlSchema, _            = jsonschema.SchemaFromFile("./test_data/html.json", "")
 
 	transformerTests = []struct {
 		description         string
@@ -319,7 +320,7 @@ var (
                            "heading": "Cats In Felt Hats",
                            "body": "<p>Two cats wearing felt hats</p>"
                        }`),
-			want: json.RawMessage(`{"body":"<p>Two cats wearing felt hats</p>","heading":"<h1>Cats In Felt Hats</h1>"}`),
+			want: json.RawMessage(`{"body":"<p>Two cats wearing felt hats</p>","heading":"Cats In Felt Hats"}`),
 		},
 	}
 
