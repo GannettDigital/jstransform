@@ -114,7 +114,7 @@ func (tr *Transformer) jsonTransform(raw json.RawMessage) (json.RawMessage, erro
 	if err != nil {
 		return nil, fmt.Errorf("failed to JSON marsal transformed data: %v", err)
 	}
-	// Encoder.Encode adds a new line
+	// Encode adds a new line
 	out := bytes.TrimRight(buf.Bytes(), "\n")
 
 	valid, err := tr.schema.Validate(out)
@@ -146,7 +146,7 @@ func (tr *Transformer) xmlTransform(raw []byte) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to JSON marsal transformed data: %v", err)
 	}
-	// Encoder.Encode adds a new line
+	// Encode adds a new line
 	out := bytes.TrimRight(buf.Bytes(), "\n")
 
 	valid, err := tr.schema.Validate(out)
