@@ -18,6 +18,7 @@ var (
 	operationsSchema, _      = jsonschema.SchemaFromFile("./test_data/operations.json", "")
 	dateTimesSchema, _       = jsonschema.SchemaFromFile("./test_data/date-times.json", "")
 	frontSchema, _           = jsonschema.SchemaFromFile("./test_data/front.json", "")
+	htmlSchema, _                  = jsonschema.SchemaFromFile("./test_data/html.json", "")
 
 	transformerTests = []struct {
 		description         string
@@ -308,6 +309,17 @@ var (
                            ]
                        }`),
 			want: json.RawMessage("{\"storyHighlights\":[\"highlight1\",\"highlight2\"]}"),
+		},
+		{
+			description:         "Test character encoding",
+			schema:              htmlSchema,
+			transformIdentifier: "html",
+			in: json.RawMessage(`
+                       {
+                           "heading": "Cats In Felt Hats",
+                           "body": "<p>Two cats wearing felt hats</p>"
+                       }`),
+			want: json.RawMessage(`{"body":"<p>Two cats wearing felt hats</p>","heading":"<h1>Cats In Felt Hats</h1>"}`),
 		},
 	}
 
