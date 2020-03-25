@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<onl:story xmlns:onl="http://test">
+    <onl:approved>true</onl:approved>
+    <onl:approved>false</onl:approved>
+    <onl:average>1.1</onl:average>
+    <onl:average>2.2</onl:average>
+    <onl:count>2</onl:count>
+    <onl:count>4</onl:count>
+    <onl:content>
+        <onl:paragraphs>
+            <onl:paragraph html="0">
+                <onl:body><![CDATA[Operation: next regular meeting on Tuesday, Jan. 5, at 7 p.m.]]></onl:body>
+            </onl:paragraph>
+            <onl:paragraph html="0">
+                <onl:body>More Body text</onl:body>
+            </onl:paragraph>
+        </onl:paragraphs>
+    </onl:content>
+</onl:story>

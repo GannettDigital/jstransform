@@ -47,6 +47,7 @@ The transform object has the following properties:
 
 - Objects can optionally have an xmlPath transform. If an object does have this transform all fields inside of it will be relative to that selection with it now acting as the root node, meaning nodes above the selected object transform node will be inaccessible inside that object. If a transform is placed on an object and it is not found all children fields inside the object will be skipped.
 
+- In the event of multiple values for a scalar item in an XML document strings are space concatenated, the first item is used for other scalar types.
 
 === Operations
 
