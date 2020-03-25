@@ -3,11 +3,12 @@ package transform
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/GannettDigital/jstransform/jsonschema"
 	"io/ioutil"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
 // used for the Transformer test and benchmark
@@ -565,6 +566,13 @@ func TestNewXMLTransformer(t *testing.T) {
 			schemaFilePath:      "./test_data/xml/xmlRefsTest/baseballBoxscores.json",
 			xmlFilePath:         "./test_data/xml/xmlRefsTest/boxscoreBaseball.xml",
 			wantFilePath:        "./test_data/xml/xmlRefsTest/boxscores.out.json",
+		},
+		{
+			description:         "transform where the xml has more than 1 value for a scalar item",
+			transformIdentifier: "ows",
+			schemaFilePath:      "./test_data/xml/repeatedScalarNode.json",
+			xmlFilePath:         "./test_data/xml/repeatedScalarNode.xml",
+			wantFilePath:        "./test_data/xml/repeatedScalarNode.out.json",
 		},
 	}
 

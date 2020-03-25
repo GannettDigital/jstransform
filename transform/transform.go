@@ -105,7 +105,6 @@ func (ti *transformInstruction) xmlTransform(in interface{}, fieldType string, m
 	if xmlNode == nil {
 		return nil, nil
 	}
-	rawValue := xmlNode
 
 	var (
 		value interface{}
@@ -122,13 +121,23 @@ func (ti *transformInstruction) xmlTransform(in interface{}, fieldType string, m
 	if numElementsWithChild == 0 && numElementsWithoutChild == 1 {
 		value, err = convert(xmlNode[0].InnerText(), fieldType)
 	} else {
-		value = xmlNode
+		switch fieldType {
+		case "array", "object":
+			value = xmlNode
+		case "string":
+			values := make([]string, len(xmlNode))
+			for i, node := range xmlNode {
+				values[i] = node.InnerText()
+			}
+			value = strings.Join(values, " ")
+		default:
+			value, err = convert(xmlNode[0].InnerText(), fieldType)
+			if err != nil {
+				value = xmlNode
+			}
+		}
 	}
 
-	if err != nil {
-		// In some cases the conversion is helpful but in others like before a max operation it isn't
-		value = rawValue
-	}
 	if value == nil {
 		return nil, nil
 	}
