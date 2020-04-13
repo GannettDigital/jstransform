@@ -225,18 +225,20 @@ func (r *ArrayStringWrapper) AppendArray() types.Field {
 
 type ArrayParents_recordWrapper []*Parents_record
 
-func (_ *ArrayParents_recordWrapper) SetBoolean(v bool)                { panic("Unsupported operation") }
-func (_ *ArrayParents_recordWrapper) SetInt(v int32)                   { panic("Unsupported operation") }
-func (_ *ArrayParents_recordWrapper) SetLong(v int64)                  { panic("Unsupported operation") }
-func (_ *ArrayParents_recordWrapper) SetFloat(v float32)               { panic("Unsupported operation") }
-func (_ *ArrayParents_recordWrapper) SetDouble(v float64)              { panic("Unsupported operation") }
-func (_ *ArrayParents_recordWrapper) SetBytes(v []byte)                { panic("Unsupported operation") }
-func (_ *ArrayParents_recordWrapper) SetString(v string)               { panic("Unsupported operation") }
-func (_ *ArrayParents_recordWrapper) SetUnionElem(v int64)             { panic("Unsupported operation") }
-func (_ *ArrayParents_recordWrapper) Get(i int) types.Field            { panic("Unsupported operation") }
-func (_ *ArrayParents_recordWrapper) AppendMap(key string) types.Field { panic("Unsupported operation") }
-func (_ *ArrayParents_recordWrapper) Finalize()                        {}
-func (_ *ArrayParents_recordWrapper) SetDefault(i int)                 { panic("Unsupported operation") }
+func (_ *ArrayParents_recordWrapper) SetBoolean(v bool)     { panic("Unsupported operation") }
+func (_ *ArrayParents_recordWrapper) SetInt(v int32)        { panic("Unsupported operation") }
+func (_ *ArrayParents_recordWrapper) SetLong(v int64)       { panic("Unsupported operation") }
+func (_ *ArrayParents_recordWrapper) SetFloat(v float32)    { panic("Unsupported operation") }
+func (_ *ArrayParents_recordWrapper) SetDouble(v float64)   { panic("Unsupported operation") }
+func (_ *ArrayParents_recordWrapper) SetBytes(v []byte)     { panic("Unsupported operation") }
+func (_ *ArrayParents_recordWrapper) SetString(v string)    { panic("Unsupported operation") }
+func (_ *ArrayParents_recordWrapper) SetUnionElem(v int64)  { panic("Unsupported operation") }
+func (_ *ArrayParents_recordWrapper) Get(i int) types.Field { panic("Unsupported operation") }
+func (_ *ArrayParents_recordWrapper) AppendMap(key string) types.Field {
+	panic("Unsupported operation")
+}
+func (_ *ArrayParents_recordWrapper) Finalize()        {}
+func (_ *ArrayParents_recordWrapper) SetDefault(i int) { panic("Unsupported operation") }
 func (r *ArrayParents_recordWrapper) AppendArray() types.Field {
 	var v *Parents_record
 	v = NewParents_record()
