@@ -8,83 +8,122 @@ import (
 	"testing"
 )
 
-func TestBuildStructsRename(t *testing.T) {
+func TestBuildStructs(t *testing.T) {
 	testdir := "test_data"
-	tests := []struct {
-		description    string
-		file           string
-		expectedFiles  []string
-		wantFiles      []string
-		useMessagePack bool
-		renameStructs  map[string]string
-	}{
-		{
-			file:           "complex.json",
-			description:    "without oneOfTypes",
-			expectedFiles:  []string{"complex.go"},
-			wantFiles:      []string{"complex.go.out2"},
-			useMessagePack: false,
-			renameStructs:  nil,
-		},
-		{
-			file:           "test_schema.json",
-			description:    "with oneOfType",
-			expectedFiles:  []string{"simple.go", "complex.go", "rename_msgp.go", "rename_msgp_test.go"},
-			wantFiles:      []string{"simple.go.out2", "complex.go.out2", "rename_msgp.go.out", "rename_msgp_test.go.out"},
-			useMessagePack: true,
-			renameStructs:  nil,
-		},
-		{
-			file:           "complex.json",
-			description:    "without oneOfTypes, renamed",
-			expectedFiles:  []string{"complex.go"},
-			wantFiles:      []string{"complex.go.out-rename"},
-			useMessagePack: false,
-			renameStructs: map[string]string{
-				"complex": "ReallyComplex",
-			},
-		},
-		{
-			file:           "test_schema.json",
-			description:    "with oneOfType, renamed",
-			expectedFiles:  []string{"simple.go", "complex.go", "rename_msgp.go", "rename_msgp_test.go"},
-			wantFiles:      []string{"simple.go.out-rename", "complex.go.out-rename", "rename_msgp.go.out-rename", "rename_msgp_test.go.out-rename"},
-			useMessagePack: true,
-			renameStructs: map[string]string{
-				"simple":  "TotallySimple",
-				"complex": "ReallyComplex",
-				"height":  "Not-Renamed",
-				"Height":  "Not-Either",
-			},
-		},
-		{
-			file:          "all_of_with_properties.json",
-			description:   "one allOf with additional properties at the top level",
-			expectedFiles: []string{"all_of_with_properties.go", "simple.go"},
-			wantFiles:     []string{"all_of_with_properties.go.out", "simple.go.out2"},
-			renameStructs: nil,
-		},
-		{
-			file:           "times.json",
-			description:    "test formatting of times",
-			expectedFiles:  []string{"times.go"},
-			wantFiles:      []string{"times.go.out"},
-			useMessagePack: false,
-			renameStructs:  nil,
-		},
-	}
-
 	outDir := filepath.Join(testdir, "rename")
 	os.Mkdir(outDir, os.ModePerm|os.ModePerm)
 	defer os.RemoveAll(outDir)
+	outDir2 := filepath.Join(testdir, "nonestTest")
+	os.Mkdir(outDir2, os.ModePerm|os.ModePerm)
+	defer os.RemoveAll(outDir2)
+
+	tests := []struct {
+		description   string
+		buildArgs     BuildArgs
+		expectedFiles []string
+		wantFiles     []string
+	}{
+		{
+			description: "without oneOfTypes",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "complex.json"),
+				OutputDir:              outDir,
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: true,
+			},
+			expectedFiles: []string{"complex.go"},
+			wantFiles:     []string{"complex.go.out2"},
+		},
+		{
+			description: "without oneOfTypes, with no nested structs and descriptions as comments",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "test_schema2.json"),
+				OutputDir:              outDir2,
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: false,
+				NoNestedStructs:        true,
+			},
+			expectedFiles: []string{"simple.go", "complex.go"},
+			wantFiles:     []string{"nonest/simple.go", "nonest/complex.go"},
+		},
+		{
+			description: "with oneOfType",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "test_schema.json"),
+				OutputDir:              outDir,
+				GenerateMessagePack:    true,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: true,
+			},
+			expectedFiles: []string{"simple.go", "complex.go", "rename_msgp.go", "rename_msgp_test.go"},
+			wantFiles:     []string{"simple.go.out2", "complex.go.out2", "rename_msgp.go.out", "rename_msgp_test.go.out"},
+		},
+		{
+			description: "without oneOfTypes, renamed",
+			buildArgs: BuildArgs{
+				SchemaPath:          filepath.Join(testdir, "complex.json"),
+				OutputDir:           outDir,
+				GenerateMessagePack: false,
+				StructNameMap: map[string]string{
+					"complex": "ReallyComplex",
+				},
+				DescriptionAsStructTag: true,
+			},
+			expectedFiles: []string{"complex.go"},
+			wantFiles:     []string{"complex.go.out-rename"},
+		},
+		{
+			description: "with oneOfType, renamed",
+			buildArgs: BuildArgs{
+				SchemaPath:          filepath.Join(testdir, "test_schema.json"),
+				OutputDir:           outDir,
+				GenerateMessagePack: true,
+				StructNameMap: map[string]string{
+					"simple":  "TotallySimple",
+					"complex": "ReallyComplex",
+					"height":  "Not-Renamed",
+					"Height":  "Not-Either",
+				},
+				DescriptionAsStructTag: true,
+			},
+			expectedFiles: []string{"simple.go", "complex.go", "rename_msgp.go", "rename_msgp_test.go"},
+			wantFiles:     []string{"simple.go.out-rename", "complex.go.out-rename", "rename_msgp.go.out-rename", "rename_msgp_test.go.out-rename"},
+		},
+		{
+			description: "one allOf with additional properties at the top level",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "all_of_with_properties.json"),
+				OutputDir:              outDir,
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: true,
+			},
+			expectedFiles: []string{"all_of_with_properties.go", "simple.go"},
+			wantFiles:     []string{"all_of_with_properties.go.out", "simple.go.out2"},
+		},
+		{
+			description: "test formatting of times",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "times.json"),
+				OutputDir:              outDir,
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: true,
+			},
+			expectedFiles: []string{"times.go"},
+			wantFiles:     []string{"times.go.out"},
+		},
+	}
 
 	for _, test := range tests {
-		if err := BuildStructsRename(filepath.Join(testdir, test.file), outDir, test.useMessagePack, test.renameStructs); err != nil {
+		if err := BuildStructsWithArgs(test.buildArgs); err != nil {
 			t.Fatalf("Test %q - BuildStructsRename failed: %v", test.description, err)
 		}
 
 		for i := range test.expectedFiles {
-			got, err := ioutil.ReadFile(filepath.Join(outDir, test.expectedFiles[i]))
+			got, err := ioutil.ReadFile(filepath.Join(test.buildArgs.OutputDir, test.expectedFiles[i]))
 			if err != nil {
 				t.Errorf("Test %q - failed to read expected file %q: %v", test.description, test.expectedFiles[i], err)
 			}

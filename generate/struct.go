@@ -105,76 +105,138 @@ func (efs extractedFields) Sorted() []*extractedField {
 	return sorted
 }
 
-type generatedStruct struct {
-	extractedField
-
-	args           BuildArgs
-	packageName    string
-	embededStructs []string
+// goFile represents the contents of a single go file to be generated based on the given JSON schema.
+type goFile struct {
+	packageName   string
+	args          BuildArgs
+	rootStruct    *generatedStruct
+	nestedStructs map[string]*generatedStruct // The key is derived from the path used by the walk function for the given struct
 }
 
-func newGeneratedStruct(schema *jsonschema.Schema, name, packageName string, embeds []string, args BuildArgs) (*generatedStruct, error) {
+// newGeneratedGoFile creates a go file based on the given JSON schema.
+// The write function can be used to write out the value of the file, which will end up with either a single struct
+// or multiple depending on the presence of nested structs and the value of the NoNestedStructs build argument.
+func newGeneratedGoFile(schema *jsonschema.Schema, name, packageName string, embeds []string, args BuildArgs) (*goFile, error) {
 	required := map[string]bool{}
 	for _, fname := range schema.Required {
 		required[fname] = true
 	}
-	generated := &generatedStruct{
-		extractedField: extractedField{
-			name:           name,
-			fields:         make(map[string]*extractedField),
-			requiredFields: required,
-		},
-		args:           args,
-		embededStructs: embeds,
-		packageName:    packageName,
+
+	gof := &goFile{
+		packageName:   packageName,
+		args:          args,
+		nestedStructs: make(map[string]*generatedStruct),
 	}
-	if err := jsonschema.Walk(schema, generated.walkFunc); err != nil {
+
+	gof.rootStruct = gof.newGeneratedStruct(name, required)
+	gof.rootStruct.embededStructs = embeds
+
+	if err := jsonschema.Walk(schema, gof.walkFunc); err != nil {
 		return nil, fmt.Errorf("failed to walk schema for %q: %v", name, err)
 	}
 
-	return generated, nil
+	return gof, nil
 }
 
-// walkFunc is a jsonschema.WalkFunc which builds the fields in the generatedStructFile as the JSON schema file is
-// walked.
-func (gen *generatedStruct) walkFunc(path string, i jsonschema.Instance) error {
-	if err := addField(gen.fields, splitJSONPath(path), i, gen.args.FieldNameMap); err != nil {
-		return err
+func (gof *goFile) newGeneratedStruct(name string, requiredFields map[string]bool) *generatedStruct {
+	return &generatedStruct{
+		extractedField: extractedField{
+			name:           name,
+			fields:         make(map[string]*extractedField),
+			requiredFields: requiredFields,
+		},
+		args: gof.args,
 	}
-	return nil
+}
+
+func (gof *goFile) structs() []*generatedStruct {
+	if len(gof.nestedStructs) < 1 {
+		return []*generatedStruct{gof.rootStruct}
+	}
+	nested := make([]*generatedStruct, len(gof.nestedStructs))
+	var i int
+	for _, s := range gof.nestedStructs {
+		nested[i] = s
+		i++
+	}
+
+	// order with root first and nested in a consistent following order
+	sort.Slice(nested, func(i, j int) bool {
+		return nested[i].name < nested[j].name
+	})
+	structs := []*generatedStruct{gof.rootStruct}
+	structs = append(structs, nested...)
+
+	return structs
+}
+
+// walkFunc is a jsonschema.WalkFunc which builds the fields for generatedStructFile within the gofile as the
+// JSON schema file is walked.
+func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
+	gen := gof.rootStruct
+
+	if !gof.args.NoNestedStructs {
+		return addField(gen.fields, splitJSONPath(path), i, gen.args.FieldNameMap)
+	}
+
+	parts := []string{exportedName(gof.rootStruct.name)}
+	for _, part := range splitJSONPath(path) {
+		parts = append(parts, exportedName(part))
+	}
+
+	// Find parent struct or if none use root struct
+	parentKey := strings.Join(parts[:len(parts)-1], "")
+	name := splitJSONPath(path)[len(parts)-2]
+	gen = gof.nestedStructs[parentKey]
+	if gen == nil {
+		gen = gof.rootStruct
+	}
+
+	// If the types is an object create a new generated struct for it
+	if i.Type == "object" {
+		key := strings.Join(parts, "")
+
+		requiredFields := make(map[string]bool)
+		for _, name := range i.Required {
+			requiredFields[name] = true
+		}
+
+		gof.nestedStructs[key] = gof.newGeneratedStruct(key, requiredFields)
+		return addField(gen.fields, []string{name}, jsonschema.Instance{Description: i.Description, Type: key}, gen.args.FieldNameMap)
+	}
+
+	return addField(gen.fields, []string{name}, i, gen.args.FieldNameMap)
 }
 
 // write will write the generated file to the given io.Writer.
-func (gen *generatedStruct) write(w io.Writer) error {
+func (gof *goFile) write(w io.Writer) error {
 	buf := &bytes.Buffer{} // the formatter uses the entire output, so buffer for that
 
-	if _, err := buf.Write([]byte(fmt.Sprintf("package %s\n\n%s\n\n", gen.packageName, disclaimer))); err != nil {
+	if _, err := buf.Write([]byte(fmt.Sprintf("package %s\n\n%s\n\n", gof.packageName, disclaimer))); err != nil {
 		return fmt.Errorf("failed writing struct: %v", err)
 	}
 
-	if gen.fields.IncludeTime() {
+	var includeTime bool
+	for _, s := range gof.structs() {
+		if s.fields.IncludeTime() {
+			includeTime = true
+			break
+		}
+	}
+
+	if includeTime {
 		if _, err := buf.Write([]byte("import \"time\"\n")); err != nil {
-			return fmt.Errorf("failed writing struct: %v", err)
+			return fmt.Errorf("failed writing imports: %v", err)
 		}
 	}
 
-	embeds := strings.Join(gen.embededStructs, "\n")
-	if embeds != "" {
-		embeds += "\n"
-	}
-	if _, err := buf.Write([]byte(fmt.Sprintf("type %s struct {\n%s\n", exportedName(gen.name), embeds))); err != nil {
-		return fmt.Errorf("failed writing struct: %v", err)
-	}
-
-	for _, field := range gen.fields.Sorted() {
-		req := gen.requiredFields[field.jsonName]
-		if err := field.write(buf, "\t", req, gen.args.DescriptionAsStructTag); err != nil {
-			return fmt.Errorf("failed writing field %q: %v", field.name, err)
+	for _, s := range gof.structs() {
+		if _, err := buf.Write([]byte("\n\n")); err != nil {
+			return fmt.Errorf("failed writing struct %q: %v", s.name, err)
 		}
-	}
-
-	if _, err := buf.Write([]byte("}")); err != nil {
-		return fmt.Errorf("failed writing struct: %v", err)
+		if err := s.write(buf); err != nil {
+			return fmt.Errorf("failed writing struct %q: %v", s.name, err)
+		}
 	}
 
 	final, err := format.Source(buf.Bytes())
@@ -185,6 +247,37 @@ func (gen *generatedStruct) write(w io.Writer) error {
 	if _, err := w.Write(final); err != nil {
 		return fmt.Errorf("error writing to io.Writer: %v", err)
 	}
+	return nil
+}
+
+type generatedStruct struct {
+	extractedField
+
+	args           BuildArgs
+	embededStructs []string
+}
+
+// write will write the generated file to the given io.Writer.
+func (gen *generatedStruct) write(w io.Writer) error {
+	embeds := strings.Join(gen.embededStructs, "\n")
+	if embeds != "" {
+		embeds += "\n\n"
+	}
+	if _, err := w.Write([]byte(fmt.Sprintf("type %s struct {\n%s", exportedName(gen.name), embeds))); err != nil {
+		return fmt.Errorf("failed writing struct: %v", err)
+	}
+
+	for _, field := range gen.fields.Sorted() {
+		req := gen.requiredFields[field.jsonName]
+		if err := field.write(w, "\t", req, gen.args.DescriptionAsStructTag); err != nil {
+			return fmt.Errorf("failed writing field %q: %v", field.name, err)
+		}
+	}
+
+	if _, err := w.Write([]byte("}")); err != nil {
+		return fmt.Errorf("failed writing struct: %v", err)
+	}
+
 	return nil
 }
 

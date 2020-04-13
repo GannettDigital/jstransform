@@ -13,7 +13,7 @@ type Complex struct {
 		Path         string  `json:"path" description:"full path to the cropped image file"`
 		RelativePath string  `json:"relativePath" description:"a long"`
 		Width        float64 `json:"width"`
-	} `json:"crops"`
+	} `json:"crops" description:"The available cropped images"`
 	Cutline        string    `json:"cutline,omitempty"`
 	DatePhotoTaken time.Time `json:"datePhotoTaken"`
 	Orientation    string    `json:"orientation"`
@@ -23,11 +23,11 @@ type Complex struct {
 	} `json:"originalSize"`
 	Type string `json:"type" description:"a type"`
 	URL  struct {
-		Absolute string `json:"absolute"`
+		Absolute string `json:"absolute" description:"The full Canonical URL"`
 		Meta     struct {
 			Description string `json:"description"`
 			SiteName    string `json:"siteName"`
 		} `json:"meta,omitempty"`
 		Publish string `json:"publish"`
-	} `json:"URL"`
+	} `json:"URL" description:"Universal Resource Locator"`
 }

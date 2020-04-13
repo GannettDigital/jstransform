@@ -9,7 +9,8 @@ type Complex struct {
 
 	Caption string `json:"caption"`
 	Credit  string `json:"credit"`
-	Crops   []struct {
+	// The available cropped images
+	Crops []struct {
 		Height float64 `json:"height"`
 		Name   string  `json:"name"`
 		// full path to the cropped image file
@@ -28,7 +29,9 @@ type Complex struct {
 	} `json:"originalSize"`
 	// a type
 	Type string `json:"type"`
-	URL  struct {
+	// Universal Resource Locator
+	URL struct {
+		// The full Canonical URL
 		Absolute string `json:"absolute"`
 		Meta     struct {
 			Description string `json:"description"`
