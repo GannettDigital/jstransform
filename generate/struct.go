@@ -26,17 +26,25 @@ type extractedField struct {
 // write outputs the Golang representation of this field to the writer with prefix before each line.
 // It handles inline structs by calling this method recursively adding a new \t to the prefix for each layer.
 // If required is set to false 'omitempty' is added in the JSON struct tag for the field
-func (ef *extractedField) write(w io.Writer, prefix string, required bool) error {
+func (ef *extractedField) write(w io.Writer, prefix string, required, descriptionAsStructTag bool) error {
 	var omitempty string
 	if !required {
 		omitempty = ",omitempty"
 	}
 	jsonTag := fmt.Sprintf(`json:"%s%s"`, ef.jsonName, omitempty)
 	var description string
-	if ef.description != "" {
+	if descriptionAsStructTag && ef.description != "" {
 		description = fmt.Sprintf(`description:"%s"`, strings.Split(ef.description, "\n")[0])
 	}
 	structTag := fmt.Sprintf("`%s`\n", strings.Trim(strings.Join([]string{jsonTag, description}, " "), " "))
+
+	if !descriptionAsStructTag && ef.description != "" {
+		for _, line := range strings.Split(ef.description, "\n") {
+			if _, err := w.Write([]byte(fmt.Sprintf("// %s\n", line))); err != nil {
+				return err
+			}
+		}
+	}
 
 	if ef.jsonType != "object" {
 		_, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s\t%s", prefix, ef.name, goType(ef.jsonType, ef.array), structTag)))
@@ -49,7 +57,7 @@ func (ef *extractedField) write(w io.Writer, prefix string, required bool) error
 
 	for _, field := range ef.fields.Sorted() {
 		fieldRequired := ef.requiredFields[field.jsonName]
-		if err := field.write(w, prefix+"\t", fieldRequired); err != nil {
+		if err := field.write(w, prefix+"\t", fieldRequired, descriptionAsStructTag); err != nil {
 			return fmt.Errorf("failed writing field %q: %v", field.name, err)
 		}
 	}
@@ -100,12 +108,12 @@ func (efs extractedFields) Sorted() []*extractedField {
 type generatedStruct struct {
 	extractedField
 
+	args           BuildArgs
 	packageName    string
 	embededStructs []string
-	fieldNameMap   map[string]string
 }
 
-func newGeneratedStruct(schema *jsonschema.Schema, name, packageName string, embeds []string, fieldNameMap map[string]string) (*generatedStruct, error) {
+func newGeneratedStruct(schema *jsonschema.Schema, name, packageName string, embeds []string, args BuildArgs) (*generatedStruct, error) {
 	required := map[string]bool{}
 	for _, fname := range schema.Required {
 		required[fname] = true
@@ -116,7 +124,7 @@ func newGeneratedStruct(schema *jsonschema.Schema, name, packageName string, emb
 			fields:         make(map[string]*extractedField),
 			requiredFields: required,
 		},
-		fieldNameMap:   fieldNameMap,
+		args:           args,
 		embededStructs: embeds,
 		packageName:    packageName,
 	}
@@ -130,7 +138,7 @@ func newGeneratedStruct(schema *jsonschema.Schema, name, packageName string, emb
 // walkFunc is a jsonschema.WalkFunc which builds the fields in the generatedStructFile as the JSON schema file is
 // walked.
 func (gen *generatedStruct) walkFunc(path string, i jsonschema.Instance) error {
-	if err := addField(gen.fields, splitJSONPath(path), i, gen.fieldNameMap); err != nil {
+	if err := addField(gen.fields, splitJSONPath(path), i, gen.args.FieldNameMap); err != nil {
 		return err
 	}
 	return nil
@@ -160,7 +168,7 @@ func (gen *generatedStruct) write(w io.Writer) error {
 
 	for _, field := range gen.fields.Sorted() {
 		req := gen.requiredFields[field.jsonName]
-		if err := field.write(buf, "\t", req); err != nil {
+		if err := field.write(buf, "\t", req, gen.args.DescriptionAsStructTag); err != nil {
 			return fmt.Errorf("failed writing field %q: %v", field.name, err)
 		}
 	}

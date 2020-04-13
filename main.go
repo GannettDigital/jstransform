@@ -39,6 +39,7 @@ func main() {
 	renameStructs := mapFlags{kv: make(map[string]string)}
 	renameFields := mapFlags{kv: make(map[string]string)}
 
+	descriptionAsStructTag := flag.Bool("descriptionAsStructTag", true, "Include the description as a struct tag, rather than a comment")
 	flag.Var(&renameStructs, "rename", "Override generated name of structure; use '-rename old=new'.")
 	flag.Var(&renameFields, "renameFields", "Override generated name of structure; use '-renameFields old=new'.")
 	genAvro := flag.Bool("avro", false, "generate Avro schema and serialization methods")
@@ -76,13 +77,14 @@ func main() {
 	}
 
 	if err = generate.BuildStructsWithArgs(generate.BuildArgs{
-		SchemaPath:          inputPath,
-		OutputDir:           outputPath,
-		GenerateAvro:        *genAvro,
-		GenerateMessagePack: *genMessagePack,
-		ImportPath:          *importPath,
-		StructNameMap:       renameStructs.kv,
-		FieldNameMap:        renameFields.kv}); err != nil {
+		SchemaPath:             inputPath,
+		OutputDir:              outputPath,
+		GenerateAvro:           *genAvro,
+		GenerateMessagePack:    *genMessagePack,
+		ImportPath:             *importPath,
+		DescriptionAsStructTag: !*descriptionAsStructTag,
+		StructNameMap:          renameStructs.kv,
+		FieldNameMap:           renameFields.kv}); err != nil {
 		fmt.Printf("Golang Struct generation failed: %v\n", err)
 		os.Exit(4)
 	}

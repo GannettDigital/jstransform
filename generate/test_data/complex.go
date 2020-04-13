@@ -10,10 +10,13 @@ type Complex struct {
 	Caption string `json:"caption"`
 	Credit  string `json:"credit"`
 	Crops   []struct {
-		Height       float64 `json:"height"`
-		Name         string  `json:"name"`
-		Path         string  `json:"path" description:"full path to the cropped image file"`
-		RelativePath string  `json:"relativePath" description:"a long"`
+		Height float64 `json:"height"`
+		Name   string  `json:"name"`
+		// full path to the cropped image file
+		Path string `json:"path"`
+		// a long
+		// multi-line description
+		RelativePath string  `json:"relativePath"`
 		Width        float64 `json:"width"`
 	} `json:"crops"`
 	Cutline        string    `json:"cutline,omitempty"`
@@ -23,7 +26,8 @@ type Complex struct {
 		Height float64 `json:"height"`
 		Width  float64 `json:"width"`
 	} `json:"originalSize"`
-	Type string `json:"type" description:"a type"`
+	// a type
+	Type string `json:"type"`
 	URL  struct {
 		Absolute string `json:"absolute"`
 		Meta     struct {

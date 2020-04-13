@@ -31,31 +31,34 @@ const msgpMode = gen.Encode | gen.Decode | gen.Marshal | gen.Unmarshal | gen.Siz
 //   The property names in the JSON tags for these structs remains the same as supplied.
 //   This can be used to accommodate names that are valid JSON but not valid Go identifiers
 type BuildArgs struct {
-	SchemaPath          string
-	OutputDir           string
-	GenerateAvro        bool
-	GenerateMessagePack bool
-	ImportPath          string
-	StructNameMap       map[string]string
-	FieldNameMap        map[string]string
+	SchemaPath             string
+	OutputDir              string
+	DescriptionAsStructTag bool
+	GenerateAvro           bool
+	GenerateMessagePack    bool
+	ImportPath             string
+	StructNameMap          map[string]string
+	FieldNameMap           map[string]string
 }
 
 // BuildStructs is a backward-compatibility wrapper for BuildStructsWithArgs.
 func BuildStructs(schemaPath string, outputDir string, useMessagePack bool) error {
 	return BuildStructsWithArgs(BuildArgs{
-		SchemaPath:          schemaPath,
-		OutputDir:           outputDir,
-		GenerateMessagePack: useMessagePack,
+		SchemaPath:             schemaPath,
+		OutputDir:              outputDir,
+		GenerateMessagePack:    useMessagePack,
+		DescriptionAsStructTag: true,
 	})
 }
 
 // BuildStructsRename is a backward-compatibility wrapper for BuildStructsWithArgs.
 func BuildStructsRename(schemaPath string, outputDir string, useMessagePack bool, nameMap map[string]string) error {
 	return BuildStructsWithArgs(BuildArgs{
-		SchemaPath:          schemaPath,
-		OutputDir:           outputDir,
-		GenerateMessagePack: useMessagePack,
-		StructNameMap:       nameMap,
+		SchemaPath:             schemaPath,
+		OutputDir:              outputDir,
+		GenerateMessagePack:    useMessagePack,
+		StructNameMap:          nameMap,
+		DescriptionAsStructTag: true,
 	})
 }
 
@@ -108,7 +111,7 @@ func BuildStructsWithArgs(args BuildArgs) error {
 		}
 		embeds = append(embeds, name)
 
-		path, err := buildStructFile(args.SchemaPath, allOfPath, name, packageName, nil, args.OutputDir, args.FieldNameMap)
+		path, err := buildStructFile(allOfPath, name, packageName, nil, args)
 		if err != nil {
 			return fmt.Errorf("failed to build struct file for %q: %v", name, err)
 		}
@@ -125,7 +128,7 @@ func BuildStructsWithArgs(args BuildArgs) error {
 			name = newName
 		}
 
-		path, err := buildStructFile(args.SchemaPath, oneOfPath, name, packageName, embeds, args.OutputDir, args.FieldNameMap)
+		path, err := buildStructFile(oneOfPath, name, packageName, embeds, args)
 		if err != nil {
 			return fmt.Errorf("failed to build struct file for %q: %v", name, err)
 		}
@@ -184,21 +187,21 @@ func buildMessagePackFile(outputDir string, mode gen.Method) error {
 }
 
 // buildStructFile generates the specified struct file.
-func buildStructFile(schemaPath, childPath, name, packageName string, embeds []string, outputDir string, fieldNameMap map[string]string) (string, error) {
+func buildStructFile(childPath, name, packageName string, embeds []string, args BuildArgs) (string, error) {
 	if !filepath.IsAbs(childPath) {
-		childPath = filepath.Join(filepath.Dir(schemaPath), childPath)
+		childPath = filepath.Join(filepath.Dir(args.SchemaPath), childPath)
 	}
 	schema, err := jsonschema.SchemaFromFile(childPath, name)
 	if err != nil {
 		return "", err
 	}
 
-	generated, err := newGeneratedStruct(schema, name, packageName, embeds, fieldNameMap)
+	generated, err := newGeneratedStruct(schema, name, packageName, embeds, args)
 	if err != nil {
 		return "", fmt.Errorf("failed to build generated struct: %v", err)
 	}
 
-	outPath := filepath.Join(outputDir, strings.Split(filepath.Base(childPath), ".")[0]+".go")
+	outPath := filepath.Join(args.OutputDir, strings.Split(filepath.Base(childPath), ".")[0]+".go")
 	gfile, err := os.Create(outPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to open file %q: %v", outPath, err)
