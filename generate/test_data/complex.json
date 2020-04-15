@@ -20,6 +20,7 @@
         },
         "crops": {
             "type": "array",
+            "description": "The available cropped images",
             "items": {
                 "type": "object",
                 "properties": {
@@ -184,6 +185,7 @@
         },
         "URL": {
             "type": "object",
+            "description": "Universal Resource Locator",
             "properties": {
                 "publish": {
                     "type": "string",
@@ -209,6 +211,7 @@
                 },
                 "absolute": {
                     "type": "string",
+                    "description": "The full Canonical URL",
                     "transform": {
                         "cumulo": {
                             "from": [

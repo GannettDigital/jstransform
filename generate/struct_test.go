@@ -239,11 +239,30 @@ func TestGeneratedStruct(t *testing.T) {
 		schemaPath             string
 		packageName            string
 		oneOfType              string
-		renameFieldMap         map[string]string
 		descriptionAsStructTag bool
+		noNestedStruct         bool
+		renameFieldMap         map[string]string
 		wantFilePath           string
 		wantWriteError         bool
 	}{
+		{
+			description:            "Simple schema - no nest",
+			schemaPath:             "test_data/test_schema.json",
+			packageName:            "nonestTest",
+			oneOfType:              "simple",
+			descriptionAsStructTag: true,
+			noNestedStruct:         true,
+			wantFilePath:           "test_data/nonest/simple.go",
+		},
+		{
+			description:    "Complex schema - no nest",
+			embeds:         []string{"Simple"},
+			schemaPath:     "test_data/test_schema.json",
+			packageName:    "nonestTest",
+			noNestedStruct: true,
+			oneOfType:      "complex",
+			wantFilePath:   "test_data/nonest/complex.go",
+		},
 		{
 			description:            "Simple schema",
 			schemaPath:             "test_data/test_schema.json",
@@ -301,10 +320,12 @@ func TestGeneratedStruct(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Test %q - SchemaFromFile failed: %v", test.description, err)
 		}
-		g, err := newGeneratedStruct(schema, test.oneOfType, test.packageName, test.embeds, BuildArgs{
-			FieldNameMap:           test.renameFieldMap,
+		bArgs := BuildArgs{
 			DescriptionAsStructTag: test.descriptionAsStructTag,
-		})
+			FieldNameMap:           test.renameFieldMap,
+			NoNestedStructs:        test.noNestedStruct,
+		}
+		g, err := newGeneratedGoFile(schema, test.oneOfType, test.packageName, test.embeds, bArgs)
 		if err != nil {
 			t.Fatalf("Test %q - failed: %v", test.description, err)
 		}
