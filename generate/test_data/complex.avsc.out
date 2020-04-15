@@ -91,13 +91,11 @@
             {
               "name": "path",
               "namespace": "crops",
-              "doc": "full path to the cropped image file",
               "type": "string"
             },
             {
               "name": "relativePath",
               "namespace": "crops",
-              "doc": "a long",
               "type": "string"
             },
             {
@@ -149,7 +147,6 @@
     },
     {
       "name": "type",
-      "doc": "a type",
       "type": "string"
     },
     {

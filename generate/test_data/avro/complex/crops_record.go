@@ -11,13 +11,9 @@ import (
 )
 
 type Crops_record struct {
-	Height float64
-	Name   string
-
-	// full path to the cropped image file
-	Path string
-
-	// a long
+	Height       float64
+	Name         string
+	Path         string
 	RelativePath string
 	Width        float64
 }
@@ -44,7 +40,7 @@ func NewCrops_record() *Crops_record {
 }
 
 func (r *Crops_record) Schema() string {
-	return "{\"fields\":[{\"name\":\"height\",\"namespace\":\"crops\",\"type\":\"double\"},{\"name\":\"name\",\"namespace\":\"crops\",\"type\":\"string\"},{\"doc\":\"full path to the cropped image file\",\"name\":\"path\",\"namespace\":\"crops\",\"type\":\"string\"},{\"doc\":\"a long\",\"name\":\"relativePath\",\"namespace\":\"crops\",\"type\":\"string\"},{\"name\":\"width\",\"namespace\":\"crops\",\"type\":\"double\"}],\"name\":\"crops_record\",\"namespace\":\"crops\",\"type\":\"record\"}"
+	return "{\"fields\":[{\"name\":\"height\",\"namespace\":\"crops\",\"type\":\"double\"},{\"name\":\"name\",\"namespace\":\"crops\",\"type\":\"string\"},{\"name\":\"path\",\"namespace\":\"crops\",\"type\":\"string\"},{\"name\":\"relativePath\",\"namespace\":\"crops\",\"type\":\"string\"},{\"name\":\"width\",\"namespace\":\"crops\",\"type\":\"double\"}],\"name\":\"crops_record\",\"namespace\":\"crops\",\"type\":\"record\"}"
 }
 
 func (r *Crops_record) SchemaName() string {

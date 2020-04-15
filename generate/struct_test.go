@@ -173,16 +173,28 @@ func TestExtractedField_Write(t *testing.T) {
 	a := &extractedField{name: "A", jsonName: "a", jsonType: "string", array: true}
 	b := &extractedField{name: "B", jsonName: "b", jsonType: "boolean", array: false}
 	tests := []struct {
-		description string
-		ef          *extractedField
-		prefix      string
-		required    bool
-		want        string
+		description            string
+		ef                     *extractedField
+		prefix                 string
+		descriptionAsStructTag bool
+		required               bool
+		want                   string
 	}{
 		{
 			description: "Write scalr with no prefix",
 			ef:          &extractedField{name: "Field", jsonName: "field", jsonType: "number"},
 			want:        "Field\tfloat64\t`json:\"field,omitempty\"`\n",
+		},
+		{
+			description: "Write scalr with descrition as comment",
+			ef:          &extractedField{name: "Field", jsonName: "field", jsonType: "number", description: "I expect a better description"},
+			want:        "// I expect a better description\nField\tfloat64\t`json:\"field,omitempty\"`\n",
+		},
+		{
+			description:            "Write scalr with descrition as struct tag",
+			ef:                     &extractedField{name: "Field", jsonName: "field", jsonType: "number", description: "I expect a better description"},
+			descriptionAsStructTag: true,
+			want:                   "Field\tfloat64\t`json:\"field,omitempty\" description:\"I expect a better description\"`\n",
 		},
 		{
 			description: "Write array scalr with prefix, required",
@@ -211,7 +223,7 @@ func TestExtractedField_Write(t *testing.T) {
 
 	for _, test := range tests {
 		buf := &bytes.Buffer{}
-		if err := test.ef.write(buf, test.prefix, test.required); err != nil {
+		if err := test.ef.write(buf, test.prefix, test.required, test.descriptionAsStructTag); err != nil {
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
 		}
 		if got, want := string(buf.Bytes()), test.want; got != want {
@@ -222,21 +234,42 @@ func TestExtractedField_Write(t *testing.T) {
 
 func TestGeneratedStruct(t *testing.T) {
 	tests := []struct {
-		description    string
-		embeds         []string
-		schemaPath     string
-		packageName    string
-		oneOfType      string
-		renameFieldMap map[string]string
-		wantFilePath   string
-		wantWriteError bool
+		description            string
+		embeds                 []string
+		schemaPath             string
+		packageName            string
+		oneOfType              string
+		descriptionAsStructTag bool
+		noNestedStruct         bool
+		renameFieldMap         map[string]string
+		wantFilePath           string
+		wantWriteError         bool
 	}{
 		{
-			description:  "Simple schema",
-			schemaPath:   "test_data/test_schema.json",
-			packageName:  "test_data",
-			oneOfType:    "simple",
-			wantFilePath: "test_data/simple.go",
+			description:            "Simple schema - no nest",
+			schemaPath:             "test_data/test_schema.json",
+			packageName:            "nonestTest",
+			oneOfType:              "simple",
+			descriptionAsStructTag: true,
+			noNestedStruct:         true,
+			wantFilePath:           "test_data/nonest/simple.go",
+		},
+		{
+			description:    "Complex schema - no nest",
+			embeds:         []string{"Simple"},
+			schemaPath:     "test_data/test_schema.json",
+			packageName:    "nonestTest",
+			noNestedStruct: true,
+			oneOfType:      "complex",
+			wantFilePath:   "test_data/nonest/complex.go",
+		},
+		{
+			description:            "Simple schema",
+			schemaPath:             "test_data/test_schema.json",
+			packageName:            "test_data",
+			oneOfType:              "simple",
+			descriptionAsStructTag: true,
+			wantFilePath:           "test_data/simple.go",
 		},
 		{
 			description: "Simple schema with field rename",
@@ -250,17 +283,19 @@ func TestGeneratedStruct(t *testing.T) {
 			wantFilePath: "test_data/simple.go.out-rename-fields",
 		},
 		{
-			description:    "valid schema with invalid go field names should fail",
-			schemaPath:     "test_data/needs_field_rename.json",
-			packageName:    "test_data",
-			oneOfType:      "rename",
-			wantWriteError: true,
+			description:            "valid schema with invalid go field names should fail",
+			schemaPath:             "test_data/needs_field_rename.json",
+			packageName:            "test_data",
+			oneOfType:              "rename",
+			descriptionAsStructTag: true,
+			wantWriteError:         true,
 		},
 		{
-			description: "valid schema with invalid go field names, renamed to work",
-			schemaPath:  "test_data/needs_field_rename.json",
-			packageName: "test_data",
-			oneOfType:   "rename",
+			description:            "valid schema with invalid go field names, renamed to work",
+			schemaPath:             "test_data/needs_field_rename.json",
+			packageName:            "test_data",
+			oneOfType:              "rename",
+			descriptionAsStructTag: true,
 			renameFieldMap: map[string]string{
 				"1_1":  "OneToOne",
 				"3_4":  "ThreeToFour",
@@ -285,7 +320,12 @@ func TestGeneratedStruct(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Test %q - SchemaFromFile failed: %v", test.description, err)
 		}
-		g, err := newGeneratedStruct(schema, test.oneOfType, test.packageName, test.embeds, test.renameFieldMap)
+		bArgs := BuildArgs{
+			DescriptionAsStructTag: test.descriptionAsStructTag,
+			FieldNameMap:           test.renameFieldMap,
+			NoNestedStructs:        test.noNestedStruct,
+		}
+		g, err := newGeneratedGoFile(schema, test.oneOfType, test.packageName, test.embeds, bArgs)
 		if err != nil {
 			t.Fatalf("Test %q - failed: %v", test.description, err)
 		}

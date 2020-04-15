@@ -65,8 +65,8 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 	Crops_recordSlice := func(in []struct {
 		Height       float64 `json:"height"`
 		Name         string  `json:"name"`
-		Path         string  `json:"path" description:"full path to the cropped image file"`
-		RelativePath string  `json:"relativePath" description:"a long"`
+		Path         string  `json:"path"`
+		RelativePath string  `json:"relativePath"`
 		Width        float64 `json:"width"`
 	}) []*complex.Crops_record {
 		converted := make([]*complex.Crops_record, len(in))
