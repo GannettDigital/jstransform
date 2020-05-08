@@ -13,6 +13,7 @@ import (
 	"github.com/antchfx/xmlquery"
 
 	"github.com/GannettDigital/jsonparser"
+
 	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
@@ -38,24 +39,35 @@ type Transformer struct {
 	transformIdentifier string // Used to select the proper transform Instructions
 	root                instanceTransformer
 	format              inputFormat
+	validate            bool
 }
 
 // NewTransformer returns a Transformer using the schema given.
 // The transformIdentifier is used to select the appropriate transform section from the schema.
 // It expects the transforms to be performed on JSON data
 func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Transformer, error) {
-	return newTransformer(schema, tranformIdentifier, jsonInput)
+	return newTransformer(schema, tranformIdentifier, jsonInput, true)
+}
+
+// NewTransformerNoValidate is like NewTransformer but doesn't perform JSON schema validation after transforming
+func NewTransformerNoValidate(schema *jsonschema.Schema, tranformIdentifier string) (*Transformer, error) {
+	return newTransformer(schema, tranformIdentifier, jsonInput, false)
 }
 
 // NewXMLTransformer returns a Transformer using the schema given.
 // The transformIdentifier is used to select the appropriate transform section from the schema.
 // It expects the transforms to be performed on XML data
 func NewXMLTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Transformer, error) {
-	return newTransformer(schema, tranformIdentifier, xmlInput)
+	return newTransformer(schema, tranformIdentifier, xmlInput, true)
 }
 
-func newTransformer(schema *jsonschema.Schema, tranformIdentifier string, format inputFormat) (*Transformer, error) {
-	tr := &Transformer{schema: schema, transformIdentifier: tranformIdentifier, format: format}
+// NewXMLTransformerNoValidate is like NewXMLTransformer but doesn't perform JSON schema validation after transforming
+func NewXMLTransformerNoValidate(schema *jsonschema.Schema, tranformIdentifier string) (*Transformer, error) {
+	return newTransformer(schema, tranformIdentifier, jsonInput, false)
+}
+
+func newTransformer(schema *jsonschema.Schema, tranformIdentifier string, format inputFormat, validate bool) (*Transformer, error) {
+	tr := &Transformer{schema: schema, transformIdentifier: tranformIdentifier, format: format, validate: validate}
 	emptyJSON := []byte(`{}`)
 	var err error
 	if schema.Properties != nil {
@@ -112,12 +124,14 @@ func (tr *Transformer) jsonTransform(raw json.RawMessage) (json.RawMessage, erro
 		return nil, fmt.Errorf("failed to JSON marsal transformed data: %v", err)
 	}
 
-	valid, err := tr.schema.Validate(out)
-	if err != nil {
-		return nil, fmt.Errorf("input successfully transformed but did not match schema: %v", err)
-	}
-	if !valid {
-		return nil, errors.New("schema validation of the transformed result reports invalid")
+	if tr.validate {
+		valid, err := tr.schema.Validate(out)
+		if err != nil {
+			return nil, fmt.Errorf("input successfully transformed but did not match schema: %v", err)
+		}
+		if !valid {
+			return nil, errors.New("schema validation of the transformed result reports invalid")
+		}
 	}
 
 	return out, nil
