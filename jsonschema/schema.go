@@ -35,7 +35,7 @@ type Instance struct {
 type Schema struct {
 	Instance
 
-	Validator Validator
+	Validator Validator `json:"-"`
 }
 
 // Validate will check that the given json is validate according the schema.
