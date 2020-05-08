@@ -35,12 +35,12 @@ type Instance struct {
 type Schema struct {
 	Instance
 
-	validator Validator
+	Validator Validator `json:"-"`
 }
 
 // Validate will check that the given json is validate according the schema.
 func (s *Schema) Validate(raw json.RawMessage) (bool, error) {
-	return s.validator.Validate(raw)
+	return s.Validator.Validate(raw)
 }
 
 // SchemaFromFile parses a file at the given path and returns a schema based on its contents.
@@ -75,7 +75,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 
 	s := Schema{
 		Instance:  sj,
-		validator: v,
+		Validator: v,
 	}
 
 	// TODO this behavior is not spec compatible, according to the spec it is possible to have multiple allOf instances
