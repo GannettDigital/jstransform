@@ -37,6 +37,12 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 			wantPath:    "./test_data/complex.avsc.out",
 		},
 		{
+			description: "with embedded and nested structs, fields with descriptions",
+			name:        "Complex",
+			goPath:      "./test_data/nonest/complex.go",
+			wantPath:    "./test_data/complex.avsc.nonest-out",
+		},
+		{
 			description: "Variations on Arrays",
 			name:        "Arrays",
 			goPath:      "./test_data/arrays.go",
