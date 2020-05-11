@@ -11,18 +11,28 @@ import (
 	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
+const (
+	imageSchemaPath       = "./test_data/image.json"
+	arraySchemaPath       = "./test_data/array-transforms.json"
+	doubleArraySchemaPath = "./test_data/double-array.json"
+	operationsSchemaPath  = "./test_data/operations.json"
+	dateTimesSchemaPath   = "./test_data/date-times.json"
+	frontSchemaPath       = "./test_data/front.json"
+)
+
 // used for the Transformer test and benchmark
 var (
-	imageSchema, _           = jsonschema.SchemaFromFile("./test_data/image.json", "")
-	arrayTransformsSchema, _ = jsonschema.SchemaFromFile("./test_data/array-transforms.json", "")
-	doublearraySchema, _     = jsonschema.SchemaFromFile("./test_data/double-array.json", "")
-	operationsSchema, _      = jsonschema.SchemaFromFile("./test_data/operations.json", "")
-	dateTimesSchema, _       = jsonschema.SchemaFromFile("./test_data/date-times.json", "")
-	frontSchema, _           = jsonschema.SchemaFromFile("./test_data/front.json", "")
+	imageSchema, _           = jsonschema.SchemaFromFile(imageSchemaPath, "")
+	arrayTransformsSchema, _ = jsonschema.SchemaFromFile(arraySchemaPath, "")
+	doubleArraySchema, _     = jsonschema.SchemaFromFile(doubleArraySchemaPath, "")
+	operationsSchema, _      = jsonschema.SchemaFromFile(operationsSchemaPath, "")
+	dateTimesSchema, _       = jsonschema.SchemaFromFile(dateTimesSchemaPath, "")
+	frontSchema, _           = jsonschema.SchemaFromFile(frontSchemaPath, "")
 
 	transformerTests = []struct {
 		description         string
 		schema              *jsonschema.Schema
+		schemaPath          string
 		transformIdentifier string
 		in                  json.RawMessage
 		want                json.RawMessage
@@ -31,6 +41,7 @@ var (
 		{
 			description:         "Test all operations",
 			schema:              operationsSchema,
+			schemaPath:          operationsSchemaPath,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
                       {
@@ -70,6 +81,7 @@ var (
 		{
 			description:         "Use basic transforms, copy from input and default to build result",
 			schema:              imageSchema,
+			schemaPath:          imageSchemaPath,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
                           {
@@ -97,6 +109,7 @@ var (
 		{
 			description:         "Input too simple, fails validation",
 			schema:              imageSchema,
+			schemaPath:          imageSchemaPath,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
                           {
@@ -119,6 +132,7 @@ var (
 		{
 			description:         "Array transforms, tests arrays with string type and with a single object type",
 			schema:              arrayTransformsSchema,
+			schemaPath:          arraySchemaPath,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
                           {
@@ -145,6 +159,7 @@ var (
 		{
 			description:         "Test empty non-required object",
 			schema:              imageSchema,
+			schemaPath:          imageSchemaPath,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
                       {
@@ -170,6 +185,7 @@ var (
 		{
 			description:         "Test empty non-required array",
 			schema:              arrayTransformsSchema,
+			schemaPath:          arraySchemaPath,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
                       {
@@ -191,7 +207,8 @@ var (
 		},
 		{
 			description:         "Test nested arrays",
-			schema:              doublearraySchema,
+			schema:              doubleArraySchema,
+			schemaPath:          doubleArraySchemaPath,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
               {
@@ -228,6 +245,7 @@ var (
 		{
 			description:         "Test format: date-time strings",
 			schema:              dateTimesSchema,
+			schemaPath:          dateTimesSchemaPath,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
               {
@@ -243,6 +261,7 @@ var (
 		{
 			description:         "Test special characters",
 			schema:              frontSchema,
+			schemaPath:          frontSchemaPath,
 			transformIdentifier: "frontInput",
 			in: json.RawMessage(`
                       {
@@ -259,6 +278,7 @@ var (
 		{
 			description:         "Test duplicate attributes",
 			schema:              arrayTransformsSchema,
+			schemaPath:          arraySchemaPath,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
                       {
@@ -278,6 +298,7 @@ var (
 		{
 			description:         "Test Width number error type",
 			schema:              arrayTransformsSchema,
+			schemaPath:          arraySchemaPath,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
                       {
@@ -298,6 +319,7 @@ var (
 		{
 			description:         "Test split with pipe delimiter",
 			schema:              operationsSchema,
+			schemaPath:          operationsSchemaPath,
 			transformIdentifier: "cumulo",
 			in: json.RawMessage(`
                        {
@@ -649,5 +671,27 @@ func BenchmarkSaveInTree(b *testing.B) {
 				b.Fatal(err)
 			}
 		}
+	}
+}
+
+func BenchmarkSchemaTransformer(b *testing.B) {
+	for _, test := range transformerTests {
+		if test.wantErr {
+			continue
+		}
+
+		tr, err := NewSchemaVersionTransformer(test.schemaPath, test.transformIdentifier)
+		if err != nil {
+			b.Fatalf("Test %q - failed to initialize transformer: %v", test.description, err)
+		}
+
+		b.Run(test.description, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_, err := tr.Transform(test.in)
+				if err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
 	}
 }

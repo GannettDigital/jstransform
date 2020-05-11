@@ -6,7 +6,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -19,9 +21,13 @@ import (
 // inputFormat denotes the type of transform to perfrom, the options are 'JSON' or 'XML'
 type inputFormat string
 
+// It is intended that this value be compiled in at binary build time for releases.
+var SchemaVersion = defaultSchemaVersion
+
 const (
-	jsonInput = inputFormat("JSON")
-	xmlInput  = inputFormat("XML")
+	defaultSchemaVersion = "0.0.0"
+	jsonInput            = inputFormat("JSON")
+	xmlInput             = inputFormat("XML")
 )
 
 // JSONTransformer - a type implemented by the jstransform.Transformer
@@ -148,6 +154,47 @@ func (tr *Transformer) xmlTransform(raw []byte) ([]byte, error) {
 	}
 
 	return out, nil
+}
+
+// VersionTransformer adds support for schema versions to transforms
+type VersionTransformer struct {
+	transformer *Transformer
+}
+
+// NewSchemaVersionTransformer initializes a transformer, erroring on problems with the JSON schema.
+func NewSchemaVersionTransformer(schemaPath, transformIdentifier string) (*VersionTransformer, error) {
+	schema, err := jsonschema.SchemaFromFile(schemaPath, "")
+	if err != nil {
+		return nil, fmt.Errorf("unable to load schema from %q: %v", schemaPath, err)
+	}
+
+	jtr, err := NewTransformer(schema, transformIdentifier)
+	if err != nil {
+		return nil, fmt.Errorf("unable to make transformer for schema %q: %v", schemaPath, err)
+	}
+
+	tr := VersionTransformer{transformer: jtr}
+	return &tr, nil
+}
+
+// Transform adds the schema version to the data before applying further transforms.
+func (tr *VersionTransformer) Transform(raw json.RawMessage) (json.RawMessage, error) {
+	data, err := setSchemaVersion(raw)
+	if err != nil {
+		return nil, err
+	}
+
+	return tr.transformer.Transform(data)
+}
+
+// setSchemaVersion sets the `schemaVersion` field to the SchemaVersion value in the raw json
+func setSchemaVersion(raw []byte) ([]byte, error) {
+	if flag.Lookup("test.v") == nil && os.Getenv("ENVIRONMENT") != "integration" {
+		if SchemaVersion == defaultSchemaVersion {
+			panic("Missing override of model.SchemaVersion value via build flag")
+		}
+	}
+	return jsonparser.Set(raw, []byte(`"`+SchemaVersion+`"`), "schemaVersion")
 }
 
 // findParent walks the instanceTransformer tree to find the parent of the given path

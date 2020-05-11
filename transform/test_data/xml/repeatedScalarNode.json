@@ -12,7 +12,11 @@
             {
               "xmlPath": "/onl:story/onl:content/onl:paragraphs/onl:paragraph/onl:body"
             }
-          ]
+          ],
+          "method": "concatenate",
+          "methodOptions": {
+            "concatenateDelimiter": "\n"
+          }
         }
       }
     },
