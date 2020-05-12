@@ -25,6 +25,12 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 			wantPath:    "./test_data/simple.avsc.out",
 		},
 		{
+			description: "simple go struct - no nest",
+			name:        "Simple",
+			goPath:      "./test_data/nonest/simple.go",
+			wantPath:    "./test_data/simple.avsc.out",
+		},
+		{
 			description: "fields with repeated field names",
 			name:        "Repeats",
 			goPath:      "./test_data/repeats.go",
@@ -40,7 +46,7 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 			description: "with embedded and nested structs, fields with descriptions",
 			name:        "Complex",
 			goPath:      "./test_data/nonest/complex.go",
-			wantPath:    "./test_data/complex.avsc.nonest-out",
+			wantPath:    "./test_data/complex.avsc.out",
 		},
 		{
 			description: "Variations on Arrays",

@@ -369,8 +369,12 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 			typeName = "bytes"
 		case "string":
 			typeName = "string"
-		default:
-			typeName = "unknown"
+		default: // Another go type
+			n, err := parseGoStruct(t.Name, cfg.dir)
+			if err != nil {
+				return "unknown"
+			}
+			return writeNestedStruct(cfg, n, name, nullable)
 		}
 		if nullable {
 			if typeName == "boolean" {
@@ -388,18 +392,7 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 			return fmt.Sprintf(`{"type":"array","items":{"type": %s}}`, itemType)
 		}
 	case *ast.StructType:
-		// recursively handle this struct
-		buf := &bytes.Buffer{}
-		newcfg := cfg
-		newcfg.namespace = append(cfg.namespace, name)
-		newcfg.writer = buf
-		newcfg.excludeFields = nil
-		// nested structs get _struct appended on their name
-		astutil.Apply(t, writeAvroStruct(newcfg, name+"_record", ""), nil)
-		if nullable {
-			return fmt.Sprintf(`["null",{%s]}]`, buf.String())
-		}
-		return fmt.Sprintf("{%s]}", buf.String())
+		return writeNestedStruct(cfg, t, name, nullable)
 	case *ast.SelectorExpr:
 		if t.Sel.Name == "Time" {
 			if nullable {
@@ -412,5 +405,21 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 		// This should break the Avro schema but with some indication as to why it failed
 		return fmt.Sprintf(`unsupported type %q`, astutil.NodeDescription(t))
 	}
+}
 
+// writeNestedStruct is a helper for convertToAvroType that handles common steps of writing a nested struct.
+// It is intended to work for either a named or anonymous nested struct.
+// Structs within structs will run recursively.
+func writeNestedStruct(cfg avroConfig, n ast.Node, name string, nullable bool) string {
+	buf := &bytes.Buffer{}
+	newcfg := cfg
+	newcfg.namespace = append(cfg.namespace, name)
+	newcfg.writer = buf
+	newcfg.excludeFields = nil
+	// nested structs get _struct appended on their name
+	astutil.Apply(n, writeAvroStruct(newcfg, name+"_record", ""), nil)
+	if nullable {
+		return fmt.Sprintf(`["null",{%s]}]`, buf.String())
+	}
+	return fmt.Sprintf("{%s]}", buf.String())
 }
