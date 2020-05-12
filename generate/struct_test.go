@@ -248,7 +248,7 @@ func TestGeneratedStruct(t *testing.T) {
 		{
 			description:            "Simple schema - no nest",
 			schemaPath:             "test_data/test_schema.json",
-			packageName:            "nonestTest",
+			packageName:            "nonest",
 			oneOfType:              "simple",
 			descriptionAsStructTag: true,
 			noNestedStruct:         true,
@@ -258,7 +258,7 @@ func TestGeneratedStruct(t *testing.T) {
 			description:    "Complex schema - no nest",
 			embeds:         []string{"Simple"},
 			schemaPath:     "test_data/test_schema.json",
-			packageName:    "nonestTest",
+			packageName:    "nonest",
 			noNestedStruct: true,
 			oneOfType:      "complex",
 			wantFilePath:   "test_data/nonest/complex.go",

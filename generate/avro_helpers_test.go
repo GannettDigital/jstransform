@@ -11,6 +11,7 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 		description string
 		name        string
 		filename    string
+		importPath  string
 		wantPath    string
 	}{
 		{
@@ -18,6 +19,13 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 			name:        "Simple",
 			filename:    "simple.go",
 			wantPath:    "simple_avro.go",
+		},
+		{
+			description: "simple avro file with named nested structs",
+			name:        "Simple",
+			filename:    "nonest/simple.go",
+			importPath:  "github.com/GannettDigital/jstransform/generate/test_data/nonest",
+			wantPath:    "nonest/simple_avro.go",
 		},
 		{
 			description: "fields with repeated field names",
@@ -30,6 +38,13 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 			name:        "Complex",
 			filename:    "complex.go",
 			wantPath:    "complex_avro.go",
+		},
+		{
+			description: "complex avro file with named nested structs",
+			name:        "Complex",
+			filename:    "nonest/complex.go",
+			importPath:  "github.com/GannettDigital/jstransform/generate/test_data/nonest",
+			wantPath:    "nonest/complex_avro.go",
 		},
 		{
 			description: "variations on Arrays",
@@ -47,8 +62,12 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 	}
 
 	testPath := "./test_data"
-	testImportPath := "github.com/GannettDigital/jstransform/generate/test_data"
+	defaultImportPath := "github.com/GannettDigital/jstransform/generate/test_data"
 	for _, test := range tests {
+		testImportPath := defaultImportPath
+		if test.importPath != "" {
+			testImportPath = test.importPath
+		}
 		if err := buildAvroHelperFunctions(test.name, filepath.Join(testPath, test.filename), testImportPath); err != nil {
 			t.Errorf("Test %q - failed: %v", test.description, err)
 		}
