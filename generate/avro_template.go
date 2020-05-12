@@ -12,7 +12,7 @@ import (
 	"github.com/GannettDigital/jstransform/generate"
     "{{ .avroImport }}"
 
-	"github.com/actgardner/gogen-avro/container"
+	"github.com/actgardner/gogen-avro/v7/container"
 )
 
 // WriteAvroCF writes an Avro Containter File to the given io.Writer using snappy compression for the data.
@@ -26,7 +26,7 @@ func (z *{{ .name }}) WriteAvroCF(writer io.Writer, writeTime time.Time) error {
 	if writeTime.IsZero() {
 		writeTime = time.Now()
 	}
-	avroWriter, err := {{ .avroPackage }}.New{{ .name }}Writer(writer, container.Snappy, 1)
+	avroWriter, err := container.NewWriter(writer, container.Snappy, 1, {{ .avroPackage }}.New{{ .name }}().Schema())
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func (z *{{ .name }}) WriteAvroDeletedCF(writer io.Writer, writeTime time.Time) 
 	if writeTime.IsZero() {
 		writeTime = time.Now()
 	}
-	avroWriter, err := {{ .avroPackage }}.New{{ .name }}Writer(writer, container.Snappy, 1)
+	avroWriter, err := container.NewWriter(writer, container.Snappy, 1, {{ .avroPackage }}.New{{ .name }}().Schema())
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func {{ .name }}BulkAvroWriter(writer io.Writer, writeTime time.Time, request <-
 	go func() {
 		defer close(errors)
 
-		avroWriter, err := {{ .avroPackage }}.New{{ .name }}Writer(writer, container.Snappy, 1)
+		avroWriter, err := container.NewWriter(writer, container.Snappy, 1, {{ .avroPackage }}.New{{ .name }}().Schema())
 		if err != nil {
 			errors <- err
 			return
@@ -123,6 +123,8 @@ import (
 
 	"github.com/GannettDigital/jstransform/generate"
     "{{ .avroImport }}"
+
+	"github.com/actgardner/gogen-avro/v7/container"
 )
 
 func Test{{ .name }}_WriteAvroCF(t *testing.T) {
@@ -139,14 +141,14 @@ func Test{{ .name }}_WriteAvroCF(t *testing.T) {
 		t.Fatalf("Unexpected error writing to a CF file: %v", err)
 	}
 
-	ocfReader, err := {{ .avroPackage }}.New{{ .name }}Reader(buf)
+	containerReader, err := container.NewReader(buf)
 	if err != nil {
-		t.Fatalf("Error creating OCF file reader: %v\n", err)
+		t.Fatalf("Failed containers from OCF file: %v\n", err)
 	}
 
-	read, err := ocfReader.Read()
+	read, err := {{ .avroPackage}}.Deserialize{{ .name }}FromSchema(containerReader, string(containerReader.AvroContainerSchema()))
 	if err != nil {
-		t.Fatalf("Failed reading from OCF file reader: %v\n", err)
+		t.Fatalf("Failed deserializing OCF file: %v\n", err)
 	}
 
 	if got, want := read.AvroWriteTime, generate.AvroTime(now); got != want {
@@ -172,14 +174,14 @@ func Test{{ .name }}_WriteAvroDeletedCF(t *testing.T) {
 		t.Fatalf("Unexpected error writing to a CF file: %v", err)
 	}
 
-	ocfReader, err := {{ .avroPackage }}.New{{ .name }}Reader(buf)
+	containerReader, err := container.NewReader(buf)
 	if err != nil {
-		t.Fatalf("Error creating OCF file reader: %v\n", err)
+		t.Fatalf("Failed containers from OCF file: %v\n", err)
 	}
 
-	read, err := ocfReader.Read()
+	read, err := {{ .avroPackage}}.Deserialize{{ .name }}FromSchema(containerReader, string(containerReader.AvroContainerSchema()))
 	if err != nil {
-		t.Fatalf("Failed reading from OCF file reader: %v\n", err)
+		t.Fatalf("Failed deserializing OCF file: %v\n", err)
 	}
 
 	if got, want := read.AvroWriteTime, generate.AvroTime(now); got != want {

@@ -9,6 +9,8 @@ import (
 
 	"github.com/GannettDigital/jstransform/generate"
 	"github.com/GannettDigital/jstransform/generate/test_data/avro/times"
+
+	"github.com/actgardner/gogen-avro/v7/container"
 )
 
 func TestTimes_WriteAvroCF(t *testing.T) {
@@ -25,14 +27,14 @@ func TestTimes_WriteAvroCF(t *testing.T) {
 		t.Fatalf("Unexpected error writing to a CF file: %v", err)
 	}
 
-	ocfReader, err := times.NewTimesReader(buf)
+	containerReader, err := container.NewReader(buf)
 	if err != nil {
-		t.Fatalf("Error creating OCF file reader: %v\n", err)
+		t.Fatalf("Failed containers from OCF file: %v\n", err)
 	}
 
-	read, err := ocfReader.Read()
+	read, err := times.DeserializeTimesFromSchema(containerReader, string(containerReader.AvroContainerSchema()))
 	if err != nil {
-		t.Fatalf("Failed reading from OCF file reader: %v\n", err)
+		t.Fatalf("Failed deserializing OCF file: %v\n", err)
 	}
 
 	if got, want := read.AvroWriteTime, generate.AvroTime(now); got != want {
@@ -58,14 +60,14 @@ func TestTimes_WriteAvroDeletedCF(t *testing.T) {
 		t.Fatalf("Unexpected error writing to a CF file: %v", err)
 	}
 
-	ocfReader, err := times.NewTimesReader(buf)
+	containerReader, err := container.NewReader(buf)
 	if err != nil {
-		t.Fatalf("Error creating OCF file reader: %v\n", err)
+		t.Fatalf("Failed containers from OCF file: %v\n", err)
 	}
 
-	read, err := ocfReader.Read()
+	read, err := times.DeserializeTimesFromSchema(containerReader, string(containerReader.AvroContainerSchema()))
 	if err != nil {
-		t.Fatalf("Failed reading from OCF file reader: %v\n", err)
+		t.Fatalf("Failed deserializing OCF file: %v\n", err)
 	}
 
 	if got, want := read.AvroWriteTime, generate.AvroTime(now); got != want {
