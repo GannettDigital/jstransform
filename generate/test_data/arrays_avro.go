@@ -8,7 +8,7 @@ import (
 	"github.com/GannettDigital/jstransform/generate"
 	"github.com/GannettDigital/jstransform/generate/test_data/avro/arrays"
 
-	"github.com/actgardner/gogen-avro/container"
+	"github.com/actgardner/gogen-avro/v7/container"
 )
 
 // WriteAvroCF writes an Avro Containter File to the given io.Writer using snappy compression for the data.
@@ -22,7 +22,7 @@ func (z *Arrays) WriteAvroCF(writer io.Writer, writeTime time.Time) error {
 	if writeTime.IsZero() {
 		writeTime = time.Now()
 	}
-	avroWriter, err := arrays.NewArraysWriter(writer, container.Snappy, 1)
+	avroWriter, err := container.NewWriter(writer, container.Snappy, 1, arrays.NewArrays().Schema())
 	if err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func (z *Arrays) WriteAvroDeletedCF(writer io.Writer, writeTime time.Time) error
 	if writeTime.IsZero() {
 		writeTime = time.Now()
 	}
-	avroWriter, err := arrays.NewArraysWriter(writer, container.Snappy, 1)
+	avroWriter, err := container.NewWriter(writer, container.Snappy, 1, arrays.NewArrays().Schema())
 	if err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func ArraysBulkAvroWriter(writer io.Writer, writeTime time.Time, request <-chan 
 	go func() {
 		defer close(errors)
 
-		avroWriter, err := arrays.NewArraysWriter(writer, container.Snappy, 1)
+		avroWriter, err := container.NewWriter(writer, container.Snappy, 1, arrays.NewArrays().Schema())
 		if err != nil {
 			errors <- err
 			return

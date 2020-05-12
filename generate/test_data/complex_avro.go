@@ -8,7 +8,7 @@ import (
 	"github.com/GannettDigital/jstransform/generate"
 	"github.com/GannettDigital/jstransform/generate/test_data/avro/complex"
 
-	"github.com/actgardner/gogen-avro/container"
+	"github.com/actgardner/gogen-avro/v7/container"
 )
 
 // WriteAvroCF writes an Avro Containter File to the given io.Writer using snappy compression for the data.
@@ -22,7 +22,7 @@ func (z *Complex) WriteAvroCF(writer io.Writer, writeTime time.Time) error {
 	if writeTime.IsZero() {
 		writeTime = time.Now()
 	}
-	avroWriter, err := complex.NewComplexWriter(writer, container.Snappy, 1)
+	avroWriter, err := container.NewWriter(writer, container.Snappy, 1, complex.NewComplex().Schema())
 	if err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func (z *Complex) WriteAvroDeletedCF(writer io.Writer, writeTime time.Time) erro
 	if writeTime.IsZero() {
 		writeTime = time.Now()
 	}
-	avroWriter, err := complex.NewComplexWriter(writer, container.Snappy, 1)
+	avroWriter, err := container.NewWriter(writer, container.Snappy, 1, complex.NewComplex().Schema())
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func ComplexBulkAvroWriter(writer io.Writer, writeTime time.Time, request <-chan
 	go func() {
 		defer close(errors)
 
-		avroWriter, err := complex.NewComplexWriter(writer, container.Snappy, 1)
+		avroWriter, err := container.NewWriter(writer, container.Snappy, 1, complex.NewComplex().Schema())
 		if err != nil {
 			errors <- err
 			return
