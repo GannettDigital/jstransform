@@ -74,6 +74,7 @@ func buildAvroHelperFunctions(name, goSourcePath, importPath string) error {
 type mappedFields struct {
 	fieldMapping  string // the lines like `avroStructField: generatedStructField,` which go withing a struct initialization
 	preProcessing string // contains go code that does any preProcessing needed before the struct initialization
+	name          string // the name of the generated struct these fields are a mapping for, only set for named nested structs
 }
 
 // avroFieldMapper provides methods to map the fields in an Avro Struct with correct fields and converted fields from
@@ -146,9 +147,27 @@ func (fm *avroFieldMapper) generate() (mappedFields, error) {
 // generateChildStruct creates a mappedFields similar to generate but with a few starting assumptions appropriate for
 // child structs.
 func (fm *avroFieldMapper) generateChildStruct(expr ast.Expr, name, prefix string, avroFields *ast.FieldList) (mappedFields, *ast.FieldList, error) {
-	stype, ok := expr.(*ast.StructType)
-	if !ok {
-		return mappedFields{}, nil, fmt.Errorf("expected generated field %q to be a struct type", name)
+	var stype *ast.StructType
+	var fields *ast.FieldList
+	var structName string
+	if s, ok := expr.(*ast.StructType); ok {
+		stype = s
+		fields = stype.Fields
+	} else {
+		ident, ok := expr.(*ast.Ident)
+		if !ok {
+			return mappedFields{}, nil, fmt.Errorf("expected generated field %q to be a struct type or identifier for a named struct", name)
+		}
+		structName = ident.Name
+		n, err := parseGoStruct(structName, filepath.Dir(fm.generatedSourcePath))
+		if err != nil {
+			return mappedFields{}, nil, fmt.Errorf("unable to find type named %q: %v", name, err)
+		}
+		if s, ok := n.Type.(*ast.StructType); ok {
+			stype = s
+		} else {
+			return mappedFields{}, nil, fmt.Errorf("type %q is not a struct", name)
+		}
 	}
 	generatedChildFieldMap, err := mapFields(stype.Fields, fm.generatedSourcePath)
 	if err != nil {
@@ -158,8 +177,9 @@ func (fm *avroFieldMapper) generateChildStruct(expr ast.Expr, name, prefix strin
 	if err != nil {
 		return mappedFields{}, nil, fmt.Errorf("failed generating mappings for field %s: %v", name, err)
 	}
+	mappedStruct.name = structName
 
-	return mappedStruct, stype.Fields, nil
+	return mappedStruct, fields, nil
 }
 
 func (fm *avroFieldMapper) generateFields(prefix string, avroFields *ast.FieldList, generatedFieldsMap map[string]*ast.Field) (mappedFields, error) {
@@ -286,11 +306,18 @@ func (fm *avroFieldMapper) generateStructValue(name, prefix, typeName string, ge
 			return mappedFields{}, err
 		}
 
+		var structDef string
+		if fields != nil {
+			structDef = fmt.Sprintf("struct{%s}", printFields(fields))
+		} else {
+			structDef = mappedStruct.name
+		}
+
 		funcName := typeName + "Slice"
 		templValues := map[string]string{
 			"funcName":     funcName,
 			"typeID":       fmt.Sprintf("%s.%s", fm.packageName, typeName),
-			"structDef":    printFields(fields),
+			"structDef":    structDef,
 			"structFields": mappedStruct.fieldMapping,
 		}
 

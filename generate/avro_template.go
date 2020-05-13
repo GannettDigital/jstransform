@@ -221,9 +221,7 @@ func Example{{ .name }}BulkAvroWriter() {
 }
 `
 	avroStructSliceTemplate = `
-{{ .funcName }} := func(in []struct{
-{{ .structDef }}
-}) []*{{ .typeID }} {
+{{ .funcName }} := func(in []{{ .structDef }}) []*{{ .typeID }} {
 	converted := make([]*{{ .typeID }}, len(in))
 	for i, z := range in {
 		converted[i] = &{{ .typeID }} {

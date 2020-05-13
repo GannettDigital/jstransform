@@ -13,7 +13,7 @@ func TestBuildStructs(t *testing.T) {
 	outDir := filepath.Join(testdir, "rename")
 	os.Mkdir(outDir, os.ModePerm|os.ModePerm)
 	defer os.RemoveAll(outDir)
-	outDir2 := filepath.Join(testdir, "nonestTest")
+	outDir2 := "nonest"
 	os.Mkdir(outDir2, os.ModePerm|os.ModePerm)
 	defer os.RemoveAll(outDir2)
 
