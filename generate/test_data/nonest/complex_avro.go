@@ -77,9 +77,15 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 	}
 
 	return &complex.Complex{
-		AvroWriteTime:  aTime,
-		Height:         &complex.UnionNullLong{Long: z.Height, UnionType: complex.UnionNullLongTypeEnumLong},
-		SomeDateObj:    &complex.UnionNullSomeDateObj_record{SomeDateObj_record: &complex.SomeDateObj_record{Dates: generate.AvroTimeSlice(z.SomeDateObj.Dates)}, UnionType: complex.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record},
+		AvroWriteTime: aTime,
+		Height:        &complex.UnionNullLong{Long: z.Height, UnionType: complex.UnionNullLongTypeEnumLong},
+		SomeDateObj: func() *complex.UnionNullSomeDateObj_record {
+			var s *complex.UnionNullSomeDateObj_record
+			if z.SomeDateObj != nil {
+				s = &complex.UnionNullSomeDateObj_record{SomeDateObj_record: &complex.SomeDateObj_record{Dates: generate.AvroTimeSlice(z.SomeDateObj.Dates)}, UnionType: complex.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record}
+			}
+			return s
+		}(),
 		Visible:        z.Visible,
 		Width:          &complex.UnionNullDouble{Double: z.Width, UnionType: complex.UnionNullDoubleTypeEnumDouble},
 		Caption:        z.Caption,
@@ -92,8 +98,14 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 			Width: z.OriginalSize.Width},
 		Type: z.Type,
 		URL: &complex.URL_record{Absolute: z.URL.Absolute,
-			Meta: &complex.UnionNullMeta_record{Meta_record: &complex.Meta_record{Description: z.URL.Meta.Description,
-				SiteName: z.URL.Meta.SiteName}, UnionType: complex.UnionNullMeta_recordTypeEnumMeta_record},
+			Meta: func() *complex.UnionNullMeta_record {
+				var s *complex.UnionNullMeta_record
+				if z.URL.Meta != nil {
+					s = &complex.UnionNullMeta_record{Meta_record: &complex.Meta_record{Description: z.URL.Meta.Description,
+						SiteName: z.URL.Meta.SiteName}, UnionType: complex.UnionNullMeta_recordTypeEnumMeta_record}
+				}
+				return s
+			}(),
 			Publish: z.URL.Publish},
 	}
 }

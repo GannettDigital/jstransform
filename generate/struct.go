@@ -195,6 +195,12 @@ func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 	// If the types is an object create a new generated struct for it
 	if i.Type == "object" {
 		key := strings.Join(parts, "")
+		structType := key
+
+		// nullable nested structs should be pointers
+		if !gof.rootStruct.requiredFields[name] {
+			structType = "*" + key
+		}
 
 		requiredFields := make(map[string]bool)
 		for _, name := range i.Required {
@@ -202,7 +208,7 @@ func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 		}
 
 		gof.nestedStructs[key] = gof.newGeneratedStruct(key, requiredFields)
-		return addField(gen.fields, []string{name}, jsonschema.Instance{Description: i.Description, Type: key}, gen.args.FieldNameMap)
+		return addField(gen.fields, []string{name}, jsonschema.Instance{Description: i.Description, Type: structType}, gen.args.FieldNameMap)
 	}
 
 	return addField(gen.fields, []string{name}, i, gen.args.FieldNameMap)
