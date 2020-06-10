@@ -150,6 +150,11 @@ func (fm *avroFieldMapper) generateChildStruct(expr ast.Expr, name, prefix strin
 	var stype *ast.StructType
 	var fields *ast.FieldList
 	var structName string
+
+	if s, ok := expr.(*ast.StarExpr); ok {
+		expr = s.X
+	}
+
 	if s, ok := expr.(*ast.StructType); ok {
 		stype = s
 		fields = stype.Fields
@@ -220,9 +225,17 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 		if err != nil {
 			return mappedFields{}, err
 		}
+		// check for a nil pointer
+		if _, ok := generatedField.Type.(*ast.StarExpr); ok {
+			return mappedFields{
+				fieldMapping:  fm.generateNullableFieldValue(name, prefix, mappedField.name, fmt.Sprintf("&%s", mappedField.fieldMapping)),
+				preProcessing: mappedField.preProcessing,
+			}, nil
+		}
 		return mappedFields{
 			fieldMapping:  fmt.Sprintf("&%s", mappedField.fieldMapping),
 			preProcessing: mappedField.preProcessing,
+			name:          prefix + name,
 		}, nil
 	case *ast.StructType: // This handles anonymous structs in the Avro struct but the generated code never has those
 		return mappedFields{}, errors.New("anonymous structs in the Avro struct are not handled")
@@ -238,18 +251,18 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 		typeName := f.Name
 		switch typeName { // handle builtin types
 		case "string", "bool", "float64":
-			return mappedFields{fieldMapping: "z." + prefix + name}, nil
+			return mappedFields{fieldMapping: "z." + prefix + name, name: prefix + name}, nil
 		case "int64":
 			// special case for converting time fields and arrays of times
 			if selector, ok := generatedField.Type.(*ast.SelectorExpr); ok && selector.Sel.Name == "Time" {
-				return mappedFields{fieldMapping: fmt.Sprintf("generate.AvroTime(z.%s)", prefix+name)}, nil
+				return mappedFields{fieldMapping: fmt.Sprintf("generate.AvroTime(z.%s)", prefix+name), name: prefix + name}, nil
 			}
 			if gArray, ok := generatedField.Type.(*ast.ArrayType); ok {
 				if selector, ok := gArray.Elt.(*ast.SelectorExpr); ok && selector.Sel.Name == "Time" {
-					return mappedFields{fieldMapping: fmt.Sprintf("generate.AvroTimeSlice(z.%s)", prefix+name)}, nil
+					return mappedFields{fieldMapping: fmt.Sprintf("generate.AvroTimeSlice(z.%s)", prefix+name), name: prefix + name}, nil
 				}
 			}
-			return mappedFields{fieldMapping: "z." + prefix + name}, nil
+			return mappedFields{fieldMapping: "z." + prefix + name, name: prefix + name}, nil
 		}
 		// If not a built in type it could be a special Avro Union type
 		if tmpl, ok := fm.unionTemplates[typeName]; ok {
@@ -280,12 +293,24 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 			if err := fm.unionNullStructTemplate.Execute(buf, templateData); err != nil {
 				return mappedFields{}, fmt.Errorf("failed generating UnionNull struct template: %v", err)
 			}
-			return mappedFields{fieldMapping: buf.String(), preProcessing: mf.preProcessing}, nil
+			return mappedFields{fieldMapping: buf.String(), preProcessing: mf.preProcessing, name: typeName}, nil
 		}
 
 		return fm.generateStructValue(name, prefix, typeName, generatedField)
 	}
 	return mappedFields{}, fmt.Errorf("unhandled type for field %q", prefix+name)
+}
+
+func (fm *avroFieldMapper) generateNullableFieldValue(name, prefix, fieldTypeName, fieldValue string) string {
+	returnType := fmt.Sprintf("*%s.%s", fm.packageName, fieldTypeName)
+	return fmt.Sprintf(
+		`func() %s {
+	var s %s
+	if z.%s != nil {
+		s = %s
+	}
+	return s
+}()`, returnType, returnType, prefix+name, fieldValue)
 }
 
 // generateStructValue will generate code to match an Avro struct or array of structs with values from the generated

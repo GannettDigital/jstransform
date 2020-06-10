@@ -359,6 +359,8 @@ func writeEmbeddedStructFields(cfg avroConfig) {
 func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool) string {
 	// Note: the go code generated from JSON schema does not include maps and they are not handled here
 	switch t := expr.(type) {
+	case *ast.StarExpr:
+		return convertToAvroType(cfg, t.X, name, nullable)
 	case *ast.Ident:
 		var typeName string
 		switch t.Name {
