@@ -62,6 +62,18 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 		return &complex.Complex{AvroWriteTime: aTime, AvroDeleted: true}
 	}
 
+	Contributors_recordSlice := func(in []*SimpleContributors) []*complex.Contributors_record {
+		converted := make([]*complex.Contributors_record, len(in))
+		for i, z := range in {
+			converted[i] = &complex.Contributors_record{
+				ContributorId: &complex.UnionNullString{String: z.ContributorId, UnionType: complex.UnionNullStringTypeEnumString},
+				Id:            z.Id,
+				Name:          z.Name,
+			}
+		}
+		return converted
+	}
+
 	Crops_recordSlice := func(in []ComplexCrops) []*complex.Crops_record {
 		converted := make([]*complex.Crops_record, len(in))
 		for i, z := range in {
@@ -78,6 +90,7 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 
 	return &complex.Complex{
 		AvroWriteTime: aTime,
+		Contributors:  Contributors_recordSlice(z.Contributors),
 		Height:        &complex.UnionNullLong{Long: z.Height, UnionType: complex.UnionNullLongTypeEnumLong},
 		SomeDateObj: func() *complex.UnionNullSomeDateObj_record {
 			var s *complex.UnionNullSomeDateObj_record

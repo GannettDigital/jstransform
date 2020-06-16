@@ -62,8 +62,25 @@ func (z *Simple) convertToAvro(writeTime time.Time) *simple.Simple {
 		return &simple.Simple{AvroWriteTime: aTime, AvroDeleted: true}
 	}
 
+	Contributors_recordSlice := func(in []struct {
+		ContributorId string `json:"contributorId,omitempty"`
+		Id            string `json:"id"`
+		Name          string `json:"name"`
+	}) []*simple.Contributors_record {
+		converted := make([]*simple.Contributors_record, len(in))
+		for i, z := range in {
+			converted[i] = &simple.Contributors_record{
+				ContributorId: &simple.UnionNullString{String: z.ContributorId, UnionType: simple.UnionNullStringTypeEnumString},
+				Id:            z.Id,
+				Name:          z.Name,
+			}
+		}
+		return converted
+	}
+
 	return &simple.Simple{
 		AvroWriteTime: aTime,
+		Contributors:  Contributors_recordSlice(z.Contributors),
 		Height:        &simple.UnionNullLong{Long: z.Height, UnionType: simple.UnionNullLongTypeEnumLong},
 		SomeDateObj:   &simple.UnionNullSomeDateObj_record{SomeDateObj_record: &simple.SomeDateObj_record{Dates: generate.AvroTimeSlice(z.SomeDateObj.Dates)}, UnionType: simple.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record},
 		Type:          z.Type,

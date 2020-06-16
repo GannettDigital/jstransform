@@ -5,11 +5,18 @@ package nonest
 import "time"
 
 type Simple struct {
-	Height      int64              `json:"height,omitempty"`
-	SomeDateObj *SimpleSomeDateObj `json:"someDateObj,omitempty"`
-	Type        string             `json:"type"`
-	Visible     bool               `json:"visible,omitempty"`
-	Width       float64            `json:"width,omitempty"`
+	Contributors []*SimpleContributors `json:"contributors,omitempty"`
+	Height       int64                 `json:"height,omitempty"`
+	SomeDateObj  *SimpleSomeDateObj    `json:"someDateObj,omitempty"`
+	Type         string                `json:"type"`
+	Visible      bool                  `json:"visible,omitempty"`
+	Width        float64               `json:"width,omitempty"`
+}
+
+type SimpleContributors struct {
+	ContributorId string `json:"contributorId,omitempty"`
+	Id            string `json:"id"`
+	Name          string `json:"name"`
 }
 
 type SimpleSomeDateObj struct {

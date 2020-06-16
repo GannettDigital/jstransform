@@ -5,6 +5,11 @@ package test_data
 import "time"
 
 type Simple struct {
+	Contributors []struct {
+		ContributorId string `json:"contributorId,omitempty"`
+		Id            string `json:"id"`
+		Name          string `json:"name"`
+	} `json:"contributors,omitempty"`
 	Height      int64 `json:"height,omitempty"`
 	SomeDateObj struct {
 		Times []time.Time `json:"dates,omitempty"`

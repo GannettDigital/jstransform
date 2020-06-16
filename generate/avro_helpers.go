@@ -337,6 +337,9 @@ func (fm *avroFieldMapper) generateStructValue(name, prefix, typeName string, ge
 		} else {
 			structDef = mappedStruct.name
 		}
+		if _, ok := aType.Elt.(*ast.StarExpr); ok {
+			structDef = "*" + structDef
+		}
 
 		funcName := typeName + "Slice"
 		templValues := map[string]string{

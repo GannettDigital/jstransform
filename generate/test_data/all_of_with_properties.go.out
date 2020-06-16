@@ -5,7 +5,12 @@ package rename
 import "time"
 
 type All_of_with_properties struct {
-	CoachId     string `json:"coachId,omitempty"`
+	CoachId      string `json:"coachId,omitempty"`
+	Contributors []struct {
+		ContributorId string `json:"contributorId,omitempty"`
+		Id            string `json:"id"`
+		Name          string `json:"name"`
+	} `json:"contributors,omitempty"`
 	Height      int64  `json:"height,omitempty"`
 	Season      string `json:"season,omitempty"`
 	SomeDateObj struct {
