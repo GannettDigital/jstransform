@@ -700,37 +700,88 @@ func (z *Simple) DecodeMsg(dc *msgp.Reader) (err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
+		case "Contributors":
+			var zb0002 uint32
+			zb0002, err = dc.ReadArrayHeader()
+			if err != nil {
+				return
+			}
+			if cap(z.Contributors) >= int(zb0002) {
+				z.Contributors = (z.Contributors)[:zb0002]
+			} else {
+				z.Contributors = make([]struct {
+					ContributorId string `json:"contributorId,omitempty"`
+					Id            string `json:"id"`
+					Name          string `json:"name"`
+				}, zb0002)
+			}
+			for za0001 := range z.Contributors {
+				var zb0003 uint32
+				zb0003, err = dc.ReadMapHeader()
+				if err != nil {
+					return
+				}
+				for zb0003 > 0 {
+					zb0003--
+					field, err = dc.ReadMapKeyPtr()
+					if err != nil {
+						return
+					}
+					switch msgp.UnsafeString(field) {
+					case "ContributorId":
+						z.Contributors[za0001].ContributorId, err = dc.ReadString()
+						if err != nil {
+							return
+						}
+					case "Id":
+						z.Contributors[za0001].Id, err = dc.ReadString()
+						if err != nil {
+							return
+						}
+					case "Name":
+						z.Contributors[za0001].Name, err = dc.ReadString()
+						if err != nil {
+							return
+						}
+					default:
+						err = dc.Skip()
+						if err != nil {
+							return
+						}
+					}
+				}
+			}
 		case "Height":
 			z.Height, err = dc.ReadInt64()
 			if err != nil {
 				return
 			}
 		case "SomeDateObj":
-			var zb0002 uint32
-			zb0002, err = dc.ReadMapHeader()
+			var zb0004 uint32
+			zb0004, err = dc.ReadMapHeader()
 			if err != nil {
 				return
 			}
-			for zb0002 > 0 {
-				zb0002--
+			for zb0004 > 0 {
+				zb0004--
 				field, err = dc.ReadMapKeyPtr()
 				if err != nil {
 					return
 				}
 				switch msgp.UnsafeString(field) {
 				case "Dates":
-					var zb0003 uint32
-					zb0003, err = dc.ReadArrayHeader()
+					var zb0005 uint32
+					zb0005, err = dc.ReadArrayHeader()
 					if err != nil {
 						return
 					}
-					if cap(z.SomeDateObj.Dates) >= int(zb0003) {
-						z.SomeDateObj.Dates = (z.SomeDateObj.Dates)[:zb0003]
+					if cap(z.SomeDateObj.Dates) >= int(zb0005) {
+						z.SomeDateObj.Dates = (z.SomeDateObj.Dates)[:zb0005]
 					} else {
-						z.SomeDateObj.Dates = make([]time.Time, zb0003)
+						z.SomeDateObj.Dates = make([]time.Time, zb0005)
 					}
-					for za0001 := range z.SomeDateObj.Dates {
-						z.SomeDateObj.Dates[za0001], err = dc.ReadTime()
+					for za0002 := range z.SomeDateObj.Dates {
+						z.SomeDateObj.Dates[za0002], err = dc.ReadTime()
 						if err != nil {
 							return
 						}
@@ -769,9 +820,48 @@ func (z *Simple) DecodeMsg(dc *msgp.Reader) (err error) {
 
 // EncodeMsg implements msgp.Encodable
 func (z *Simple) EncodeMsg(en *msgp.Writer) (err error) {
-	// map header, size 5
+	// map header, size 6
+	// write "Contributors"
+	err = en.Append(0x86, 0xac, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x6f, 0x72, 0x73)
+	if err != nil {
+		return
+	}
+	err = en.WriteArrayHeader(uint32(len(z.Contributors)))
+	if err != nil {
+		return
+	}
+	for za0001 := range z.Contributors {
+		// map header, size 3
+		// write "ContributorId"
+		err = en.Append(0x83, 0xad, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x6f, 0x72, 0x49, 0x64)
+		if err != nil {
+			return
+		}
+		err = en.WriteString(z.Contributors[za0001].ContributorId)
+		if err != nil {
+			return
+		}
+		// write "Id"
+		err = en.Append(0xa2, 0x49, 0x64)
+		if err != nil {
+			return
+		}
+		err = en.WriteString(z.Contributors[za0001].Id)
+		if err != nil {
+			return
+		}
+		// write "Name"
+		err = en.Append(0xa4, 0x4e, 0x61, 0x6d, 0x65)
+		if err != nil {
+			return
+		}
+		err = en.WriteString(z.Contributors[za0001].Name)
+		if err != nil {
+			return
+		}
+	}
 	// write "Height"
-	err = en.Append(0x85, 0xa6, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74)
+	err = en.Append(0xa6, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74)
 	if err != nil {
 		return
 	}
@@ -790,8 +880,8 @@ func (z *Simple) EncodeMsg(en *msgp.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	for za0001 := range z.SomeDateObj.Dates {
-		err = en.WriteTime(z.SomeDateObj.Dates[za0001])
+	for za0002 := range z.SomeDateObj.Dates {
+		err = en.WriteTime(z.SomeDateObj.Dates[za0002])
 		if err != nil {
 			return
 		}
@@ -829,17 +919,32 @@ func (z *Simple) EncodeMsg(en *msgp.Writer) (err error) {
 // MarshalMsg implements msgp.Marshaler
 func (z *Simple) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	// map header, size 5
+	// map header, size 6
+	// string "Contributors"
+	o = append(o, 0x86, 0xac, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x6f, 0x72, 0x73)
+	o = msgp.AppendArrayHeader(o, uint32(len(z.Contributors)))
+	for za0001 := range z.Contributors {
+		// map header, size 3
+		// string "ContributorId"
+		o = append(o, 0x83, 0xad, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x6f, 0x72, 0x49, 0x64)
+		o = msgp.AppendString(o, z.Contributors[za0001].ContributorId)
+		// string "Id"
+		o = append(o, 0xa2, 0x49, 0x64)
+		o = msgp.AppendString(o, z.Contributors[za0001].Id)
+		// string "Name"
+		o = append(o, 0xa4, 0x4e, 0x61, 0x6d, 0x65)
+		o = msgp.AppendString(o, z.Contributors[za0001].Name)
+	}
 	// string "Height"
-	o = append(o, 0x85, 0xa6, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74)
+	o = append(o, 0xa6, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74)
 	o = msgp.AppendInt64(o, z.Height)
 	// string "SomeDateObj"
 	// map header, size 1
 	// string "Dates"
 	o = append(o, 0xab, 0x53, 0x6f, 0x6d, 0x65, 0x44, 0x61, 0x74, 0x65, 0x4f, 0x62, 0x6a, 0x81, 0xa5, 0x44, 0x61, 0x74, 0x65, 0x73)
 	o = msgp.AppendArrayHeader(o, uint32(len(z.SomeDateObj.Dates)))
-	for za0001 := range z.SomeDateObj.Dates {
-		o = msgp.AppendTime(o, z.SomeDateObj.Dates[za0001])
+	for za0002 := range z.SomeDateObj.Dates {
+		o = msgp.AppendTime(o, z.SomeDateObj.Dates[za0002])
 	}
 	// string "Type"
 	o = append(o, 0xa4, 0x54, 0x79, 0x70, 0x65)
@@ -869,37 +974,88 @@ func (z *Simple) UnmarshalMsg(bts []byte) (o []byte, err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
+		case "Contributors":
+			var zb0002 uint32
+			zb0002, bts, err = msgp.ReadArrayHeaderBytes(bts)
+			if err != nil {
+				return
+			}
+			if cap(z.Contributors) >= int(zb0002) {
+				z.Contributors = (z.Contributors)[:zb0002]
+			} else {
+				z.Contributors = make([]struct {
+					ContributorId string `json:"contributorId,omitempty"`
+					Id            string `json:"id"`
+					Name          string `json:"name"`
+				}, zb0002)
+			}
+			for za0001 := range z.Contributors {
+				var zb0003 uint32
+				zb0003, bts, err = msgp.ReadMapHeaderBytes(bts)
+				if err != nil {
+					return
+				}
+				for zb0003 > 0 {
+					zb0003--
+					field, bts, err = msgp.ReadMapKeyZC(bts)
+					if err != nil {
+						return
+					}
+					switch msgp.UnsafeString(field) {
+					case "ContributorId":
+						z.Contributors[za0001].ContributorId, bts, err = msgp.ReadStringBytes(bts)
+						if err != nil {
+							return
+						}
+					case "Id":
+						z.Contributors[za0001].Id, bts, err = msgp.ReadStringBytes(bts)
+						if err != nil {
+							return
+						}
+					case "Name":
+						z.Contributors[za0001].Name, bts, err = msgp.ReadStringBytes(bts)
+						if err != nil {
+							return
+						}
+					default:
+						bts, err = msgp.Skip(bts)
+						if err != nil {
+							return
+						}
+					}
+				}
+			}
 		case "Height":
 			z.Height, bts, err = msgp.ReadInt64Bytes(bts)
 			if err != nil {
 				return
 			}
 		case "SomeDateObj":
-			var zb0002 uint32
-			zb0002, bts, err = msgp.ReadMapHeaderBytes(bts)
+			var zb0004 uint32
+			zb0004, bts, err = msgp.ReadMapHeaderBytes(bts)
 			if err != nil {
 				return
 			}
-			for zb0002 > 0 {
-				zb0002--
+			for zb0004 > 0 {
+				zb0004--
 				field, bts, err = msgp.ReadMapKeyZC(bts)
 				if err != nil {
 					return
 				}
 				switch msgp.UnsafeString(field) {
 				case "Dates":
-					var zb0003 uint32
-					zb0003, bts, err = msgp.ReadArrayHeaderBytes(bts)
+					var zb0005 uint32
+					zb0005, bts, err = msgp.ReadArrayHeaderBytes(bts)
 					if err != nil {
 						return
 					}
-					if cap(z.SomeDateObj.Dates) >= int(zb0003) {
-						z.SomeDateObj.Dates = (z.SomeDateObj.Dates)[:zb0003]
+					if cap(z.SomeDateObj.Dates) >= int(zb0005) {
+						z.SomeDateObj.Dates = (z.SomeDateObj.Dates)[:zb0005]
 					} else {
-						z.SomeDateObj.Dates = make([]time.Time, zb0003)
+						z.SomeDateObj.Dates = make([]time.Time, zb0005)
 					}
-					for za0001 := range z.SomeDateObj.Dates {
-						z.SomeDateObj.Dates[za0001], bts, err = msgp.ReadTimeBytes(bts)
+					for za0002 := range z.SomeDateObj.Dates {
+						z.SomeDateObj.Dates[za0002], bts, err = msgp.ReadTimeBytes(bts)
 						if err != nil {
 							return
 						}
@@ -939,6 +1095,10 @@ func (z *Simple) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z *Simple) Msgsize() (s int) {
-	s = 1 + 7 + msgp.Int64Size + 12 + 1 + 6 + msgp.ArrayHeaderSize + (len(z.SomeDateObj.Dates) * (msgp.TimeSize)) + 5 + msgp.StringPrefixSize + len(z.Type) + 8 + msgp.BoolSize + 6 + msgp.Float64Size
+	s = 1 + 13 + msgp.ArrayHeaderSize
+	for za0001 := range z.Contributors {
+		s += 1 + 14 + msgp.StringPrefixSize + len(z.Contributors[za0001].ContributorId) + 3 + msgp.StringPrefixSize + len(z.Contributors[za0001].Id) + 5 + msgp.StringPrefixSize + len(z.Contributors[za0001].Name)
+	}
+	s += 7 + msgp.Int64Size + 12 + 1 + 6 + msgp.ArrayHeaderSize + (len(z.SomeDateObj.Dates) * (msgp.TimeSize)) + 5 + msgp.StringPrefixSize + len(z.Type) + 8 + msgp.BoolSize + 6 + msgp.Float64Size
 	return
 }

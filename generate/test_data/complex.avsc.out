@@ -15,6 +15,38 @@
       "type": "boolean"
     },
     {
+      "name": "contributors",
+      "namespace": "Simple",
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "contributors_record",
+          "namespace": "Simple.contributors",
+          "type": "record",
+          "fields": [
+            {
+              "name": "contributorId",
+              "namespace": "Simple.contributors",
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            {
+              "name": "id",
+              "namespace": "Simple.contributors",
+              "type": "string"
+            },
+            {
+              "name": "name",
+              "namespace": "Simple.contributors",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
       "name": "height",
       "namespace": "Simple",
       "type": [

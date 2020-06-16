@@ -62,6 +62,22 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 		return &complex.Complex{AvroWriteTime: aTime, AvroDeleted: true}
 	}
 
+	Contributors_recordSlice := func(in []struct {
+		ContributorId string `json:"contributorId,omitempty"`
+		Id            string `json:"id"`
+		Name          string `json:"name"`
+	}) []*complex.Contributors_record {
+		converted := make([]*complex.Contributors_record, len(in))
+		for i, z := range in {
+			converted[i] = &complex.Contributors_record{
+				ContributorId: &complex.UnionNullString{String: z.ContributorId, UnionType: complex.UnionNullStringTypeEnumString},
+				Id:            z.Id,
+				Name:          z.Name,
+			}
+		}
+		return converted
+	}
+
 	Crops_recordSlice := func(in []struct {
 		Height       float64 `json:"height"`
 		Name         string  `json:"name"`
@@ -84,6 +100,7 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 
 	return &complex.Complex{
 		AvroWriteTime:  aTime,
+		Contributors:   Contributors_recordSlice(z.Contributors),
 		Height:         &complex.UnionNullLong{Long: z.Height, UnionType: complex.UnionNullLongTypeEnumLong},
 		SomeDateObj:    &complex.UnionNullSomeDateObj_record{SomeDateObj_record: &complex.SomeDateObj_record{Dates: generate.AvroTimeSlice(z.SomeDateObj.Dates)}, UnionType: complex.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record},
 		Visible:        z.Visible,

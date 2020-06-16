@@ -15,6 +15,37 @@
       "type": "boolean"
     },
     {
+      "name": "contributors",
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "contributors_record",
+          "namespace": "contributors",
+          "type": "record",
+          "fields": [
+            {
+              "name": "contributorId",
+              "namespace": "contributors",
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            {
+              "name": "id",
+              "namespace": "contributors",
+              "type": "string"
+            },
+            {
+              "name": "name",
+              "namespace": "contributors",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
       "name": "height",
       "type": [
         "null",

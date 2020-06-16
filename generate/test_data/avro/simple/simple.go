@@ -14,6 +14,8 @@ type Simple struct {
 	// This is set to true when the Avro data is recording a delete in the source data.
 	AvroDeleted bool `json:"AvroDeleted"`
 
+	Contributors []*Contributors_record `json:"contributors"`
+
 	Height *UnionNullLong `json:"height"`
 
 	SomeDateObj *UnionNullSomeDateObj_record `json:"someDateObj"`
@@ -25,7 +27,7 @@ type Simple struct {
 	Width *UnionNullDouble `json:"width"`
 }
 
-const SimpleAvroCRC64Fingerprint = "\xe1\xf9\xea\xa1\xf7\x0f\xe9\x8d"
+const SimpleAvroCRC64Fingerprint = "\xe8\xb3ا׳\b\xde"
 
 func NewSimple() *Simple {
 	return &Simple{}
@@ -70,6 +72,10 @@ func writeSimple(r *Simple, w io.Writer) error {
 	if err != nil {
 		return err
 	}
+	err = writeArrayContributors_record(r.Contributors, w)
+	if err != nil {
+		return err
+	}
 	err = writeUnionNullLong(r.Height, w)
 	if err != nil {
 		return err
@@ -98,7 +104,7 @@ func (r *Simple) Serialize(w io.Writer) error {
 }
 
 func (r *Simple) Schema() string {
-	return "{\"fields\":[{\"doc\":\"The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.\",\"logicalType\":\"timestamp-millis\",\"name\":\"AvroWriteTime\",\"type\":\"long\"},{\"default\":false,\"doc\":\"This is set to true when the Avro data is recording a delete in the source data.\",\"name\":\"AvroDeleted\",\"type\":\"boolean\"},{\"name\":\"height\",\"type\":[\"null\",\"long\"]},{\"name\":\"someDateObj\",\"type\":[\"null\",{\"fields\":[{\"name\":\"dates\",\"namespace\":\"someDateObj\",\"type\":{\"items\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"},\"type\":\"array\"}}],\"name\":\"someDateObj_record\",\"namespace\":\"someDateObj\",\"type\":\"record\"}]},{\"name\":\"type\",\"type\":\"string\"},{\"default\":false,\"name\":\"visible\",\"type\":\"boolean\"},{\"name\":\"width\",\"type\":[\"null\",\"double\"]}],\"name\":\"Simple\",\"type\":\"record\"}"
+	return "{\"fields\":[{\"doc\":\"The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.\",\"logicalType\":\"timestamp-millis\",\"name\":\"AvroWriteTime\",\"type\":\"long\"},{\"default\":false,\"doc\":\"This is set to true when the Avro data is recording a delete in the source data.\",\"name\":\"AvroDeleted\",\"type\":\"boolean\"},{\"name\":\"contributors\",\"type\":{\"items\":{\"fields\":[{\"name\":\"contributorId\",\"namespace\":\"contributors\",\"type\":[\"null\",\"string\"]},{\"name\":\"id\",\"namespace\":\"contributors\",\"type\":\"string\"},{\"name\":\"name\",\"namespace\":\"contributors\",\"type\":\"string\"}],\"name\":\"contributors_record\",\"namespace\":\"contributors\",\"type\":\"record\"},\"type\":\"array\"}},{\"name\":\"height\",\"type\":[\"null\",\"long\"]},{\"name\":\"someDateObj\",\"type\":[\"null\",{\"fields\":[{\"name\":\"dates\",\"namespace\":\"someDateObj\",\"type\":{\"items\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"},\"type\":\"array\"}}],\"name\":\"someDateObj_record\",\"namespace\":\"someDateObj\",\"type\":\"record\"}]},{\"name\":\"type\",\"type\":\"string\"},{\"default\":false,\"name\":\"visible\",\"type\":\"boolean\"},{\"name\":\"width\",\"type\":[\"null\",\"double\"]}],\"name\":\"Simple\",\"type\":\"record\"}"
 }
 
 func (r *Simple) SchemaName() string {
@@ -121,18 +127,22 @@ func (r *Simple) Get(i int) types.Field {
 	case 1:
 		return &types.Boolean{Target: &r.AvroDeleted}
 	case 2:
+		r.Contributors = make([]*Contributors_record, 0)
+
+		return &ArrayContributors_recordWrapper{Target: &r.Contributors}
+	case 3:
 		r.Height = NewUnionNullLong()
 
 		return r.Height
-	case 3:
+	case 4:
 		r.SomeDateObj = NewUnionNullSomeDateObj_record()
 
 		return r.SomeDateObj
-	case 4:
-		return &types.String{Target: &r.Type}
 	case 5:
-		return &types.Boolean{Target: &r.Visible}
+		return &types.String{Target: &r.Type}
 	case 6:
+		return &types.Boolean{Target: &r.Visible}
+	case 7:
 		r.Width = NewUnionNullDouble()
 
 		return r.Width
@@ -145,7 +155,7 @@ func (r *Simple) SetDefault(i int) {
 	case 1:
 		r.AvroDeleted = false
 		return
-	case 5:
+	case 6:
 		r.Visible = false
 		return
 	}
@@ -154,13 +164,13 @@ func (r *Simple) SetDefault(i int) {
 
 func (r *Simple) NullField(i int) {
 	switch i {
-	case 2:
+	case 3:
 		r.Height = nil
 		return
-	case 3:
+	case 4:
 		r.SomeDateObj = nil
 		return
-	case 6:
+	case 7:
 		r.Width = nil
 		return
 	}
