@@ -95,7 +95,7 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 		SomeDateObj: func() *complex.UnionNullSomeDateObj_record {
 			var s *complex.UnionNullSomeDateObj_record
 			if z.SomeDateObj != nil {
-				s = &complex.UnionNullSomeDateObj_record{SomeDateObj_record: &complex.SomeDateObj_record{Dates: generate.AvroTimeSlice(z.SomeDateObj.Dates)}, UnionType: complex.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record}
+				s = &complex.UnionNullSomeDateObj_record{SomeDateObj_record: &complex.SomeDateObj_record{Dates: generate.AvroOptionalTimeSlice(z.SomeDateObj.Dates)}, UnionType: complex.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record}
 			}
 			return s
 		}(),

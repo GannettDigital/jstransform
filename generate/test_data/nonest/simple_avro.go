@@ -81,7 +81,7 @@ func (z *Simple) convertToAvro(writeTime time.Time) *simple.Simple {
 		SomeDateObj: func() *simple.UnionNullSomeDateObj_record {
 			var s *simple.UnionNullSomeDateObj_record
 			if z.SomeDateObj != nil {
-				s = &simple.UnionNullSomeDateObj_record{SomeDateObj_record: &simple.SomeDateObj_record{Dates: generate.AvroTimeSlice(z.SomeDateObj.Dates)}, UnionType: simple.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record}
+				s = &simple.UnionNullSomeDateObj_record{SomeDateObj_record: &simple.SomeDateObj_record{Dates: generate.AvroOptionalTimeSlice(z.SomeDateObj.Dates)}, UnionType: simple.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record}
 			}
 			return s
 		}(),

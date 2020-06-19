@@ -47,11 +47,11 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 	}
 
 	if ef.jsonType != "object" {
-		_, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s\t%s", prefix, ef.name, goType(ef.jsonType, ef.array), structTag)))
+		_, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s\t%s", prefix, ef.name, goType(ef.jsonType, ef.array, required), structTag)))
 		return err
 	}
 
-	if _, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s {\n", prefix, ef.name, goType(ef.jsonType, ef.array)))); err != nil {
+	if _, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s {\n", prefix, ef.name, goType(ef.jsonType, ef.array, required)))); err != nil {
 		return err
 	}
 

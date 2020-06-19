@@ -778,12 +778,23 @@ func (z *TotallySimple) DecodeMsg(dc *msgp.Reader) (err error) {
 					if cap(z.SomeDateObj.Dates) >= int(zb0005) {
 						z.SomeDateObj.Dates = (z.SomeDateObj.Dates)[:zb0005]
 					} else {
-						z.SomeDateObj.Dates = make([]time.Time, zb0005)
+						z.SomeDateObj.Dates = make([]*time.Time, zb0005)
 					}
 					for za0002 := range z.SomeDateObj.Dates {
-						z.SomeDateObj.Dates[za0002], err = dc.ReadTime()
-						if err != nil {
-							return
+						if dc.IsNil() {
+							err = dc.ReadNil()
+							if err != nil {
+								return
+							}
+							z.SomeDateObj.Dates[za0002] = nil
+						} else {
+							if z.SomeDateObj.Dates[za0002] == nil {
+								z.SomeDateObj.Dates[za0002] = new(time.Time)
+							}
+							*z.SomeDateObj.Dates[za0002], err = dc.ReadTime()
+							if err != nil {
+								return
+							}
 						}
 					}
 				default:
@@ -881,9 +892,16 @@ func (z *TotallySimple) EncodeMsg(en *msgp.Writer) (err error) {
 		return
 	}
 	for za0002 := range z.SomeDateObj.Dates {
-		err = en.WriteTime(z.SomeDateObj.Dates[za0002])
-		if err != nil {
-			return
+		if z.SomeDateObj.Dates[za0002] == nil {
+			err = en.WriteNil()
+			if err != nil {
+				return
+			}
+		} else {
+			err = en.WriteTime(*z.SomeDateObj.Dates[za0002])
+			if err != nil {
+				return
+			}
 		}
 	}
 	// write "Type"
@@ -944,7 +962,11 @@ func (z *TotallySimple) MarshalMsg(b []byte) (o []byte, err error) {
 	o = append(o, 0xab, 0x53, 0x6f, 0x6d, 0x65, 0x44, 0x61, 0x74, 0x65, 0x4f, 0x62, 0x6a, 0x81, 0xa5, 0x44, 0x61, 0x74, 0x65, 0x73)
 	o = msgp.AppendArrayHeader(o, uint32(len(z.SomeDateObj.Dates)))
 	for za0002 := range z.SomeDateObj.Dates {
-		o = msgp.AppendTime(o, z.SomeDateObj.Dates[za0002])
+		if z.SomeDateObj.Dates[za0002] == nil {
+			o = msgp.AppendNil(o)
+		} else {
+			o = msgp.AppendTime(o, *z.SomeDateObj.Dates[za0002])
+		}
 	}
 	// string "Type"
 	o = append(o, 0xa4, 0x54, 0x79, 0x70, 0x65)
@@ -1052,12 +1074,23 @@ func (z *TotallySimple) UnmarshalMsg(bts []byte) (o []byte, err error) {
 					if cap(z.SomeDateObj.Dates) >= int(zb0005) {
 						z.SomeDateObj.Dates = (z.SomeDateObj.Dates)[:zb0005]
 					} else {
-						z.SomeDateObj.Dates = make([]time.Time, zb0005)
+						z.SomeDateObj.Dates = make([]*time.Time, zb0005)
 					}
 					for za0002 := range z.SomeDateObj.Dates {
-						z.SomeDateObj.Dates[za0002], bts, err = msgp.ReadTimeBytes(bts)
-						if err != nil {
-							return
+						if msgp.IsNil(bts) {
+							bts, err = msgp.ReadNilBytes(bts)
+							if err != nil {
+								return
+							}
+							z.SomeDateObj.Dates[za0002] = nil
+						} else {
+							if z.SomeDateObj.Dates[za0002] == nil {
+								z.SomeDateObj.Dates[za0002] = new(time.Time)
+							}
+							*z.SomeDateObj.Dates[za0002], bts, err = msgp.ReadTimeBytes(bts)
+							if err != nil {
+								return
+							}
 						}
 					}
 				default:
@@ -1099,6 +1132,14 @@ func (z *TotallySimple) Msgsize() (s int) {
 	for za0001 := range z.Contributors {
 		s += 1 + 14 + msgp.StringPrefixSize + len(z.Contributors[za0001].ContributorId) + 3 + msgp.StringPrefixSize + len(z.Contributors[za0001].Id) + 5 + msgp.StringPrefixSize + len(z.Contributors[za0001].Name)
 	}
-	s += 7 + msgp.Int64Size + 12 + 1 + 6 + msgp.ArrayHeaderSize + (len(z.SomeDateObj.Dates) * (msgp.TimeSize)) + 5 + msgp.StringPrefixSize + len(z.Type) + 8 + msgp.BoolSize + 6 + msgp.Float64Size
+	s += 7 + msgp.Int64Size + 12 + 1 + 6 + msgp.ArrayHeaderSize
+	for za0002 := range z.SomeDateObj.Dates {
+		if z.SomeDateObj.Dates[za0002] == nil {
+			s += msgp.NilSize
+		} else {
+			s += msgp.TimeSize
+		}
+	}
+	s += 5 + msgp.StringPrefixSize + len(z.Type) + 8 + msgp.BoolSize + 6 + msgp.Float64Size
 	return
 }

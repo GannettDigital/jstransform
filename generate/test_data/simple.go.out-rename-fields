@@ -12,7 +12,7 @@ type Simple struct {
 	} `json:"contributors,omitempty"`
 	Height      int64 `json:"height,omitempty"`
 	SomeDateObj struct {
-		Times []time.Time `json:"dates,omitempty"`
+		Times []*time.Time `json:"dates,omitempty"`
 	} `json:"someDateObj,omitempty"`
 	TypeRenamed string  `json:"type"`
 	Visible     bool    `json:"visible,omitempty"`

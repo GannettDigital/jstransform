@@ -145,6 +145,7 @@ func TestGoType(t *testing.T) {
 		description string
 		jsonType    string
 		array       bool
+		required    bool
 		want        string
 	}{
 		{
@@ -206,18 +207,32 @@ func TestGoType(t *testing.T) {
 			description: "JSON string date-time",
 			jsonType:    "date-time",
 			array:       false,
+			required:    true,
 			want:        "time.Time",
 		},
 		{
 			description: "JSON string date-time array",
 			jsonType:    "date-time",
 			array:       true,
+			required:    true,
 			want:        "[]time.Time",
+		},
+		{
+			description: "JSON string date-time, omitempty",
+			jsonType:    "date-time",
+			array:       false,
+			want:        "*time.Time",
+		},
+		{
+			description: "JSON string date-time array, omitempty",
+			jsonType:    "date-time",
+			array:       true,
+			want:        "[]*time.Time",
 		},
 	}
 
 	for _, test := range tests {
-		got := goType(test.jsonType, test.array)
+		got := goType(test.jsonType, test.array, test.required)
 		if got != test.want {
 			t.Errorf("Test %q - got %q, want %q", test.description, got, test.want)
 		}

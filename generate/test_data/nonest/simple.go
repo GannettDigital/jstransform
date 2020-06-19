@@ -20,5 +20,5 @@ type SimpleContributors struct {
 }
 
 type SimpleSomeDateObj struct {
-	Dates []time.Time `json:"dates,omitempty"`
+	Dates []*time.Time `json:"dates,omitempty"`
 }

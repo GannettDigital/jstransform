@@ -5,6 +5,6 @@ package test_data
 import "time"
 
 type Times struct {
-	NonRequiredDate time.Time `json:"nonRequiredDate,omitempty"`
-	RequiredDate    time.Time `json:"requiredDate"`
+	NonRequiredDate *time.Time `json:"nonRequiredDate,omitempty"`
+	RequiredDate    time.Time  `json:"requiredDate"`
 }
