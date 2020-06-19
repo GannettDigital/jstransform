@@ -232,7 +232,8 @@ func exportedName(name string) string {
 // If Array is true it makes the type into an array.
 // If the JSON Schema had a type of "string" and a format of "date-time" it is expected the input jsonType will be
 // "date-time".
-func goType(jsonType string, array bool) string {
+// Non-required times are added as pointers to allow for their values to missing go marshalled JSON
+func goType(jsonType string, array, required bool) string {
 	var goType string
 	switch jsonType {
 	case "boolean":
@@ -244,7 +245,11 @@ func goType(jsonType string, array bool) string {
 	case "string":
 		goType = "string"
 	case "date-time":
-		goType = "time.Time"
+		if required {
+			goType = "time.Time"
+		} else {
+			goType = "*time.Time"
+		}
 	case "object":
 		goType = "struct"
 	default:
