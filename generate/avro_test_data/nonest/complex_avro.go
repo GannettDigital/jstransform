@@ -1,4 +1,4 @@
-package test_data
+package nonest
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/GannettDigital/jstransform/generate"
-	"github.com/GannettDigital/jstransform/generate/test_data/avro/complex"
+	"github.com/GannettDigital/jstransform/generate/avro_test_data/nonest/avro/complex"
 
 	"github.com/actgardner/gogen-avro/v7/container"
 )
@@ -62,11 +62,7 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 		return &complex.Complex{AvroWriteTime: aTime, AvroDeleted: true}
 	}
 
-	Contributors_recordSlice := func(in []struct {
-		ContributorId string `json:"contributorId,omitempty"`
-		Id            string `json:"id"`
-		Name          string `json:"name"`
-	}) []*complex.Contributors_record {
+	Contributors_recordSlice := func(in []*SimpleContributors) []*complex.Contributors_record {
 		converted := make([]*complex.Contributors_record, len(in))
 		for i, z := range in {
 			converted[i] = &complex.Contributors_record{
@@ -78,13 +74,7 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 		return converted
 	}
 
-	Crops_recordSlice := func(in []struct {
-		Height       float64 `json:"height"`
-		Name         string  `json:"name"`
-		Path         string  `json:"path"`
-		RelativePath string  `json:"relativePath"`
-		Width        float64 `json:"width"`
-	}) []*complex.Crops_record {
+	Crops_recordSlice := func(in []ComplexCrops) []*complex.Crops_record {
 		converted := make([]*complex.Crops_record, len(in))
 		for i, z := range in {
 			converted[i] = &complex.Crops_record{
@@ -99,10 +89,16 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 	}
 
 	return &complex.Complex{
-		AvroWriteTime:  aTime,
-		Contributors:   Contributors_recordSlice(z.Contributors),
-		Height:         &complex.UnionNullLong{Long: z.Height, UnionType: complex.UnionNullLongTypeEnumLong},
-		SomeDateObj:    &complex.UnionNullSomeDateObj_record{SomeDateObj_record: &complex.SomeDateObj_record{Dates: generate.AvroOptionalTimeSlice(z.SomeDateObj.Dates)}, UnionType: complex.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record},
+		AvroWriteTime: aTime,
+		Contributors:  Contributors_recordSlice(z.Contributors),
+		Height:        &complex.UnionNullLong{Long: z.Height, UnionType: complex.UnionNullLongTypeEnumLong},
+		SomeDateObj: func() *complex.UnionNullSomeDateObj_record {
+			var s *complex.UnionNullSomeDateObj_record
+			if z.SomeDateObj != nil {
+				s = &complex.UnionNullSomeDateObj_record{SomeDateObj_record: &complex.SomeDateObj_record{Dates: generate.AvroOptionalTimeSlice(z.SomeDateObj.Dates)}, UnionType: complex.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record}
+			}
+			return s
+		}(),
 		Visible:        z.Visible,
 		Width:          &complex.UnionNullDouble{Double: z.Width, UnionType: complex.UnionNullDoubleTypeEnumDouble},
 		Caption:        z.Caption,
@@ -115,8 +111,14 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 			Width: z.OriginalSize.Width},
 		Type: z.Type,
 		URL: &complex.URL_record{Absolute: z.URL.Absolute,
-			Meta: &complex.UnionNullMeta_record{Meta_record: &complex.Meta_record{Description: z.URL.Meta.Description,
-				SiteName: z.URL.Meta.SiteName}, UnionType: complex.UnionNullMeta_recordTypeEnumMeta_record},
+			Meta: func() *complex.UnionNullMeta_record {
+				var s *complex.UnionNullMeta_record
+				if z.URL.Meta != nil {
+					s = &complex.UnionNullMeta_record{Meta_record: &complex.Meta_record{Description: z.URL.Meta.Description,
+						SiteName: z.URL.Meta.SiteName}, UnionType: complex.UnionNullMeta_recordTypeEnumMeta_record}
+				}
+				return s
+			}(),
 			Publish: z.URL.Publish},
 	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func TestBuildStructs(t *testing.T) {
-	testdir := "test_data"
+	testdir := "generate_test_data"
 	outDir := filepath.Join(testdir, "rename")
 	os.Mkdir(outDir, os.ModePerm|os.ModePerm)
 	defer os.RemoveAll(outDir)

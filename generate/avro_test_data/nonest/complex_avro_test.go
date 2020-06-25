@@ -1,4 +1,4 @@
-package test_data
+package nonest
 
 import (
 	"bytes"
@@ -8,13 +8,13 @@ import (
 	"time"
 
 	"github.com/GannettDigital/jstransform/generate"
-	"github.com/GannettDigital/jstransform/generate/test_data/avro/times"
+	"github.com/GannettDigital/jstransform/generate/avro_test_data/nonest/avro/complex"
 
 	"github.com/actgardner/gogen-avro/v7/container"
 )
 
-func TestTimes_WriteAvroCF(t *testing.T) {
-	z := &Times{}
+func TestComplex_WriteAvroCF(t *testing.T) {
+	z := &Complex{}
 
 	// compile error if for some reason z does not implement generate.AvroCFWriter
 	var _ generate.AvroCFWriter = z
@@ -32,7 +32,7 @@ func TestTimes_WriteAvroCF(t *testing.T) {
 		t.Fatalf("Failed containers from OCF file: %v\n", err)
 	}
 
-	read, err := times.DeserializeTimesFromSchema(containerReader, string(containerReader.AvroContainerSchema()))
+	read, err := complex.DeserializeComplexFromSchema(containerReader, string(containerReader.AvroContainerSchema()))
 	if err != nil {
 		t.Fatalf("Failed deserializing OCF file: %v\n", err)
 	}
@@ -46,8 +46,8 @@ func TestTimes_WriteAvroCF(t *testing.T) {
 	}
 }
 
-func TestTimes_WriteAvroDeletedCF(t *testing.T) {
-	z := &Times{} // In real usage at minimum an ID field should be populated
+func TestComplex_WriteAvroDeletedCF(t *testing.T) {
+	z := &Complex{} // In real usage at minimum an ID field should be populated
 
 	// compile error if for some reason z does not implement generate.AvroCFDeleter
 	var _ generate.AvroCFDeleter = z
@@ -65,7 +65,7 @@ func TestTimes_WriteAvroDeletedCF(t *testing.T) {
 		t.Fatalf("Failed containers from OCF file: %v\n", err)
 	}
 
-	read, err := times.DeserializeTimesFromSchema(containerReader, string(containerReader.AvroContainerSchema()))
+	read, err := complex.DeserializeComplexFromSchema(containerReader, string(containerReader.AvroContainerSchema()))
 	if err != nil {
 		t.Fatalf("Failed deserializing OCF file: %v\n", err)
 	}
@@ -79,14 +79,14 @@ func TestTimes_WriteAvroDeletedCF(t *testing.T) {
 	}
 }
 
-func ExampleTimesBulkAvroWriter() {
-	input := []*Times{{}, {}, {}}
-	inputChan := make(chan *Times)
+func ExampleComplexBulkAvroWriter() {
+	input := []*Complex{{}, {}, {}}
+	inputChan := make(chan *Complex)
 
 	devnull, _ := os.Open("/dev/null")
 	defer devnull.Close()
 
-	errChan := TimesBulkAvroWriter(devnull, time.Now(), inputChan)
+	errChan := ComplexBulkAvroWriter(devnull, time.Now(), inputChan)
 
 	for _, item := range input {
 		select {

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/GannettDigital/jstransform/generate"
-	"github.com/GannettDigital/jstransform/generate/test_data/nonest/avro/simple"
+	"github.com/GannettDigital/jstransform/generate/avro_test_data/nonest/avro/simple"
 
 	"github.com/actgardner/gogen-avro/v7/container"
 )

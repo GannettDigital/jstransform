@@ -24,7 +24,7 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 			description: "simple avro file with named nested structs",
 			name:        "Simple",
 			filename:    "nonest/simple.go",
-			importPath:  "github.com/GannettDigital/jstransform/generate/test_data/nonest",
+			importPath:  "github.com/GannettDigital/jstransform/generate/avro_test_data/nonest",
 			wantPath:    "nonest/simple_avro.go",
 		},
 		{
@@ -43,7 +43,7 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 			description: "complex avro file with named nested structs",
 			name:        "Complex",
 			filename:    "nonest/complex.go",
-			importPath:  "github.com/GannettDigital/jstransform/generate/test_data/nonest",
+			importPath:  "github.com/GannettDigital/jstransform/generate/avro_test_data/nonest",
 			wantPath:    "nonest/complex_avro.go",
 		},
 		{
@@ -61,8 +61,8 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 		// TODO test an array of structs within an array of structs (I think it will fail)
 	}
 
-	testPath := "./test_data"
-	defaultImportPath := "github.com/GannettDigital/jstransform/generate/test_data"
+	testPath := "./avro_test_data"
+	defaultImportPath := "github.com/GannettDigital/jstransform/generate/avro_test_data"
 	for _, test := range tests {
 		testImportPath := defaultImportPath
 		if test.importPath != "" {

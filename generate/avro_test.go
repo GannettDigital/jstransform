@@ -21,44 +21,44 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 		{
 			description: "simple go struct",
 			name:        "Simple",
-			goPath:      "./test_data/simple.go",
-			wantPath:    "./test_data/simple.avsc.out",
+			goPath:      "./avro_test_data/simple.go",
+			wantPath:    "./avro_test_data/simple.avsc.out",
 		},
 		{
 			description: "simple go struct - no nest",
 			name:        "Simple",
-			goPath:      "./test_data/nonest/simple.go",
-			wantPath:    "./test_data/simple.avsc.out",
+			goPath:      "./avro_test_data/nonest/simple.go",
+			wantPath:    "./avro_test_data/simple.avsc.out",
 		},
 		{
 			description: "fields with repeated field names",
 			name:        "Repeats",
-			goPath:      "./test_data/repeats.go",
-			wantPath:    "./test_data/repeats.avsc.out",
+			goPath:      "./avro_test_data/repeats.go",
+			wantPath:    "./avro_test_data/repeats.avsc.out",
 		},
 		{
 			description: "with embedded and nested structs, fields with descriptions",
 			name:        "Complex",
-			goPath:      "./test_data/complex.go",
-			wantPath:    "./test_data/complex.avsc.out",
+			goPath:      "./avro_test_data/complex.go",
+			wantPath:    "./avro_test_data/complex.avsc.out",
 		},
 		{
 			description: "with embedded and named nested structs, fields with descriptions",
 			name:        "Complex",
-			goPath:      "./test_data/nonest/complex.go",
-			wantPath:    "./test_data/complex.avsc.out",
+			goPath:      "./avro_test_data/nonest/complex.go",
+			wantPath:    "./avro_test_data/complex.avsc.out",
 		},
 		{
 			description: "Variations on Arrays",
 			name:        "Arrays",
-			goPath:      "./test_data/arrays.go",
-			wantPath:    "./test_data/arrays.avsc.out",
+			goPath:      "./avro_test_data/arrays.go",
+			wantPath:    "./avro_test_data/arrays.avsc.out",
 		},
 		{
 			description: "Time fields",
 			name:        "Times",
-			goPath:      "./test_data/times.go",
-			wantPath:    "./test_data/times.avsc.out",
+			goPath:      "./avro_test_data/times.go",
+			wantPath:    "./avro_test_data/times.avsc.out",
 		},
 	}
 
@@ -94,23 +94,23 @@ func TestBuildAvroSerializationFunctions(t *testing.T) {
 	}{
 		{
 			description: "simple avro file",
-			path:        "./test_data/simple.avsc.out",
+			path:        "./avro_test_data/simple.avsc.out",
 		},
 		{
 			description: "fields with repeated field names",
-			path:        "./test_data/repeats.avsc.out",
+			path:        "./avro_test_data/repeats.avsc.out",
 		},
 		{
 			description: "complex avro file",
-			path:        "./test_data/complex.avsc.out",
+			path:        "./avro_test_data/complex.avsc.out",
 		},
 		{
 			description: "Variations on Arrays",
-			path:        "./test_data/arrays.avsc.out",
+			path:        "./avro_test_data/arrays.avsc.out",
 		},
 		{
 			description: "Variations on time",
-			path:        "./test_data/times.avsc.out",
+			path:        "./avro_test_data/times.avsc.out",
 		},
 	}
 
@@ -121,7 +121,7 @@ func TestBuildAvroSerializationFunctions(t *testing.T) {
 
 		git := exec.Command("git", "diff", "--quiet", "*.go")
 		schemaName := strings.Split(filepath.Base(test.path), ".")[0]
-		git.Dir = filepath.Join("./test_data/avro", schemaName)
+		git.Dir = filepath.Join("./avro_test_data/avro", schemaName)
 		if err := git.Run(); err != nil {
 			t.Errorf("Test %q - Differences in generated files found", test.description)
 		}
@@ -137,7 +137,7 @@ func TestParseGoStruct(t *testing.T) {
 		{
 			description: "simple struct",
 			name:        "Simple",
-			path:        "./test_data/simple.go",
+			path:        "./avro_test_data/simple.go",
 		},
 		{
 			description: "a struct among many others",
