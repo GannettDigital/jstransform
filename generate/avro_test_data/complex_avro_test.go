@@ -1,4 +1,4 @@
-package nonest
+package avro_test_data
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/GannettDigital/jstransform/generate"
-	"github.com/GannettDigital/jstransform/generate/test_data/nonest/avro/complex"
+	"github.com/GannettDigital/jstransform/generate/avro_test_data/avro/complex"
 
 	"github.com/actgardner/gogen-avro/v7/container"
 )

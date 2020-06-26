@@ -1,4 +1,4 @@
-package test_data
+package avro_test_data
 
 import "time"
 

@@ -1,4 +1,4 @@
-package test_data
+package avro_test_data
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/GannettDigital/jstransform/generate"
-	"github.com/GannettDigital/jstransform/generate/test_data/avro/repeats"
+	"github.com/GannettDigital/jstransform/generate/avro_test_data/avro/repeats"
 
 	"github.com/actgardner/gogen-avro/v7/container"
 )
