@@ -14,4 +14,4 @@ script:
   - go test -v -race -parallel 4 -coverprofile=coverage.txt -covermode=atomic ./...
 
 after_success:
-  - goveralls -coverprofile=coverage.txt -service=travis-ci -ignore=generate/test_data/*
+  - goveralls -coverprofile=coverage.txt -service=travis-ci -ignore=generate/avro_test_data/*,generate/generate_test_data/*,struct_test_data/*
