@@ -53,12 +53,24 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 			wantPath:    "arrays_avro.go",
 		},
 		{
+			description: "nested array structs",
+			name:        "Nested",
+			filename:    "nested.go",
+			wantPath:    "nested_avro.go",
+		},
+		{
+			description: "nested array structs with named nested structs",
+			name:        "Nested",
+			filename:    "nonest/nested.go",
+			importPath:  "github.com/GannettDigital/jstransform/generate/avro_test_data/nonest",
+			wantPath:    "nonest/nested_avro.go",
+		},
+		{
 			description: "variations on Times",
 			name:        "Times",
 			filename:    "times.go",
 			wantPath:    "times_avro.go",
 		},
-		// TODO test an array of structs within an array of structs (I think it will fail)
 	}
 
 	testPath := "./avro_test_data"

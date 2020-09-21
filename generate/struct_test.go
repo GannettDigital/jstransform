@@ -313,6 +313,22 @@ func TestGeneratedStruct(t *testing.T) {
 			oneOfType:    "complex",
 			wantFilePath: "struct_test_data/complex.go",
 		},
+		{
+			description:            "nested array structs schema - no nest",
+			schemaPath:             "struct_test_data/nested.json",
+			packageName:            "nonest",
+			oneOfType:              "nested",
+			descriptionAsStructTag: false,
+			noNestedStruct:         true,
+			wantFilePath:           "struct_test_data/nonest/nested.go",
+		},
+		{
+			description:  "nested array structs schema",
+			schemaPath:   "struct_test_data/nested.json",
+			packageName:  "test_data",
+			oneOfType:    "nested",
+			wantFilePath: "struct_test_data/nested.go",
+		},
 	}
 
 	for _, test := range tests {

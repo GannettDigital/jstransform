@@ -510,6 +510,13 @@ func printFields(list *ast.FieldList) string {
 		case *ast.Ident:
 			out += fmt.Sprintf("%s %s %s\n", name, fType.Name, f.Tag.Value)
 		case *ast.ArrayType:
+			// Handle the case where an array of structs is inside an array of structs.
+			str, ok := fType.Elt.(*ast.StructType)
+			if ok {
+				out += fmt.Sprintf("%s []struct{\n%s} %s\n", name, printFields(str.Fields), f.Tag.Value)
+				continue
+			}
+
 			ident, ok := fType.Elt.(*ast.Ident)
 			if !ok {
 				return "unknown array type"
