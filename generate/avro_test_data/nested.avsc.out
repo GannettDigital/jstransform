@@ -1,0 +1,88 @@
+{
+  "name": "Nested",
+  "type": "record",
+  "fields": [
+    {
+      "name": "AvroWriteTime",
+      "doc": "The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.",
+      "type": "long",
+      "logicalType": "timestamp-millis"
+    },
+    {
+      "name": "AvroDeleted",
+      "doc": "This is set to true when the Avro data is recording a delete in the source data.",
+      "default": false,
+      "type": "boolean"
+    },
+    {
+      "name": "factCheckClaims",
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "factCheckClaims_record",
+          "namespace": "factCheckClaims",
+          "type": "record",
+          "fields": [
+            {
+              "name": "appearanceURLs",
+              "namespace": "factCheckClaims",
+              "type": {
+                "type": "array",
+                "items": {
+                  "name": "appearanceURLs_record",
+                  "namespace": "factCheckClaims.appearanceURLs",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "original",
+                      "namespace": "factCheckClaims.appearanceURLs",
+                      "type": "boolean",
+                      "default": false
+                    },
+                    {
+                      "name": "url",
+                      "namespace": "factCheckClaims.appearanceURLs",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "author",
+              "namespace": "factCheckClaims",
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            {
+              "name": "claim",
+              "namespace": "factCheckClaims",
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            {
+              "name": "date",
+              "namespace": "factCheckClaims",
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            {
+              "name": "rating",
+              "namespace": "factCheckClaims",
+              "type": [
+                "null",
+                "string"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

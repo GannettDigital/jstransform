@@ -115,6 +115,32 @@ func TestBuildStructs(t *testing.T) {
 			expectedFiles: []string{"times.go"},
 			wantFiles:     []string{"times.go.out"},
 		},
+		{
+			description: "nested array structs",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "nested.json"),
+				OutputDir:              outDir,
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: false,
+				NoNestedStructs:        false,
+			},
+			expectedFiles: []string{"nested.go"},
+			wantFiles:     []string{"nested.go"},
+		},
+		{
+			description: "nested array structs - nonest",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "nested.json"),
+				OutputDir:              outDir2,
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: false,
+				NoNestedStructs:        true,
+			},
+			expectedFiles: []string{"nested.go"},
+			wantFiles:     []string{"nonest/nested.go"},
+		},
 	}
 
 	for _, test := range tests {

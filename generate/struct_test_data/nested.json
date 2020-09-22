@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "factCheckClaims": {
+      "type": "array",
+      "description": "Information related to the International Fact-Checking Network (IFCN) program",
+      "additionalItems": false,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "claim": {
+            "description": "The factCheck claim",
+            "type": "string"
+          },
+          "rating": {
+            "description": "The factCheck rating",
+            "type": "string",
+            "enum": [
+              "True",
+              "Satire",
+              "Missing Context",
+              "Partly False",
+              "Altered",
+              "False"
+            ]
+          },
+          "author": {
+            "description": "The factCheck author",
+            "type": "string"
+          },
+          "date": {
+            "description": "The date of the factCheck",
+            "type": "string",
+            "format": "date"
+          },
+          "appearanceURLs": {
+            "type": "array",
+            "description": "The factCheck appearanceURLs",
+            "additionalItems": false,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "url": {
+                  "description": "The appearance url",
+                  "type": "string",
+                  "format": "url"
+                },
+                "original": {
+                  "description": "The original flag",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "url"
+              ]
+            }
+          }
+        }
+      },
+      "required": [
+        "claim",
+        "rating"
+      ]
+    }
+  },
+  "required": [
+    "factCheckClaims"
+  ]
+}
