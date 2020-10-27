@@ -4,7 +4,7 @@ package rename
 
 import "time"
 
-type TotallySimple struct {
+type Simple struct {
 	Contributors []struct {
 		ContributorId string `json:"contributorId,omitempty"`
 		Id            string `json:"id"`
@@ -12,7 +12,7 @@ type TotallySimple struct {
 	} `json:"contributors,omitempty"`
 	Height      int64 `json:"height,omitempty"`
 	SomeDateObj struct {
-		Dates []*time.Time `json:"dates,omitempty"`
+		Dates []time.Time `json:"dates,omitempty"`
 	} `json:"someDateObj,omitempty"`
 	Type    string  `json:"type"`
 	Visible bool    `json:"visible,omitempty"`

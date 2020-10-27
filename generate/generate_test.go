@@ -8,77 +8,97 @@ import (
 	"testing"
 )
 
+// TestBuildStructs generates go files and compares them to their corresponding files located at generate_test_data/{outDir}
+// To add new test cases that fit into the existing cases:
+// 1. Generate go files in the generate_test_data/{outDir} that matches your test case
+// To add new test cases that do NOT fit into the existing cases:
+// 1. Add a new output directory with the name of your test case to generate_test_data/{outDir} (use one word all lowercase so the go files package name is simple)
+// 2. Generate go files in the new output directory at generate_test_data/{outDir}
 func TestBuildStructs(t *testing.T) {
 	testdir := "generate_test_data"
-	outDir := filepath.Join(testdir, "rename")
-	os.Mkdir(outDir, os.ModePerm|os.ModePerm)
-	defer os.RemoveAll(outDir)
-	outDir2 := "nonest"
-	os.Mkdir(outDir2, os.ModePerm|os.ModePerm)
-	defer os.RemoveAll(outDir2)
 
 	tests := []struct {
-		description   string
-		buildArgs     BuildArgs
-		expectedFiles []string
-		wantFiles     []string
+		description string
+		// BuildArgs.OutputDir is the directory name that holds the go files
+		// go files created by these tests exist at {outDir} (this directory is cleaned up after each test)
+		// expected go files that are used to compare against the test created files exist at generate_test_data/{outDir}
+		buildArgs BuildArgs
+		files     []string
 	}{
 		{
 			description: "without oneOfTypes",
 			buildArgs: BuildArgs{
 				SchemaPath:             filepath.Join(testdir, "complex.json"),
-				OutputDir:              outDir,
+				OutputDir:              "generated",
 				GenerateMessagePack:    false,
 				StructNameMap:          nil,
 				DescriptionAsStructTag: true,
 			},
-			expectedFiles: []string{"complex.go"},
-			wantFiles:     []string{"complex.go.out2"},
+			files: []string{"complex.go"},
 		},
 		{
-			description: "without oneOfTypes, with no nested structs and descriptions as comments",
+			description: "one allOf with additional properties at the top level",
 			buildArgs: BuildArgs{
-				SchemaPath:             filepath.Join(testdir, "test_schema2.json"),
-				OutputDir:              outDir2,
+				SchemaPath:             filepath.Join(testdir, "all_of_with_properties.json"),
+				OutputDir:              "generated",
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: true,
+			},
+			files: []string{"all_of_with_properties.go", "simple.go"},
+		},
+		{
+			description: "test formatting of times",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "times.json"),
+				OutputDir:              "generated",
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: true,
+			},
+			files: []string{"times.go"},
+		},
+		{
+			description: "nested array structs",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "nested.json"),
+				OutputDir:              "generated",
 				GenerateMessagePack:    false,
 				StructNameMap:          nil,
 				DescriptionAsStructTag: false,
-				NoNestedStructs:        true,
+				NoNestedStructs:        false,
 			},
-			expectedFiles: []string{"simple.go", "complex.go"},
-			wantFiles:     []string{"nonest/simple.go", "nonest/complex.go"},
+			files: []string{"nested.go"},
 		},
 		{
 			description: "with oneOfType",
 			buildArgs: BuildArgs{
 				SchemaPath:             filepath.Join(testdir, "test_schema.json"),
-				OutputDir:              outDir,
+				OutputDir:              "msgp",
 				GenerateMessagePack:    true,
 				StructNameMap:          nil,
 				DescriptionAsStructTag: true,
 			},
-			expectedFiles: []string{"simple.go", "complex.go", "rename_msgp.go", "rename_msgp_test.go"},
-			wantFiles:     []string{"simple.go.out2", "complex.go.out2", "rename_msgp.go.out", "rename_msgp_test.go.out"},
+			files: []string{"simple.go", "complex.go", "msgp_msgp.go", "msgp_msgp_test.go"},
 		},
 		{
 			description: "without oneOfTypes, renamed",
 			buildArgs: BuildArgs{
 				SchemaPath:          filepath.Join(testdir, "complex.json"),
-				OutputDir:           outDir,
+				OutputDir:           "rename",
 				GenerateMessagePack: false,
 				StructNameMap: map[string]string{
 					"complex": "ReallyComplex",
 				},
 				DescriptionAsStructTag: true,
 			},
-			expectedFiles: []string{"complex.go"},
-			wantFiles:     []string{"complex.go.out-rename"},
+			files: []string{"complex.go"},
 		},
 		{
 			description: "with oneOfType, renamed",
 			buildArgs: BuildArgs{
 				SchemaPath:          filepath.Join(testdir, "test_schema.json"),
-				OutputDir:           outDir,
+				OutputDir:           "rename",
 				GenerateMessagePack: true,
 				StructNameMap: map[string]string{
 					"simple":  "TotallySimple",
@@ -88,80 +108,99 @@ func TestBuildStructs(t *testing.T) {
 				},
 				DescriptionAsStructTag: true,
 			},
-			expectedFiles: []string{"simple.go", "complex.go", "rename_msgp.go", "rename_msgp_test.go"},
-			wantFiles:     []string{"simple.go.out-rename", "complex.go.out-rename", "rename_msgp.go.out-rename", "rename_msgp_test.go.out-rename"},
+			files: []string{"simple.go", "complex.go", "rename_msgp.go", "rename_msgp_test.go"},
 		},
 		{
-			description: "one allOf with additional properties at the top level",
+			description: "without oneOfTypes, with no nested structs and descriptions as comments",
 			buildArgs: BuildArgs{
-				SchemaPath:             filepath.Join(testdir, "all_of_with_properties.json"),
-				OutputDir:              outDir,
-				GenerateMessagePack:    false,
-				StructNameMap:          nil,
-				DescriptionAsStructTag: true,
-			},
-			expectedFiles: []string{"all_of_with_properties.go", "simple.go"},
-			wantFiles:     []string{"all_of_with_properties.go.out", "simple.go.out2"},
-		},
-		{
-			description: "test formatting of times",
-			buildArgs: BuildArgs{
-				SchemaPath:             filepath.Join(testdir, "times.json"),
-				OutputDir:              outDir,
-				GenerateMessagePack:    false,
-				StructNameMap:          nil,
-				DescriptionAsStructTag: true,
-			},
-			expectedFiles: []string{"times.go"},
-			wantFiles:     []string{"times.go.out"},
-		},
-		{
-			description: "nested array structs",
-			buildArgs: BuildArgs{
-				SchemaPath:             filepath.Join(testdir, "nested.json"),
-				OutputDir:              outDir,
-				GenerateMessagePack:    false,
-				StructNameMap:          nil,
-				DescriptionAsStructTag: false,
-				NoNestedStructs:        false,
-			},
-			expectedFiles: []string{"nested.go"},
-			wantFiles:     []string{"nested.go"},
-		},
-		{
-			description: "nested array structs - nonest",
-			buildArgs: BuildArgs{
-				SchemaPath:             filepath.Join(testdir, "nested.json"),
-				OutputDir:              outDir2,
+				SchemaPath:             filepath.Join(testdir, "test_schema2.json"),
+				OutputDir:              "nonest",
 				GenerateMessagePack:    false,
 				StructNameMap:          nil,
 				DescriptionAsStructTag: false,
 				NoNestedStructs:        true,
 			},
-			expectedFiles: []string{"nested.go"},
-			wantFiles:     []string{"nonest/nested.go"},
+			files: []string{"simple.go", "complex.go"},
+		},
+		{
+			description: "nested array structs - nonest",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "nested.json"),
+				OutputDir:              "nonest",
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: false,
+				NoNestedStructs:        true,
+			},
+			files: []string{"nested.go"},
+		},
+		{
+			description: "without oneOfTypes, with no nested structs and descriptions as comments - pointers",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "test_schema2.json"),
+				OutputDir:              "pointers",
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: false,
+				NoNestedStructs:        true,
+				Pointers:               true,
+			},
+			files: []string{"simple.go", "complex.go"},
+		},
+		{
+			description: "nested array structs - pointers",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "nested.json"),
+				OutputDir:              "pointers",
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: false,
+				NoNestedStructs:        true,
+				Pointers:               true,
+			},
+			files: []string{"nested.go"},
+		},
+		{
+			description: "test formatting of times - pointers",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "times.json"),
+				OutputDir:              "pointers",
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: false,
+				NoNestedStructs:        true,
+				Pointers:               true,
+			},
+			files: []string{"times.go"},
 		},
 	}
 
 	for _, test := range tests {
+		outDir := test.buildArgs.OutputDir
+		os.Mkdir(outDir, os.ModePerm|os.ModePerm)
+
 		if err := BuildStructsWithArgs(test.buildArgs); err != nil {
 			t.Fatalf("Test %q - BuildStructsRename failed: %v", test.description, err)
 		}
 
-		for i := range test.expectedFiles {
-			got, err := ioutil.ReadFile(filepath.Join(test.buildArgs.OutputDir, test.expectedFiles[i]))
+		for i := range test.files {
+			got, err := ioutil.ReadFile(filepath.Join(outDir, test.files[i]))
 			if err != nil {
-				t.Errorf("Test %q - failed to read expected file %q: %v", test.description, test.expectedFiles[i], err)
+				t.Errorf("Test %q - failed to read expected file %q: %v", test.description, test.files[i], err)
 			}
 
-			want, err := ioutil.ReadFile(filepath.Join(testdir, test.wantFiles[i]))
+			want, err := ioutil.ReadFile(filepath.Join(testdir, outDir, test.files[i]))
 			if err != nil {
-				t.Errorf("Test %q - failed to read want file %q: %v", test.description, test.wantFiles[i], err)
+				t.Errorf("Test %q - failed to read want file %q: %v", test.description, test.files[i], err)
 			}
 
 			if string(got) != string(want) {
-				t.Errorf("Test %q - file %q got\n%s\n!= want\n%s", test.description, test.expectedFiles[i], got, want)
+				t.Errorf("Test %q - file %q got\n%s\n!= want\n%s", test.description, test.files[i], got, want)
 			}
+		}
+
+		if err := os.RemoveAll(outDir); err != nil {
+			t.Errorf("Test %q - failed to cleanup output dir %s for test generated files", test.description, outDir)
 		}
 	}
 }
@@ -172,6 +211,7 @@ func TestGoType(t *testing.T) {
 		jsonType    string
 		array       bool
 		required    bool
+		pointers    bool
 		want        string
 	}{
 		{
@@ -247,18 +287,32 @@ func TestGoType(t *testing.T) {
 			description: "JSON string date-time, omitempty",
 			jsonType:    "date-time",
 			array:       false,
-			want:        "*time.Time",
+			want:        "time.Time",
 		},
 		{
 			description: "JSON string date-time array, omitempty",
 			jsonType:    "date-time",
 			array:       true,
+			want:        "[]time.Time",
+		},
+		{
+			description: "JSON string date-time, omitempty, pointers",
+			jsonType:    "date-time",
+			array:       false,
+			pointers:    true,
+			want:        "*time.Time",
+		},
+		{
+			description: "JSON string date-time array, omitempty, pointers",
+			jsonType:    "date-time",
+			array:       true,
+			pointers:    true,
 			want:        "[]*time.Time",
 		},
 	}
 
 	for _, test := range tests {
-		got := goType(test.jsonType, test.array, test.required)
+		got := goType(test.jsonType, test.array, test.required, test.pointers)
 		if got != test.want {
 			t.Errorf("Test %q - got %q, want %q", test.description, got, test.want)
 		}

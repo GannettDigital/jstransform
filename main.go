@@ -40,6 +40,7 @@ func main() {
 	renameFields := mapFlags{kv: make(map[string]string)}
 
 	nestedStructs := flag.Bool("nestedStructs", true, "Build struct with unnamed nested structs, if false each nested struct is made its own type.")
+	pointers := flag.Bool("pointers", false, "Build non-required JSON objects and date time fields as struct pointers")
 	descriptionAsStructTag := flag.Bool("descriptionAsStructTag", true, "Include the description as a struct tag, rather than a comment")
 	flag.Var(&renameStructs, "rename", "Override generated name of structure; use '-rename old=new'.")
 	flag.Var(&renameFields, "renameFields", "Override generated name of structure; use '-renameFields old=new'.")
@@ -85,6 +86,7 @@ func main() {
 		ImportPath:             *importPath,
 		DescriptionAsStructTag: *descriptionAsStructTag,
 		NoNestedStructs:        !*nestedStructs,
+		Pointers:               *pointers,
 		StructNameMap:          renameStructs.kv,
 		FieldNameMap:           renameFields.kv}); err != nil {
 		fmt.Printf("Golang Struct generation failed: %v\n", err)
