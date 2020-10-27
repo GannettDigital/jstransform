@@ -139,7 +139,7 @@ func TestBuildStructs(t *testing.T) {
 			buildArgs: BuildArgs{
 				SchemaPath:             filepath.Join(testdir, "test_schema2.json"),
 				OutputDir:              "pointers",
-				GenerateMessagePack:    false,
+				GenerateMessagePack:    true,
 				StructNameMap:          nil,
 				DescriptionAsStructTag: false,
 				NoNestedStructs:        true,
