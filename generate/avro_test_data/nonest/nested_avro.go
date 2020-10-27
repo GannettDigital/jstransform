@@ -62,7 +62,7 @@ func (z *Nested) convertToAvro(writeTime time.Time) *nested.Nested {
 		return &nested.Nested{AvroWriteTime: aTime, AvroDeleted: true}
 	}
 
-	AppearanceURLs_recordSlice := func(in []*NestedFactCheckClaimsAppearanceURLs) []*nested.AppearanceURLs_record {
+	AppearanceURLs_recordSlice := func(in []NestedFactCheckClaimsAppearanceURLs) []*nested.AppearanceURLs_record {
 		converted := make([]*nested.AppearanceURLs_record, len(in))
 		for i, z := range in {
 			converted[i] = &nested.AppearanceURLs_record{

@@ -102,7 +102,7 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 		AvroWriteTime:  aTime,
 		Contributors:   Contributors_recordSlice(z.Contributors),
 		Height:         &complex.UnionNullLong{Long: z.Height, UnionType: complex.UnionNullLongTypeEnumLong},
-		SomeDateObj:    &complex.UnionNullSomeDateObj_record{SomeDateObj_record: &complex.SomeDateObj_record{Dates: generate.AvroOptionalTimeSlice(z.SomeDateObj.Dates)}, UnionType: complex.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record},
+		SomeDateObj:    &complex.UnionNullSomeDateObj_record{SomeDateObj_record: &complex.SomeDateObj_record{Dates: generate.AvroTimeSlice(z.SomeDateObj.Dates)}, UnionType: complex.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record},
 		Visible:        z.Visible,
 		Width:          &complex.UnionNullDouble{Double: z.Width, UnionType: complex.UnionNullDoubleTypeEnumDouble},
 		Caption:        z.Caption,

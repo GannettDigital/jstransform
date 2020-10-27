@@ -9,7 +9,7 @@ type Nested struct {
 
 type NestedFactCheckClaims struct {
 	// The factCheck appearanceURLs
-	AppearanceURLs []*NestedFactCheckClaimsAppearanceURLs `json:"appearanceURLs,omitempty"`
+	AppearanceURLs []NestedFactCheckClaimsAppearanceURLs `json:"appearanceURLs,omitempty"`
 	// The factCheck author
 	Author string `json:"author,omitempty"`
 	// The factCheck claim

@@ -63,15 +63,9 @@ func (z *Times) convertToAvro(writeTime time.Time) *times.Times {
 	}
 
 	return &times.Times{
-		AvroWriteTime: aTime,
-		NonRequiredDate: func() *times.UnionNullLong {
-			var s *times.UnionNullLong
-			if z.NonRequiredDate != nil {
-				s = &times.UnionNullLong{Long: generate.AvroOptionalTime(z.NonRequiredDate), UnionType: times.UnionNullLongTypeEnumLong}
-			}
-			return s
-		}(),
-		RequiredDate: generate.AvroTime(z.RequiredDate),
+		AvroWriteTime:   aTime,
+		NonRequiredDate: &times.UnionNullLong{Long: generate.AvroTime(z.NonRequiredDate), UnionType: times.UnionNullLongTypeEnumLong},
+		RequiredDate:    generate.AvroTime(z.RequiredDate),
 	}
 }
 
