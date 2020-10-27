@@ -26,7 +26,7 @@ type extractedField struct {
 // write outputs the Golang representation of this field to the writer with prefix before each line.
 // It handles inline structs by calling this method recursively adding a new \t to the prefix for each layer.
 // If required is set to false 'omitempty' is added in the JSON struct tag for the field
-func (ef *extractedField) write(w io.Writer, prefix string, required, descriptionAsStructTag bool) error {
+func (ef *extractedField) write(w io.Writer, prefix string, required, descriptionAsStructTag, pointers bool) error {
 	var omitempty string
 	if !required {
 		omitempty = ",omitempty"
@@ -47,17 +47,17 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 	}
 
 	if ef.jsonType != "object" {
-		_, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s\t%s", prefix, ef.name, goType(ef.jsonType, ef.array, required), structTag)))
+		_, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s\t%s", prefix, ef.name, goType(ef.jsonType, ef.array, required, pointers), structTag)))
 		return err
 	}
 
-	if _, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s {\n", prefix, ef.name, goType(ef.jsonType, ef.array, required)))); err != nil {
+	if _, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s {\n", prefix, ef.name, goType(ef.jsonType, ef.array, required, pointers)))); err != nil {
 		return err
 	}
 
 	for _, field := range ef.fields.Sorted() {
 		fieldRequired := ef.requiredFields[field.jsonName]
-		if err := field.write(w, prefix+"\t", fieldRequired, descriptionAsStructTag); err != nil {
+		if err := field.write(w, prefix+"\t", fieldRequired, descriptionAsStructTag, pointers); err != nil {
 			return fmt.Errorf("failed writing field %q: %v", field.name, err)
 		}
 	}
@@ -197,8 +197,8 @@ func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 		key := strings.Join(parts, "")
 		structType := key
 
-		// nullable nested structs should be pointers
-		if !gof.rootStruct.requiredFields[name] {
+		// nullable nested structs could be pointers
+		if !gof.rootStruct.requiredFields[name] && gof.args.Pointers {
 			structType = "*" + key
 		}
 
@@ -275,7 +275,7 @@ func (gen *generatedStruct) write(w io.Writer) error {
 
 	for _, field := range gen.fields.Sorted() {
 		req := gen.requiredFields[field.jsonName]
-		if err := field.write(w, "\t", req, gen.args.DescriptionAsStructTag); err != nil {
+		if err := field.write(w, "\t", req, gen.args.DescriptionAsStructTag, gen.args.Pointers); err != nil {
 			return fmt.Errorf("failed writing field %q: %v", field.name, err)
 		}
 	}

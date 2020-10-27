@@ -223,7 +223,7 @@ func TestExtractedField_Write(t *testing.T) {
 
 	for _, test := range tests {
 		buf := &bytes.Buffer{}
-		if err := test.ef.write(buf, test.prefix, test.required, test.descriptionAsStructTag); err != nil {
+		if err := test.ef.write(buf, test.prefix, test.required, test.descriptionAsStructTag, false); err != nil {
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
 		}
 		if got, want := string(buf.Bytes()), test.want; got != want {

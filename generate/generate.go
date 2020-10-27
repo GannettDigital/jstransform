@@ -26,6 +26,8 @@ const msgpMode = gen.Encode | gen.Decode | gen.Marshal | gen.Unmarshal | gen.Siz
 //  NoNestedStructs will create structs that have no unnamed nested structs in them but rather defined types for each
 //  nested struct
 //
+//  Pointers will create non-required objects and date/time fields with pointers thus allowing the JSON to support null for those fields.
+//
 //  GenerateAvro is a flag that defines if Avro serializing code should be built.
 //  The Avro generated code will only use a single field in the case where a field name is defined in a oneOf and
 //  elsewhere in the JSON schema. When converting the most specific version of such a field will be used. In general
@@ -43,6 +45,7 @@ type BuildArgs struct {
 	OutputDir              string
 	DescriptionAsStructTag bool
 	NoNestedStructs        bool
+	Pointers               bool
 	GenerateAvro           bool
 	GenerateMessagePack    bool
 	ImportPath             string
@@ -233,7 +236,7 @@ func exportedName(name string) string {
 // If the JSON Schema had a type of "string" and a format of "date-time" it is expected the input jsonType will be
 // "date-time".
 // Non-required times are added as pointers to allow for their values to missing go marshalled JSON
-func goType(jsonType string, array, required bool) string {
+func goType(jsonType string, array, required, pointers bool) string {
 	var goType string
 	switch jsonType {
 	case "boolean":
@@ -245,9 +248,8 @@ func goType(jsonType string, array, required bool) string {
 	case "string":
 		goType = "string"
 	case "date-time":
-		if required {
-			goType = "time.Time"
-		} else {
+		goType = "time.Time"
+		if pointers && !required {
 			goType = "*time.Time"
 		}
 	case "object":

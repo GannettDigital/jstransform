@@ -4,17 +4,15 @@ package rename
 
 import "time"
 
-type All_of_with_properties struct {
-	CoachId      string `json:"coachId,omitempty"`
+type TotallySimple struct {
 	Contributors []struct {
 		ContributorId string `json:"contributorId,omitempty"`
 		Id            string `json:"id"`
 		Name          string `json:"name"`
 	} `json:"contributors,omitempty"`
-	Height      int64  `json:"height,omitempty"`
-	Season      string `json:"season,omitempty"`
+	Height      int64 `json:"height,omitempty"`
 	SomeDateObj struct {
-		Dates []*time.Time `json:"dates,omitempty"`
+		Dates []time.Time `json:"dates,omitempty"`
 	} `json:"someDateObj,omitempty"`
 	Type    string  `json:"type"`
 	Visible bool    `json:"visible,omitempty"`
