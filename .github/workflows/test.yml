@@ -1,10 +1,6 @@
 name: test
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push, pull_request]
 
 jobs:
   golang:
@@ -20,8 +16,6 @@ jobs:
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-$GITHUB_REPOSITORY-${{ hashFiles('**/go.mod') }}
-      - name: install dependencies
-        run: go mod download
       - name: go vet
         run: go vet ./...
       - name: go test race
