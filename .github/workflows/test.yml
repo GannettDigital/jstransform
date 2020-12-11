@@ -20,13 +20,17 @@ jobs:
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-$GITHUB_REPOSITORY-${{ hashFiles('**/go.mod') }}
+      - name: install dependencies
+        run: go mod download
       - name: go vet
         run: go vet ./...
       - name: go test race
-        run: go test -v -race -parallel 4 -coverprofile=coverage.txt -covermode=atomic ./...
+        run: go test -v -race -parallel 4 -coverprofile=covprofile -covermode=atomic ./...
       - name: install goveralls
+        env:
+          GO111MODULE: off
         run: go get github.com/mattn/goveralls
       - name: send coverage
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          run: goveralls -coverprofile=coverage.txt -service=github
+          run: goveralls -coverprofile=covprofile -service=github
