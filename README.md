@@ -1,6 +1,6 @@
 # jstransform
 [![Go Docs](https://godoc.org/github.com/GannettDigital/jstransform?status.svg)](https://godoc.org/github.com/GannettDigital/jstransform)
-[![Build Status](https://travis-ci.org/GannettDigital/jstransform.svg)](https://travis-ci.org/GannettDigital/jstransform)
+[![Build Status](https://github.com/GannettDigital/jstransform/workflows/test/badge.svg)](https://github.com/GannettDigital/jstransform/actions?query=workflow%3Atest)
 [![Go Report Card](https://goreportcard.com/badge/github.com/GannettDigital/jstransform)](https://goreportcard.com/report/github.com/GannettDigital/jstransform)
 [![Coverage Status](https://coveralls.io/repos/github/GannettDigital/jstransform/badge.svg?branch=master)](https://coveralls.io/github/GannettDigital/jstransform?branch=master)
 
