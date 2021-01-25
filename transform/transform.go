@@ -78,6 +78,8 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 			op = &timeParse{}
 		case "toCamelCase":
 			op = &toCamelCase{}
+		case "removeHTML":
+			op = &removeHTML{}
 		default:
 			return fmt.Errorf("unsupported operation %q", toj.Name)
 		}

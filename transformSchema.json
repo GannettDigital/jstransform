@@ -60,7 +60,7 @@
 						"oneOf": [{
 								"$ref": "#/definitions/operations/caseChange"
 							},
-              {
+							{
 								"$ref": "#/definitions/operations/currentTime"
 							},
 							{
@@ -80,6 +80,9 @@
 							},
 							{
 								"$ref": "#/definitions/operations/toCamelCase"
+							},
+							{
+								"$ref": "#/definitions/operations/removeHTML"
 							}
 						]
 					}
@@ -335,6 +338,22 @@
 							"type": "string"
 						}
 					}
+				}
+			}
+		},
+		"removeHTML": {
+			"description": "Accepts a string as input, returns string with all html tags stripped",
+			"type": "object",
+			"required": [
+				"type"
+			],
+			"additionalProperties": false,
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"removeHTML"
+					]
 				}
 			}
 		}

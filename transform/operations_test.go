@@ -449,6 +449,28 @@ func TestCurrentTime(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &currentTime{} }, tests)
 }
 
+func TestRemoveHTML(t *testing.T) {
+	tests := []opTests{
+		{
+			description: "Working case one",
+			in:          "Japanese man calls for a trial by combat when talking to his wife's <br>mother in law<br> &",
+			want:        "Japanese man calls for a trial by combat when talking to his wife's mother in law &",
+		},
+		{
+			description: "Working case two",
+			in:          "<div><br>++Japanese <i>man</i> Collin D'Oliver Murasame <strong>calls for a trial by combat when talking</strong> to his wife<custom>",
+			want:        "++Japanese man Collin D'Oliver Murasame calls for a trial by combat when talking to his wife",
+		},
+		{
+			description: "Working case three",
+			in:          "<p dir=\"ltr\">STILLWATER — Oklahoma State’s men’s new-look basketball team has versatility and a lot of hype.</p><p dir=\"ltr\">The Cowboys finalized their top-10 recruiting class on Wednesday, signing a talented trio from across the continent to join early signees Cade Cunningham, Montreal Pena and Rondel Walker.&nbsp;</p><p dir=\"ltr\">OSU added Canada’s top player, Matthew-Alexander Moncrieffe along with dynamic scorer Donovan Williams and sharp-shooting graduate transfer Ferron Flavors Jr.</p><p dir=\"ltr\">The class is ranked No. 4 by Rivals.com and No. 9 by 247Sports.com.</p><p dir=\"ltr\">It’s also the biggest step in coach Mike Boynton’s plan to rebuild the program.",
+			want:        "STILLWATER — Oklahoma State’s men’s new-look basketball team has versatility and a lot of hype. The Cowboys finalized their top-10 recruiting class on Wednesday, signing a talented trio from across the continent to join early signees Cade Cunningham, Montreal Pena and Rondel Walker.  OSU added Canada’s top player, Matthew-Alexander Moncrieffe along with dynamic scorer Donovan Williams and sharp-shooting graduate transfer Ferron Flavors Jr. The class is ranked No. 4 by Rivals.com and No. 9 by 247Sports.com. It’s also the biggest step in coach Mike Boynton’s plan to rebuild the program.",
+		},
+	}
+
+	runOpTests(t, func() transformOperation { return &removeHTML{} }, tests)
+}
+
 func compareWantErrs(gotErr error, wantErr bool) error {
 	switch {
 	case wantErr && gotErr == nil:
