@@ -69,5 +69,6 @@ Operations allow further mutation of data, for mutation types that are not curre
 | | | | layout | The layout of the returned date string
 | currentTime | string | string | |
 | toCamelCase | string | string | delimiter | The delimiter to split the string on
+| removeHTML | string | string ||
 |===
 

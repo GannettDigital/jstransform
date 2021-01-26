@@ -8,6 +8,7 @@ require (
 	github.com/actgardner/gogen-avro/v7 v7.0.0
 	github.com/antchfx/xmlquery v1.0.0
 	github.com/antchfx/xpath v0.0.0-20190319080838-ce1d48779e67 // indirect
+	github.com/microcosm-cc/bluemonday v1.0.4
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect

@@ -3,12 +3,14 @@ package transform
 import (
 	"errors"
 	"fmt"
+	"html"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/PaesslerAG/jsonpath"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 var durationRe = regexp.MustCompile(`^([\d]*?):?([\d]*):([\d]*)$`)
@@ -309,6 +311,28 @@ func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
 	}
 
 	return strings.Join(arr, ""), nil
+}
+
+// removeHTML is a transformOperation which removes all html from a string.
+type removeHTML struct {
+	args map[string]string
+}
+
+func (c *removeHTML) init(args map[string]string) error {
+	return nil
+}
+
+func (c *removeHTML) transform(raw interface{}) (interface{}, error) {
+	in, ok := raw.(string)
+	if !ok {
+		return nil, errors.New("removeHTML only supports input of type string")
+	}
+
+	p := bluemonday.NewPolicy().AddSpaceWhenStrippingTag(true)
+	sanitized := p.Sanitize(in)
+
+	s := strings.ReplaceAll(strings.TrimSpace(sanitized), "  ", " ")
+	return html.UnescapeString(s), nil
 }
 
 // requiredArgs checks the given args map to make sure it contains the required args and only the required args.
