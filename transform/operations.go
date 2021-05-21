@@ -347,12 +347,12 @@ func (c *stringToFloat64) init(args map[string]string) error {
 func (c *stringToFloat64) transform(raw interface{}) (interface{}, error) {
 	in, ok := raw.(string)
 	if !ok {
-		return nil, errors.New("stringToFloat64 only supports strings")
+		return nil, fmt.Errorf("stringToFloat64 only supports strings")
 	}
 
 	f, err := strconv.ParseFloat(in, 64)
 	if err != nil {
-		return nil, errors.New("error converting string to float64")
+		return nil, fmt.Errorf("error converting string to float64: %v", err)
 	}
 
 	return f, nil
