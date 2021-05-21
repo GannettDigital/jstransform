@@ -335,6 +335,29 @@ func (c *removeHTML) transform(raw interface{}) (interface{}, error) {
 	return html.UnescapeString(s), nil
 }
 
+// stringToFloat64 is a transformOperation which converts a string to float64.
+type stringToFloat64 struct {
+	args map[string]string
+}
+
+func (c *stringToFloat64) init(args map[string]string) error {
+	return nil
+}
+
+func (c *stringToFloat64) transform(raw interface{}) (interface{}, error) {
+	in, ok := raw.(string)
+	if !ok {
+		return nil, errors.New("stringToFloat64 only supports strings")
+	}
+
+	f, err := strconv.ParseFloat(in, 64)
+	if err != nil {
+		return nil, errors.New("error converting string to float64")
+	}
+
+	return f, nil
+}
+
 // requiredArgs checks the given args map to make sure it contains the required args and only the required args.
 func requiredArgs(required []string, args map[string]string) error {
 	if len(args) != len(required) {
