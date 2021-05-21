@@ -83,6 +83,9 @@
 							},
 							{
 								"$ref": "#/definitions/operations/removeHTML"
+							},
+							{
+								"$ref": "#/definitions/operations/stringToFloat64"
 							}
 						]
 					}
@@ -353,6 +356,22 @@
 					"type": "string",
 					"enum": [
 						"removeHTML"
+					]
+				}
+			}
+		},
+		"stringToFloat64": {
+			"description": "Accepts a string as input, returns a float64",
+			"type": "object",
+			"required": [
+				"type"
+			],
+			"additionalProperties": false,
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"stringToFloat64"
 					]
 				}
 			}
