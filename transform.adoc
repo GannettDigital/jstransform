@@ -70,6 +70,6 @@ Operations allow further mutation of data, for mutation types that are not curre
 | currentTime | string | string | |
 | toCamelCase | string | string | delimiter | The delimiter to split the string on
 | removeHTML | string | string ||
-| stringToFloat64 | string | float64 ||
+| convertToFloat64 | string, int, float64 | float64 ||
 |===
 

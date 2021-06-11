@@ -335,27 +335,26 @@ func (c *removeHTML) transform(raw interface{}) (interface{}, error) {
 	return html.UnescapeString(s), nil
 }
 
-// stringToFloat64 is a transformOperation which converts a string to float64.
-type stringToFloat64 struct {
+// convertToFloat64 is a transformOperation which converts various types to float64.
+type convertToFloat64 struct {
 	args map[string]string
 }
 
-func (c *stringToFloat64) init(args map[string]string) error {
+func (c *convertToFloat64) init(args map[string]string) error {
 	return nil
 }
 
-func (c *stringToFloat64) transform(raw interface{}) (interface{}, error) {
-	in, ok := raw.(string)
-	if !ok {
-		return nil, fmt.Errorf("stringToFloat64 only supports strings, raw type: %T", raw)
+func (c *convertToFloat64) transform(raw interface{}) (interface{}, error) {
+	switch in := raw.(type) {
+	case string:
+		return strconv.ParseFloat(in, 64)
+	case int:
+		return float64(in), nil
+	case float64:
+		return in, nil
+	default:
+		return nil, fmt.Errorf("convertToFloat64 only supports strings, int, and float64, raw type: %T", raw)
 	}
-
-	f, err := strconv.ParseFloat(in, 64)
-	if err != nil {
-		return nil, fmt.Errorf("error converting string to float64: %v", err)
-	}
-
-	return f, nil
 }
 
 // requiredArgs checks the given args map to make sure it contains the required args and only the required args.

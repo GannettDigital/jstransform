@@ -471,7 +471,7 @@ func TestRemoveHTML(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &removeHTML{} }, tests)
 }
 
-func TestStringToFloat64(t *testing.T) {
+func TestConvertToFloat64(t *testing.T) {
 	tests := []opTests{
 		{
 			description: "Working case one",
@@ -489,18 +489,25 @@ func TestStringToFloat64(t *testing.T) {
 			want:        float64(124),
 		},
 		{
-			description: "Not a string",
-			in: 123,
-			wantErr: true,
+			description: "Handle an integer",
+			in:          0,
+			want:        float64(0),
+		},
+		{
+			description: "Handle a float64",
+			in:          float64(123),
+			want:        float64(123),
+			wantErr:     false,
 		},
 		{
 			description: "Can't convert from string to float64",
-			in: "Hello",
-			wantErr: true,
+			in:          "Hello",
+			want:        float64(0),
+			wantErr:     true,
 		},
 	}
 
-	runOpTests(t, func() transformOperation { return &stringToFloat64{} }, tests)
+	runOpTests(t, func() transformOperation { return &convertToFloat64{} }, tests)
 }
 
 func compareWantErrs(gotErr error, wantErr bool) error {
