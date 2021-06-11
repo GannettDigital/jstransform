@@ -85,7 +85,7 @@
 								"$ref": "#/definitions/operations/removeHTML"
 							},
 							{
-								"$ref": "#/definitions/operations/stringToFloat64"
+								"$ref": "#/definitions/operations/convertToFloat64"
 							}
 						]
 					}
@@ -360,8 +360,8 @@
 				}
 			}
 		},
-		"stringToFloat64": {
-			"description": "Accepts a string as input, returns a float64",
+		"convertToFloat64": {
+			"description": "Accepts a string, int, and float64 as input, returns a float64",
 			"type": "object",
 			"required": [
 				"type"
@@ -371,7 +371,7 @@
 				"type": {
 					"type": "string",
 					"enum": [
-						"stringToFloat64"
+						"convertToFloat64"
 					]
 				}
 			}

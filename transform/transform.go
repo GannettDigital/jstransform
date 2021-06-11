@@ -80,8 +80,8 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 			op = &toCamelCase{}
 		case "removeHTML":
 			op = &removeHTML{}
-		case "stringToFloat64":
-			op = &stringToFloat64{}
+		case "convertToFloat64":
+			op = &convertToFloat64{}
 		default:
 			return fmt.Errorf("unsupported operation %q", toj.Name)
 		}
