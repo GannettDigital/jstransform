@@ -1,3 +1,5 @@
+github.com/GannettDigital/gojsonschema v0.0.0-20210803184842-ea6855828cd1 h1:NxPLgmzXvXx2SaIZDZ8hXJjMvTw1k9gDgzHFNewFqh0=
+github.com/GannettDigital/gojsonschema v0.0.0-20210803184842-ea6855828cd1/go.mod h1:anYRn/JVcOK2ZgGU+IjEV4nwlhoK5sQluxsYJ78Id3Y=
 github.com/GannettDigital/jsonparser v0.0.0-20190829201207-fbf976767e56 h1:EYtDQEULk5HAfDhfmA+DH+Ns+pxHCg9NZOLO57y+WgE=
 github.com/GannettDigital/jsonparser v0.0.0-20190829201207-fbf976767e56/go.mod h1:VAXveR4MSguIGAhplT7AA2DlDunnoWmAVRsu9nO/Nfg=
 github.com/GannettDigital/msgp v1.1.4 h1:uyKPN4k6zevrs8KGTYUipiuOo/uku3ssfp2CztX7cIM=
