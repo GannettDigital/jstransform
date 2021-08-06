@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"sort"
 
-	"github.com/xeipuuv/gojsonschema"
+	"github.com/GannettDigital/gojsonschema"
 )
 
 // Validator defines an interface for validating JSON matches a JSON schema.
