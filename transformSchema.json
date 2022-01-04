@@ -245,7 +245,7 @@
         }
       },
       "max": {
-        "description": "Accepts an array and finds the max valuye of these items. Can return a generic or a complex object",
+        "description": "Accepts an array and finds the max value of these items. Can return a generic or a complex object",
         "type": "object",
         "required": [
           "type",
