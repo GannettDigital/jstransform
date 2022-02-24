@@ -1,0 +1,65 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "type": "object",
+    "required": [
+        "categories"
+    ],
+    "properties": {
+        "categories": {
+            "type": "array",            
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "category": {
+                        "type": "string",
+                        "transform": {
+                            "nested": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.firstLevelName"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "marketTypes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "transform": {
+                                "nested": {
+                                    "from": [
+                                        {
+                                            "jsonPath": "@.secondLevelName"
+                                        }
+                                    ]
+                                }
+                            }
+
+                        },           
+                        "transform": {
+                            "nested": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.secondLevelArray[*]"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            "transform": {
+                "nested": {
+                    "from": [
+                        {
+                            "jsonPath": "$.firstLevelArray[*]"
+                        }
+                    ]
+                }
+            }
+        }
+    
+    }
+}

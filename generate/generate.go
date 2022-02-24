@@ -2,6 +2,10 @@
 // It is intended to be used with the go generate, https://blog.golang.org/generate
 package generate
 
+
+
+//go:generate go run github.com/GannettDigital/jstransform ./generate_test_data/nested_to_primitive.json ./generate_test_data/nonest 
+
 import (
 	"fmt"
 	"os"
