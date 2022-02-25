@@ -50,7 +50,15 @@
                     }
                 }
             },
-            
+            "transform": {
+                "nested": {
+                    "from": [
+                        {
+                            "jsonPath": "$.firstLevelArray[*]"
+                        }
+                    ]
+                }
+            }
         }
     
     }
