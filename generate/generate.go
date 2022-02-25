@@ -4,7 +4,8 @@ package generate
 
 
 
-//go:generate go run github.com/GannettDigital/jstransform ./generate_test_data/nested_to_primitive.json ./generate_test_data/nonest 
+//go:generate go run github.com/GannettDigital/jstransform  -nestedStructs=false ./generate_test_data/nested_to_primitive.json ./generate_test_data/nonest 
+//go:generate go run github.com/GannettDigital/jstransform  -nestedStructs=false ./generate_test_data/nested.json ./generate_test_data/nonest 
 
 import (
 	"fmt"
