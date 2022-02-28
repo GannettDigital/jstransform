@@ -13,7 +13,7 @@ import (
 // used for the Transformer test and benchmark
 var (
 	// imageSchema, _            = jsonschema.SchemaFromFile("./test_data/image.json", "")
-	// arrayTransformsSchema, _  = jsonschema.SchemaFromFile("./test_data/array-transforms.json", "")
+	arrayTransformsSchema, _ = jsonschema.SchemaFromFile("./test_data/array-transforms.json", "")
 	// doublearraySchema, _      = jsonschema.SchemaFromFile("./test_data/double-array.json", "")
 	// operationsSchema, _       = jsonschema.SchemaFromFile("./test_data/operations.json", "")
 	// dateTimesSchema, _        = jsonschema.SchemaFromFile("./test_data/date-times.json", "")
@@ -330,7 +330,7 @@ var (
 					}
 				]
 			}`),
-			want: json.RawMessage("{\"categories\": [{ \"category\": \"Game Lines\", \"marketTypes\": [\"handicap\",\"standard\"]}]}"),
+			want: json.RawMessage("{\"categories\": [{ \"category\": \"first level name\", \"marketTypes\": [\"second level name, first thing\",\"second level name, second thing\"]}]}"),
 		},
 	}
 
@@ -489,7 +489,7 @@ func TestSaveValue(t *testing.T) {
 }
 
 func TestTransformer(t *testing.T) {
-	const parallelRuns = 4
+	const parallelRuns = 1
 	for _, test := range transformerTests {
 		tr, err := NewTransformer(test.schema, test.transformIdentifier)
 		if err != nil {
