@@ -221,10 +221,6 @@ func TestBuildStructs(t *testing.T) {
 		}
 
 		for i := range test.files {
-			gotFilePath := filepath.Join(outDir, test.files[i])
-			t.Log(gotFilePath)
-			wantFilePath := filepath.Join(testdir, outDir, test.files[i])
-			t.Log(wantFilePath)
 			got, err := ioutil.ReadFile(filepath.Join(outDir, test.files[i]))
 			if err != nil {
 				t.Errorf("Test %q - failed to read expected file %q: %v", test.description, test.files[i], err)
