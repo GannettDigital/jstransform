@@ -167,10 +167,12 @@ func extractTransformInstructions(raw json.RawMessage, transformIdentifier, path
 		return nil, nil
 	}
 	splits := strings.Split(path, ".")
-	parentPath := strings.Join(splits[:len(splits)-1], ".")
+	var parentPath string
 	// check if last 3 bytes are "[*] and last 4 are not ".[*]"
 	if instanceType == "scalar" && strings.HasSuffix(path, "[*]") && !strings.HasSuffix(path, ".[*]") {
 		parentPath = path
+	} else {
+		parentPath = strings.Join(splits[:len(splits)-1], ".")
 	}
 
 	var tis transformInstructions
