@@ -487,7 +487,7 @@ func TestSaveValue(t *testing.T) {
 }
 
 func TestTransformer(t *testing.T) {
-	const parallelRuns = 1
+	const parallelRuns = 4
 	for _, test := range transformerTests {
 		tr, err := NewTransformer(test.schema, test.transformIdentifier)
 		if err != nil {
