@@ -312,7 +312,7 @@ var (
 			want: json.RawMessage("{\"storyHighlights\":[\"highlight1\",\"highlight2\"]}"),
 		},
 		{
-			description:         "Jeff tests",
+			description:         "nested array of primitives",
 			schema:              arrayTransformsSchema2,
 			transformIdentifier: "tipico",
 			in: json.RawMessage(`

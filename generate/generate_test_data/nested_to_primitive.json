@@ -12,53 +12,20 @@
                 "additionalProperties": false,
                 "properties": {
                     "category": {
-                        "type": "string",
-                        "transform": {
-                            "nested": {
-                                "from": [
-                                    {
-                                        "jsonPath": "@.firstLevelName"
-                                    }
-                                ]
-                            }
-                        }
+                        "type": "string"
                     },
                     "marketTypes": {
                         "type": "array",
                         "items": {
-                            "type": "string",
-                            "transform": {
-                                "nested": {
-                                    "from": [
-                                        {
-                                            "jsonPath": "@.secondLevelName"
-                                        }
-                                    ]
-                                }
-                            }
-
-                        },           
-                        "transform": {
-                            "nested": {
-                                "from": [
-                                    {
-                                        "jsonPath": "@.secondLevelArray[*]"
-                                    }
-                                ]
-                            }
+                            "type": "string"
                         }
                     }
                 }
             },
-            "transform": {
-                "nested": {
-                    "from": [
-                        {
-                            "jsonPath": "$.firstLevelArray[*]"
-                        }
-                    ]
-                }
-            }
+            "required": [
+                "category",
+                "marketTypes"
+            ]
         }
     
     }
