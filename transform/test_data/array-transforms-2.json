@@ -12,40 +12,12 @@
                 "additionalProperties": false,
                 "properties": {
                     "category": {
-                        "type": "string",
-                        "transform": {
-                            "tipico": {
-                                "from": [
-                                    {
-                                        "jsonPath": "@.firstLevelName"
-                                    }
-                                ]
-                            }
-                        }
+                        "type": "string"
                     },
                     "marketTypes": {
                         "type": "array",
                         "items": {
-                            "type": "string",
-                            "transform": {
-                                "tipico": {
-                                    "from": [
-                                        {
-                                            "jsonPath": "@.secondLevelName"
-                                        }
-                                    ]
-                                }
-                            }
-
-                        },           
-                        "transform": {
-                            "tipico": {
-                                "from": [
-                                    {
-                                        "jsonPath": "@.secondLevelArray[*]"
-                                    }
-                                ]
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -53,16 +25,7 @@
             "required": [
                 "category",
                 "marketTypes"
-            ],
-            "transform": {
-                "tipico": {
-                    "from": [
-                        {
-                            "jsonPath": "$.firstLevelArray[*]"
-                        }
-                    ]
-                }
-            }
+            ]
         }
     
     }
