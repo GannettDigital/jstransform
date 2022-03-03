@@ -1,0 +1,69 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "type": "object",
+    "required": [
+        "categories"
+    ],
+    "properties": {
+        "categories": {
+            "type": "array",            
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "category": {
+                        "type": "string",
+                        "transform": {
+                            "tipico": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.firstLevelName"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "marketTypes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "transform": {
+                                "tipico": {
+                                    "from": [
+                                        {
+                                            "jsonPath": "@.secondLevelName"
+                                        }
+                                    ]
+                                }
+                            }
+
+                        },           
+                        "transform": {
+                            "tipico": {
+                                "from": [
+                                    {
+                                        "jsonPath": "@.secondLevelArray[*]"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            "required": [
+                "category",
+                "marketTypes"
+            ],
+            "transform": {
+                "tipico": {
+                    "from": [
+                        {
+                            "jsonPath": "$.firstLevelArray[*]"
+                        }
+                    ]
+                }
+            }
+        }
+    
+    }
+}

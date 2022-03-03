@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "type": "object",
+    "required": [
+        "categories"
+    ],
+    "properties": {
+        "categories": {
+            "type": "array",            
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "category": {
+                        "type": "string"
+                    },
+                    "marketTypes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "required": [
+                "category",
+                "marketTypes"
+            ]
+        }
+    
+    }
+}

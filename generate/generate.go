@@ -2,6 +2,9 @@
 // It is intended to be used with the go generate, https://blog.golang.org/generate
 package generate
 
+
+
+ 
 import (
 	"fmt"
 	"os"

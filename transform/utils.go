@@ -159,16 +159,20 @@ func convertString(raw interface{}) (interface{}, error) {
 	}
 }
 
-func extractTransformInstructions(raw json.RawMessage, transformIdentifier, path string) (*transformInstructions, error) {
+func extractTransformInstructions(raw json.RawMessage, transformIdentifier, path string, instanceType string) (*transformInstructions, error) {
 	rawTransformInstruction, _, _, err := jsonparser.Get(raw, "transform", transformIdentifier)
 	if err != nil && err != jsonparser.KeyPathNotFoundError {
 		return nil, fmt.Errorf("failed to extract raw instance transform: %v", err)
 	} else if len(rawTransformInstruction) == 0 {
 		return nil, nil
 	}
-
-	splits := strings.Split(path, ".")
-	parentPath := strings.Join(splits[:len(splits)-1], ".")
+	var parentPath string
+	if instanceType == "scalar" && strings.HasSuffix(path, "[*]") && !strings.HasSuffix(path, ".[*]") {
+		parentPath = path
+	} else {
+		splits := strings.Split(path, ".")
+		parentPath = strings.Join(splits[:len(splits)-1], ".")
+	}
 
 	var tis transformInstructions
 	if err := json.Unmarshal(rawTransformInstruction, &tis); err != nil {

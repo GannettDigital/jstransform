@@ -54,7 +54,7 @@ func newArrayTransformer(path, transformIdentifier string, raw json.RawMessage, 
 	}
 
 	var err error
-	at.transforms, err = extractTransformInstructions(raw, transformIdentifier, path)
+	at.transforms, err = extractTransformInstructions(raw, transformIdentifier, path, "array")
 	if err != nil {
 		return nil, err
 	}
@@ -280,7 +280,7 @@ func newObjectTransformer(path, transformIdentifier string, raw json.RawMessage,
 	}
 
 	var err error
-	ot.transforms, err = extractTransformInstructions(raw, transformIdentifier, path)
+	ot.transforms, err = extractTransformInstructions(raw, transformIdentifier, path, "object")
 	if err != nil {
 		return nil, err
 	}
@@ -471,7 +471,7 @@ func newScalarTransformer(path, transformIdentifier string, raw json.RawMessage,
 	}
 
 	var err error
-	st.transforms, err = extractTransformInstructions(raw, transformIdentifier, path)
+	st.transforms, err = extractTransformInstructions(raw, transformIdentifier, path, "scalar")
 	if err != nil {
 		return nil, err
 	}

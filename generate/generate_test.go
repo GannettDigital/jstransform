@@ -71,6 +71,18 @@ func TestBuildStructs(t *testing.T) {
 			files: []string{"nested.go"},
 		},
 		{
+			description: "nested to primitive array structs",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "nested_to_primitive.json"),
+				OutputDir:              "generated",
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: false,
+				NoNestedStructs:        false,
+			},
+			files: []string{"nested_to_primitive.go"},
+		},
+		{
 			description: "with oneOfType",
 			buildArgs: BuildArgs{
 				SchemaPath:             filepath.Join(testdir, "test_schema.json"),
@@ -135,6 +147,18 @@ func TestBuildStructs(t *testing.T) {
 			files: []string{"nested.go"},
 		},
 		{
+			description: "nested to primitive array structs - nonest",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "nested_to_primitive.json"),
+				OutputDir:              "nonest",
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: false,
+				NoNestedStructs:        true,
+			},
+			files: []string{"nested_to_primitive.go"},
+		},
+		{
 			description: "without oneOfTypes, with no nested structs and descriptions as comments - pointers",
 			buildArgs: BuildArgs{
 				SchemaPath:             filepath.Join(testdir, "test_schema2.json"),
@@ -159,6 +183,19 @@ func TestBuildStructs(t *testing.T) {
 				Pointers:               true,
 			},
 			files: []string{"nested.go"},
+		},
+		{
+			description: "nested to primitive array structs - pointers",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "nested_to_primitive.json"),
+				OutputDir:              "pointers",
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: false,
+				NoNestedStructs:        true,
+				Pointers:               true,
+			},
+			files: []string{"nested_to_primitive.go"},
 		},
 		{
 			description: "test formatting of times - pointers",
