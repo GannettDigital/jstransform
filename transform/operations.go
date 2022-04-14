@@ -16,7 +16,7 @@ import (
 var durationRe = regexp.MustCompile(`^([\d]*?):?([\d]*):([\d]*)$`)
 
 // duration is a transformOperation which changes from a string duration like
-// an integer. "MM:SS" to a number of seconds as
+// "MM:SS" to a number of seconds as an integer.
 type duration struct {
 	re *regexp.Regexp
 }
