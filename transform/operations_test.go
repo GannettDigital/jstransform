@@ -541,6 +541,12 @@ func TestConvertToInt64(t *testing.T) {
 			wantErr:     false,
 		},
 		{
+			description: "Handle a float32",
+			in:          float32(3.14),
+			want:        int64(3),
+			wantErr:     false,
+		},
+		{
 			description: "Can't convert from string to int64",
 			in:          "Hello",
 			want:        int64(0),
