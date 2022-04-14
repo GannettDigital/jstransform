@@ -360,7 +360,36 @@ func (c *convertToFloat64) transform(raw interface{}) (interface{}, error) {
 	}
 }
 
-// requiredArgs checks the given args map to make sure it contains the required args and only the required args.
+// convertToInt64 is a transformOperation which converts various types to int64.
+type convertToInt64 struct {
+	args map[string]string
+}
+
+func (c *convertToInt64) init(args map[string]string) error {
+	return nil
+}
+
+func (c *convertToInt64) transform(raw interface{}) (interface{}, error) {
+	switch in := raw.(type) {
+	case string:
+		return strconv.ParseInt(in, 2, 64)
+	case int:
+		return int64(in), nil
+	case int8:
+		return int64(in), nil
+	case int16:
+		return int64(in), nil
+	case int32:
+		return int64(in), nil
+	case int64:
+		return int64(in), nil
+	default:
+		return nil, fmt.Errorf("convertToInt64 only supports strings, int, and float64, raw type: %T", raw)
+	}
+}
+
+// requiredArgs checks the given args map to make sure it contains the required args
+// and only the required args.
 func requiredArgs(required []string, args map[string]string) error {
 	if len(args) != len(required) {
 		return fmt.Errorf("expected args %v but got %d args", required, len(args))
