@@ -510,6 +510,41 @@ func TestConvertToFloat64(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &convertToFloat64{} }, tests)
 }
 
+func TestConvertToInt64(t *testing.T) {
+	tests := []opTests{
+		{
+			description: "Working case one",
+			in:          "1",
+			want:        int64(1),
+		},
+		{
+			description: "Working case two",
+			in:          "0",
+			want:        int64(0),
+		},
+		{
+			description: "Handle an int",
+			in:          int(123),
+			want:        int64(123),
+			wantErr:     false,
+		},
+		{
+			description: "Handle an int64",
+			in:          int64(123),
+			want:        int64(123),
+			wantErr:     false,
+		},
+		{
+			description: "Can't convert from string to int64",
+			in:          "Hello",
+			want:        int64(0),
+			wantErr:     true,
+		},
+	}
+
+	runOpTests(t, func() transformOperation { return &convertToInt64{} }, tests)
+}
+
 func compareWantErrs(gotErr error, wantErr bool) error {
 	switch {
 	case wantErr && gotErr == nil:
