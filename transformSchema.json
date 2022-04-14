@@ -87,6 +87,9 @@
               },
               {
                 "$ref": "#/definitions/operations/convertToFloat64"
+              },
+              {
+                "$ref": "#/definitions/operations/convertToInt64"
               }
             ]
           }
@@ -372,6 +375,22 @@
             "type": "string",
             "enum": [
               "convertToFloat64"
+            ]
+          }
+        }
+      },
+      "convertToInt64": {
+        "description": "Accept string, int, int64, & float64 as input, returns a int64",
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "convertToInt64"
             ]
           }
         }
