@@ -373,6 +373,8 @@ func (c *convertToInt64) transform(raw interface{}) (interface{}, error) {
 	switch in := raw.(type) {
 	case string:
 		return strconv.ParseInt(in, 2, 64)
+	case float64:
+		return int64(in), nil
 	case int:
 		return int64(in), nil
 	case int8:
