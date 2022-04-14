@@ -18,7 +18,8 @@ const (
 	concatenate
 )
 
-// transformOperation defines the interface for operations that are implemented within the transform schema.
+// transformOperation defines the interface for operations that are implemented
+// within the transform schema.
 type transformOperation interface {
 	init(args map[string]string) error
 	transform(in interface{}) (interface{}, error)
@@ -29,8 +30,8 @@ type transformOperationJSON struct {
 	Args map[string]string `json:"args"`
 }
 
-// transformInstruction defines a jsonPath and xmlPath for a transform and an optional set of operations to be performed on the
-// data from that path.
+// transformInstruction defines a jsonPath and xmlPath for a transform and an
+// optional set of operations to be performed on the data from that path.
 type transformInstruction struct {
 	// For jsonPath format see http://goessner.net/articles/JsonPath/
 	jsonPath string
@@ -45,7 +46,8 @@ type transformInstructionJSON struct {
 	Operations []transformOperationJSON `json:"operations"`
 }
 
-// UnmarshalJSON implements the json.Unmarshaler interface, this function exists to properly map the transformOperation.
+// UnmarshalJSON implements the json.Unmarshaler interface, this function exists
+// to properly map the transformOperation.
 func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 	var jti transformInstructionJSON
 
@@ -82,6 +84,8 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 			op = &removeHTML{}
 		case "convertToFloat64":
 			op = &convertToFloat64{}
+		case "convertToInt64":
+			op = &convertToInt64{}
 		default:
 			return fmt.Errorf("unsupported operation %q", toj.Name)
 		}
