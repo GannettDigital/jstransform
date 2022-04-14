@@ -15,8 +15,8 @@ import (
 
 var durationRe = regexp.MustCompile(`^([\d]*?):?([\d]*):([\d]*)$`)
 
-// duration is a transformOperation which changes from a string duration like "MM:SS" to a number of seconds as
-// an integer.
+// duration is a transformOperation which changes from a string duration like
+// an integer. "MM:SS" to a number of seconds as
 type duration struct {
 	re *regexp.Regexp
 }
@@ -112,8 +112,9 @@ func (i *inverse) transform(raw interface{}) (interface{}, error) {
 	return !in, nil
 }
 
-// max is a transformOperation which retrieves a field from the maximum item in an array.
-// The maxiumum item is determined by comparing values in a defined number field on the array items.
+// max is a transformOperation which retrieves a field from the maximum item in
+// an array. The maxiumum item is determined by comparing values in a defined
+// number field on the array items.
 type max struct {
 	args map[string]string
 }
@@ -163,7 +164,8 @@ func (m *max) transform(in interface{}) (interface{}, error) {
 	return rawReturn, nil
 }
 
-// replace is a transformOperation which performs a regex based find/replace on a string value.
+// replace is a transformOperation which performs a regex based find/replace on
+// a string value.
 type replace struct {
 	args  map[string]string
 	regex *regexp.Regexp
@@ -258,7 +260,8 @@ func (t *timeParse) transform(raw interface{}) (interface{}, error) {
 	return parsedTime.Format(t.args["layout"]), nil
 }
 
-// currentTime is a transformOperation which returns the current time in a specified format
+// currentTime is a transformOperation which returns the current time in a
+// specified format
 type currentTime struct {
 	args map[string]string
 }
