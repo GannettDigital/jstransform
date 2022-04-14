@@ -372,7 +372,7 @@ func (c *convertToInt64) init(args map[string]string) error {
 func (c *convertToInt64) transform(raw interface{}) (interface{}, error) {
 	switch in := raw.(type) {
 	case string:
-		return strconv.ParseInt(in, 2, 64)
+		return strconv.ParseInt(in, 10, 64)
 	case float32:
 		return int64(in), nil
 	case float64:
