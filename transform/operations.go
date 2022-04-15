@@ -15,8 +15,8 @@ import (
 
 var durationRe = regexp.MustCompile(`^([\d]*?):?([\d]*):([\d]*)$`)
 
-// duration is a transformOperation which changes from a string duration like "MM:SS" to a number of seconds as
-// an integer.
+// duration is a transformOperation which changes from a string duration like
+// "MM:SS" to a number of seconds as an integer.
 type duration struct {
 	re *regexp.Regexp
 }
@@ -112,8 +112,9 @@ func (i *inverse) transform(raw interface{}) (interface{}, error) {
 	return !in, nil
 }
 
-// max is a transformOperation which retrieves a field from the maximum item in an array.
-// The maxiumum item is determined by comparing values in a defined number field on the array items.
+// max is a transformOperation which retrieves a field from the maximum item in
+// an array. The maxiumum item is determined by comparing values in a defined
+// number field on the array items.
 type max struct {
 	args map[string]string
 }
@@ -163,7 +164,8 @@ func (m *max) transform(in interface{}) (interface{}, error) {
 	return rawReturn, nil
 }
 
-// replace is a transformOperation which performs a regex based find/replace on a string value.
+// replace is a transformOperation which performs a regex based find/replace on
+// a string value.
 type replace struct {
 	args  map[string]string
 	regex *regexp.Regexp
@@ -258,7 +260,8 @@ func (t *timeParse) transform(raw interface{}) (interface{}, error) {
 	return parsedTime.Format(t.args["layout"]), nil
 }
 
-// currentTime is a transformOperation which returns the current time in a specified format
+// currentTime is a transformOperation which returns the current time in a
+// specified format
 type currentTime struct {
 	args map[string]string
 }
@@ -357,7 +360,40 @@ func (c *convertToFloat64) transform(raw interface{}) (interface{}, error) {
 	}
 }
 
-// requiredArgs checks the given args map to make sure it contains the required args and only the required args.
+// convertToInt64 is a transformOperation which converts various types to int64.
+type convertToInt64 struct {
+	args map[string]string
+}
+
+func (c *convertToInt64) init(args map[string]string) error {
+	return nil
+}
+
+func (c *convertToInt64) transform(raw interface{}) (interface{}, error) {
+	switch in := raw.(type) {
+	case string:
+		return strconv.ParseInt(in, 10, 64)
+	case float32:
+		return int64(in), nil
+	case float64:
+		return int64(in), nil
+	case int:
+		return int64(in), nil
+	case int8:
+		return int64(in), nil
+	case int16:
+		return int64(in), nil
+	case int32:
+		return int64(in), nil
+	case int64:
+		return int64(in), nil
+	default:
+		return nil, fmt.Errorf("convertToInt64 only supports strings, int, and float64, raw type: %T", raw)
+	}
+}
+
+// requiredArgs checks the given args map to make sure it contains the required args
+// and only the required args.
 func requiredArgs(required []string, args map[string]string) error {
 	if len(args) != len(required) {
 		return fmt.Errorf("expected args %v but got %d args", required, len(args))
