@@ -636,7 +636,7 @@ func TestNewXMLTransformer(t *testing.T) {
 
 		want, err := ioutil.ReadFile(test.wantFilePath)
 		if err != nil {
-			t.Fatalf("error reading want file: %w", err)
+			t.Fatalf("error reading want file: %v", err)
 		}
 
 		var (
