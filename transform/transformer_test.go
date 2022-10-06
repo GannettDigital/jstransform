@@ -533,6 +533,14 @@ func TestNewXMLTransformer(t *testing.T) {
 			wantFilePath:        "./test_data/xml/sports/teams/teamsNBA.out.json",
 		},
 		{
+			description:         "teams NBA - skip validation",
+			transformIdentifier: "sport",
+			schemaFilePath:      "./test_data/xml/sports/teams/teams.json",
+			xmlFilePath:         "./test_data/xml/sports/teams/teams_NBA.xml",
+			wantFilePath:        "./test_data/xml/sports/teams/teamsNBA.out.json",
+			skipValidation:      true,
+		},
+		{
 			description:         "teams MLB",
 			transformIdentifier: "sport",
 			schemaFilePath:      "./test_data/xml/sports/teams/teams.json",
@@ -594,13 +602,6 @@ func TestNewXMLTransformer(t *testing.T) {
 			schemaFilePath:      "./test_data/xml/repeatedScalarNode.json",
 			xmlFilePath:         "./test_data/xml/repeatedScalarNode.xml",
 			wantFilePath:        "./test_data/xml/repeatedScalarNode.out.json",
-		},
-		{
-			description:         "teams NBA",
-			transformIdentifier: "sport",
-			schemaFilePath:      "./test_data/xml/sports/teams/teams.json",
-			xmlFilePath:         "./test_data/xml/sports/teams/teams_NBA.xml",
-			wantFilePath:        "./test_data/xml/sports/teams/teamsNBA.out.json",
 		},
 	}
 
