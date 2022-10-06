@@ -96,7 +96,37 @@ func (tr *Transformer) Transform(raw json.RawMessage) (json.RawMessage, error) {
 	return nil, fmt.Errorf("unknown transform type %s, must be 'JSON' or 'XML'", tr.format)
 }
 
+// TransformNoValidation is the same as the normal 'Transform' func but skips any kind of validation. This is used in cases
+// where we want to test schema transforms, but the schema requires the existence of fields that have to be made beyond the automatic
+// jstransform stage.
+func (tr *Transformer) TransformNoValidation(raw json.RawMessage) (json.RawMessage, error) {
+	if tr.format == jsonInput {
+		return tr.baseJSONTransform(raw)
+	}
+	if tr.format == xmlInput {
+		return tr.baseXMLTransform(raw)
+	}
+	return nil, fmt.Errorf("unknown transform type %s, must be 'JSON' or 'XML'", tr.format)
+}
+
 func (tr *Transformer) jsonTransform(raw json.RawMessage) (json.RawMessage, error) {
+	transformed, err := tr.baseJSONTransform(raw)
+	if err != nil {
+		return nil, err
+	}
+
+	valid, err := tr.schema.Validate(transformed)
+	if err != nil {
+		return nil, fmt.Errorf("input successfully transformed but did not match schema: %v", err)
+	}
+	if !valid {
+		return nil, errors.New("schema validation of the transformed result reports invalid")
+	}
+
+	return transformed, nil
+}
+
+func (tr *Transformer) baseJSONTransform(raw json.RawMessage) (json.RawMessage, error) {
 	var in interface{}
 	if err := json.Unmarshal(raw, &in); err != nil {
 		return nil, fmt.Errorf("failed to parse input JSON: %v", err)
@@ -112,18 +142,27 @@ func (tr *Transformer) jsonTransform(raw json.RawMessage) (json.RawMessage, erro
 		return nil, fmt.Errorf("failed to JSON marsal transformed data: %v", err)
 	}
 
-	valid, err := tr.schema.Validate(out)
+	return out, nil
+}
+
+func (tr *Transformer) xmlTransform(raw []byte) ([]byte, error) {
+	transformedXML, err := tr.baseXMLTransform(raw)
 	if err != nil {
-		return nil, fmt.Errorf("input successfully transformed but did not match schema: %v", err)
+		return nil, err
+	}
+
+	valid, err := tr.schema.Validate(transformedXML)
+	if err != nil {
+		return nil, fmt.Errorf("transformed result validation error: %v", err)
 	}
 	if !valid {
 		return nil, errors.New("schema validation of the transformed result reports invalid")
 	}
 
-	return out, nil
+	return transformedXML, nil
 }
 
-func (tr *Transformer) xmlTransform(raw []byte) ([]byte, error) {
+func (tr *Transformer) baseXMLTransform(raw []byte) ([]byte, error) {
 	xmlDoc, err := xmlquery.Parse(bytes.NewReader(raw))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse input XML: %v", err)
@@ -137,14 +176,6 @@ func (tr *Transformer) xmlTransform(raw []byte) ([]byte, error) {
 	out, err := json.Marshal(transformed)
 	if err != nil {
 		return nil, fmt.Errorf("failed to JSON marsal transformed data: %v", err)
-	}
-
-	valid, err := tr.schema.Validate(out)
-	if err != nil {
-		return nil, fmt.Errorf("transformed result validation error: %v", err)
-	}
-	if !valid {
-		return nil, errors.New("schema validation of the transformed result reports invalid")
 	}
 
 	return out, nil
