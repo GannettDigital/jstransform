@@ -523,6 +523,7 @@ func TestNewXMLTransformer(t *testing.T) {
 		schemaFilePath      string
 		xmlFilePath         string
 		wantFilePath        string
+		skipValidation      bool
 	}{
 		{
 			description:         "teams NBA",
@@ -530,6 +531,14 @@ func TestNewXMLTransformer(t *testing.T) {
 			schemaFilePath:      "./test_data/xml/sports/teams/teams.json",
 			xmlFilePath:         "./test_data/xml/sports/teams/teams_NBA.xml",
 			wantFilePath:        "./test_data/xml/sports/teams/teamsNBA.out.json",
+		},
+		{
+			description:         "teams NBA - skip validation",
+			transformIdentifier: "sport",
+			schemaFilePath:      "./test_data/xml/sports/teams/teams.json",
+			xmlFilePath:         "./test_data/xml/sports/teams/teams_NBA.xml",
+			wantFilePath:        "./test_data/xml/sports/teams/teamsNBA.out.json",
+			skipValidation:      true,
 		},
 		{
 			description:         "teams MLB",
@@ -612,12 +621,24 @@ func TestNewXMLTransformer(t *testing.T) {
 			t.Fatalf("Test %q: %v", test.description, err)
 		}
 
-		output, err := tr.Transform(rawXMLBytes)
-		if err != nil {
-			t.Fatalf("Test %q: %v", test.description, err)
+		var output json.RawMessage
+
+		if test.skipValidation {
+			output, err = tr.TransformNoValidation(rawXMLBytes)
+			if err != nil {
+				t.Fatalf("Test %q: %v", test.description, err)
+			}
+		} else {
+			output, err = tr.Transform(rawXMLBytes)
+			if err != nil {
+				t.Fatalf("Test %q: %v", test.description, err)
+			}
 		}
 
 		want, err := ioutil.ReadFile(test.wantFilePath)
+		if err != nil {
+			t.Fatalf("error reading want file: %v", err)
+		}
 
 		var (
 			outputMap map[string]interface{}
