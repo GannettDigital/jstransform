@@ -97,7 +97,7 @@ func (tr *Transformer) Transform(raw json.RawMessage) (json.RawMessage, error) {
 }
 
 // TransformNoValidation is the same as the normal 'Transform' func but skips any kind of validation. This is used in cases
-// where we want to test schema transforms, but the schema requires the existence of fields that have to be made beyond the automatic
+// to test schema transforms, but the schema requires the existence of fields that have to be made beyond the automatic
 // jstransform stage.
 func (tr *Transformer) TransformNoValidation(raw json.RawMessage) (json.RawMessage, error) {
 	if tr.format == jsonInput {
