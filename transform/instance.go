@@ -391,6 +391,12 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 			} else {
 				return ot.defaultValue, nil
 			}
+		} else if val, ok := rawValue.(string); ok {
+			// If the XML node is returned as an empty string, then it likely indicates that the transformer encountered an empty XML tag, e.g. <tag /> or <tag></tag>.
+			// While not particularly useful, it is also not an error. The end result is that the field won't show up in the output file.
+			if val == "" {
+				return nil, nil
+			}
 		}
 
 		switch v := rawValue.(type) {

@@ -603,6 +603,13 @@ func TestNewXMLTransformer(t *testing.T) {
 			xmlFilePath:         "./test_data/xml/repeatedScalarNode.xml",
 			wantFilePath:        "./test_data/xml/repeatedScalarNode.out.json",
 		},
+		{
+			description:         "test an XML object transform with an empty tag",
+			transformIdentifier: "test",
+			schemaFilePath:      "./test_data/xml/emptyTagTransform.json",
+			xmlFilePath:         "./test_data/xml/emptyTagTransform.xml",
+			wantFilePath:        "./test_data/xml/emptyTagTransform-out.json",
+		},
 	}
 
 	for _, test := range tests {
