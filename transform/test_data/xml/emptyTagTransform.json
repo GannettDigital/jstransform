@@ -15,7 +15,12 @@
         }
       },
       "emptyTag": {
-        "type": "string",
+        "type": "object",
+        "properties": {
+            "field": {
+                "type": "string"
+            }
+        },
         "transform": {
           "test": {
             "from": [
