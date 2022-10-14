@@ -391,6 +391,10 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 			} else {
 				return ot.defaultValue, nil
 			}
+		} else if val, ok := rawValue.(string); ok {
+			if val == "" {
+				return nil, nil
+			}
 		}
 
 		switch v := rawValue.(type) {
