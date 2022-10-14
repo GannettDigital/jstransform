@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+      "description": {
+        "type": "string",
+        "transform": {
+          "test": {
+            "from": [
+              {
+                "xmlPath": "//nested/description"
+              }
+            ]
+          }
+        }
+      },
+      "emptyTag": {
+        "type": "string",
+        "transform": {
+          "test": {
+            "from": [
+              {
+                "xmlPath": "//nested/emptyTag"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
