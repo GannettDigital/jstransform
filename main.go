@@ -25,13 +25,15 @@ func (mf *mapFlags) String() string {
 	return strings.Join(kvs, " ")
 }
 
-// Set stores the provided options into the data structure.
+// Set stores the provided options into the data structure. Multiple key-values pairs can be provided if separated by a comma.
 func (mf *mapFlags) Set(value string) error {
-	kv := strings.SplitN(value, "=", 2)
-	if len(kv) != 2 {
-		return fmt.Errorf("Value in 'key=value' format: %v", value)
+	for _, pair := range strings.Split(value, ",") {
+		kv := strings.SplitN(pair, "=", 2)
+		if len(kv) != 2 {
+			return fmt.Errorf("value in 'key=value' format: %v", value)
+		}
+		mf.kv[kv[0]] = kv[1]
 	}
-	mf.kv[kv[0]] = kv[1]
 	return nil
 }
 
