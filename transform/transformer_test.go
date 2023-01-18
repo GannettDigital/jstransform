@@ -20,6 +20,7 @@ var (
 	dateTimesSchema, _        = jsonschema.SchemaFromFile("./test_data/date-times.json", "")
 	frontSchema, _            = jsonschema.SchemaFromFile("./test_data/front.json", "")
 	arrayTransformsSchema2, _ = jsonschema.SchemaFromFile("./test_data/array-transforms-2.json", "")
+	orderedKeysSchema, _      = jsonschema.SchemaFromFile("./test_data/ordered-keys.json", "")
 
 	transformerTests = []struct {
 		description         string
@@ -240,6 +241,23 @@ var (
 		          "optionalDate": ""
 		      }`),
 			want: json.RawMessage(`{"dates":["2018-06-25T20:21:13Z","2018-06-25T20:21:13Z"],"requiredDate":"2018-06-25T20:21:13Z"}`),
+		},
+		{
+			description:         "Test format: ordered keys",
+			schema:              orderedKeysSchema,
+			transformIdentifier: "cumulo",
+			in: json.RawMessage(`
+		      {
+		        "dates": {
+		          "z": "2018-06-25T20:21:19Z",
+		          "a": "2018-06-25T20:21:10Z",
+		          "y": "2018-06-25T20:21:18Z",
+		          "b": "2018-06-25T20:21:11Z",
+		          "x": "2018-06-25T20:21:17Z",
+		          "c": "2018-06-25T20:21:12Z"
+		        }
+		      }`),
+			want: json.RawMessage(`{"dates":["2018-06-25T20:21:10Z","2018-06-25T20:21:11Z","2018-06-25T20:21:12Z","2018-06-25T20:21:17Z","2018-06-25T20:21:18Z","2018-06-25T20:21:19Z"]}`),
 		},
 		{
 			description:         "Test special characters",

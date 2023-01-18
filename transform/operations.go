@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/PaesslerAG/jsonpath"
+	"github.com/GannettDigital/PaesslerAG_jsonpath"
 	"github.com/microcosm-cc/bluemonday"
 )
 
