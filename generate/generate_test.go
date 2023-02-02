@@ -1,7 +1,6 @@
 package generate
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -13,7 +12,7 @@ import (
 // 1. Generate go files in the generate_test_data/{outDir} that matches your test case
 // To add new test cases that do NOT fit into the existing cases:
 // 1. Add a new output directory with the name of your test case to generate_test_data/{outDir} (use one word all lowercase so the go files package name is simple)
-// 2. Generate go files in the new output directory at generate_test_data/{outDir}
+// 2. Generate go files in the new output directory at generate_test_data/{outDir}.
 func TestBuildStructs(t *testing.T) {
 	testdir := "generate_test_data"
 
@@ -221,12 +220,12 @@ func TestBuildStructs(t *testing.T) {
 		}
 
 		for i := range test.files {
-			got, err := ioutil.ReadFile(filepath.Join(outDir, test.files[i]))
+			got, err := os.ReadFile(filepath.Join(outDir, test.files[i]))
 			if err != nil {
 				t.Errorf("Test %q - failed to read expected file %q: %v", test.description, test.files[i], err)
 			}
 
-			want, err := ioutil.ReadFile(filepath.Join(testdir, outDir, test.files[i]))
+			want, err := os.ReadFile(filepath.Join(testdir, outDir, test.files[i]))
 			if err != nil {
 				t.Errorf("Test %q - failed to read want file %q: %v", test.description, test.files[i], err)
 			}

@@ -3,7 +3,7 @@ package transform
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -11,7 +11,7 @@ import (
 	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
-// used for the Transformer test and benchmark
+// used for the Transformer test and benchmark.
 var (
 	imageSchema, _            = jsonschema.SchemaFromFile("./test_data/image.json", "")
 	arrayTransformsSchema, _  = jsonschema.SchemaFromFile("./test_data/array-transforms.json", "")
@@ -641,7 +641,7 @@ func TestNewXMLTransformer(t *testing.T) {
 			t.Fatalf("Test %q: %v", test.description, err)
 		}
 
-		rawXMLBytes, err := ioutil.ReadFile(test.xmlFilePath)
+		rawXMLBytes, err := os.ReadFile(test.xmlFilePath)
 		if err != nil {
 			t.Fatalf("Test %q: %v", test.description, err)
 		}
@@ -660,7 +660,7 @@ func TestNewXMLTransformer(t *testing.T) {
 			}
 		}
 
-		want, err := ioutil.ReadFile(test.wantFilePath)
+		want, err := os.ReadFile(test.wantFilePath)
 		if err != nil {
 			t.Fatalf("error reading want file: %v", err)
 		}
@@ -682,7 +682,6 @@ func TestNewXMLTransformer(t *testing.T) {
 			t.Fatalf("Test %q - failed \n got:\n %s \n want:\n %s", test.description, output, want)
 		}
 	}
-
 }
 
 func BenchmarkTransformer(b *testing.B) {

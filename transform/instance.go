@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"strings"
 
+	jsonpath "github.com/GannettDigital/PaesslerAG_jsonpath"
 	"github.com/GannettDigital/jsonparser"
 
-	"github.com/GannettDigital/PaesslerAG_jsonpath"
 	"github.com/antchfx/xmlquery"
 )
 
-// pathModifier is used to modify the JSON path of an instance to indicate
+// pathModifier is used to modify the JSON path of an instance to indicate.
 type pathModifier func(string) string
 
 func pathReplace(old, new string, modifier pathModifier) pathModifier {
@@ -38,7 +38,7 @@ type instanceTransformer interface {
 }
 
 // arrayTransformer represents a JSON instance type array in the case of a JSON transform or an array of xmlquery.Node in the case of an XML transform.
-// in both cases the output will be JSON
+// in both cases the output will be JSON.
 type arrayTransformer struct {
 	childTransformer instanceTransformer
 	defaultValue     []interface{}
@@ -120,7 +120,7 @@ func (at *arrayTransformer) baseValueXML(in interface{}, path string, modifier p
 			return nil, false, err
 		}
 
-		//if rawValue is an array of xml nodes we need to append them to newValue for return as []interface{}
+		// if rawValue is an array of xml nodes we need to append them to newValue for return as []interface{}
 		xmlNodeArray, ok := rawValue.([]*xmlquery.Node)
 		if ok {
 			newValue := make([]interface{}, len(xmlNodeArray))
@@ -146,7 +146,7 @@ func (at *arrayTransformer) baseValueXML(in interface{}, path string, modifier p
 	return nil, false, nil
 }
 
-// baseValue routes to the correct arrayTransformer.baseValue format
+// baseValue routes to the correct arrayTransformer.baseValue format.
 func (at *arrayTransformer) baseValue(in interface{}, path string, modifier pathModifier) ([]interface{}, bool, error) {
 	if at.format == jsonInput {
 		return at.baseValueJSON(in, path, modifier)
@@ -252,7 +252,7 @@ func (at *arrayTransformer) arrayTransformXML(in interface{}, modifier pathModif
 	return newArray, nil
 }
 
-// transform routes to the correct array transform type
+// transform routes to the correct array transform type.
 func (at *arrayTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
 	if at.format == jsonInput {
 		return at.arrayTransformJSON(in, modifier)
@@ -365,7 +365,6 @@ func (ot *objectTransformer) objectTransformJSON(in interface{}, modifier pathMo
 	}
 
 	return newValue, nil
-
 }
 
 // objectTransformXML retrieves the value for this object by building the value for the base object and then adding in any
@@ -436,10 +435,9 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 	}
 
 	return newValue, nil
-
 }
 
-// transform routes to the correct object transform type
+// transform routes to the correct object transform type.
 func (ot *objectTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
 	if ot.format == jsonInput {
 		return ot.objectTransformJSON(in, modifier)
@@ -536,7 +534,7 @@ func (st *scalarTransformer) transformScalarJSON(in interface{}, modifier pathMo
 //
 // 1. Use a Transform if it exists.
 //
-// 2. If transform does not exist or returns no value send back default
+// 2. If transform does not exist or returns no value send back default.
 func (st *scalarTransformer) transformScalarXML(in interface{}, modifier pathModifier) (interface{}, error) {
 	path := st.jsonPath
 	if modifier != nil {
@@ -558,7 +556,7 @@ func (st *scalarTransformer) transformScalarXML(in interface{}, modifier pathMod
 	return st.defaultValue, nil
 }
 
-// transform routes to the correct scalar transform type
+// transform routes to the correct scalar transform type.
 func (st *scalarTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
 	if st.format == jsonInput {
 		return st.transformScalarJSON(in, modifier)

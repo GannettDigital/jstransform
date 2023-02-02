@@ -205,7 +205,7 @@ func schemaDefault(schema json.RawMessage) (interface{}, error) {
 }
 
 // replaceIndex takes a path which may include array index values like `a[0].b.c[23].d` with the index values replaced
-// with "*", ie `a[*].b.c[*].d`
+// with "*", ie `a[*].b.c[*].d`.
 func replaceIndex(path string) string {
 	return indexRe.ReplaceAllString(path, "[*]")
 }

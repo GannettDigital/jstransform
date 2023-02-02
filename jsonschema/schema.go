@@ -3,7 +3,7 @@ package jsonschema
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -50,7 +50,7 @@ func (s *Schema) Validate(raw json.RawMessage) (bool, error) {
 //
 // Referenced files are recursively processed. At this time only definition and file references are supported.
 func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
-	data, err := ioutil.ReadFile(schemaPath)
+	data, err := os.ReadFile(schemaPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
 	}
@@ -107,7 +107,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 
 // SchemaTypes will parse the given file and report which top level allOfTypes, oneOfTypes, and properties are found in the schema.
 func SchemaTypes(schemaPath string) ([]string, []string, []string, error) {
-	data, err := ioutil.ReadFile(schemaPath)
+	data, err := os.ReadFile(schemaPath)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
 	}
@@ -126,7 +126,7 @@ func SchemaTypes(schemaPath string) ([]string, []string, []string, error) {
 		oneOfTypes = append(oneOfTypes, one.Ref)
 	}
 	var properties []string
-	for prop, _ := range sj.Properties {
+	for prop := range sj.Properties {
 		properties = append(properties, prop)
 	}
 	sort.Strings(properties)

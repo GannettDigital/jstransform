@@ -25,7 +25,7 @@ type extractedField struct {
 
 // write outputs the Golang representation of this field to the writer with prefix before each line.
 // It handles inline structs by calling this method recursively adding a new \t to the prefix for each layer.
-// If required is set to false 'omitempty' is added in the JSON struct tag for the field
+// If required is set to false 'omitempty' is added in the JSON struct tag for the field.
 func (ef *extractedField) write(w io.Writer, prefix string, required, descriptionAsStructTag, pointers bool) error {
 	var omitempty string
 	if !required {
@@ -71,7 +71,7 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 // extractedFields is a map of fields keyed on the field name.
 type extractedFields map[string]*extractedField
 
-// IncludeTime does a depth-first recursive search to see if any field or child field is of type "date-time"
+// IncludeTime does a depth-first recursive search to see if any field or child field is of type "date-time".
 func (efs extractedFields) IncludeTime() bool {
 	for _, field := range efs {
 		if field.fields != nil {
@@ -86,7 +86,7 @@ func (efs extractedFields) IncludeTime() bool {
 	return false
 }
 
-// Sorted will return the fields in a sorted list. The sort is a string sort on the keys
+// Sorted will return the fields in a sorted list. The sort is a string sort on the keys.
 func (efs extractedFields) Sorted() []*extractedField {
 	var sorted []*extractedField
 	var sortedKeys sort.StringSlice
@@ -291,7 +291,7 @@ func (gen *generatedStruct) write(w io.Writer) error {
 // Nested fields are handled by recursively calling this function until the leaf field is reached.
 // For all fields the name and jsonType are set, for arrays the array bool is set for true and for JSON objects,
 // the fields map is created and if it exists the requiredFields section populated.
-// fields will be renamed if a matching entry is supplied in the fieldRenameMap
+// fields will be renamed if a matching entry is supplied in the fieldRenameMap.
 func addField(fields extractedFields, tree []string, inst jsonschema.Instance, fieldRenameMap map[string]string) error {
 	if len(tree) > 1 {
 		if f, ok := fields[tree[0]]; ok {

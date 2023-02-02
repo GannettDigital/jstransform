@@ -2,10 +2,10 @@ package jsonschema
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -82,11 +82,10 @@ func TestDereference(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-
 		var want interface{}
 		if !test.wantErr {
 			wantPath := strings.Replace(test.schemaPath, "/jsref_", "/deref_", 1)
-			wantJson, err := ioutil.ReadFile(wantPath)
+			wantJson, err := os.ReadFile(wantPath)
 			if err != nil {
 				t.Errorf("Test %q - failed to read json want file %q: %v", test.description, wantPath, err)
 			}
@@ -94,7 +93,7 @@ func TestDereference(t *testing.T) {
 		}
 
 		var got interface{}
-		gotJson, err := ioutil.ReadFile(test.schemaPath)
+		gotJson, err := os.ReadFile(test.schemaPath)
 		if err != nil {
 			t.Errorf("Test %q - failed to read json got file %q: %v", test.description, test.schemaPath, err)
 		}
