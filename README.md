@@ -23,11 +23,11 @@ The Golang struct generation portion of this code based is intended to be used w
 
 To use the struct generation with go generate include a generate line in a go source file for example:
 
-    //go:generate go run ../../vendor/github.com/GannettDigital/jstransform/main.go myschema.json $PWD
+    //go:generate go run ../../vendor/github.com/GannettDigital/jstransform/main.go myschema.json .
 
 or if you have compiled the tool and have it in your path rather than vendoring the source:
 
-    //go:generate jstransform myschema.json $PWD
+    //go:generate jstransform myschema.json .
 
 then simply run `go generate`.
 
