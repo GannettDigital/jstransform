@@ -79,7 +79,7 @@ func buildAvroSerializationFunctions(schemaPath string) error {
 //
 // Note: Avro can't handle maps with a key other than a string, http://avro.apache.org/docs/current/spec.html#Maps
 // Neither can JSON schema, https://json-schema.org/understanding-json-schema/reference/object.html so this only
-// becomes relevant if it is used with go structs which weren't just generated from JSON schema
+// becomes relevant if it is used with go structs which weren't just generated from JSON schema.
 func buildAvroSchemaFile(name, goSourcePath string, pretty bool) (string, error) {
 	// Step 1 create the Avro Schema file
 	// there are 3 ways to approach this, walk the JSON schema, walk the AST for the go struct or load the Go struct up and do reflection
@@ -134,7 +134,7 @@ func buildAvroSchemaFile(name, goSourcePath string, pretty bool) (string, error)
 	return outPath, nil
 }
 
-// parseGoStruct parses the go file(s) at path returning the named struct type definition as an *ast.TypeSpec
+// parseGoStruct parses the go file(s) at path returning the named struct type definition as an *ast.TypeSpec.
 func parseGoStruct(name, path string) (*ast.TypeSpec, error) {
 	fileSet := token.NewFileSet()
 
@@ -355,7 +355,7 @@ func writeEmbeddedStructFields(cfg avroConfig) {
 	}, nil)
 }
 
-// convertToAvroType returns the avro type definition for a go type
+// convertToAvroType returns the avro type definition for a go type.
 func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool) string {
 	// Note: the go code generated from JSON schema does not include maps and they are not handled here
 	switch t := expr.(type) {

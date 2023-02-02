@@ -351,7 +351,7 @@ func TestGeneratedStruct(t *testing.T) {
 		if !test.wantWriteError && err != nil {
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
 		} else if test.wantWriteError && err == nil {
-			t.Fatalf("Test %q - expected failure but succeded to write", test.description)
+			t.Fatalf("Test %q - expected failure but succeeded to write", test.description)
 		} else if test.wantWriteError {
 			continue
 		}

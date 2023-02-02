@@ -326,7 +326,6 @@ func TestMappings(t *testing.T) {
 
 			if !reflect.DeepEqual(got.Instance, test.want) {
 				t.Errorf("Test %q - got \n%v\n\twant\n%v", test.description, got.Instance, test.want)
-
 			}
 		})
 	}

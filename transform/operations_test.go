@@ -42,7 +42,7 @@ type opTests struct {
 	wantInitErr bool
 }
 
-// A common test runner for all the operations tests
+// A common test runner for all the operations tests.
 func runOpTests(t *testing.T, opType func() transformOperation, tests []opTests) {
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {

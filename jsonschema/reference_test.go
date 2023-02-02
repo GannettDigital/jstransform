@@ -82,7 +82,6 @@ func TestDereference(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-
 		var want interface{}
 		if !test.wantErr {
 			wantPath := strings.Replace(test.schemaPath, "/jsref_", "/deref_", 1)

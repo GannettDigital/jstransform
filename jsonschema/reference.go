@@ -135,7 +135,7 @@ func findRefs(data json.RawMessage) ([][]string, error) {
 }
 
 // resolveRef looks at the reference value passed in as ref and resolves it to a set of JSON.
-// The reference may refer to a definition withing the given data or a file reference.
+// The reference may refer to a definition within the given data or a file reference.
 // For files schemaPath is used to resolve relative references then SchemaFromFile is used to build the file.
 // oneOfType is used by schemaFromFile to select a specific oneOfType.
 func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType string) (json.RawMessage, error) {

@@ -11,7 +11,7 @@ import (
 	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
-// used for the Transformer test and benchmark
+// used for the Transformer test and benchmark.
 var (
 	imageSchema, _            = jsonschema.SchemaFromFile("./test_data/image.json", "")
 	arrayTransformsSchema, _  = jsonschema.SchemaFromFile("./test_data/array-transforms.json", "")
@@ -682,7 +682,6 @@ func TestNewXMLTransformer(t *testing.T) {
 			t.Fatalf("Test %q - failed \n got:\n %s \n want:\n %s", test.description, output, want)
 		}
 	}
-
 }
 
 func BenchmarkTransformer(b *testing.B) {

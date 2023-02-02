@@ -10,13 +10,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/antchfx/xmlquery"
-
 	"github.com/GannettDigital/jsonparser"
 	"github.com/GannettDigital/jstransform/jsonschema"
+
+	"github.com/antchfx/xmlquery"
 )
 
-// inputFormat denotes the type of transform to perfrom, the options are 'JSON' or 'XML'
+// inputFormat denotes the type of transform to perfrom, the options are 'JSON' or 'XML'.
 type inputFormat string
 
 const (
@@ -24,7 +24,7 @@ const (
 	xmlInput  = inputFormat("XML")
 )
 
-// JSONTransformer - a type implemented by the jstransform.Transformer
+// JSONTransformer - a type implemented by the jstransform.Transformer.
 type JSONTransformer interface {
 	Transform(raw json.RawMessage) (json.RawMessage, error)
 }
@@ -42,14 +42,14 @@ type Transformer struct {
 
 // NewTransformer returns a Transformer using the schema given.
 // The transformIdentifier is used to select the appropriate transform section from the schema.
-// It expects the transforms to be performed on JSON data
+// It expects the transforms to be performed on JSON data.
 func NewTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Transformer, error) {
 	return newTransformer(schema, tranformIdentifier, jsonInput)
 }
 
 // NewXMLTransformer returns a Transformer using the schema given.
 // The transformIdentifier is used to select the appropriate transform section from the schema.
-// It expects the transforms to be performed on XML data
+// It expects the transforms to be performed on XML data.
 func NewXMLTransformer(schema *jsonschema.Schema, tranformIdentifier string) (*Transformer, error) {
 	return newTransformer(schema, tranformIdentifier, xmlInput)
 }
@@ -181,7 +181,7 @@ func (tr *Transformer) baseXMLTransform(raw []byte) ([]byte, error) {
 	return out, nil
 }
 
-// findParent walks the instanceTransformer tree to find the parent of the given path
+// findParent walks the instanceTransformer tree to find the parent of the given path.
 func (tr *Transformer) findParent(path string) (instanceTransformer, error) {
 	path = strings.Replace(path, "[", ".[", -1)
 	splits := strings.Split(path, ".")
@@ -205,7 +205,7 @@ func (tr *Transformer) findParent(path string) (instanceTransformer, error) {
 }
 
 // walker is a WalkFunc for the Transformer which builds an representation of the fields and transforms in the schema.
-// This is later used to do the actual transform for incoming data
+// This is later used to do the actual transform for incoming data.
 func (tr *Transformer) walker(path string, value json.RawMessage) error {
 	instanceType, err := jsonparser.GetString(value, "type")
 	if err != nil {

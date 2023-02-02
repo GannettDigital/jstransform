@@ -33,7 +33,7 @@ func AvroTime(t time.Time) int64 {
 	return t.UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond))
 }
 
-// AvroTimeSlice converts the given []time.Time into a []int64 leveraging AvroTime
+// AvroTimeSlice converts the given []time.Time into a []int64 leveraging AvroTime.
 func AvroTimeSlice(times []time.Time) []int64 {
 	newTimes := make([]int64, len(times))
 	for i, t := range times {
@@ -98,7 +98,7 @@ func buildAvroHelperFunctions(name, goSourcePath, importPath string) error {
 
 // mappedFields contains the data needed to build a new avro struct.
 type mappedFields struct {
-	fieldMapping  string // the lines like `avroStructField: generatedStructField,` which go withing a struct initialization
+	fieldMapping  string // the lines like `avroStructField: generatedStructField,` which go within a struct initialization
 	preProcessing string // contains go code that does any preProcessing needed before the struct initialization
 	name          string // the name of the generated struct these fields are a mapping for, only set for named nested structs
 }
@@ -496,7 +496,7 @@ func mapFields(list *ast.FieldList, srcDir string) (map[string]*ast.Field, error
 	return fieldMap, nil
 }
 
-// printFields outputs the field definition for a struct as it was read from the original code
+// printFields outputs the field definition for a struct as it was read from the original code.
 func printFields(list *ast.FieldList) string {
 	var out string
 	for _, f := range list.List {

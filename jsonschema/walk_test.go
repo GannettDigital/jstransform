@@ -421,7 +421,6 @@ func TestWalkJSONSchema(t *testing.T) {
 				}
 			}
 		})
-
 	}
 }
 func TestWalkJSONSchemaRaw(t *testing.T) {
@@ -850,7 +849,6 @@ func BenchmarkWalkInstance(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-
 		if err := Walk(schema, func(path string, i Instance) error { return nil }); err != nil {
 			b.Fatal(err)
 		}
@@ -865,7 +863,6 @@ func BenchmarkWalkRaw(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-
 		if err := WalkRaw(schema, func(path string, raw json.RawMessage) error { return nil }); err != nil {
 			b.Fatal(err)
 		}

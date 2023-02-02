@@ -106,7 +106,6 @@ func TestTransformInstruction(t *testing.T) {
 }
 
 func TestTransformInstructions(t *testing.T) {
-
 	tests := []struct {
 		description string
 		tis         transformInstructions

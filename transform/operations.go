@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/GannettDigital/PaesslerAG_jsonpath"
+
 	"github.com/microcosm-cc/bluemonday"
 )
 
@@ -234,7 +235,7 @@ func (s *split) transform(raw interface{}) (interface{}, error) {
 	return interfaceSplits, nil
 }
 
-// timeParse is a transformOperation which formats a date string into the layout
+// timeParse is a transformOperation which formats a date string into the layout.
 type timeParse struct {
 	args map[string]string
 }
@@ -261,7 +262,7 @@ func (t *timeParse) transform(raw interface{}) (interface{}, error) {
 }
 
 // currentTime is a transformOperation which returns the current time in a
-// specified format
+// specified format.
 type currentTime struct {
 	args map[string]string
 }
@@ -279,7 +280,6 @@ func (c *currentTime) transform(_ interface{}) (interface{}, error) {
 	switch c.args["format"] {
 	case "RFC3339":
 		timeFmt = time.RFC3339
-
 	}
 	return time.Now().Format(timeFmt), nil
 }
