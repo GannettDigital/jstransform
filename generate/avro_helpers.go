@@ -7,7 +7,7 @@ import (
 	"go/ast"
 	"go/format"
 	"io"
-	"io/ioutil"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -552,7 +552,7 @@ func writeCodeTemplate(src string, values map[string]string, path string) error 
 		return fmt.Errorf("failed to format source: %v", err)
 	}
 
-	if err := ioutil.WriteFile(path, final, 0644); err != nil {
+	if err := os.WriteFile(path, final, 0644); err != nil {
 		return fmt.Errorf("failed to write file %q: %v", path, err)
 	}
 

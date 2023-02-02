@@ -3,7 +3,7 @@ package jsonschema
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -163,7 +163,7 @@ func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType s
 		if err != nil {
 			return nil, fmt.Errorf("unable to get reference from %q: %v", sourcePath, err)
 		}
-		source, err = ioutil.ReadAll(resp.Body)
+		source, err = io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read body from %q: %v", sourcePath, err)
 		}

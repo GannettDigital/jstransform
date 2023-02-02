@@ -9,7 +9,6 @@ import (
 	"go/parser"
 	"go/token"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -42,7 +41,7 @@ func buildAvroSerializationFunctions(schemaPath string) error {
 	namespace := avroparser.NewNamespace(false)
 	gen := flat.NewFlatPackageGenerator(pkg, false)
 
-	schema, err := ioutil.ReadFile(schemaPath)
+	schema, err := os.ReadFile(schemaPath)
 	if err != nil {
 		return fmt.Errorf("failed to read schema file at path %q: %v", schemaPath, err)
 	}
@@ -75,7 +74,7 @@ func buildAvroSerializationFunctions(schemaPath string) error {
 // given path. I will write it to the same directory as the go file as `<name>.avsc` but with the name lowercased.
 // http://avro.apache.org/docs/current/spec.html
 //
-// By default the file is written with now whitespace to minimize the size, choose pretty for better formatting
+// # By default the file is written with now whitespace to minimize the size, choose pretty for better formatting
 //
 // Note: Avro can't handle maps with a key other than a string, http://avro.apache.org/docs/current/spec.html#Maps
 // Neither can JSON schema, https://json-schema.org/understanding-json-schema/reference/object.html so this only

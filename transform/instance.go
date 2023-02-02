@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/GannettDigital/PaesslerAG_jsonpath"
+	jsonpath "github.com/GannettDigital/PaesslerAG_jsonpath"
 	"github.com/GannettDigital/jsonparser"
 
 	"github.com/antchfx/xmlquery"

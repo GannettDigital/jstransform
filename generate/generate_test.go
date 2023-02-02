@@ -1,7 +1,6 @@
 package generate
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -221,12 +220,12 @@ func TestBuildStructs(t *testing.T) {
 		}
 
 		for i := range test.files {
-			got, err := ioutil.ReadFile(filepath.Join(outDir, test.files[i]))
+			got, err := os.ReadFile(filepath.Join(outDir, test.files[i]))
 			if err != nil {
 				t.Errorf("Test %q - failed to read expected file %q: %v", test.description, test.files[i], err)
 			}
 
-			want, err := ioutil.ReadFile(filepath.Join(testdir, outDir, test.files[i]))
+			want, err := os.ReadFile(filepath.Join(testdir, outDir, test.files[i]))
 			if err != nil {
 				t.Errorf("Test %q - failed to read want file %q: %v", test.description, test.files[i], err)
 			}

@@ -2,7 +2,7 @@ package generate
 
 import (
 	"bytes"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"testing"
 
@@ -357,7 +357,7 @@ func TestGeneratedStruct(t *testing.T) {
 		}
 		got := buf.Bytes()
 
-		want, err := ioutil.ReadFile(test.wantFilePath)
+		want, err := os.ReadFile(test.wantFilePath)
 		if err != nil {
 			t.Fatalf("Test %q - failed to read result file: %v", test.description, err)
 		}

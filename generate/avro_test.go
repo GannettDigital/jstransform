@@ -2,7 +2,6 @@ package generate
 
 import (
 	"go/ast"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -80,12 +79,12 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 			t.Errorf("Test %q - failed to build Avro schema: %v", test.description, err)
 		}
 
-		got, err := ioutil.ReadFile(outpath)
+		got, err := os.ReadFile(outpath)
 		if err != nil {
 			t.Errorf("Test %q - failed to read Avro schema file: %v", test.description, err)
 		}
 
-		want, err := ioutil.ReadFile(test.wantPath)
+		want, err := os.ReadFile(test.wantPath)
 		if err != nil {
 			t.Errorf("Test %q - failed to read want Avro schema file: %v", test.description, err)
 		}

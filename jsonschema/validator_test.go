@@ -2,7 +2,7 @@ package jsonschema
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -45,7 +45,7 @@ func TestValidate(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Test %q - failed to load schema: %v", test.description, err)
 		}
-		raw, err := ioutil.ReadFile(test.jsonPath)
+		raw, err := os.ReadFile(test.jsonPath)
 		if err != nil {
 			t.Fatalf("Test %q - failed to load test JSON: %v", test.description, err)
 		}
