@@ -15,6 +15,32 @@ import (
 	"time"
 )
 
+// invalidFieldNames is a list of field names that conflict with hard-coded method names on
+// generated structs. These are converted to `Field_<name>` in the resulting struct to avoid errors.
+// Copied from github.com/actgardner/gogen-avro/v7/schema/field.go which isn't a great solution
+// but works for now.
+var invalidFieldNames = map[string]bool{
+	"Schema":               true,
+	"Serialize":            true,
+	"SchemaName":           true,
+	"MarshalJSON":          true,
+	"UnmarshalJSON":        true,
+	"AvroCRC64Fingerprint": true,
+	"SetBoolean":           true,
+	"SetInt":               true,
+	"SetLong":              true,
+	"SetFloat":             true,
+	"SetDouble":            true,
+	"SetBytes":             true,
+	"SetString":            true,
+	"Get":                  true,
+	"SetDefault":           true,
+	"AppendMap":            true,
+	"AppendArray":          true,
+	"NullField":            true,
+	"Finalize":             true,
+}
+
 // AvroCFWriter creates a Avro Container file containing the data from the struct that implements this interface.
 type AvroCFWriter interface {
 	WriteAvroCF(io.Writer, time.Time) error
@@ -278,10 +304,10 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 		typeName := f.Name
 		switch typeName { // handle builtin types
 		case "string", "bool", "float64":
-			return mappedFields{fieldMapping: "z." + prefix + name, name: prefix + name}, nil
+			return mappedFields{fieldMapping: "z." + prefix + generatedField.Names[0].Name, name: prefix + name}, nil
 		case "int64":
 			// special case for converting time fields and arrays of times
-			m := mappedFields{fieldMapping: "z." + prefix + name, name: prefix + name}
+			m := mappedFields{fieldMapping: "z." + prefix + generatedField.Names[0].Name, name: prefix + name}
 			fieldType := generatedField.Type
 			pointer := false
 			if p, ok := generatedField.Type.(*ast.StarExpr); ok {
@@ -289,7 +315,7 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 				fieldType = p.X
 			}
 			if selector, ok := fieldType.(*ast.SelectorExpr); ok && selector.Sel.Name == "Time" {
-				m = mappedFields{fieldMapping: fmt.Sprintf("generate.AvroTime(z.%s)", prefix+name), name: prefix + name}
+				m = mappedFields{fieldMapping: fmt.Sprintf("generate.AvroTime(z.%s)", prefix+generatedField.Names[0].Name), name: prefix + name}
 			}
 			if gArray, ok := fieldType.(*ast.ArrayType); ok {
 				aType := gArray.Elt
@@ -298,7 +324,7 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 					pointer = true
 				}
 				if selector, ok := aType.(*ast.SelectorExpr); ok && selector.Sel.Name == "Time" {
-					m = mappedFields{fieldMapping: fmt.Sprintf("generate.AvroTimeSlice(z.%s)", prefix+name), name: prefix + name}
+					m = mappedFields{fieldMapping: fmt.Sprintf("generate.AvroTimeSlice(z.%s)", prefix+generatedField.Names[0].Name), name: prefix + name}
 				}
 			}
 			if pointer {
@@ -394,7 +420,11 @@ func (fm *avroFieldMapper) generateStructValue(name, prefix, typeName string, ge
 			structDef = "*" + structDef
 		}
 
-		funcName := typeName + "Slice"
+		var funcPrefix string
+		if fields == nil {
+			funcPrefix = mappedStruct.name + "_"
+		}
+		funcName := funcPrefix + typeName + "Slice"
 		templValues := map[string]string{
 			"funcName":     funcName,
 			"typeID":       fmt.Sprintf("%s.%s", fm.packageName, typeName),
@@ -408,7 +438,7 @@ func (fm *avroFieldMapper) generateStructValue(name, prefix, typeName string, ge
 		}
 
 		return mappedFields{
-			fieldMapping:  fmt.Sprintf("%s(%s)", funcName, "z."+prefix+name),
+			fieldMapping:  fmt.Sprintf("%s(%s)", funcName, "z."+prefix+generatedField.Names[0].Name),
 			preProcessing: mappedStruct.preProcessing + buf.String(),
 		}, nil
 	}
@@ -490,6 +520,9 @@ func mapFields(list *ast.FieldList, srcDir string) (map[string]*ast.Field, error
 			continue
 		}
 		key := f.Names[0].Name
+		if invalidFieldNames[key] {
+			key = "Field_" + key
+		}
 		fieldMap[key] = f
 	}
 

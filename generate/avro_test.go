@@ -126,7 +126,7 @@ func TestBuildAvroSerializationFunctions(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if err := buildAvroSerializationFunctions(test.path); err != nil {
+		if err := buildAvroSerializationFunctions(test.path, BuildArgs{}); err != nil {
 			t.Errorf("Test %q - failed: %v", test.description, err)
 		}
 

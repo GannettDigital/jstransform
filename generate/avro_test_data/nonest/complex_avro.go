@@ -62,7 +62,7 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 		return &complex.Complex{AvroWriteTime: aTime, AvroDeleted: true}
 	}
 
-	Contributors_recordSlice := func(in []SimpleContributors) []*complex.Contributors_record {
+	SimpleContributors_Contributors_recordSlice := func(in []SimpleContributors) []*complex.Contributors_record {
 		converted := make([]*complex.Contributors_record, len(in))
 		for i, z := range in {
 			converted[i] = &complex.Contributors_record{
@@ -74,7 +74,7 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 		return converted
 	}
 
-	Crops_recordSlice := func(in []ComplexCrops) []*complex.Crops_record {
+	ComplexCrops_Crops_recordSlice := func(in []ComplexCrops) []*complex.Crops_record {
 		converted := make([]*complex.Crops_record, len(in))
 		for i, z := range in {
 			converted[i] = &complex.Crops_record{
@@ -90,14 +90,14 @@ func (z *Complex) convertToAvro(writeTime time.Time) *complex.Complex {
 
 	return &complex.Complex{
 		AvroWriteTime:  aTime,
-		Contributors:   Contributors_recordSlice(z.Contributors),
+		Contributors:   SimpleContributors_Contributors_recordSlice(z.Contributors),
 		Height:         &complex.UnionNullLong{Long: z.Height, UnionType: complex.UnionNullLongTypeEnumLong},
 		SomeDateObj:    &complex.UnionNullSomeDateObj_record{SomeDateObj_record: &complex.SomeDateObj_record{Dates: generate.AvroTimeSlice(z.SomeDateObj.Dates)}, UnionType: complex.UnionNullSomeDateObj_recordTypeEnumSomeDateObj_record},
 		Visible:        z.Visible,
 		Width:          &complex.UnionNullDouble{Double: z.Width, UnionType: complex.UnionNullDoubleTypeEnumDouble},
 		Caption:        z.Caption,
 		Credit:         z.Credit,
-		Crops:          Crops_recordSlice(z.Crops),
+		Crops:          ComplexCrops_Crops_recordSlice(z.Crops),
 		Cutline:        &complex.UnionNullString{String: z.Cutline, UnionType: complex.UnionNullStringTypeEnumString},
 		DatePhotoTaken: generate.AvroTime(z.DatePhotoTaken),
 		Orientation:    z.Orientation,
