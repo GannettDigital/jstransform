@@ -62,7 +62,7 @@ func (z *Nested) convertToAvro(writeTime time.Time) *nested.Nested {
 		return &nested.Nested{AvroWriteTime: aTime, AvroDeleted: true}
 	}
 
-	AppearanceURLs_recordSlice := func(in []NestedFactCheckClaimsAppearanceURLs) []*nested.AppearanceURLs_record {
+	NestedFactCheckClaimsAppearanceURLs_AppearanceURLs_recordSlice := func(in []NestedFactCheckClaimsAppearanceURLs) []*nested.AppearanceURLs_record {
 		converted := make([]*nested.AppearanceURLs_record, len(in))
 		for i, z := range in {
 			converted[i] = &nested.AppearanceURLs_record{
@@ -73,11 +73,11 @@ func (z *Nested) convertToAvro(writeTime time.Time) *nested.Nested {
 		return converted
 	}
 
-	FactCheckClaims_recordSlice := func(in []NestedFactCheckClaims) []*nested.FactCheckClaims_record {
+	NestedFactCheckClaims_FactCheckClaims_recordSlice := func(in []NestedFactCheckClaims) []*nested.FactCheckClaims_record {
 		converted := make([]*nested.FactCheckClaims_record, len(in))
 		for i, z := range in {
 			converted[i] = &nested.FactCheckClaims_record{
-				AppearanceURLs: AppearanceURLs_recordSlice(z.AppearanceURLs),
+				AppearanceURLs: NestedFactCheckClaimsAppearanceURLs_AppearanceURLs_recordSlice(z.AppearanceURLs),
 				Author:         &nested.UnionNullString{String: z.Author, UnionType: nested.UnionNullStringTypeEnumString},
 				Claim:          &nested.UnionNullString{String: z.Claim, UnionType: nested.UnionNullStringTypeEnumString},
 				Date:           &nested.UnionNullString{String: z.Date, UnionType: nested.UnionNullStringTypeEnumString},
@@ -89,7 +89,7 @@ func (z *Nested) convertToAvro(writeTime time.Time) *nested.Nested {
 
 	return &nested.Nested{
 		AvroWriteTime:   aTime,
-		FactCheckClaims: FactCheckClaims_recordSlice(z.FactCheckClaims),
+		FactCheckClaims: NestedFactCheckClaims_FactCheckClaims_recordSlice(z.FactCheckClaims),
 	}
 }
 

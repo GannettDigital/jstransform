@@ -129,7 +129,7 @@ func BuildStructsWithArgs(args BuildArgs) error {
 			return fmt.Errorf("failed to build struct file for %q: %v", name, err)
 		}
 		if args.GenerateAvro {
-			if err := buildAvro(name, path, args.ImportPath); err != nil {
+			if err := buildAvro(name, path, args); err != nil {
 				return fmt.Errorf("failed to build Avro files for %q: %v", packageName, err)
 			}
 		}
@@ -146,7 +146,7 @@ func BuildStructsWithArgs(args BuildArgs) error {
 			return fmt.Errorf("failed to build struct file for %q: %v", name, err)
 		}
 		if args.GenerateAvro {
-			if err := buildAvro(name, path, args.ImportPath); err != nil {
+			if err := buildAvro(name, path, args); err != nil {
 				return fmt.Errorf("failed to build Avro files for %q: %v", packageName, err)
 			}
 		}
@@ -164,7 +164,8 @@ func BuildStructsWithArgs(args BuildArgs) error {
 // buildAvro creates an Avro schema file, Avro serialization functions and some helper functions which link the structs
 // used by the generated Avro serialization with those created by the BuildStructs functions.
 // The serialization methods are created with https://github.com/actgardner/gogen-avro
-func buildAvro(name, path, importPath string) error {
+func buildAvro(name, path string, args BuildArgs) error {
+	importPath := args.ImportPath
 	name = exportedName(name)
 
 	avroSchemaPath, err := buildAvroSchemaFile(name, path, false)
@@ -174,7 +175,7 @@ func buildAvro(name, path, importPath string) error {
 
 	// step 2 build serialization functions from the new avro schema
 	// this step parses the just created Avro schema and by doing so acts as validation step as well
-	if err := buildAvroSerializationFunctions(avroSchemaPath); err != nil {
+	if err := buildAvroSerializationFunctions(avroSchemaPath, args); err != nil {
 		return fmt.Errorf("failed to build Avro serialization code: %v", err)
 	}
 
