@@ -1,0 +1,48 @@
+
+type nested @goModel(model: ".Nested") {
+  "Information related to the International Fact-Checking Network (IFCN) program"
+  factCheckClaims(
+    "A List Filter expression such as '{Field: \"position\", Operation: \"<=\", Argument: {Value: 10}}'"
+    filter: ListFilter
+
+    "Sort the list, ie '{Field: \"position\", Order: \"ASC\"}'"
+    sort: ListSortParams
+  )	[(!]! @goField(forceResolver: true) {
+  	"The factCheck appearanceURLs"
+  	appearanceURLs(
+    "A List Filter expression such as '{Field: \"position\", Operation: \"<=\", Argument: {Value: 10}}'"
+    filter: ListFilter
+
+    "Sort the list, ie '{Field: \"position\", Order: \"ASC\"}'"
+    sort: ListSortParams
+  )	[(!]! @goField(forceResolver: true) {
+  		"The original flag"
+  		original: Boolean!
+  		"The appearance url"
+  		url: String!
+  		}  	"The factCheck appearanceURLs"
+  	appearanceURLs(
+    "A List Filter expression such as '{Field: \"position\", Operation: \"<=\", Argument: {Value: 10}}'"
+    filter: ListFilter
+
+    "Sort the list, ie '{Field: \"position\", Order: \"ASC\"}'"
+    sort: ListSortParams
+  )	[(!]! @goField(forceResolver: true) {
+  		"The original flag"
+  		original: Boolean!
+  		"The appearance url"
+  		url: String!
+  		}  	"The factCheck author"
+  	author: String!
+  	"The factCheck claim"
+  	claim: String!
+  	"The date of the factCheck"
+  	date: String!
+  	"The factCheck rating"
+  	rating: String!
+  	"The total length of the appearanceURLs list at this same level in the data, this number is unaffected by filtering."
+  	totalAppearanceURLs: Int!
+  	}
+  "The total length of the factCheckClaims list at this same level in the data, this number is unaffected by filtering."
+  totalFactCheckClaims: Int!
+}

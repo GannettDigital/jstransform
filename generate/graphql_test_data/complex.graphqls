@@ -1,0 +1,50 @@
+
+interface complex @goModel(model: ".Complex") {
+Simple  caption: String!
+
+  credit: String!
+
+  "The available cropped images"
+  crops(
+    "A List Filter expression such as '{Field: \"position\", Operation: \"<=\", Argument: {Value: 10}}'"
+    filter: ListFilter
+
+    "Sort the list, ie '{Field: \"position\", Order: \"ASC\"}'"
+    sort: ListSortParams
+  )	[(!]! @goField(forceResolver: true) {
+  	height: Float!
+  	name: String!
+  	"full path to the cropped image file"
+  	path: String!
+  	"""
+  	a long
+  	multi-line description
+  	"""
+  	relativePath: String!
+  	width: Float!
+  	}
+  cutline: String!
+
+  datePhotoTaken: DateTime
+
+  orientation: String!
+
+  originalSize	(! {
+  	height: Float!
+  	width: Float!
+  	}
+  "The total length of the crops list at this same level in the data, this number is unaffected by filtering."
+  totalCrops: Int!
+
+  "a type"
+  type: String!
+
+  "Universal Resource Locator"
+  URL	(! {
+  	"The full Canonical URL"
+  	absolute: String!
+  	meta	(! {
+  		description: String!
+  		siteName: String!
+  		}  	publish: String!
+  	}}

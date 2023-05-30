@@ -21,7 +21,7 @@ func TestAddField(t *testing.T) {
 			description: "Simple scalar field",
 			fields:      make(map[string]*extractedField),
 			tree:        []string{"field"},
-			instance:    jsonschema.Instance{Type: "string"},
+			instance:    jsonschema.Instance{Type: []string{"string"}},
 			want: extractedFields{
 				"field": &extractedField{
 					name:     "Field",
@@ -34,7 +34,7 @@ func TestAddField(t *testing.T) {
 			description: "Array field",
 			fields:      make(map[string]*extractedField),
 			tree:        []string{"arrayfield"},
-			instance:    jsonschema.Instance{Type: "array", Items: []byte(`{ "type": "string" }`)},
+			instance:    jsonschema.Instance{Type: []string{"array"}, Items: []byte(`{ "type": "string" }`)},
 			want: extractedFields{
 				"arrayfield": &extractedField{
 					name:     "Arrayfield",
@@ -55,7 +55,7 @@ func TestAddField(t *testing.T) {
 				},
 			},
 			tree:     []string{"arrayfield"},
-			instance: jsonschema.Instance{Type: "string"},
+			instance: jsonschema.Instance{Type: []string{"string"}},
 			want: extractedFields{
 				"arrayfield": &extractedField{
 					name:     "Arrayfield",
@@ -69,7 +69,7 @@ func TestAddField(t *testing.T) {
 			description: "Struct field",
 			fields:      make(map[string]*extractedField),
 			tree:        []string{"structfield"},
-			instance:    jsonschema.Instance{Type: "object"},
+			instance:    jsonschema.Instance{Type: []string{"object"}},
 			want: extractedFields{
 				"structfield": &extractedField{
 					name:           "Structfield",
@@ -92,7 +92,7 @@ func TestAddField(t *testing.T) {
 				},
 			},
 			tree:     []string{"structfield", "child"},
-			instance: jsonschema.Instance{Type: "string"},
+			instance: jsonschema.Instance{Type: []string{"string"}},
 			want: extractedFields{
 				"structfield": &extractedField{
 					name:     "Structfield",
@@ -223,7 +223,7 @@ func TestExtractedField_Write(t *testing.T) {
 
 	for _, test := range tests {
 		buf := &bytes.Buffer{}
-		if err := test.ef.write(buf, test.prefix, test.required, test.descriptionAsStructTag, false); err != nil {
+		if err := test.ef.write(buf, test.prefix, test.required, test.descriptionAsStructTag, false, nil); err != nil {
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
 		}
 		if got, want := string(buf.Bytes()), test.want; got != want {
@@ -364,6 +364,124 @@ func TestGeneratedStruct(t *testing.T) {
 
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, want)
+		}
+	}
+}
+
+func TestGoType(t *testing.T) {
+	tests := []struct {
+		description string
+		jsonType    string
+		array       bool
+		required    bool
+		pointers    bool
+		want        string
+	}{
+		{
+			description: "JSON boolean",
+			jsonType:    "boolean",
+			want:        "bool",
+		},
+		{
+			description: "JSON boolean",
+			jsonType:    "boolean",
+			array:       true,
+			want:        "[]bool",
+		},
+		{
+			description: "JSON integer",
+			jsonType:    "integer",
+			want:        "int64",
+		},
+		{
+			description: "JSON integer",
+			jsonType:    "integer",
+			array:       true,
+			want:        "[]int64",
+		},
+		{
+			description: "JSON number",
+			jsonType:    "number",
+			want:        "float64",
+		},
+		{
+			description: "JSON number",
+			jsonType:    "number",
+			array:       true,
+			want:        "[]float64",
+		},
+		{
+			description: "JSON string",
+			jsonType:    "string",
+			want:        "string",
+		},
+		{
+			description: "JSON string",
+			jsonType:    "string",
+			array:       true,
+			want:        "[]string",
+		},
+		{
+			description: "JSON object",
+			jsonType:    "object",
+			want:        "struct",
+		},
+		{
+			description: "JSON object",
+			jsonType:    "object",
+			array:       true,
+			want:        "[]struct",
+		},
+		{
+			description: "JSON string date-time",
+			jsonType:    "date-time",
+			array:       false,
+			required:    true,
+			want:        "time.Time",
+		},
+		{
+			description: "JSON string date-time array",
+			jsonType:    "date-time",
+			array:       true,
+			required:    true,
+			want:        "[]time.Time",
+		},
+		{
+			description: "JSON string date-time, omitempty",
+			jsonType:    "date-time",
+			array:       false,
+			want:        "time.Time",
+		},
+		{
+			description: "JSON string date-time array, omitempty",
+			jsonType:    "date-time",
+			array:       true,
+			want:        "[]time.Time",
+		},
+		{
+			description: "JSON string date-time, omitempty, pointers",
+			jsonType:    "date-time",
+			array:       false,
+			pointers:    true,
+			want:        "*time.Time",
+		},
+		{
+			description: "JSON string date-time array, omitempty, pointers",
+			jsonType:    "date-time",
+			array:       true,
+			pointers:    true,
+			want:        "[]*time.Time",
+		},
+	}
+
+	for _, test := range tests {
+		ef := extractedField{
+			array:    test.array,
+			jsonType: test.jsonType,
+		}
+		got := ef.goType(test.required, test.pointers)
+		if got != test.want {
+			t.Errorf("Test %q - got %q, want %q", test.description, got, test.want)
 		}
 	}
 }

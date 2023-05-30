@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/GannettDigital/jsonparser"
+
+	"golang.org/x/exp/slices"
 )
 
 // WalkFunc processes a single Instance within a JSON schema file returning an error on any problems.
@@ -65,8 +67,8 @@ func walkInstance(raw json.RawMessage, path string, walkFn WalkInstanceFunc) err
 		return fmt.Errorf("walkFn failed at path %q: %v", path, err)
 	}
 
-	switch i.Type {
-	case "object":
+	switch {
+	case slices.Contains(i.Type, "object"):
 		if i.Properties == nil {
 			return fmt.Errorf("object at path %q missing Properties", path)
 		}
@@ -75,7 +77,7 @@ func walkInstance(raw json.RawMessage, path string, walkFn WalkInstanceFunc) err
 				return err
 			}
 		}
-	case "array":
+	case slices.Contains(i.Type, "array"):
 		if i.Items == nil {
 			return fmt.Errorf("array at path %q missing Items", path)
 		}

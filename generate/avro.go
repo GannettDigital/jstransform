@@ -59,7 +59,7 @@ func buildAvroSerializationFunctions(schemaPath string, args BuildArgs) error {
 	}
 
 	if _, err := namespace.TypeForSchema(schema); err != nil {
-		return fmt.Errorf("failed to decode schema file: %v", err)
+		return fmt.Errorf("failed to decode schema file %q: %v", schemaPath, err)
 	}
 
 	for _, def := range namespace.Roots {
@@ -392,6 +392,7 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 		default: // Another go type
 			n, err := parseGoStruct(t.Name, cfg.dir)
 			if err != nil {
+				//panic(fmt.Errorf("failed to parse Go struct: %v", err))
 				return "unknown"
 			}
 			return writeNestedStruct(cfg, n, name, nullable)
