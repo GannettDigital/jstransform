@@ -1,0 +1,42 @@
+
+interface simple @goModel(model: ".Simple") {
+  contributors(
+    "A List Filter expression such as '{Field: \"position\", Operation: \"<=\", Argument: {Value: 10}}'"
+    filter: ListFilter
+
+    "Sort the list, ie '{Field: \"position\", Order: \"ASC\"}'"
+    sort: ListSortParams
+  )	[(!]! @goField(forceResolver: true) {
+  	contributorId: String!
+  	id: String!
+  	name: String!
+  	}
+  height: Int!
+
+  someDateObj	(! {
+  	dates(
+    "A List Filter expression such as '{Field: \"position\", Operation: \"<=\", Argument: {Value: 10}}'"
+    filter: ListFilter
+
+    "Sort the list, ie '{Field: \"position\", Order: \"ASC\"}'"
+    sort: ListSortParams
+  ): [DateTime]! @goField(forceResolver: true)
+  	dates(
+    "A List Filter expression such as '{Field: \"position\", Operation: \"<=\", Argument: {Value: 10}}'"
+    filter: ListFilter
+
+    "Sort the list, ie '{Field: \"position\", Order: \"ASC\"}'"
+    sort: ListSortParams
+  ): [DateTime]! @goField(forceResolver: true)
+  	"The total length of the times list at this same level in the data, this number is unaffected by filtering."
+  	totalTimes: Int!
+  	}
+  "The total length of the contributors list at this same level in the data, this number is unaffected by filtering."
+  totalContributors: Int!
+
+  type: String!
+
+  visible: Boolean!
+
+  width: Float!
+}

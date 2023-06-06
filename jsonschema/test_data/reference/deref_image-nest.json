@@ -131,7 +131,7 @@
                         "originalSize",
                         "datePhotoTaken"
                     ],
-                    "type": "object",
+                    "type": ["object"],
                     "fromRef": "./jsref_image-list2.json"
                 },
                 {

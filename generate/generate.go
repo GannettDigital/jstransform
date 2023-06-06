@@ -44,14 +44,17 @@ const msgpMode = gen.Encode | gen.Decode | gen.Marshal | gen.Unmarshal | gen.Siz
 type BuildArgs struct {
 	SchemaPath             string
 	OutputDir              string
+	OutputDirGraphQL       string
 	DescriptionAsStructTag bool
 	NoNestedStructs        bool
 	Pointers               bool
 	GenerateAvro           bool
 	GenerateMessagePack    bool
+	GenerateGraphQL        bool
 	ImportPath             string
 	StructNameMap          map[string]string
 	FieldNameMap           map[string]string
+	GraphQLTypeNameMap     map[string]string // Changes the "type ABC" name of GraphQL schema.
 }
 
 // BuildStructs is a backward-compatibility wrapper for BuildStructsWithArgs.
@@ -98,6 +101,9 @@ func BuildStructsWithArgs(args BuildArgs) error {
 		}
 		args.OutputDir = wd
 	}
+	if args.OutputDirGraphQL == "" {
+		args.OutputDirGraphQL = args.OutputDir
+	}
 
 	packageName := filepath.Base(args.OutputDir)
 
@@ -112,6 +118,13 @@ func BuildStructsWithArgs(args BuildArgs) error {
 			return fmt.Errorf("failed to determine absolute path of %q: %v", args.SchemaPath, err)
 		}
 		allOfTypes = append(allOfTypes, path)
+	}
+
+	if args.GenerateGraphQL {
+		name := strings.Split(filepath.Base(args.SchemaPath), ".")[0]
+		if err := buildGraphQLFile(args.SchemaPath, name, packageName, args); err != nil {
+			return fmt.Errorf("failed to build GraphQL file for %q: %v", name, err)
+		}
 	}
 
 	var embeds []string
@@ -231,40 +244,6 @@ func buildStructFile(childPath, name, packageName string, embeds []string, args 
 // unacceptable names will likely fail during formatting.
 func exportedName(name string) string {
 	return strings.Title(name)
-}
-
-// goType maps a jsonType to a string representation of the go type.
-// If Array is true it makes the type into an array.
-// If the JSON Schema had a type of "string" and a format of "date-time" it is expected the input jsonType will be
-// "date-time".
-// Non-required times are added as pointers to allow for their values to missing go marshalled JSON.
-func goType(jsonType string, array, required, pointers bool) string {
-	var goType string
-	switch jsonType {
-	case "boolean":
-		goType = "bool"
-	case "number":
-		goType = "float64"
-	case "integer":
-		goType = "int64"
-	case "string":
-		goType = "string"
-	case "date-time":
-		goType = "time.Time"
-		if pointers && !required {
-			goType = "*time.Time"
-		}
-	case "object":
-		goType = "struct"
-	default:
-		goType = jsonType
-	}
-
-	if array {
-		return "[]" + goType
-	}
-
-	return goType
 }
 
 // splitJSONPath takes a JSON path and returns an array of path items each of which represents a JSON object with the

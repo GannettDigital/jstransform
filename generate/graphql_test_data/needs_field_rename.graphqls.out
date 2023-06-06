@@ -1,0 +1,110 @@
+
+type rename @goModel(model: ".Rename") {
+  caption: String!
+
+  credit: String!
+
+  "Crops"
+  crops	(! {
+  	"16:9 ratio"
+  	16_9	(! {
+  		"Height"
+  		height: Int!
+  		"Full URL to the 16:9 ratio image"
+  		path: String!
+  		"Relative Path of a 16:9 ratio image"
+  		relativePath: String!
+  		"Width"
+  		width: Int!
+  		"Height"
+  		x: Int!
+  		"Width"
+  		y: Int!
+  		}  	"1:1 ratio"
+  	1_1	(! {
+  		"Height"
+  		height: Int!
+  		"Full URL to the 1:1 ratio image"
+  		path: String!
+  		"Relative Path of a 1:1 ratio image"
+  		relativePath: String!
+  		"Width"
+  		width: Int!
+  		"Height"
+  		x: Int!
+  		"Width"
+  		y: Int!
+  		}  	"3:4 ratio"
+  	3_4	(! {
+  		"Height"
+  		height: Int!
+  		"Full URL to the 3:4 ratio image"
+  		path: String!
+  		"Relative Path of a 3:4 ratio image"
+  		relativePath: String!
+  		"Width"
+  		width: Int!
+  		"Height"
+  		x: Int!
+  		"Width"
+  		y: Int!
+  		}  	"4:3 ratio"
+  	4_3	(! {
+  		"Height"
+  		height: Int!
+  		"Full URL to the 4:3 ratio image"
+  		path: String!
+  		"Relative Path of a 4:3 ratio image"
+  		relativePath: String!
+  		"Width"
+  		width: Int!
+  		"Height"
+  		x: Int!
+  		"Width"
+  		y: Int!
+  		}  	"9:16 ratio"
+  	9_16	(! {
+  		"Height"
+  		height: Int!
+  		"Full URL to the 9:16 ratio image"
+  		path: String!
+  		"Relative Path of a 9:16 ratio image"
+  		relativePath: String!
+  		"Width"
+  		width: Int!
+  		"Height"
+  		x: Int!
+  		"Width"
+  		y: Int!
+  		}  	"Best Crop"
+  	bestCrop	(! {
+  		"Height"
+  		height: Int!
+  		"Full URL to the best crop image"
+  		path: String!
+  		"Relative Path of a best crop image"
+  		relativePath: String!
+  		"Width"
+  		width: Int!
+  		"Height"
+  		x: Int!
+  		"Width"
+  		y: Int!
+  		}  	}
+  cutline: String!
+
+  datePhotoTaken: String!
+
+  orientation: String!
+
+  originalSize	(! {
+  	height: Float!
+  	width: Float!
+  	}
+  "a type"
+  type: String!
+
+  URL	(! {
+  	absolute: String!
+  	publish: String!
+  	}}

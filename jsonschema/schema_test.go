@@ -235,7 +235,9 @@ func TestSchemaFromFile(t *testing.T) {
               }
             },
 		    "$schema": "http://json-schema.org/draft-04/schema#",
-		    "type": "object"
+		    "type": [
+				"object"
+			]
           }
 		],
         "properties": {
@@ -247,7 +249,9 @@ func TestSchemaFromFile(t *testing.T) {
           }
         },
 		"$schema": "http://json-schema.org/draft-04/schema#",
-		"type": "object",
+		"type": [
+			"object"
+		],
 	  	"fromRef": "./embed_parent.json"
       }
   }`),
@@ -301,7 +305,7 @@ func TestMappings(t *testing.T) {
 			want: Instance{
 				AdditionalProperties: false,
 				Description:          "missing",
-				Type:                 "object",
+				Type:                 []string{"object"},
 				Required:             []string{"required"},
 			},
 		},
@@ -311,7 +315,7 @@ func TestMappings(t *testing.T) {
 			want: Instance{
 				AdditionalProperties: true,
 				Description:          "missing",
-				Type:                 "object",
+				Type:                 []string{"object"},
 				Required:             []string{"required"},
 			},
 		},

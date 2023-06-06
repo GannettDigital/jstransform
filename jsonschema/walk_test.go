@@ -33,8 +33,8 @@ func TestWalkJSONSchema(t *testing.T) {
 			description: "Basic walk, no allOf, no oneOf",
 			schemaPath:  "./test_data/image.json",
 			want: map[string]Instance{
-				"$.type": {Type: "string"},
-				"$.crops": {Type: "array", Items: []byte(`{
+				"$.type": {Type: []string{"string"}},
+				"$.crops": {Type: []string{"array"}, Items: []byte(`{
         "type": "object",
         "properties": {
           "name": {
@@ -62,7 +62,7 @@ func TestWalkJSONSchema(t *testing.T) {
           "relativePath"
         ]
 			}`)},
-				"$.crops[*]": {Type: "object", Properties: map[string]json.RawMessage{
+				"$.crops[*]": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
 					"name":         []byte(`{"type": "string", "default": "name"}`),
 					"width":        []byte(`{"type": "number" }`),
 					"height":       []byte(`{"type": "number" }`),
@@ -71,12 +71,12 @@ func TestWalkJSONSchema(t *testing.T) {
 				},
 					Required: []string{"name", "width", "height", "path", "relativePath"},
 				},
-				"$.crops[*].name":         {Type: "string"},
-				"$.crops[*].width":        {Type: "number"},
-				"$.crops[*].height":       {Type: "number"},
-				"$.crops[*].path":         {Type: "string"},
-				"$.crops[*].relativePath": {Type: "string"},
-				"$.URL": {Type: "object", Properties: map[string]json.RawMessage{
+				"$.crops[*].name":         {Type: []string{"string"}},
+				"$.crops[*].width":        {Type: []string{"number"}},
+				"$.crops[*].height":       {Type: []string{"number"}},
+				"$.crops[*].path":         {Type: []string{"string"}},
+				"$.crops[*].relativePath": {Type: []string{"string"}},
+				"$.URL": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
 					"publish": []byte(`{"type": "string",
           "transform": {
             "cumulo": {
@@ -101,22 +101,22 @@ func TestWalkJSONSchema(t *testing.T) {
 				},
 					Required: []string{"publish", "absolute"},
 				},
-				"$.URL.publish":  {Type: "string"},
-				"$.URL.absolute": {Type: "string"},
+				"$.URL.publish":  {Type: []string{"string"}},
+				"$.URL.absolute": {Type: []string{"string"}},
 			},
 		},
 		{
 			description: "Walk with allOf, no oneOf",
 			schemaPath:  "./test_data/embed_parent.json",
-			want:        map[string]Instance{"$.type": {Type: "string"}},
+			want:        map[string]Instance{"$.type": {Type: []string{"string"}}},
 		},
 		{
 			description: "Walk with oneOf, no allOf",
 			oneOfType:   "image",
 			schemaPath:  "./test_data/image_parent.json",
 			want: map[string]Instance{
-				"$.type": {Type: "string"},
-				"$.crops": {Type: "array", Items: []byte(`{
+				"$.type": {Type: []string{"string"}},
+				"$.crops": {Type: []string{"array"}, Items: []byte(`{
 			        "type": "object",
 			        "properties": {
 			          "name": {
@@ -144,7 +144,7 @@ func TestWalkJSONSchema(t *testing.T) {
 			          "relativePath"
 			        ]
 			    }`)},
-				"$.crops[*]": {Type: "object", Properties: map[string]json.RawMessage{
+				"$.crops[*]": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
 					"name": []byte(`{
 			            "type": "string",
 			            "default": "name"
@@ -164,12 +164,12 @@ func TestWalkJSONSchema(t *testing.T) {
 				},
 					Required: []string{"name", "width", "height", "path", "relativePath"},
 				},
-				"$.crops[*].name":         {Type: "string"},
-				"$.crops[*].width":        {Type: "number"},
-				"$.crops[*].height":       {Type: "number"},
-				"$.crops[*].path":         {Type: "string"},
-				"$.crops[*].relativePath": {Type: "string"},
-				"$.URL": {Type: "object", Properties: map[string]json.RawMessage{
+				"$.crops[*].name":         {Type: []string{"string"}},
+				"$.crops[*].width":        {Type: []string{"number"}},
+				"$.crops[*].height":       {Type: []string{"number"}},
+				"$.crops[*].path":         {Type: []string{"string"}},
+				"$.crops[*].relativePath": {Type: []string{"string"}},
+				"$.URL": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
 					"publish": []byte(`{
 			          "type": "string",
 			          "transform": {
@@ -196,8 +196,8 @@ func TestWalkJSONSchema(t *testing.T) {
 			      }`)},
 					Required: []string{"publish", "absolute"},
 				},
-				"$.URL.publish":  {Type: "string"},
-				"$.URL.absolute": {Type: "string"},
+				"$.URL.publish":  {Type: []string{"string"}},
+				"$.URL.absolute": {Type: []string{"string"}},
 			},
 		},
 		{
@@ -205,8 +205,8 @@ func TestWalkJSONSchema(t *testing.T) {
 			oneOfType:   "array-of-array",
 			schemaPath:  "./test_data/parent.json",
 			want: map[string]Instance{
-				"$.type": {Type: "string"},
-				"$.crops": {Type: "array", Items: []byte(`{
+				"$.type": {Type: []string{"string"}},
+				"$.crops": {Type: []string{"array"}, Items: []byte(`{
 			        "type": "array",
 			        "items": {
 			          "type": "object",
@@ -217,7 +217,7 @@ func TestWalkJSONSchema(t *testing.T) {
 			          }
 			        }
 			    }`)},
-				"$.crops[*]": {Type: "array", Items: []byte(`{
+				"$.crops[*]": {Type: []string{"array"}, Items: []byte(`{
 			          "type": "object",
 			          "properties": {
 			            "name": {
@@ -225,12 +225,12 @@ func TestWalkJSONSchema(t *testing.T) {
 			            }
 			          }
 			      }`)},
-				"$.crops[*][*]": {Type: "object", Properties: map[string]json.RawMessage{
+				"$.crops[*][*]": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
 					"name": []byte(`{
 			              "type": "string"
 			        }`)},
 				},
-				"$.crops[*][*].name": {Type: "string"},
+				"$.crops[*][*].name": {Type: []string{"string"}},
 			},
 		},
 		{
@@ -247,15 +247,15 @@ func TestWalkJSONSchema(t *testing.T) {
 			description: "Nested AllOf",
 			oneOfType:   "",
 			schemaPath:  "./test_data/parent3.json",
-			want:        map[string]Instance{"$.type": {Type: "string"}},
+			want:        map[string]Instance{"$.type": {Type: []string{"string"}}},
 		},
 		{
 			description: "Nested AllOf with oneOf",
 			oneOfType:   "image",
 			schemaPath:  "./test_data/parent4.json",
 			want: map[string]Instance{
-				"$.type": {Type: "string"},
-				"$.crops": {Type: "array", Items: []byte(`{
+				"$.type": {Type: []string{"string"}},
+				"$.crops": {Type: []string{"array"}, Items: []byte(`{
 			        "type": "object",
 			        "properties": {
 			          "name": {
@@ -283,7 +283,7 @@ func TestWalkJSONSchema(t *testing.T) {
 			          "relativePath"
 			        ]
 			    }`)},
-				"$.crops[*]": {Type: "object", Properties: map[string]json.RawMessage{
+				"$.crops[*]": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
 					"name": []byte(`{
 			            "type": "string",
 			            "default": "name"
@@ -303,12 +303,12 @@ func TestWalkJSONSchema(t *testing.T) {
 				},
 					Required: []string{"name", "width", "height", "path", "relativePath"},
 				},
-				"$.crops[*].name":         {Type: "string"},
-				"$.crops[*].width":        {Type: "number"},
-				"$.crops[*].height":       {Type: "number"},
-				"$.crops[*].path":         {Type: "string"},
-				"$.crops[*].relativePath": {Type: "string"},
-				"$.URL": {Type: "object", Properties: map[string]json.RawMessage{
+				"$.crops[*].name":         {Type: []string{"string"}},
+				"$.crops[*].width":        {Type: []string{"number"}},
+				"$.crops[*].height":       {Type: []string{"number"}},
+				"$.crops[*].path":         {Type: []string{"string"}},
+				"$.crops[*].relativePath": {Type: []string{"string"}},
+				"$.URL": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
 					"publish": []byte(`{
 			          "type": "string",
 			          "transform": {
@@ -335,8 +335,8 @@ func TestWalkJSONSchema(t *testing.T) {
 			      }`)},
 					Required: []string{"publish", "absolute"},
 				},
-				"$.URL.publish":  {Type: "string"},
-				"$.URL.absolute": {Type: "string"},
+				"$.URL.publish":  {Type: []string{"string"}},
+				"$.URL.absolute": {Type: []string{"string"}},
 			},
 		},
 		{
@@ -345,11 +345,11 @@ func TestWalkJSONSchema(t *testing.T) {
 			schemaPath:  "./test_data/embed_embed.json",
 			want: map[string]Instance{
 				"$.embed": {
-					Type:  "array",
-					Items: json.RawMessage(`{"additionalProperties":true,"allOf":[{"additionalProperties":true,"fromRef":"./embed.json","properties":{"type":{"type":"string","enum":["embed"]}},"$schema":"http://json-schema.org/draft-04/schema#","type":"object"}],"properties":{"type":{"type":"string","enum":["embed"]}},"$schema":"http://json-schema.org/draft-04/schema#","type":"object","fromRef":"./embed_parent.json"}`),
+					Type:  []string{"array"},
+					Items: json.RawMessage(`{"additionalProperties":true,"allOf":[{"additionalProperties":true,"fromRef":"./embed.json","properties":{"type":{"type":"string","enum":["embed"]}},"$schema":"http://json-schema.org/draft-04/schema#","type":["object"]}],"properties":{"type":{"type":"string","enum":["embed"]}},"$schema":"http://json-schema.org/draft-04/schema#","type":["object"],"fromRef":"./embed_parent.json"}`),
 				},
 				"$.embed[*]": {
-					Type:                 "object",
+					Type:                 []string{"object"},
 					AdditionalProperties: true,
 					AllOf: []Instance{
 						{
@@ -359,7 +359,7 @@ func TestWalkJSONSchema(t *testing.T) {
 								"type": []byte(`{"type":"string","enum":["embed"]}`),
 							},
 							Schema: "http://json-schema.org/draft-04/schema#",
-							Type:   "object",
+							Type:   []string{"object"},
 						},
 					},
 					FromRef: "./embed_parent.json",
@@ -368,7 +368,7 @@ func TestWalkJSONSchema(t *testing.T) {
 					},
 					Schema: "http://json-schema.org/draft-04/schema#",
 				},
-				"$.embed[*].type": {Type: "string"},
+				"$.embed[*].type": {Type: []string{"string"}},
 			},
 		},
 	}

@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
+
+	"golang.org/x/exp/slices"
 )
 
 // extractedField represents a Golang struct field as extracted from a JSON schema file. It is an intermediate format
@@ -20,13 +22,14 @@ type extractedField struct {
 	jsonName       string
 	jsonType       string
 	name           string
+	nullable       bool
 	requiredFields map[string]bool
 }
 
 // write outputs the Golang representation of this field to the writer with prefix before each line.
 // It handles inline structs by calling this method recursively adding a new \t to the prefix for each layer.
 // If required is set to false 'omitempty' is added in the JSON struct tag for the field.
-func (ef *extractedField) write(w io.Writer, prefix string, required, descriptionAsStructTag, pointers bool) error {
+func (ef *extractedField) write(w io.Writer, prefix string, required, descriptionAsStructTag, pointers bool, excludeNested map[string]bool) error {
 	var omitempty string
 	if !required {
 		omitempty = ",omitempty"
@@ -46,18 +49,22 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 		}
 	}
 
+	fieldGoType := ef.goType(required, pointers)
+	if excludeNested[fieldGoType] {
+		return nil
+	}
 	if ef.jsonType != "object" {
-		_, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s\t%s", prefix, ef.name, goType(ef.jsonType, ef.array, required, pointers), structTag)))
+		_, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s\t%s", prefix, ef.name, fieldGoType, structTag)))
 		return err
 	}
 
-	if _, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s {\n", prefix, ef.name, goType(ef.jsonType, ef.array, required, pointers)))); err != nil {
+	if _, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s {\n", prefix, ef.name, fieldGoType))); err != nil {
 		return err
 	}
 
 	for _, field := range ef.fields.Sorted() {
 		fieldRequired := ef.requiredFields[field.jsonName]
-		if err := field.write(w, prefix+"\t", fieldRequired, descriptionAsStructTag, pointers); err != nil {
+		if err := field.write(w, prefix+"\t", fieldRequired, descriptionAsStructTag, pointers, excludeNested); err != nil {
 			return fmt.Errorf("failed writing field %q: %v", field.name, err)
 		}
 	}
@@ -193,22 +200,22 @@ func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 	}
 
 	// If the types is an object create a new generated struct for it
-	if i.Type == "object" {
+	if slices.Contains(i.Type, "object") {
 		key := strings.Join(parts, "")
 		structType := key
 
 		// nullable nested structs could be pointers
-		if !gof.rootStruct.requiredFields[name] && gof.args.Pointers {
+		if gof.args.Pointers && !gen.requiredFields[name] || slices.Contains(i.Type, "null") {
 			structType = "*" + key
 		}
 
-		requiredFields := make(map[string]bool)
+		requiredFields := make(map[string]bool, len(i.Required))
 		for _, name := range i.Required {
 			requiredFields[name] = true
 		}
 
 		gof.nestedStructs[key] = gof.newGeneratedStruct(key, requiredFields)
-		return addField(gen.fields, []string{name}, jsonschema.Instance{Description: i.Description, Type: structType}, gen.args.FieldNameMap)
+		return addField(gen.fields, []string{name}, jsonschema.Instance{Description: i.Description, Type: []string{structType}}, gen.args.FieldNameMap)
 	}
 
 	return addField(gen.fields, []string{name}, i, gen.args.FieldNameMap)
@@ -223,10 +230,13 @@ func (gof *goFile) write(w io.Writer) error {
 	}
 
 	var includeTime bool
+	excludeNested := make(map[string]bool)
 	for _, s := range gof.structs() {
 		if s.fields.IncludeTime() {
 			includeTime = true
-			break
+		}
+		if len(s.fields) == 0 {
+			excludeNested[s.name] = true
 		}
 	}
 
@@ -237,10 +247,13 @@ func (gof *goFile) write(w io.Writer) error {
 	}
 
 	for _, s := range gof.structs() {
+		if len(s.fields) == 0 {
+			continue
+		}
 		if _, err := buf.Write([]byte("\n\n")); err != nil {
 			return fmt.Errorf("failed writing struct %q: %v", s.name, err)
 		}
-		if err := s.write(buf); err != nil {
+		if err := s.write(buf, excludeNested); err != nil {
 			return fmt.Errorf("failed writing struct %q: %v", s.name, err)
 		}
 	}
@@ -264,7 +277,7 @@ type generatedStruct struct {
 }
 
 // write will write the generated file to the given io.Writer.
-func (gen *generatedStruct) write(w io.Writer) error {
+func (gen *generatedStruct) write(w io.Writer, excludeNested map[string]bool) error {
 	embeds := strings.Join(gen.embededStructs, "\n")
 	if embeds != "" {
 		embeds += "\n\n"
@@ -275,7 +288,7 @@ func (gen *generatedStruct) write(w io.Writer) error {
 
 	for _, field := range gen.fields.Sorted() {
 		req := gen.requiredFields[field.jsonName]
-		if err := field.write(w, "\t", req, gen.args.DescriptionAsStructTag, gen.args.Pointers); err != nil {
+		if err := field.write(w, "\t", req, gen.args.DescriptionAsStructTag, gen.args.Pointers, excludeNested); err != nil {
 			return fmt.Errorf("failed writing field %q: %v", field.name, err)
 		}
 	}
@@ -293,6 +306,11 @@ func (gen *generatedStruct) write(w io.Writer) error {
 // the fields map is created and if it exists the requiredFields section populated.
 // fields will be renamed if a matching entry is supplied in the fieldRenameMap.
 func addField(fields extractedFields, tree []string, inst jsonschema.Instance, fieldRenameMap map[string]string) error {
+	// Ignored type for Go structure.
+	if slices.Contains(inst.Type, "graphql-hydration") {
+		return nil
+	}
+
 	if len(tree) > 1 {
 		if f, ok := fields[tree[0]]; ok {
 			return addField(f.fields, tree[1:], inst, fieldRenameMap)
@@ -310,22 +328,33 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 		if !ok {
 			fieldName = tree[0]
 		}
+		var jsonType string
+		for _, iType := range inst.Type {
+			if iType == "null" {
+				continue
+			}
+			if jsonType != "" {
+				return fmt.Errorf("cannot generate structures for union types of %q and %q", jsonType, iType)
+			}
+			jsonType = iType
+		}
 		f := &extractedField{
 			description: inst.Description,
 			name:        exportedName(fieldName),
 			jsonName:    tree[0],
-			jsonType:    inst.Type,
+			jsonType:    jsonType,
+			nullable:    slices.Contains(inst.Type, "null"),
 		}
 		// Second processing of an array type
 		if exists, ok := fields[f.jsonName]; ok {
 			f = exists
 			if f.array && f.jsonType == "" {
-				f.jsonType = inst.Type
+				f.jsonType = jsonType
 			} else {
-				return fmt.Errorf("field %q already exists but is not an array field", f.name)
+				return fmt.Errorf("field %q already exists but is not an array field: %q", f.name, f.jsonType)
 			}
 		}
-		if inst.Type == "string" && inst.Format == "date-time" {
+		if slices.Contains(inst.Type, "string") && inst.Format == "date-time" {
 			f.jsonType = "date-time"
 		}
 
@@ -345,4 +374,44 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 	}
 
 	return nil
+}
+
+// goType maps a jsonType to a string representation of the go type.
+// If Array is true it makes the type into an array.
+// If the JSON Schema had a type of "string" and a format of "date-time" it is expected the input jsonType will be
+// "date-time".
+// Non-required times are added as pointers to allow for their values to missing go marshalled JSON.
+func (ef *extractedField) goType(required, pointers bool) string {
+	// Simple types aren't pointers unless explicitly typed to nullable.
+	var goType string
+	var customType bool
+	switch ef.jsonType {
+	case "boolean":
+		goType = "bool"
+	case "number":
+		goType = "float64"
+	case "integer":
+		goType = "int64"
+	case "string":
+		goType = "string"
+	case "date-time":
+		goType = "time.Time"
+		if pointers && !required {
+			goType = "*" + goType
+			customType = true
+		}
+	case "object":
+		// This only happens with nested structures.
+		goType = "struct"
+	default:
+		goType = ef.jsonType
+		customType = true
+	}
+	if !customType && ef.nullable {
+		goType = "*" + goType
+	}
+	if ef.array {
+		return "[]" + goType
+	}
+	return goType
 }

@@ -2,11 +2,14 @@ package jsonschema
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/GannettDigital/jsonparser"
 )
 
 // Instance represents a JSON Schema instance.
@@ -17,14 +20,32 @@ type Instance struct {
 	Description          string                     `json:"description,omitempty"`
 	Definitions          json.RawMessage            `json:"definitions,omitempty"`
 	Format               string                     `json:"format,omitempty"`
-	FromRef              string                     `json:"fromRef,omitempty"` // Added as a way of tracking the ref which was already expanded
+	FromRef              string                     `json:"fromRef,omitempty"`           // Added as a way of tracking the ref which was already expanded
+	GraphQLArguments     []string                   `json:"graphql-arguments,omitempty"` // For type="graphql-hydration" to also require query arguments.
 	Items                json.RawMessage            `json:"items,omitempty"`
 	OneOf                []Instance                 `json:"oneOf,omitempty"`
 	Properties           map[string]json.RawMessage `json:"properties,omitempty"`
 	Ref                  string                     `json:"$ref,omitempty"`
 	Required             []string                   `json:"required,omitempty"`
 	Schema               string                     `json:"$schema,omitempty"`
-	Type                 string                     `json:"type"`
+	Target               string                     `json:"target,omitempty"` // For type="graphql-hydration" or GraphQL schema type overrides.
+	Type                 []string                   `json:"type"`
+}
+type instanceUnmarshal Instance
+
+func (i *Instance) UnmarshalJSON(data []byte) error {
+	// The "type" field in JSON Schema is either a scalar or an array.
+	// This code normalizes it to an array so that unmarshaling succeeds.
+	value, dataType, _, err := jsonparser.Get(data, "type")
+	if err != nil && !errors.Is(err, jsonparser.KeyPathNotFoundError) {
+		return fmt.Errorf("error reading schema type: %w %s", err, data)
+	} else if dataType == jsonparser.String {
+		data, err = jsonparser.Set(data, []byte(fmt.Sprintf("[%q]", value)), "type")
+		if err != nil {
+			return fmt.Errorf("error changing schema type to array: %w", err)
+		}
+	}
+	return json.Unmarshal(data, (*instanceUnmarshal)(i))
 }
 
 // Schema represents a JSON Schema with the AllOf and OneOf references parsed and squashed into a single representation.
