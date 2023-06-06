@@ -436,6 +436,12 @@ func (gof *goGQL) walkFunc(path string, i jsonschema.Instance) error {
 		obj.arguments = i.GraphQLArguments
 		obj.target = i.Target
 		gof.nestedStructs[key] = obj
+
+		// Don't add GraphQL schema for sub-objects of a targeted object.
+		if gen.target != "" || gen.buildType == "ignored" {
+			obj.buildType = "ignored"
+		}
+
 		return gen.addField([]string{name}, jsonschema.Instance{Description: i.Description, Type: []string{structType}, Target: i.Target, GraphQLArguments: i.GraphQLArguments})
 	}
 
@@ -447,7 +453,7 @@ func (gof *goGQL) write(w io.Writer) error {
 	buf := &bytes.Buffer{} // the formatter uses the entire output, so buffer for that
 
 	for _, s := range gof.structs() {
-		if s.target == "" {
+		if s.target == "" && s.buildType != "ignored" {
 			if _, err := buf.Write([]byte("\n")); err != nil {
 				return fmt.Errorf("failed writing GraphQL %q: %v", s.name, err)
 			}
@@ -466,7 +472,7 @@ func (gof *goGQL) write(w io.Writer) error {
 // write will write the generated file to the given io.Writer.
 func (gen *generatedGraphQLObject) write(w io.Writer) error {
 	// If there is an alternate type for this object then don't generate it.
-	if gen.target != "" {
+	if gen.target != "" || gen.buildType == "ignored" {
 		return nil
 	}
 	var implements string
