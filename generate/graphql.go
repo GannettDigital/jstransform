@@ -628,10 +628,16 @@ func (ef *gqlExtractedField) graphqlType(required, pointers bool) (string, strin
 		if len(ef.arguments) == 0 {
 			return "", ef.target
 		}
-		arguments := make([]string, 0, len(ef.arguments)+1)
+		arguments := make([]string, 0, len(ef.arguments)+2)
 		arguments = append(arguments, "(")
-		arguments = append(arguments, ef.arguments...)
-		return strings.Join(arguments, "\n    ") + "\n  )", ef.target
+		for _, argStr := range ef.arguments {
+			if argStr != "" {
+				argStr = "    " + argStr
+			}
+			arguments = append(arguments, argStr)
+		}
+		arguments = append(arguments, "  )")
+		return strings.Join(arguments, "\n"), ef.target
 	}
 
 	var regularType bool
