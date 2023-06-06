@@ -258,7 +258,6 @@ func TestGraphQLExtractedField_Write(t *testing.T) {
 func TestGraphQLGeneratedStruct(t *testing.T) {
 	tests := []struct {
 		description            string
-		embeds                 []string
 		schemaPath             string
 		packageName            string
 		oneOfType              string
@@ -279,7 +278,6 @@ func TestGraphQLGeneratedStruct(t *testing.T) {
 		},
 		{
 			description:    "Complex schema - no nest",
-			embeds:         []string{"Simple"},
 			schemaPath:     "graphql_test_data/test_schema.json",
 			packageName:    "nonest",
 			noNestedStruct: true,
@@ -322,7 +320,6 @@ func TestGraphQLGeneratedStruct(t *testing.T) {
 		},
 		{
 			description:  "Complex schema",
-			embeds:       []string{"Simple"},
 			schemaPath:   "graphql_test_data/test_schema.json",
 			packageName:  "test_data",
 			oneOfType:    "complex",
@@ -356,7 +353,7 @@ func TestGraphQLGeneratedStruct(t *testing.T) {
 			FieldNameMap:           test.renameFieldMap,
 			NoNestedStructs:        test.noNestedStruct,
 		}
-		g, err := newGeneratedGraphQLFile(schema.Instance, test.oneOfType, test.packageName, test.embeds, bArgs)
+		g, err := newGeneratedGraphQLFile(schema.Instance, test.oneOfType, test.packageName, false, bArgs)
 		if err != nil {
 			t.Fatalf("Test %q - failed: %v", test.description, err)
 		}

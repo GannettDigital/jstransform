@@ -1,5 +1,5 @@
 
-interface simple @goModel(model: ".Simple") {
+interface Simple @goModel(model: ".Simple") {
   contributors(
     "A List Filter expression such as '{Field: \"position\", Operation: \"<=\", Argument: {Value: 10}}'"
     filter: ListFilter

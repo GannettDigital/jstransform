@@ -1,5 +1,5 @@
 
-type nested @goModel(model: ".Nested") {
+type Nested @goModel(model: ".Nested") {
   "Information related to the International Fact-Checking Network (IFCN) program"
   factCheckClaims(
     "A List Filter expression such as '{Field: \"position\", Operation: \"<=\", Argument: {Value: 10}}'"

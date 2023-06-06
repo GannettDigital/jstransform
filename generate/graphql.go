@@ -44,8 +44,7 @@ type goGQL struct {
 type generatedGraphQLObject struct {
 	gqlExtractedField
 
-	buildType      string
-	embededStructs []string
+	buildType string
 }
 
 // gqlExtractedField represents a Golang struct field as extracted from a JSON schema file. It is an intermediate format
@@ -99,12 +98,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 		common = make([]*goGQL, 0, len(schema.AllOf))
 		for _, allOfSchema := range schema.AllOf {
 			baseName := strings.Split(filepath.Base(schema.AllOf[0].FromRef), ".")[0]
-			if newName, ok := args.StructNameMap[baseName]; ok {
-				baseName = newName
-			} else {
-				baseName = exportedName(baseName)
-			}
-			generated, err := newGeneratedGraphQLFile(allOfSchema, baseName, packageName, nil, args)
+			generated, err := newGeneratedGraphQLFile(allOfSchema, baseName, packageName, false, args)
 			if err != nil {
 				return fmt.Errorf("failed to build generated struct: %v", err)
 			}
@@ -171,18 +165,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 	// If the schema has one or more OneOf definitions then these are the Implementations of the Interface type.
 	for _, oneOfSchema := range schema.OneOf {
 		oneOfName := strings.Split(filepath.Base(oneOfSchema.FromRef), ".")[0]
-		oneOfNameType := oneOfName
-		if newName, ok := args.StructNameMap[oneOfName]; ok {
-			oneOfName = newName
-		} else {
-			oneOfName = exportedName(oneOfName)
-		}
-		if newName, ok := args.GraphQLTypeNameMap[oneOfNameType]; ok {
-			oneOfNameType = newName
-		} else {
-			oneOfNameType = strings.ToLower(oneOfName)
-		}
-		generated, err := newGeneratedGraphQLFile(oneOfSchema, oneOfName, packageName, nil, args)
+		generated, err := newGeneratedGraphQLFile(oneOfSchema, oneOfName, packageName, len(schema.AllOf) != 0, args)
 		if err != nil {
 			return fmt.Errorf("failed to build generated struct: %v", err)
 		}
@@ -196,7 +179,6 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 			}
 			generated.rootStruct.implements = implements
 		}
-		generated.rootStruct.jsonName = oneOfNameType
 
 		// Must merge into this implementation the fields defined in the AllOf blocks
 		// because in GraphQL each implementation repeats the fields from the interface
@@ -226,12 +208,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 	// The properties in this schema.  As in, not AllOf or OneOf subschema definitions.
 	if len(schema.AllOf) == 0 && len(schema.OneOf) == 0 {
 		schemaName := strings.Split(filepath.Base(schemaPath), ".")[0]
-		if newName, ok := args.StructNameMap[schemaName]; ok {
-			schemaName = newName
-		} else {
-			schemaName = exportedName(schemaName)
-		}
-		generated, err := newGeneratedGraphQLFile(schema.Instance, schemaName, packageName, nil, args)
+		generated, err := newGeneratedGraphQLFile(schema.Instance, schemaName, packageName, false, args)
 		if err != nil {
 			return fmt.Errorf("failed to build generated struct: %v", err)
 		}
@@ -330,7 +307,7 @@ func (efs gqlExtractedFields) Sorted() []*gqlExtractedField {
 // newGeneratedGraphQLFile creates a GraphQL schema file based on the given JSON schema.
 // The write function can be used to write out the value of the file, which will end up with either a single struct
 // or multiple depending on the presence of nested structs and the value of the NoNestedStructs build argument.
-func newGeneratedGraphQLFile(schema jsonschema.Instance, name, packageName string, embeds []string, args BuildArgs) (*goGQL, error) {
+func newGeneratedGraphQLFile(schema jsonschema.Instance, name, packageName string, implements bool, args BuildArgs) (*goGQL, error) {
 	required := make(map[string]bool, len(schema.Required))
 	for _, fname := range schema.Required {
 		required[fname] = true
@@ -342,8 +319,22 @@ func newGeneratedGraphQLFile(schema jsonschema.Instance, name, packageName strin
 		nestedStructs: make(map[string]*generatedGraphQLObject),
 	}
 
-	gof.rootStruct = gof.newGeneratedGraphQLObject(name, required)
-	gof.rootStruct.embededStructs = embeds
+	// Apply renaming for Go structure and GraphQL type.
+	gqlName := name
+	if newName, ok := args.StructNameMap[name]; ok {
+		name = newName
+	} else {
+		name = exportedName(name)
+	}
+	if newName, ok := args.GraphQLTypeNameMap[gqlName]; ok {
+		gqlName = newName
+	} else if implements {
+		gqlName = strings.ToLower(gqlName)
+	} else {
+		gqlName = exportedName(name)
+	}
+
+	gof.rootStruct = gof.newGeneratedGraphQLObject(name, gqlName, required)
 	if len(schema.OneOf) != 0 {
 		gof.rootStruct.buildType = "interface"
 	} else {
@@ -357,11 +348,11 @@ func newGeneratedGraphQLFile(schema jsonschema.Instance, name, packageName strin
 	return gof, nil
 }
 
-func (gof *goGQL) newGeneratedGraphQLObject(name string, requiredFields map[string]bool) *generatedGraphQLObject {
+func (gof *goGQL) newGeneratedGraphQLObject(name, gqlName string, requiredFields map[string]bool) *generatedGraphQLObject {
 	return &generatedGraphQLObject{
 		buildType: "type",
 		gqlExtractedField: gqlExtractedField{
-			jsonName:       name,
+			jsonName:       gqlName,
 			name:           name,
 			fields:         make(map[string]*gqlExtractedField),
 			requiredFields: requiredFields,
@@ -408,10 +399,21 @@ func (gof *goGQL) walkFunc(path string, i jsonschema.Instance) error {
 	// Find parent struct or if none use root struct
 	parentKey := strings.Join(parts[:len(parts)-1], "")
 	name := splitJSONPath(path)[len(parts)-2]
+
+	// There's a convention that "implements" types are all lowercase,
+	// but sub-objects use the normal Pascal-case format like other
+	// GraphQL objects do.  This uses the exported name as the base
+	// level GraphQL name prefix if this is the first level off the
+	// root schema tree.
+	var gqlName string
 	gen = gof.nestedStructs[parentKey]
 	if gen == nil {
 		gen = gof.rootStruct
+		gqlName = exportedName(gen.jsonName)
+	} else {
+		gqlName = gen.jsonName
 	}
+	gqlName += exportedName(name)
 
 	// If the types is an object create a new generated struct for it
 	if slices.Contains(i.Type, "object") {
@@ -430,7 +432,7 @@ func (gof *goGQL) walkFunc(path string, i jsonschema.Instance) error {
 			requiredFields[name] = true
 		}
 
-		obj := gof.newGeneratedGraphQLObject(key, requiredFields)
+		obj := gof.newGeneratedGraphQLObject(key, gqlName, requiredFields)
 		obj.arguments = i.GraphQLArguments
 		obj.target = i.Target
 		gof.nestedStructs[key] = obj
@@ -467,7 +469,6 @@ func (gen *generatedGraphQLObject) write(w io.Writer) error {
 	if gen.target != "" {
 		return nil
 	}
-	embeds := strings.Join(gen.embededStructs, "\n")
 	var implements string
 	if gen.implements != "" {
 		implements = " implements " + gen.implements
@@ -480,7 +481,7 @@ func (gen *generatedGraphQLObject) write(w io.Writer) error {
 			break
 		}
 	}
-	if _, err := fmt.Fprintf(w, "%s %s%s %s{\n%s", gen.buildType, gen.jsonName, implements, hasModel, embeds); err != nil {
+	if _, err := fmt.Fprintf(w, "%s %s%s %s{\n", gen.buildType, gen.jsonName, implements, hasModel); err != nil {
 		return fmt.Errorf("failed writing GraphQL: %v", err)
 	}
 
