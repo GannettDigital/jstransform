@@ -125,7 +125,7 @@ func TestGraphQLAddField(t *testing.T) {
 			fields:         test.fields,
 			requiredFields: make(map[string]bool),
 		}
-		if err := ef.addField(test.tree, test.instance); err != nil {
+		if err := ef.addField(test.tree, nil, test.instance); err != nil {
 			t.Fatalf("Test %q - failed to add fields: %v", test.description, err)
 		}
 

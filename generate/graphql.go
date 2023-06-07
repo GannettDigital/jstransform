@@ -388,7 +388,7 @@ func (gof *goGQL) walkFunc(path string, i jsonschema.Instance) error {
 	gen := gof.rootStruct
 
 	if !gof.args.NoNestedStructs {
-		return gen.addField(splitJSONPath(path), i)
+		return gen.addField(splitJSONPath(path), nil, i)
 	}
 
 	parts := []string{exportedName(gof.rootStruct.name)}
@@ -405,15 +405,15 @@ func (gof *goGQL) walkFunc(path string, i jsonschema.Instance) error {
 	// GraphQL objects do.  This uses the exported name as the base
 	// level GraphQL name prefix if this is the first level off the
 	// root schema tree.
-	var gqlName string
+	var gqlTypeName string
 	gen = gof.nestedStructs[parentKey]
 	if gen == nil {
 		gen = gof.rootStruct
-		gqlName = exportedName(gen.jsonName)
+		gqlTypeName = exportedName(gen.jsonName)
 	} else {
-		gqlName = gen.jsonName
+		gqlTypeName = gen.jsonName
 	}
-	gqlName += exportedName(name)
+	gqlTypeName += exportedName(name)
 
 	// If the types is an object create a new generated struct for it
 	if slices.Contains(i.Type, "object") {
@@ -432,7 +432,7 @@ func (gof *goGQL) walkFunc(path string, i jsonschema.Instance) error {
 			requiredFields[name] = true
 		}
 
-		obj := gof.newGeneratedGraphQLObject(key, gqlName, requiredFields)
+		obj := gof.newGeneratedGraphQLObject(key, gqlTypeName, requiredFields)
 		obj.arguments = i.GraphQLArguments
 		obj.target = i.Target
 		gof.nestedStructs[key] = obj
@@ -442,10 +442,16 @@ func (gof *goGQL) walkFunc(path string, i jsonschema.Instance) error {
 			obj.buildType = "ignored"
 		}
 
-		return gen.addField([]string{name}, jsonschema.Instance{Description: i.Description, Type: []string{structType}, Target: i.Target, GraphQLArguments: i.GraphQLArguments})
+		// Generate proper GraphQL type name target, taking into account renaming.
+		gqlTypeList := []string{gqlTypeName}
+		if slices.Contains(i.Type, "null") {
+			gqlTypeList = append(gqlTypeList, "null")
+		}
+
+		return gen.addField([]string{name}, gqlTypeList, jsonschema.Instance{Description: i.Description, Type: []string{structType}, Target: i.Target, GraphQLArguments: i.GraphQLArguments})
 	}
 
-	return gen.addField([]string{name}, i)
+	return gen.addField([]string{name}, nil, i)
 }
 
 // write will write the generated file to the given io.Writer.
@@ -515,10 +521,10 @@ func (gen *generatedGraphQLObject) write(w io.Writer) error {
 // For all fields the name and jsonType are set, for arrays the array bool is set for true and for JSON objects,
 // the fields map is created and if it exists the requiredFields section populated.
 // fields will be renamed if a matching entry is supplied in the fieldRenameMap.
-func (gen *gqlExtractedField) addField(tree []string, inst jsonschema.Instance) error {
+func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst jsonschema.Instance) error {
 	if len(tree) > 1 {
 		if f, ok := gen.fields[tree[0]]; ok {
-			return f.addField(tree[1:], inst)
+			return f.addField(tree[1:], nil, inst)
 		}
 		f := &gqlExtractedField{
 			jsonName:  tree[0],
@@ -531,7 +537,7 @@ func (gen *gqlExtractedField) addField(tree []string, inst jsonschema.Instance) 
 		}
 		gen.fields[tree[0]] = f
 		gen.fieldOrder = append(gen.fieldOrder, tree[0])
-		if err := f.addField(tree[1:], inst); err != nil {
+		if err := f.addField(tree[1:], nil, inst); err != nil {
 			return fmt.Errorf("failed field %q: %v", tree[0], err)
 		}
 		return nil
@@ -542,8 +548,12 @@ func (gen *gqlExtractedField) addField(tree []string, inst jsonschema.Instance) 
 		if !ok {
 			fieldName = tree[0]
 		}
+		typeSource := inst.Type
+		if gqlTypeName != nil {
+			typeSource = gqlTypeName
+		}
 		var jsonType string
-		for _, iType := range inst.Type {
+		for _, iType := range typeSource {
 			if iType == "null" {
 				continue
 			}
