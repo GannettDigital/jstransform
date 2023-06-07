@@ -64,7 +64,7 @@ func walkInstance(raw json.RawMessage, path string, walkFn WalkInstanceFunc) err
 	}
 
 	if err := walkFn(path, i); err != nil {
-		return fmt.Errorf("walkFn failed at path %q: %v", path, err)
+		return fmt.Errorf("walkInstance failed at path %q: %v", path, err)
 	}
 
 	switch {
@@ -113,10 +113,10 @@ func WalkRaw(s *Schema, walkFn WalkRawFunc) error {
 // function with drives Walk.
 func walkRaw(raw json.RawMessage, path string, walkFn WalkRawFunc) error {
 	if err := walkFn(path, raw); err != nil {
-		return fmt.Errorf("walkFn failed at path %q: %v", path, err)
+		return fmt.Errorf("walkRaw failed at path %q: %v", path, err)
 	}
 
-	iType, err := jsonparser.GetUnsafeString(raw, "type")
+	iType, _, err := FieldType(raw)
 	if err != nil {
 		return fmt.Errorf("failed to determine instance type at path %q: %v", path, err)
 	}

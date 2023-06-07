@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/GannettDigital/jsonparser"
 	"github.com/GannettDigital/jstransform/jsonschema"
 
 	"github.com/antchfx/xmlquery"
@@ -207,7 +206,7 @@ func (tr *Transformer) findParent(path string) (instanceTransformer, error) {
 // walker is a WalkFunc for the Transformer which builds an representation of the fields and transforms in the schema.
 // This is later used to do the actual transform for incoming data.
 func (tr *Transformer) walker(path string, value json.RawMessage) error {
-	instanceType, err := jsonparser.GetString(value, "type")
+	instanceType, _, err := jsonschema.FieldType(value)
 	if err != nil {
 		return fmt.Errorf("failed to extract instance type: %v", err)
 	}
