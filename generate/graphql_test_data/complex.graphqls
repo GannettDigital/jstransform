@@ -1,6 +1,6 @@
 
-interface complex @goModel(model: ".Complex") {
-Simple  caption: String!
+interface Complex @goModel(model: ".Complex") {
+  caption: String!
 
   credit: String!
 

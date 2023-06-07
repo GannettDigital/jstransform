@@ -1,5 +1,5 @@
 
-type rename @goModel(model: ".Rename") {
+type Rename @goModel(model: ".Rename") {
   caption: String!
 
   credit: String!
