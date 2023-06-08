@@ -167,3 +167,40 @@ func mergeProperties(parent, child map[string]json.RawMessage) map[string]json.R
 	}
 	return newProperties
 }
+
+// FieldType returns the type name of a field and whether the field is nullable.
+func FieldType(data []byte) (string, bool, error) {
+	// The "type" field in JSON Schema is either a scalar or an array.
+	value, dataType, _, err := jsonparser.Get(data, "type")
+	if err != nil && !errors.Is(err, jsonparser.KeyPathNotFoundError) {
+		return "", false, fmt.Errorf("error reading schema type: %w", err)
+	} else if dataType == jsonparser.String {
+		return string(value), false, nil
+	} else if dataType == jsonparser.Array {
+		var nullable bool
+		var jsonType string
+		_, aErr := jsonparser.ArrayEach(value, func(avalue []byte, adataType jsonparser.ValueType, aoffset int, aerr error) {
+			if adataType != jsonparser.String {
+				return
+			}
+			switch string(avalue) {
+			case "null":
+				nullable = true
+			default:
+				if jsonType != "" {
+					err = fmt.Errorf("union types are not supported: %s", value)
+				}
+				jsonType = string(avalue)
+			}
+		})
+		if aErr != nil && err == nil {
+			err = aErr
+		}
+		if err != nil {
+			return "", false, fmt.Errorf("error iterating over type array: %w", err)
+		}
+		return jsonType, nullable, nil
+	} else {
+		return "", false, fmt.Errorf("unknown schema type: %s", dataType)
+	}
+}
