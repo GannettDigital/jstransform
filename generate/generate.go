@@ -20,27 +20,30 @@ const msgpMode = gen.Encode | gen.Decode | gen.Marshal | gen.Unmarshal | gen.Siz
 
 // BuildArgs contains information used to build the structs for a JSONschema.
 //
-//	SchemaPath is the path tot he jsonSchema file to use generate the Go struct representations
+//		SchemaPath is the path tot he jsonSchema file to use generate the Go struct representations
 //
-//	OutputDir is the destination for the generated files
+//		OutputDir is the destination for the generated files
 //
-//	NoNestedStructs will create structs that have no unnamed nested structs in them but rather defined types for each
-//	nested struct
+//		NoNestedStructs will create structs that have no unnamed nested structs in them but rather defined types for each
+//		nested struct
 //
-//	Pointers will create non-required objects and date/time fields with pointers thus allowing the JSON to support null for those fields.
+//		Pointers will create non-required objects and date/time fields with pointers thus allowing the JSON to support null for those fields.
 //
-//	GenerateAvro is a flag that defines if Avro serializing code should be built.
-//	The Avro generated code will only use a single field in the case where a field name is defined in a oneOf and
-//	elsewhere in the JSON schema. When converting the most specific version of such a field will be used. In general
-//	conflicting names like this should be avoided in the JSON schema.
+//	 InterfaceFiles will create separate files for interface implementations rather than putting them all in the interface file.
+//	 (GraphQL-only currently.)
 //
-//	GenerateMessagePack is a flag that defines if message pack serializing code should be built.
+//		GenerateAvro is a flag that defines if Avro serializing code should be built.
+//		The Avro generated code will only use a single field in the case where a field name is defined in a oneOf and
+//		elsewhere in the JSON schema. When converting the most specific version of such a field will be used. In general
+//		conflicting names like this should be avoided in the JSON schema.
 //
-//	StructNameMap allows specifying the type name of the struct for each JSON file.
+//		GenerateMessagePack is a flag that defines if message pack serializing code should be built.
 //
-//	FieldNameMap is used to provide alternate names for fields in the resulting structs.
-//	The property names in the JSON tags for these structs remains the same as supplied.
-//	This can be used to accommodate names that are valid JSON but not valid Go identifiers
+//		StructNameMap allows specifying the type name of the struct for each JSON file.
+//
+//		FieldNameMap is used to provide alternate names for fields in the resulting structs.
+//		The property names in the JSON tags for these structs remains the same as supplied.
+//		This can be used to accommodate names that are valid JSON but not valid Go identifiers
 type BuildArgs struct {
 	SchemaPath             string
 	OutputDir              string
@@ -48,6 +51,7 @@ type BuildArgs struct {
 	DescriptionAsStructTag bool
 	NoNestedStructs        bool
 	Pointers               bool
+	InterfaceFiles         bool
 	GenerateAvro           bool
 	GenerateMessagePack    bool
 	GenerateGraphQL        bool

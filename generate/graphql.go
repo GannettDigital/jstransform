@@ -200,8 +200,30 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 			generated.rootStruct.fields[lf] = lfd[lf]
 			generated.rootStruct.fieldOrder = append(generated.rootStruct.fieldOrder, lf)
 		}
+
+		gfile := gfile
+		outPath := outPath
+		if args.InterfaceFiles {
+			outName := oneOfName + ".graphqls"
+			if !strings.HasPrefix(oneOfName, name) {
+				outName = name + "_" + outName
+			}
+			outPath = filepath.Join(args.OutputDirGraphQL, outName)
+			gfile, err = os.Create(outPath)
+			if err != nil {
+				return fmt.Errorf("failed to open file %q: %v", outPath, err)
+			}
+			if _, err := fmt.Fprintf(gfile, "# %s\n", disclaimer); err != nil {
+				return fmt.Errorf("failed writing GraphQL: %v", err)
+			}
+		}
 		if err := generated.write(gfile); err != nil {
 			return fmt.Errorf("failed to write oneOf struct: %v", err)
+		}
+		if args.InterfaceFiles {
+			if err := gfile.Close(); err != nil {
+				return fmt.Errorf("failed to close file %q: %v", outPath, err)
+			}
 		}
 	}
 

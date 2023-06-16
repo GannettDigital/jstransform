@@ -42,6 +42,7 @@ func main() {
 	renameFields := mapFlags{kv: make(map[string]string)}
 	renameGQLType := mapFlags{kv: make(map[string]string)}
 
+	interfaceFiles := flag.Bool("interfaceFiles", false, "Build GraphQL schemas for interface implementations in separate files.")
 	nestedStructs := flag.Bool("nestedStructs", true, "Build struct with unnamed nested structs, if false each nested struct is made its own type.")
 	pointers := flag.Bool("pointers", false, "Build non-required JSON objects and date time fields as struct pointers")
 	descriptionAsStructTag := flag.Bool("descriptionAsStructTag", true, "Include the description as a struct tag, rather than a comment")
@@ -100,6 +101,7 @@ func main() {
 		DescriptionAsStructTag: *descriptionAsStructTag,
 		NoNestedStructs:        !*nestedStructs,
 		Pointers:               *pointers,
+		InterfaceFiles:         *interfaceFiles,
 		StructNameMap:          renameStructs.kv,
 		FieldNameMap:           renameFields.kv,
 		GraphQLTypeNameMap:     renameGQLType.kv,
