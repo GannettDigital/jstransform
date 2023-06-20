@@ -77,10 +77,10 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 	outPath := filepath.Join(args.OutputDirGraphQL, name+".graphqls")
 	gfile, err := os.Create(outPath)
 	if err != nil {
-		return fmt.Errorf("failed to open file %q: %v", outPath, err)
+		return fmt.Errorf("failed to open file %q: %w", outPath, err)
 	}
 	if _, err := fmt.Fprintf(gfile, "# %s\n", disclaimer); err != nil {
-		return fmt.Errorf("failed writing GraphQL: %v", err)
+		return fmt.Errorf("failed writing GraphQL: %w", err)
 	}
 
 	if !filepath.IsAbs(schemaPath) {
@@ -100,7 +100,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 			baseName := strings.Split(filepath.Base(schema.AllOf[0].FromRef), ".")[0]
 			generated, err := newGeneratedGraphQLFile(allOfSchema, baseName, packageName, false, args)
 			if err != nil {
-				return fmt.Errorf("failed to build generated struct: %v", err)
+				return fmt.Errorf("failed to build generated struct: %w", err)
 			}
 			common = append(common, generated)
 		}
@@ -167,7 +167,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 		oneOfName := strings.Split(filepath.Base(oneOfSchema.FromRef), ".")[0]
 		generated, err := newGeneratedGraphQLFile(oneOfSchema, oneOfName, packageName, len(schema.AllOf) != 0, args)
 		if err != nil {
-			return fmt.Errorf("failed to build generated struct: %v", err)
+			return fmt.Errorf("failed to build generated struct: %w", err)
 		}
 		if len(schema.AllOf) != 0 {
 			// Only an implementation of an interface if there was also an AllOf schema.
@@ -211,18 +211,18 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 			outPath = filepath.Join(args.OutputDirGraphQL, outName)
 			gfile, err = os.Create(outPath)
 			if err != nil {
-				return fmt.Errorf("failed to open file %q: %v", outPath, err)
+				return fmt.Errorf("failed to open file %q: %w", outPath, err)
 			}
 			if _, err := fmt.Fprintf(gfile, "# %s\n", disclaimer); err != nil {
-				return fmt.Errorf("failed writing GraphQL: %v", err)
+				return fmt.Errorf("failed writing GraphQL: %w", err)
 			}
 		}
 		if err := generated.write(gfile); err != nil {
-			return fmt.Errorf("failed to write oneOf struct: %v", err)
+			return fmt.Errorf("failed to write oneOf struct: %w", err)
 		}
 		if args.InterfaceFiles {
 			if err := gfile.Close(); err != nil {
-				return fmt.Errorf("failed to close file %q: %v", outPath, err)
+				return fmt.Errorf("failed to close file %q: %w", outPath, err)
 			}
 		}
 	}
@@ -232,15 +232,15 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 		schemaName := strings.Split(filepath.Base(schemaPath), ".")[0]
 		generated, err := newGeneratedGraphQLFile(schema.Instance, schemaName, packageName, false, args)
 		if err != nil {
-			return fmt.Errorf("failed to build generated struct: %v", err)
+			return fmt.Errorf("failed to build generated struct: %w", err)
 		}
 		if err := generated.write(gfile); err != nil {
-			return fmt.Errorf("failed to write properties struct: %v", err)
+			return fmt.Errorf("failed to write properties struct: %w", err)
 		}
 	}
 
 	if err := gfile.Close(); err != nil {
-		return fmt.Errorf("failed to close file %q: %v", outPath, err)
+		return fmt.Errorf("failed to close file %q: %w", outPath, err)
 	}
 	return nil
 }
@@ -297,7 +297,7 @@ func (ef *gqlExtractedField) write(w io.Writer, prefix string, required, descrip
 	for _, fieldName := range ef.fieldOrder {
 		field := ef.fields[fieldName]
 		if err := field.write(w, prefix+"\t", ef.requiredFields[field.jsonName], descriptionAsStructTag, pointers); err != nil {
-			return fmt.Errorf("failed writing field %q: %v", field.name, err)
+			return fmt.Errorf("failed writing field %q: %w", field.name, err)
 		}
 	}
 
@@ -364,7 +364,7 @@ func newGeneratedGraphQLFile(schema jsonschema.Instance, name, packageName strin
 	}
 
 	if err := jsonschema.Walk(&jsonschema.Schema{Instance: schema}, gof.walkFunc); err != nil {
-		return nil, fmt.Errorf("failed to walk schema for %q: %v", name, err)
+		return nil, fmt.Errorf("failed to walk schema for %q: %w", name, err)
 	}
 
 	return gof, nil
@@ -483,16 +483,16 @@ func (gof *goGQL) write(w io.Writer) error {
 	for _, s := range gof.structs() {
 		if s.target == "" && s.buildType != "ignored" {
 			if _, err := buf.Write([]byte("\n")); err != nil {
-				return fmt.Errorf("failed writing GraphQL %q: %v", s.name, err)
+				return fmt.Errorf("failed writing GraphQL %q: %w", s.name, err)
 			}
 			if err := s.write(buf); err != nil {
-				return fmt.Errorf("failed writing GraphQL %q: %v", s.name, err)
+				return fmt.Errorf("failed writing GraphQL %q: %w", s.name, err)
 			}
 		}
 	}
 
 	if _, err := w.Write(buf.Bytes()); err != nil {
-		return fmt.Errorf("error writing to io.Writer: %v", err)
+		return fmt.Errorf("error writing to io.Writer: %w", err)
 	}
 	return nil
 }
@@ -516,23 +516,23 @@ func (gen *generatedGraphQLObject) write(w io.Writer) error {
 		}
 	}
 	if _, err := fmt.Fprintf(w, "%s %s%s %s{\n", gen.buildType, gen.jsonName, implements, hasModel); err != nil {
-		return fmt.Errorf("failed writing GraphQL: %v", err)
+		return fmt.Errorf("failed writing GraphQL: %w", err)
 	}
 
 	sortedFields := gen.fields.Sorted()
 	for idx, field := range sortedFields {
 		if err := field.write(w, "  ", gen.requiredFields[field.jsonName], gen.args.DescriptionAsStructTag, gen.args.Pointers); err != nil {
-			return fmt.Errorf("failed writing field %q: %v", field.name, err)
+			return fmt.Errorf("failed writing field %q: %w", field.name, err)
 		}
 		if idx+1 != len(sortedFields) {
 			if _, err := io.WriteString(w, "\n"); err != nil {
-				return fmt.Errorf("failed writing field %q extra line: %v", field.name, err)
+				return fmt.Errorf("failed writing field %q extra line: %w", field.name, err)
 			}
 		}
 	}
 
 	if _, err := w.Write([]byte("}\n")); err != nil {
-		return fmt.Errorf("failed writing GraphQL: %v", err)
+		return fmt.Errorf("failed writing GraphQL: %w", err)
 	}
 
 	return nil
@@ -560,7 +560,7 @@ func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst
 		gen.fields[tree[0]] = f
 		gen.fieldOrder = append(gen.fieldOrder, tree[0])
 		if err := f.addField(tree[1:], nil, inst); err != nil {
-			return fmt.Errorf("failed field %q: %v", tree[0], err)
+			return fmt.Errorf("failed field %q: %w", tree[0], err)
 		}
 		return nil
 	}
