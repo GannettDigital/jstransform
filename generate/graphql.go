@@ -436,6 +436,9 @@ func (gof *goGQL) walkFunc(path string, i jsonschema.Instance) error {
 		gqlTypeName = gen.jsonName
 	}
 	gqlTypeName += exportedName(name)
+	if newName, ok := gof.args.GraphQLTypeNameMap[gqlTypeName]; ok {
+		gqlTypeName = newName
+	}
 
 	// If the types is an object create a new generated struct for it
 	if slices.Contains(i.Type, "object") {
