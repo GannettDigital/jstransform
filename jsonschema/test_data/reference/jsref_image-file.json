@@ -40,7 +40,8 @@
       }
     },
     "URL": {
-      "$ref": "./jsref_image-defs.json#/definitions/imageurl"
+      "$ref": "./jsref_image-defs.json#/definitions/imageurl",
+      "description": "URL of the image."
     }
   },
   "required": [

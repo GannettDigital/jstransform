@@ -42,15 +42,14 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string) (jso
 		data = jsonparser.Delete(data, append(destPath, refKey)...)
 
 		if len(destPath) != 0 {
-			// Attempt to read the `transform` object from the source data so that we can apply it after the ref resolving
-			// wipes out that object in the data. Ensures that transform is an object and errors if not.
-			transformPath := append(destPath, transformKey)
-			transform, dataType, _, err := jsonparser.Get(data, transformPath...)
+			// Attempt to read the object from the source data so that we can apply it after the ref resolving
+			// wipes out that object in the data.
+			prior, dataType, _, err := jsonparser.Get(data, destPath...)
 			if err != nil && err != jsonparser.KeyPathNotFoundError {
-				return nil, fmt.Errorf("failed to read transform object on source data at path %v: %v", transformPath, err)
+				return nil, fmt.Errorf("failed to read object on source data at path %v: %v", destPath, err)
 			}
-			if transform != nil && dataType != jsonparser.Object {
-				return nil, fmt.Errorf("transform object is wrong type %q, should be object", dataType)
+			if prior != nil && dataType != jsonparser.Object {
+				return nil, fmt.Errorf("referencing object is wrong type %q, should be object", dataType)
 			}
 
 			// Set the resolved ref contents on the data. This wipes out existing fields in that object
@@ -59,12 +58,26 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string) (jso
 				return nil, fmt.Errorf("failed to update data with resolved ref %q at path %v: %v", ref, refPath, err)
 			}
 
-			// If we found a transform inside that object in the source data, apply that back since setting of the ref
-			// would have cleared it
-			if transform != nil {
-				data, err = jsonparser.Set(data, transform, transformPath...)
+			// If we found other keys inside that object in the source data, apply that back since setting of the ref
+			// would have cleared it.  This wasn't true in JSON Schema draft 4 through 7 but is the current standard.
+			if prior != nil {
+				err := jsonparser.ObjectEach(prior, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
+					keyPath := destPath
+					keyPath = append(keyPath, string(key))
+					if dataType == jsonparser.String {
+						value, err = json.Marshal(string(value))
+						if err != nil {
+							return fmt.Errorf("failed to marshal string %q to update data with ref %q at path %v key %q: %w", value, ref, refPath, key, err)
+						}
+					}
+					data, err = jsonparser.Set(data, value, keyPath...)
+					if err != nil {
+						return fmt.Errorf("failed to update data with ref %q at path %v key %q: %w", ref, refPath, key, err)
+					}
+					return nil
+				})
 				if err != nil {
-					return nil, fmt.Errorf("failed to update data transform with resolved ref %q at path %v: %v", ref, refPath, err)
+					return nil, fmt.Errorf("failed to iterate over original object with ref %q at path %v: %w", ref, refPath, err)
 				}
 			}
 		}

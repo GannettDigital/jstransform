@@ -2,6 +2,7 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "properties": {
         "URL": {
+            "description": "URL of the image.",
             "properties": {
                 "absolute": {
                     "transform": {
