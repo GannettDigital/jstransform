@@ -258,22 +258,7 @@ func (ef *gqlExtractedField) write(w io.Writer, prefix string, required, descrip
 		description = strings.TrimSpace(strings.Join(lines[1:], "\n"))
 	}
 	if description != "" {
-		// Multi-line descriptions get the """ comment syntax.
-		if strings.IndexRune(description, '\n') < 0 {
-			description = fmt.Sprintf("%s\"%s\"\n", prefix, description)
-		} else {
-			newDescription := prefix + `"""` + "\n"
-			for _, line := range strings.Split(description, "\n") {
-				if line == "" {
-					newDescription += "\n"
-				} else {
-					newDescription += prefix + line + "\n"
-				}
-			}
-			newDescription += prefix + `"""` + "\n"
-			description = newDescription
-		}
-		if _, err := fmt.Fprint(w, description); err != nil {
+		if _, err := fmt.Fprint(w, graphqlComment(prefix, description)); err != nil {
 			return fmt.Errorf("error writing field %q description: %w", ef.name, err)
 		}
 	}
@@ -357,6 +342,7 @@ func newGeneratedGraphQLFile(schema jsonschema.Instance, name, packageName strin
 	}
 
 	gof.rootStruct = gof.newGeneratedGraphQLObject(name, gqlName, required)
+	gof.rootStruct.description = schema.Description
 	if len(schema.OneOf) != 0 {
 		gof.rootStruct.buildType = "interface"
 	} else {
@@ -458,6 +444,7 @@ func (gof *goGQL) walkFunc(path string, i jsonschema.Instance) error {
 		}
 
 		obj := gof.newGeneratedGraphQLObject(key, gqlTypeName, requiredFields)
+		obj.description = i.Description
 		obj.arguments = i.GraphQLArguments
 		obj.target = i.Target
 		gof.nestedStructs[key] = obj
@@ -518,8 +505,13 @@ func (gen *generatedGraphQLObject) write(w io.Writer) error {
 			break
 		}
 	}
+	if gen.description != "" {
+		if _, err := w.Write([]byte(graphqlComment("", gen.description))); err != nil {
+			return fmt.Errorf("failed writing GraphQL description: %w", err)
+		}
+	}
 	if _, err := fmt.Fprintf(w, "%s %s%s %s{\n", gen.buildType, gen.jsonName, implements, hasModel); err != nil {
-		return fmt.Errorf("failed writing GraphQL: %w", err)
+		return fmt.Errorf("failed writing GraphQL type: %w", err)
 	}
 
 	sortedFields := gen.fields.Sorted()
@@ -706,4 +698,20 @@ func (ef *gqlExtractedField) graphqlType(required, pointers bool) (string, strin
 		graphqlType += " @goField(forceResolver: true)"
 	}
 	return graphqlArguments, graphqlType
+}
+
+// graphqlComment takes a string and returns GraphQL comment syntax.
+func graphqlComment(prefix, description string) string {
+	if strings.IndexRune(description, '\n') < 0 {
+		return fmt.Sprintf("%s\"%s\"\n", prefix, description)
+	}
+	// Multi-line descriptions get the """ comment syntax.
+	newDescription := prefix + `"""` + "\n"
+	for _, line := range strings.Split(description, "\n") {
+		if line != "" {
+			newDescription += prefix + line
+		}
+		newDescription += "\n"
+	}
+	return newDescription + prefix + `"""` + "\n"
 }

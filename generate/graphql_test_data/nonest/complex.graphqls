@@ -54,6 +54,7 @@ type ComplexOriginalSize @goModel(model: ".ComplexOriginalSize") {
   width: Float!
 }
 
+"Universal Resource Locator"
 type ComplexURL @goModel(model: ".ComplexURL") {
   "The full Canonical URL"
   absolute: String!
