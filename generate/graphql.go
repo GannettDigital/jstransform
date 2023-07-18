@@ -592,8 +592,17 @@ func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst
 		// Second processing of an array type
 		if exists, ok := gen.fields[f.jsonName]; ok {
 			f = exists
-			if f.array && f.jsonType == "" {
-				f.jsonType = jsonType
+			if f.array {
+				if f.jsonType == "" {
+					f.jsonType = jsonType
+				}
+				// Need to preserve the value if this array's item type had a GraphQL hydration target.
+				if f.target == "" && inst.Target != "" {
+					f.target = "[" + inst.Target + "]"
+					if !(f.nullable || gen.args.Pointers && !gen.requiredFields[f.jsonName]) {
+						f.target += "!"
+					}
+				}
 			} else {
 				return fmt.Errorf("field %q already exists but is not an array field", f.name)
 			}
