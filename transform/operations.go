@@ -105,6 +105,10 @@ func (n *notEmpty) init(args map[string]string) error {
 }
 
 func (c *notEmpty) transform(raw interface{}) (interface{}, error) {
+	if raw == nil {
+		return nil, nil
+	}
+
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("notEmpty only supports strings")
