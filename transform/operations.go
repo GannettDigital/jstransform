@@ -111,7 +111,7 @@ func (c *notEmpty) transform(raw interface{}) (interface{}, error) {
 
 	in, ok := raw.(string)
 	if !ok {
-		return nil, errors.New("notEmpty only supports strings")
+		return nil, fmt.Errorf("received unsupported type: %T", raw)
 	}
 
 	if len(in) > 0 {
