@@ -105,10 +105,7 @@ func (n *notEmpty) init(args map[string]string) error {
 }
 
 func (c *notEmpty) transform(raw interface{}) (interface{}, error) {
-	if raw == nil {
-		return nil, nil
-	}
-
+	fmt.Printf("OUT: %+v\n", raw)
 	in, ok := raw.(string)
 	if !ok {
 		return nil, fmt.Errorf("received unsupported type: %T", raw)
