@@ -10,6 +10,7 @@ import (
 	"time"
 
 	jsonpath "github.com/GannettDigital/PaesslerAG_jsonpath"
+	"github.com/antchfx/xmlquery"
 	"github.com/microcosm-cc/bluemonday"
 )
 
@@ -105,15 +106,19 @@ func (n *notEmpty) init(args map[string]string) error {
 }
 
 func (c *notEmpty) transform(raw interface{}) (interface{}, error) {
-	fmt.Printf("OUT: %+v\n", raw)
-	in, ok := raw.(string)
-	if !ok {
+	switch v := raw.(type) {
+	case string:
+		if len(v) > 0 {
+			return true, nil
+		}
+	case []*xmlquery.Node:
+		if len(v) > 0 {
+			return true, nil
+		}
+	default:
 		return nil, fmt.Errorf("received unsupported type: %T", raw)
 	}
 
-	if len(in) > 0 {
-		return true, nil
-	}
 	return false, nil
 }
 
