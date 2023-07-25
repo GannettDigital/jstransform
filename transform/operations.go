@@ -96,7 +96,7 @@ func (c *changeCase) transform(raw interface{}) (interface{}, error) {
 	return nil, errors.New("unknown error in changeCase")
 }
 
-// notEmpty is a transformOperation which returns a boolean depending on if the passed in string value is empty.
+// notEmpty is a transformOperation which returns a boolean depending on if the passed in value is considered "empty", as the definition changes on a per-type basis.
 type notEmpty struct {
 	args map[string]string
 }
