@@ -209,6 +209,23 @@ func TestInverse(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &inverse{} }, tests)
 }
 
+func TestNotEmpty(t *testing.T) {
+	tests := []opTests{
+		{
+			description: "Simple working case, true",
+			in:          "someValue",
+			want:        true,
+		},
+		{
+			description: "Simple working case, false",
+			in:          "",
+			want:        false,
+		},
+	}
+
+	runOpTests(t, func() transformOperation { return &notEmpty{} }, tests)
+}
+
 func TestMax(t *testing.T) {
 	tests := []opTests{
 		{

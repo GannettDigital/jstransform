@@ -95,6 +95,27 @@ func (c *changeCase) transform(raw interface{}) (interface{}, error) {
 	return nil, errors.New("unknown error in changeCase")
 }
 
+// notEmpty is a transformOperation which returns a boolean depending on if the passed in string value is empty.
+type notEmpty struct {
+	args map[string]string
+}
+
+func (n *notEmpty) init(args map[string]string) error {
+	return nil
+}
+
+func (c *notEmpty) transform(raw interface{}) (interface{}, error) {
+	in, ok := raw.(string)
+	if !ok {
+		return nil, errors.New("notEmpty only supports strings")
+	}
+
+	if len(in) > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
 // inverse is a transformOperation which flips the value of a boolean.
 type inverse struct {
 	args map[string]string
