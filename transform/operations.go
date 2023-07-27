@@ -10,6 +10,7 @@ import (
 	"time"
 
 	jsonpath "github.com/GannettDigital/PaesslerAG_jsonpath"
+	"github.com/antchfx/xmlquery"
 	"github.com/microcosm-cc/bluemonday"
 )
 
@@ -93,6 +94,32 @@ func (c *changeCase) transform(raw interface{}) (interface{}, error) {
 		return strings.ToUpper(in), nil
 	}
 	return nil, errors.New("unknown error in changeCase")
+}
+
+// notEmpty is a transformOperation which returns a boolean depending on if the passed in value is considered "empty", as the definition changes on a per-type basis.
+type valueExists struct {
+	args map[string]string
+}
+
+func (n *valueExists) init(args map[string]string) error {
+	return nil
+}
+
+func (c *valueExists) transform(raw interface{}) (interface{}, error) {
+	switch v := raw.(type) {
+	case string:
+		if len(v) > 0 {
+			return true, nil
+		}
+	case []*xmlquery.Node:
+		if len(v) > 0 {
+			return true, nil
+		}
+	default:
+		return nil, fmt.Errorf("received unsupported type: %T", raw)
+	}
+
+	return false, nil
 }
 
 // inverse is a transformOperation which flips the value of a boolean.

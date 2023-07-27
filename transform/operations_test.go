@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/antchfx/xmlquery"
 )
 
 type testOp struct {
@@ -207,6 +209,33 @@ func TestInverse(t *testing.T) {
 	}
 
 	runOpTests(t, func() transformOperation { return &inverse{} }, tests)
+}
+
+func TestValueExists(t *testing.T) {
+	tests := []opTests{
+		{
+			description: "Simple working string case, true",
+			in:          "someValue",
+			want:        true,
+		},
+		{
+			description: "Simple working string case, false",
+			in:          "",
+			want:        false,
+		},
+		{
+			description: "Simple working XML node array case, true",
+			in:          []*xmlquery.Node{{}},
+			want:        true,
+		},
+		{
+			description: "Simple working XML node array case, false",
+			in:          []*xmlquery.Node{},
+			want:        false,
+		},
+	}
+
+	runOpTests(t, func() transformOperation { return &valueExists{} }, tests)
 }
 
 func TestMax(t *testing.T) {
