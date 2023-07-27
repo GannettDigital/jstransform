@@ -111,7 +111,7 @@ func (c *valueExists) transform(raw interface{}) (interface{}, error) {
 	case reflect.Slice, reflect.Array, reflect.String, reflect.Map:
 		return rv.Len() != 0, nil
 	default:
-		// Add other type cases as needed
+		// Add other type cases as needed.
 		return false, fmt.Errorf("unsupported type: %T", raw)
 	}
 }
