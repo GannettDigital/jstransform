@@ -4,13 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"html"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	jsonpath "github.com/GannettDigital/PaesslerAG_jsonpath"
-	"github.com/antchfx/xmlquery"
 	"github.com/microcosm-cc/bluemonday"
 )
 
@@ -96,30 +96,35 @@ func (c *changeCase) transform(raw interface{}) (interface{}, error) {
 	return nil, errors.New("unknown error in changeCase")
 }
 
-// notEmpty is a transformOperation which returns a boolean depending on if the passed in value is considered "empty", as the definition changes on a per-type basis.
-type notEmpty struct {
+// valueExists is a transformOperation which returns a boolean depending on if the passed in value exists, as the definition changes on a per-type basis.
+type valueExists struct {
 	args map[string]string
 }
 
-func (n *notEmpty) init(args map[string]string) error {
+func (n *valueExists) init(args map[string]string) error {
 	return nil
 }
 
-func (c *notEmpty) transform(raw interface{}) (interface{}, error) {
-	switch v := raw.(type) {
-	case string:
-		if len(v) > 0 {
-			return true, nil
-		}
-	case []*xmlquery.Node:
-		if len(v) > 0 {
-			return true, nil
-		}
+func (c *valueExists) transform(raw interface{}) (interface{}, error) {
+	rv := reflect.ValueOf(raw)
+	switch rv.Kind() {
+	case reflect.Slice, reflect.Array, reflect.String, reflect.Map:
+		return rv.Len() != 0, nil
 	default:
-		return nil, fmt.Errorf("received unsupported type: %T", raw)
+		// Add other type cases as needed
+		return false, fmt.Errorf("unsupported type: %T", raw)
 	}
+}
 
-	return false, nil
+func isZero(value any) bool {
+	v := reflect.ValueOf(value)
+	switch v.Kind() {
+	case reflect.Slice, reflect.Map, reflect.Ptr, reflect.Chan, reflect.Interface:
+		return v.IsNil() || v.IsZero()
+	default:
+		zeroValue := reflect.Zero(v.Type())
+		return v.Interface() == zeroValue.Interface()
+	}
 }
 
 // inverse is a transformOperation which flips the value of a boolean.
