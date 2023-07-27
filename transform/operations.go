@@ -116,17 +116,6 @@ func (c *valueExists) transform(raw interface{}) (interface{}, error) {
 	}
 }
 
-func isZero(value any) bool {
-	v := reflect.ValueOf(value)
-	switch v.Kind() {
-	case reflect.Slice, reflect.Map, reflect.Ptr, reflect.Chan, reflect.Interface:
-		return v.IsNil() || v.IsZero()
-	default:
-		zeroValue := reflect.Zero(v.Type())
-		return v.Interface() == zeroValue.Interface()
-	}
-}
-
 // inverse is a transformOperation which flips the value of a boolean.
 type inverse struct {
 	args map[string]string
