@@ -4,13 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"html"
-	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	jsonpath "github.com/GannettDigital/PaesslerAG_jsonpath"
+	"github.com/antchfx/xmlquery"
 	"github.com/microcosm-cc/bluemonday"
 )
 
@@ -96,7 +96,7 @@ func (c *changeCase) transform(raw interface{}) (interface{}, error) {
 	return nil, errors.New("unknown error in changeCase")
 }
 
-// valueExists is a transformOperation which returns a boolean depending on if the passed in value exists, as the definition changes on a per-type basis.
+// notEmpty is a transformOperation which returns a boolean depending on if the passed in value is considered "empty", as the definition changes on a per-type basis.
 type valueExists struct {
 	args map[string]string
 }
@@ -106,14 +106,20 @@ func (n *valueExists) init(args map[string]string) error {
 }
 
 func (c *valueExists) transform(raw interface{}) (interface{}, error) {
-	rv := reflect.ValueOf(raw)
-	switch rv.Kind() {
-	case reflect.Slice, reflect.Array, reflect.String, reflect.Map:
-		return rv.Len() != 0, nil
+	switch v := raw.(type) {
+	case string:
+		if len(v) > 0 {
+			return true, nil
+		}
+	case []*xmlquery.Node:
+		if len(v) > 0 {
+			return true, nil
+		}
 	default:
-		// Add other type cases as needed.
-		return false, fmt.Errorf("unsupported type: %T", raw)
+		return nil, fmt.Errorf("received unsupported type: %T", raw)
 	}
+
+	return false, nil
 }
 
 // inverse is a transformOperation which flips the value of a boolean.

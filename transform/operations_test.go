@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/antchfx/xmlquery"
 )
 
 type testOp struct {
@@ -222,13 +224,13 @@ func TestValueExists(t *testing.T) {
 			want:        false,
 		},
 		{
-			description: "Simple working slice case, true",
-			in:          []int{1},
+			description: "Simple working XML node array case, true",
+			in:          []*xmlquery.Node{{}},
 			want:        true,
 		},
 		{
-			description: "Simple working slice case, false",
-			in:          []string{},
+			description: "Simple working XML node array case, false",
+			in:          []*xmlquery.Node{},
 			want:        false,
 		},
 	}
