@@ -122,6 +122,25 @@ func (c *valueExists) transform(raw interface{}) (interface{}, error) {
 	return false, nil
 }
 
+// firstOnly takes the first item only when the xmpPath returns all extracted values and appends them to the resulting string.
+type firstOnly struct {
+	args map[string]string
+}
+
+func (fo *firstOnly) init(args map[string]string) error {
+	return nil
+}
+
+func (fo *firstOnly) transform(raw interface{}) (interface{}, error) {
+	in, ok := raw.(string)
+	if !ok {
+		return nil, errors.New("firstOnly only supports strings")
+	}
+
+	inSplit := strings.Split(in, " ")
+	return inSplit[0], nil
+}
+
 // inverse is a transformOperation which flips the value of a boolean.
 type inverse struct {
 	args map[string]string

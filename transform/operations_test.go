@@ -238,6 +238,18 @@ func TestValueExists(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &valueExists{} }, tests)
 }
 
+func TestFirstOnly(t *testing.T) {
+	tests := []opTests{
+		{
+			description: "Simple string extractor",
+			in:          "Seattle Seattle Seattle",
+			want:        "Seattle",
+		},
+	}
+
+	runOpTests(t, func() transformOperation { return &firstOnly{} }, tests)
+}
+
 func TestMax(t *testing.T) {
 	tests := []opTests{
 		{

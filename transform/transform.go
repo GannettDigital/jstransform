@@ -88,6 +88,8 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 			op = &convertToInt64{}
 		case "valueExists":
 			op = &valueExists{}
+		case "firstOnly":
+			op = &firstOnly{}
 		default:
 			return fmt.Errorf("unsupported operation %q", toj.Name)
 		}
