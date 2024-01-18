@@ -29,8 +29,8 @@ The transform object has the following properties:
          "methodOptions": {                      // options to be passed along to the chosen method.
              "concatenateDelimiter": ""          // optional delimiter to be used when concatenating multiple jsonPath items. Must be a string
          }
-    }                  
-}   
+    }
+}
 ```
 
 === Implementation Requirements
@@ -72,5 +72,5 @@ Operations allow further mutation of data, for mutation types that are not curre
 | removeHTML | string | string ||
 | convertToFloat64 | string, int, float64 | float64 ||
 | convertToInt64 | string, int, float32, float64 | int64 ||
+| convertToBool | string, int, float32, float64, boolean, array | boolean ||
 |===
-
