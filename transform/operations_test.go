@@ -595,8 +595,14 @@ func TestConvertToBool(t *testing.T) {
 		},
 		{
 			description: "Failing string case",
+			in:          "0",
+			want:        false,
+		},
+		{
+			description: "Erroring string case",
 			in:          "",
 			want:        false,
+			wantErr:     true,
 		},
 		{
 			description: "Working int case",
