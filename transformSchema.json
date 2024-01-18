@@ -90,6 +90,9 @@
               },
               {
                 "$ref": "#/definitions/operations/convertToInt64"
+              },
+              {
+                "$ref": "#/definitions/operations/convertToBool"
               }
             ]
           }
@@ -391,6 +394,22 @@
             "type": "string",
             "enum": [
               "convertToInt64"
+            ]
+          }
+        }
+      },
+      "convertToBool": {
+        "description": "Accept string, boolean, int (all), float32, float64, & arrays as input, returns a boolean",
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "convertToBool"
             ]
           }
         }
