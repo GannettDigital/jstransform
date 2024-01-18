@@ -432,7 +432,7 @@ func (c *convertToBool) transform(raw interface{}) (interface{}, error) {
 	case bool:
 		return in, nil
 	case string:
-		return len(in) != 0, nil
+		return strconv.ParseBool(in)
 	case []interface{}:
 		return len(in) != 0, nil
 	case float32:
