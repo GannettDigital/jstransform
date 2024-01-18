@@ -418,7 +418,7 @@ func (c *convertToInt64) transform(raw interface{}) (interface{}, error) {
 	}
 }
 
-// convertToBool is a transformOperation which converts various types to int64.
+// convertToBool is a transformOperation which converts various types to boolean.
 type convertToBool struct {
 	args map[string]string
 }
