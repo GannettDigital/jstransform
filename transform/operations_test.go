@@ -647,7 +647,7 @@ func TestConvertToBool(t *testing.T) {
 			}{
 				Field: "test",
 			},
-			want:    nil,
+			want:    false,
 			wantErr: true,
 		},
 	}

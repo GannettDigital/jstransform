@@ -450,7 +450,7 @@ func (c *convertToBool) transform(raw interface{}) (interface{}, error) {
 	case int64:
 		return in != 0, nil
 	default:
-		return nil, fmt.Errorf("convertToBool only supports boolean, strings, ints, floats, and array types: %T", raw)
+		return false, fmt.Errorf("convertToBool only supports boolean, strings, ints, floats, and array types: %T", raw)
 	}
 }
 
