@@ -586,6 +586,69 @@ func TestConvertToInt64(t *testing.T) {
 	runOpTests(t, func() transformOperation { return &convertToInt64{} }, tests)
 }
 
+func TestConvertToBool(t *testing.T) {
+	tests := []opTests{
+		{
+			description: "Working string case",
+			in:          "1",
+			want:        true,
+		},
+		{
+			description: "Failing string case",
+			in:          "",
+			want:        false,
+		},
+		{
+			description: "Working int case",
+			in:          int(123),
+			want:        true,
+			wantErr:     false,
+		},
+		{
+			description: "Failing int case",
+			in:          int(0),
+			want:        false,
+			wantErr:     false,
+		},
+		{
+			description: "Working float32 case",
+			in:          float32(3.14),
+			want:        true,
+			wantErr:     false,
+		},
+		{
+			description: "Failing float32 case",
+			in:          float32(0),
+			want:        false,
+			wantErr:     false,
+		},
+		{
+			description: "Working float64 case",
+			in:          float64(3.14),
+			want:        true,
+			wantErr:     false,
+		},
+		{
+			description: "Failing float64 case",
+			in:          float64(0),
+			want:        false,
+			wantErr:     false,
+		},
+		{
+			description: "Can't convert from arbitrary object to bool",
+			in: struct {
+				Field string
+			}{
+				Field: "test",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	runOpTests(t, func() transformOperation { return &convertToBool{} }, tests)
+}
+
 func compareWantErrs(gotErr error, wantErr bool) error {
 	switch {
 	case wantErr && gotErr == nil:
