@@ -418,6 +418,42 @@ func (c *convertToInt64) transform(raw interface{}) (interface{}, error) {
 	}
 }
 
+// convertToBool is a transformOperation which converts various types to boolean.
+type convertToBool struct {
+	args map[string]string
+}
+
+func (c *convertToBool) init(args map[string]string) error {
+	return nil
+}
+
+func (c *convertToBool) transform(raw interface{}) (interface{}, error) {
+	switch in := raw.(type) {
+	case bool:
+		return in, nil
+	case string:
+		return strconv.ParseBool(in)
+	case []interface{}:
+		return len(in) != 0, nil
+	case float32:
+		return in != 0, nil
+	case float64:
+		return in != 0, nil
+	case int:
+		return in != 0, nil
+	case int8:
+		return in != 0, nil
+	case int16:
+		return in != 0, nil
+	case int32:
+		return in != 0, nil
+	case int64:
+		return in != 0, nil
+	default:
+		return false, fmt.Errorf("convertToBool only supports boolean, strings, ints, floats, and array types: %T", raw)
+	}
+}
+
 // requiredArgs checks the given args map to make sure it contains the required args
 // and only the required args.
 func requiredArgs(required []string, args map[string]string) error {
