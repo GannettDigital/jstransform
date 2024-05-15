@@ -69,6 +69,9 @@ func walkInstance(raw json.RawMessage, path string, walkFn WalkInstanceFunc) err
 
 	switch {
 	case slices.Contains(i.Type, "object"):
+		if i.Target != "" { // If object is overridden by a Target struct, skip processing properties of the object.
+			return nil
+		}
 		if i.Properties == nil {
 			return fmt.Errorf("object at path %q missing Properties", path)
 		}
@@ -78,6 +81,9 @@ func walkInstance(raw json.RawMessage, path string, walkFn WalkInstanceFunc) err
 			}
 		}
 	case slices.Contains(i.Type, "array"):
+		if i.Target != "" { // If array is overridden by a Target struct, skip processing properties of the array.
+			return nil
+		}
 		if i.Items == nil {
 			return fmt.Errorf("array at path %q missing Items", path)
 		}
