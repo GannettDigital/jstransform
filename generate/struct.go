@@ -206,8 +206,8 @@ func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 	// If the types is an object create a new generated struct for it
 	if slices.Contains(i.Type, "object") {
 		key := strings.Join(parts, "")
-		if i.Target != "" {
-			key = i.Target
+		if i.GoModel != "" {
+			key = i.GoModel
 		}
 		structType := key
 
@@ -221,15 +221,15 @@ func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 			requiredFields[name] = true
 		}
 
-		if i.Target == "" {
+		if i.GoModel == "" {
 			gof.nestedStructs[key] = gof.newGeneratedStruct(key, requiredFields)
 		}
 
 		return addField(gen.fields, []string{name}, jsonschema.Instance{Description: i.Description, Type: []string{structType}}, gen.args.FieldNameMap)
 	}
-	if slices.Contains(i.Type, "array") && i.Target != "" {
+	if slices.Contains(i.Type, "array") && i.GoModel != "" {
 		if gof.args.Pointers && !gen.requiredFields[name] || slices.Contains(i.Type, "null") {
-			i.Target = "*" + i.Target
+			i.GoModel = "*" + i.GoModel
 		}
 	}
 
@@ -385,8 +385,8 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 			f.fields = make(map[string]*extractedField)
 		}
 
-		if inst.Target != "" {
-			f.jsonType = inst.Target
+		if inst.GoModel != "" {
+			f.jsonType = inst.GoModel
 		}
 		fields[tree[0]] = f
 	}

@@ -21,6 +21,7 @@ type Instance struct {
 	Definitions          json.RawMessage            `json:"definitions,omitempty"`
 	Format               string                     `json:"format,omitempty"`
 	FromRef              string                     `json:"fromRef,omitempty"`           // Added as a way of tracking the ref which was already expanded
+	GoModel              string                     `json:"goModel,omitempty"`           // For specifying the Go model which to reference.
 	GraphQLArguments     []string                   `json:"graphql-arguments,omitempty"` // For type="graphql-hydration" to also require query arguments.
 	Items                json.RawMessage            `json:"items,omitempty"`
 	OneOf                []Instance                 `json:"oneOf,omitempty"`

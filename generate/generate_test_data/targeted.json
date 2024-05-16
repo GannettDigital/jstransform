@@ -4,11 +4,11 @@
   "properties": {
     "crops": {
       "$ref": "./complex.json#properties/crops",
-      "target": "Complex_no_nestedCrops"
+      "goModel": "Complex_no_nestedCrops"
     },
     "URL": {
       "$ref": "./complex.json#properties/URL",
-      "target": "Complex_no_nestedURL"
+      "goModel": "Complex_no_nestedURL"
     },
     "anotherField": {
       "type": "string"
