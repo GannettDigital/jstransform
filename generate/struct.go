@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/format"
 	"io"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -142,6 +143,18 @@ func newGeneratedGoFile(schema *jsonschema.Schema, name, packageName string, emb
 	gof.rootStruct = gof.newGeneratedStruct(name, required)
 	gof.rootStruct.embededStructs = embeds
 
+	for _, all := range schema.AllOf {
+		if all.Embed {
+			ref := strings.Split(filepath.Base(all.FromRef), ".")[0]
+			if newName, ok := args.StructNameMap[ref]; ok {
+				ref = newName
+			} else {
+				ref = exportedName(ref)
+			}
+			gof.rootStruct.embededStructs = append(gof.rootStruct.embededStructs, ref)
+		}
+	}
+
 	if err := jsonschema.Walk(schema, gof.walkFunc); err != nil {
 		return nil, fmt.Errorf("failed to walk schema for %q: %v", name, err)
 	}
@@ -206,9 +219,6 @@ func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 	// If the types is an object create a new generated struct for it
 	if slices.Contains(i.Type, "object") {
 		key := strings.Join(parts, "")
-		if i.GoModel != "" {
-			key = i.GoModel
-		}
 		structType := key
 
 		// nullable nested structs could be pointers
@@ -221,16 +231,8 @@ func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 			requiredFields[name] = true
 		}
 
-		if i.GoModel == "" {
-			gof.nestedStructs[key] = gof.newGeneratedStruct(key, requiredFields)
-		}
-
+		gof.nestedStructs[key] = gof.newGeneratedStruct(key, requiredFields)
 		return addField(gen.fields, []string{name}, jsonschema.Instance{Description: i.Description, Type: []string{structType}}, gen.args.FieldNameMap)
-	}
-	if slices.Contains(i.Type, "array") && i.GoModel != "" {
-		if gof.args.Pointers && !gen.requiredFields[name] || slices.Contains(i.Type, "null") {
-			i.GoModel = "*" + i.GoModel
-		}
 	}
 
 	return addField(gen.fields, []string{name}, i, gen.args.FieldNameMap)
@@ -385,9 +387,6 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 			f.fields = make(map[string]*extractedField)
 		}
 
-		if inst.GoModel != "" {
-			f.jsonType = inst.GoModel
-		}
 		fields[tree[0]] = f
 	}
 

@@ -19,9 +19,9 @@ type Instance struct {
 	AnyOf                []Instance                 `json:"anyOf,omitempty"` // TODO unsupported
 	Description          string                     `json:"description,omitempty"`
 	Definitions          json.RawMessage            `json:"definitions,omitempty"`
+	Embed                bool                       `json:"embed,omitempty"`
 	Format               string                     `json:"format,omitempty"`
 	FromRef              string                     `json:"fromRef,omitempty"`           // Added as a way of tracking the ref which was already expanded
-	GoModel              string                     `json:"goModel,omitempty"`           // For specifying the Go model which to reference.
 	GraphQLArguments     []string                   `json:"graphql-arguments,omitempty"` // For type="graphql-hydration" to also require query arguments.
 	Items                json.RawMessage            `json:"items,omitempty"`
 	OneOf                []Instance                 `json:"oneOf,omitempty"`
@@ -104,6 +104,9 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	// that conflict. The legit use case for that is rare but it is in the spec. Rather than merge these the walk
 	// should go through each set of files but this makes the raw walking much more complicated.
 	for _, all := range sj.AllOf {
+		if all.Embed {
+			continue
+		}
 		s.Properties = mergeProperties(s.Properties, all.Properties)
 		s.Required = append(s.Required, all.Required...)
 		if s.Items == nil {

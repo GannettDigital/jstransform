@@ -210,41 +210,16 @@ func TestBuildStructs(t *testing.T) {
 			files: []string{"times.go"},
 		},
 		{
-			description: "complex no nested",
+			description: "embedded allOf",
 			buildArgs: BuildArgs{
-				SchemaPath:             filepath.Join(testdir, "complex_no_nested.json"),
+				SchemaPath:             filepath.Join(testdir, "base.json"),
 				OutputDir:              "generated",
 				GenerateMessagePack:    false,
 				StructNameMap:          nil,
 				DescriptionAsStructTag: false,
 				NoNestedStructs:        true,
 			},
-			files: []string{"complex_no_nested.go"},
-		},
-		{
-			description: "targeted with pointers",
-			buildArgs: BuildArgs{
-				SchemaPath:             filepath.Join(testdir, "targeted_pointers.json"),
-				OutputDir:              "pointers",
-				GenerateMessagePack:    false,
-				StructNameMap:          nil,
-				DescriptionAsStructTag: false,
-				NoNestedStructs:        true,
-				Pointers:               true,
-			},
-			files: []string{"targeted_pointers.go"},
-		},
-		{
-			description: "targeted",
-			buildArgs: BuildArgs{
-				SchemaPath:             filepath.Join(testdir, "targeted.json"),
-				OutputDir:              "generated",
-				GenerateMessagePack:    false,
-				StructNameMap:          nil,
-				DescriptionAsStructTag: false,
-				NoNestedStructs:        true,
-			},
-			files: []string{"targeted.go"},
+			files: []string{"simple_no_nested.go", "embedded.go"},
 		},
 	}
 
