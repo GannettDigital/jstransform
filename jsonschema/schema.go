@@ -65,13 +65,23 @@ func (s *Schema) Validate(raw json.RawMessage) (bool, error) {
 	return s.Validator.Validate(raw)
 }
 
+func SchemaFromFileNoFlatten(schemaPath, oneOfType string) (*Schema, error) {
+	return schemaFromFile(schemaPath, oneOfType, false)
+}
+
+func SchemaFromFile(schemaPath, oneOfType string) (*Schema, error) {
+	return schemaFromFile(schemaPath, oneOfType, true)
+}
+
 // SchemaFromFile parses a file at the given path and returns a schema based on its contents.
 // The function traverses allOf fields within the schema. For oneOf fields the reference base
 // name minus any extension is compared to the value of the oneOfType argument and if they match that file is also
 // traversed. AnyOf fields are currently ignored.
 //
+// Flatten==true will merge any allOf properties into the parent schema's properties.
+//
 // Referenced files are recursively processed. At this time only definition and file references are supported.
-func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
+func schemaFromFile(schemaPath string, oneOfType string, flatten bool) (*Schema, error) {
 	data, err := os.ReadFile(schemaPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
@@ -82,7 +92,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	}
 
 	// dereferencing during walking is more efficient but more complicated so all dereferencing for a file is done immediately
-	data, err = dereference(schemaPath, data, oneOfType)
+	data, err = dereference(schemaPath, data, oneOfType, flatten)
 	if err != nil {
 		return nil, fmt.Errorf("failed to Dereference Schema: %v", err)
 	}
@@ -104,7 +114,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	// that conflict. The legit use case for that is rare but it is in the spec. Rather than merge these the walk
 	// should go through each set of files but this makes the raw walking much more complicated.
 	for _, all := range sj.AllOf {
-		if all.Embed {
+		if !flatten && s.Properties != nil {
 			continue
 		}
 		s.Properties = mergeProperties(s.Properties, all.Properties)

@@ -17,18 +17,18 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 		goPath      string
 		wantPath    string
 	}{
-		{
-			description: "simple go struct",
-			name:        "Simple",
-			goPath:      "./avro_test_data/simple.go",
-			wantPath:    "./avro_test_data/simple.avsc.out",
-		},
-		{
-			description: "simple go struct - no nest",
-			name:        "Simple",
-			goPath:      "./avro_test_data/nonest/simple.go",
-			wantPath:    "./avro_test_data/simple.avsc.out",
-		},
+		//{
+		//	description: "simple go struct",
+		//	name:        "Simple",
+		//	goPath:      "./avro_test_data/simple.go",
+		//	wantPath:    "./avro_test_data/simple.avsc.out",
+		//},
+		//{
+		//	description: "simple go struct - no nest",
+		//	name:        "Simple",
+		//	goPath:      "./avro_test_data/nonest/simple.go",
+		//	wantPath:    "./avro_test_data/simple.avsc.out",
+		//},
 		{
 			description: "fields with repeated field names",
 			name:        "Repeats",

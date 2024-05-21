@@ -86,7 +86,12 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 	if !filepath.IsAbs(schemaPath) {
 		schemaPath = filepath.Join(filepath.Dir(args.SchemaPath), schemaPath)
 	}
-	schema, err := jsonschema.SchemaFromFile(schemaPath, name)
+	var schema *jsonschema.Schema
+	if args.EmbedAllOf {
+		schema, err = jsonschema.SchemaFromFileNoFlatten(schemaPath, name)
+	} else {
+		schema, err = jsonschema.SchemaFromFile(schemaPath, name)
+	}
 	if err != nil {
 		return err
 	}
@@ -178,6 +183,16 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 				implements = exportedName(name)
 			}
 			generated.rootStruct.implements = implements
+		}
+		if len(oneOfSchema.AllOf) != 0 {
+			for _, oneOf := range oneOfSchema.AllOf {
+				baseName := strings.Split(filepath.Base(oneOf.FromRef), ".")[0]
+				gen2, err := newGeneratedGraphQLFile(oneOf, baseName, packageName, false, args)
+				if err != nil {
+					return fmt.Errorf("failed to build generated struct: %w", err)
+				}
+				common = append(common, gen2)
+			}
 		}
 
 		// Must merge into this implementation the fields defined in the AllOf blocks

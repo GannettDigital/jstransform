@@ -20,7 +20,7 @@ const (
 // dereference parses JSON and replaces all $ref with the referenced data.
 // If $ref refers to a file schemaFromFile is called and in this way references in referenced files are handled
 // recursively along with other processing done by schemaFromFile.
-func dereference(schemaPath string, data json.RawMessage, oneOfType string) (json.RawMessage, error) {
+func dereference(schemaPath string, data json.RawMessage, oneOfType string, flatten bool) (json.RawMessage, error) {
 	refs, err := findRefs(data)
 	if err != nil {
 		return nil, fmt.Errorf("failed when finding refs: %v", err)
@@ -32,7 +32,7 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string) (jso
 			return nil, fmt.Errorf("failed to retrieve ref at path %v: %v", refPath, err)
 		}
 
-		resolved, err := resolveRef(ref, data, schemaPath, oneOfType)
+		resolved, err := resolveRef(ref, data, schemaPath, oneOfType, flatten)
 		if err != nil {
 			return nil, fmt.Errorf("failed to resolve ref %q at path %v: %v", ref, refPath, err)
 		}
@@ -91,7 +91,7 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string) (jso
 		return nil, fmt.Errorf("failed checking for remaining refs: %v", err)
 	}
 	if len(remaining) > 0 {
-		return dereference(schemaPath, data, oneOfType)
+		return dereference(schemaPath, data, oneOfType, flatten)
 	}
 
 	return data, nil
@@ -151,7 +151,7 @@ func findRefs(data json.RawMessage) ([][]string, error) {
 // The reference may refer to a definition within the given data or a file reference.
 // For files schemaPath is used to resolve relative references then SchemaFromFile is used to build the file.
 // oneOfType is used by schemaFromFile to select a specific oneOfType.
-func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType string) (json.RawMessage, error) {
+func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType string, flatten bool) (json.RawMessage, error) {
 	// TODO there is nothing here to stop circular references other than self references
 	var sourcePath, target string
 	splits := strings.SplitN(ref, "#", 2)
@@ -192,7 +192,12 @@ func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType s
 			source = data
 			break
 		}
-		schema, err := SchemaFromFile(refPath, oneOfType)
+		var schema *Schema
+		if !flatten {
+			schema, err = SchemaFromFileNoFlatten(refPath, oneOfType)
+		} else {
+			schema, err = SchemaFromFile(refPath, oneOfType)
+		}
 		if err != nil {
 			return nil, fmt.Errorf("failed to process reference file %q: %v", refPath, err)
 		}

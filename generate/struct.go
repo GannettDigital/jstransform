@@ -144,7 +144,7 @@ func newGeneratedGoFile(schema *jsonschema.Schema, name, packageName string, emb
 	gof.rootStruct.embededStructs = embeds
 
 	for _, all := range schema.AllOf {
-		if all.Embed {
+		if args.EmbedAllOf {
 			ref := strings.Split(filepath.Base(all.FromRef), ".")[0]
 			if newName, ok := args.StructNameMap[ref]; ok {
 				ref = newName

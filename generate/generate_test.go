@@ -218,6 +218,7 @@ func TestBuildStructs(t *testing.T) {
 				StructNameMap:          nil,
 				DescriptionAsStructTag: false,
 				NoNestedStructs:        true,
+				EmbedAllOf:             true,
 			},
 			files: []string{"simple_no_nested.go", "embedded.go"},
 		},
