@@ -193,10 +193,10 @@ func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType s
 			break
 		}
 		var schema *Schema
-		if !flatten {
-			schema, err = SchemaFromFileNoFlatten(refPath, oneOfType)
-		} else {
+		if flatten {
 			schema, err = SchemaFromFile(refPath, oneOfType)
+		} else {
+			schema, err = SchemaFromFileNoFlatten(refPath, oneOfType)
 		}
 		if err != nil {
 			return nil, fmt.Errorf("failed to process reference file %q: %v", refPath, err)

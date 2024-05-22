@@ -370,6 +370,7 @@ func writeEmbeddedStructFields(cfg avroConfig) {
 		return true
 	}, nil)
 
+	// Avoid re-processing and duplicating fields in the case that this struct is nested elsewhere.
 	cfg.excludeNamespace[structName] = true
 }
 
