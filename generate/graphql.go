@@ -184,14 +184,14 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 			}
 			generated.rootStruct.implements = implements
 		}
-		if len(oneOfSchema.AllOf) != 0 {
-			for _, oneOf := range oneOfSchema.AllOf {
-				baseName := strings.Split(filepath.Base(oneOf.FromRef), ".")[0]
-				gen2, err := newGeneratedGraphQLFile(oneOf, baseName, packageName, false, args)
+		if args.EmbedAllOf && len(oneOfSchema.AllOf) != 0 {
+			for _, allOf := range oneOfSchema.AllOf {
+				baseName := strings.Split(filepath.Base(allOf.FromRef), ".")[0]
+				allOfGen, err := newGeneratedGraphQLFile(allOf, baseName, packageName, false, args)
 				if err != nil {
 					return fmt.Errorf("failed to build generated struct: %w", err)
 				}
-				common = append(common, gen2)
+				common = append(common, allOfGen)
 			}
 		}
 

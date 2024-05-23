@@ -1,0 +1,16 @@
+{
+  "additionalProperties": false,
+  "description": "basic",
+  "type": "object",
+  "properties": {
+    "aField": {
+      "type": "string"
+    },
+    "bField": {
+      "type": "integer"
+    },
+    "cField": {
+      "type": "boolean"
+    }
+  }
+}

@@ -91,3 +91,33 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 		}
 	}
 }
+
+func TestStructToFilename(t *testing.T) {
+	tests := []struct {
+		description string
+		structName  string
+		wantPath    string
+	}{
+		{
+			description: "Simple",
+			structName:  "Simple",
+			wantPath:    "simple.go",
+		},
+		{
+			description: "CamelCase",
+			structName:  "CamelCase",
+			wantPath:    "camelCase.go",
+		},
+		{
+			description: "Snake_Case",
+			structName:  "Snake_Case",
+			wantPath:    "snake_Case.go",
+		},
+	}
+
+	for _, test := range tests {
+		if got := structToFilename(test.structName); got != test.wantPath {
+			t.Errorf("Test %q - got unexpected path %q", test.description, got)
+		}
+	}
+}

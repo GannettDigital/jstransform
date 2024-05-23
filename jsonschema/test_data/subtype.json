@@ -1,0 +1,18 @@
+{
+  "additionalProperties": false,
+  "description": "subtype",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "./subtypeAllOf.json"
+    }
+  ],
+  "properties": {
+    "gField": {
+      "type": "string"
+    },
+    "hField": {
+      "type": "string"
+    }
+  }
+}
