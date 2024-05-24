@@ -70,7 +70,9 @@ func (s *Schema) Validate(raw json.RawMessage) (bool, error) {
 // name minus any extension is compared to the value of the oneOfType argument and if they match that file is also
 // traversed. AnyOf fields are currently ignored.
 //
-// Any allOf references will be embedded as a Go struct rather than being flattened (merged) into one schema.
+// Any allOf references will be skipped and their properties will not be merged with the parent, except those
+// schemas with only oneOf/allOf references and no properties defined.
+// This allows for said allOf references to be embedded as a Go struct rather than being flattened into one model.
 //
 // Referenced files are recursively processed. At this time only definition and file references are supported.
 func SchemaFromFileNoFlatten(schemaPath, oneOfType string) (*Schema, error) {
