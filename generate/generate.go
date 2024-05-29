@@ -59,6 +59,7 @@ type BuildArgs struct {
 	StructNameMap          map[string]string
 	FieldNameMap           map[string]string
 	GraphQLTypeNameMap     map[string]string // Changes the "type ABC" name of GraphQL schema.
+	EmbedAllOf             bool
 }
 
 // BuildStructs is a backward-compatibility wrapper for BuildStructsWithArgs.
@@ -222,7 +223,13 @@ func buildStructFile(childPath, name, packageName string, embeds []string, args 
 	if !filepath.IsAbs(childPath) {
 		childPath = filepath.Join(filepath.Dir(args.SchemaPath), childPath)
 	}
-	schema, err := jsonschema.SchemaFromFile(childPath, name)
+	var schema *jsonschema.Schema
+	var err error
+	if args.EmbedAllOf {
+		schema, err = jsonschema.SchemaFromFileNoFlatten(childPath, name)
+	} else {
+		schema, err = jsonschema.SchemaFromFile(childPath, name)
+	}
 	if err != nil {
 		return "", err
 	}

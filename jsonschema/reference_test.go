@@ -98,7 +98,7 @@ func TestDereference(t *testing.T) {
 			t.Errorf("Test %q - failed to read json got file %q: %v", test.description, test.schemaPath, err)
 		}
 
-		gotJson, err = dereference(test.schemaPath, gotJson, "")
+		gotJson, err = dereference(test.schemaPath, gotJson, "", true)
 		if err != nil && !test.wantErr {
 			t.Errorf("Test %q - failed to dereference json file %q: %v", test.description, test.schemaPath, err)
 		}

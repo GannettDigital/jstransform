@@ -500,7 +500,7 @@ func mapFields(list *ast.FieldList, srcDir string) (map[string]*ast.Field, error
 				continue
 			}
 			embedName := t.Name
-			embedStruct, err := parseGoStruct(embedName, filepath.Join(srcDir, strings.ToLower(embedName)+".go"))
+			embedStruct, err := parseGoStruct(embedName, filepath.Join(srcDir, structToFilename(embedName)))
 			if err != nil {
 				return nil, fmt.Errorf("failed to parse embedded go struct %q: %v", embedName, err)
 			}
@@ -590,4 +590,12 @@ func writeCodeTemplate(src string, values map[string]string, path string) error 
 	}
 
 	return nil
+}
+
+// structToFilename will lowercase the first letter of the string to align with the typical
+// Go struct to file naming convention. E.G. GoModel = goModel.go
+func structToFilename(structName string) string {
+	s := strings.Split(structName, "")
+	s[0] = strings.ToLower(s[0])
+	return strings.Join(s, "") + ".go"
 }

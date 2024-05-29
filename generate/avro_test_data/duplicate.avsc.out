@@ -1,0 +1,83 @@
+{
+  "name": "Duplicate",
+  "type": "record",
+  "fields": [
+    {
+      "name": "AvroWriteTime",
+      "doc": "The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.",
+      "type": "long",
+      "logicalType": "timestamp-millis"
+    },
+    {
+      "name": "AvroDeleted",
+      "doc": "This is set to true when the Avro data is recording a delete in the source data.",
+      "default": false,
+      "type": "boolean"
+    },
+    {
+      "name": "height",
+      "namespace": "Basic",
+      "type": [
+        "null",
+        "long"
+      ]
+    },
+    {
+      "name": "visible",
+      "namespace": "Basic",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "name": "width",
+      "namespace": "Basic",
+      "type": [
+        "null",
+        "double"
+      ]
+    },
+    {
+      "name": "caption",
+      "namespace": "OneOfType",
+      "type": "string"
+    },
+    {
+      "name": "credit",
+      "namespace": "OneOfType",
+      "type": "string"
+    },
+    {
+      "name": "cutline",
+      "namespace": "OneOfType",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "datePhotoTaken",
+      "namespace": "OneOfType",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "orientation",
+      "namespace": "OneOfType",
+      "type": "string"
+    },
+    {
+      "name": "type",
+      "namespace": "OneOfType",
+      "type": "string"
+    },
+    {
+      "name": "anotherField",
+      "type": [
+        "null",
+        "string"
+      ]
+    }
+  ]
+}

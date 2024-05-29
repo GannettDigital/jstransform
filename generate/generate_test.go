@@ -209,6 +209,19 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"times.go"},
 		},
+		{
+			description: "embedded allOf",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "base.json"),
+				OutputDir:              "generated",
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: false,
+				NoNestedStructs:        true,
+				EmbedAllOf:             true,
+			},
+			files: []string{"simple_no_nested.go", "embedded.go"},
+		},
 	}
 
 	for _, test := range tests {

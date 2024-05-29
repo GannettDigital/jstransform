@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/format"
 	"io"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -141,6 +142,18 @@ func newGeneratedGoFile(schema *jsonschema.Schema, name, packageName string, emb
 
 	gof.rootStruct = gof.newGeneratedStruct(name, required)
 	gof.rootStruct.embededStructs = embeds
+
+	if args.EmbedAllOf {
+		for _, all := range schema.AllOf {
+			ref := strings.Split(filepath.Base(all.FromRef), ".")[0]
+			if newName, ok := args.StructNameMap[ref]; ok {
+				ref = newName
+			} else {
+				ref = exportedName(ref)
+			}
+			gof.rootStruct.embededStructs = append(gof.rootStruct.embededStructs, ref)
+		}
+	}
 
 	if err := jsonschema.Walk(schema, gof.walkFunc); err != nil {
 		return nil, fmt.Errorf("failed to walk schema for %q: %v", name, err)

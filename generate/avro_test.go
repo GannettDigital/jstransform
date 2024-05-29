@@ -71,6 +71,12 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 			goPath:      "./avro_test_data/times.go",
 			wantPath:    "./avro_test_data/times.avsc.out",
 		},
+		{
+			description: "Nested duplicate struct",
+			name:        "Duplicate",
+			goPath:      "./avro_test_data/duplicate.go",
+			wantPath:    "./avro_test_data/duplicate.avsc.out",
+		},
 	}
 
 	for _, test := range tests {

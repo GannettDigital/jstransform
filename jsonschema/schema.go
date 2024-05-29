@@ -19,6 +19,7 @@ type Instance struct {
 	AnyOf                []Instance                 `json:"anyOf,omitempty"` // TODO unsupported
 	Description          string                     `json:"description,omitempty"`
 	Definitions          json.RawMessage            `json:"definitions,omitempty"`
+	Embed                bool                       `json:"embed,omitempty"`
 	Format               string                     `json:"format,omitempty"`
 	FromRef              string                     `json:"fromRef,omitempty"`           // Added as a way of tracking the ref which was already expanded
 	GraphQLArguments     []string                   `json:"graphql-arguments,omitempty"` // For type="graphql-hydration" to also require query arguments.
@@ -64,13 +65,33 @@ func (s *Schema) Validate(raw json.RawMessage) (bool, error) {
 	return s.Validator.Validate(raw)
 }
 
+// SchemaFromFileNoFlatten parses a file at the given path and returns a schema based on its contents.
+// The function traverses allOf fields within the schema. For oneOf fields the reference base
+// name minus any extension is compared to the value of the oneOfType argument and if they match that file is also
+// traversed. AnyOf fields are currently ignored.
+//
+// Any allOf references will be skipped and their properties will not be merged with the parent, except those
+// schemas with only oneOf/allOf references and no properties defined.
+// This allows for said allOf references to be embedded as a Go struct rather than being flattened into one model.
+//
+// Referenced files are recursively processed. At this time only definition and file references are supported.
+func SchemaFromFileNoFlatten(schemaPath, oneOfType string) (*Schema, error) {
+	return schemaFromFile(schemaPath, oneOfType, false)
+}
+
 // SchemaFromFile parses a file at the given path and returns a schema based on its contents.
 // The function traverses allOf fields within the schema. For oneOf fields the reference base
 // name minus any extension is compared to the value of the oneOfType argument and if they match that file is also
 // traversed. AnyOf fields are currently ignored.
 //
+// Any properties defined in allOf references will be merged into the parent schema's properties.
+//
 // Referenced files are recursively processed. At this time only definition and file references are supported.
-func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
+func SchemaFromFile(schemaPath, oneOfType string) (*Schema, error) {
+	return schemaFromFile(schemaPath, oneOfType, true)
+}
+
+func schemaFromFile(schemaPath string, oneOfType string, flatten bool) (*Schema, error) {
 	data, err := os.ReadFile(schemaPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
@@ -81,7 +102,7 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	}
 
 	// dereferencing during walking is more efficient but more complicated so all dereferencing for a file is done immediately
-	data, err = dereference(schemaPath, data, oneOfType)
+	data, err = dereference(schemaPath, data, oneOfType, flatten)
 	if err != nil {
 		return nil, fmt.Errorf("failed to Dereference Schema: %v", err)
 	}
@@ -103,6 +124,11 @@ func SchemaFromFile(schemaPath string, oneOfType string) (*Schema, error) {
 	// that conflict. The legit use case for that is rare but it is in the spec. Rather than merge these the walk
 	// should go through each set of files but this makes the raw walking much more complicated.
 	for _, all := range sj.AllOf {
+		// If not flattening, check that the schema also has properties in order to avoid issues with schemas that only
+		// contain oneOf/allOf references.
+		if !flatten && s.Properties != nil {
+			continue
+		}
 		s.Properties = mergeProperties(s.Properties, all.Properties)
 		s.Required = append(s.Required, all.Required...)
 		if s.Items == nil {

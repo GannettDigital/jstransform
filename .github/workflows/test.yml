@@ -5,26 +5,33 @@ on: [push, pull_request]
 jobs:
   golang:
     env:
-      GO111MODULE: on
+      WORKFLOW_GO_VERSION: "1.22.3"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v2
+      - name: Checkout app repo
+        uses: actions/checkout@v4
         with:
-          go-version: '^1.15.5'
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
+          ref: ${{ github.event.inputs.version }}
+      - name: Setup go
+        uses: actions/setup-go@v5
         with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-$GITHUB_REPOSITORY-${{ hashFiles('**/go.mod') }}
+          go-version: "~${{ env.WORKFLOW_GO_VERSION }}"
+      - name: Build go cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       - name: go vet
         run: go vet ./...
-      - name: go test race
+      - name: go test
         run: go test -v -race -parallel 4 -coverprofile=covprofile -covermode=atomic ./...
-      - name: install goveralls
-        env:
-          GO111MODULE: off
-        run: go get github.com/mattn/goveralls
-      - name: send coverage
+      - name: Install goveralls
+        run: go install github.com/mattn/goveralls@latest
+      - name: Send coverage
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: goveralls -coverprofile=covprofile -service=github

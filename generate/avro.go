@@ -26,10 +26,11 @@ const (
 )
 
 type avroConfig struct {
-	dir           string
-	excludeFields map[string]bool
-	namespace     []string
-	writer        io.Writer
+	dir              string
+	excludeFields    map[string]bool
+	namespace        []string
+	writer           io.Writer
+	excludeNamespace map[string]bool
 }
 
 type normalizeNamer struct {
@@ -121,8 +122,9 @@ func buildAvroSchemaFile(name, goSourcePath string, pretty bool) (string, error)
 	}
 
 	cfg := avroConfig{
-		dir:    dir,
-		writer: writer,
+		dir:              dir,
+		writer:           writer,
+		excludeNamespace: make(map[string]bool),
 	}
 
 	fmt.Fprint(cfg.writer, "{")
@@ -296,6 +298,9 @@ func writeAvroField(cfg avroConfig, f *ast.Field, fieldMap map[string]bool) bool
 		if !ok {
 			return false
 		}
+		if cfg.excludeNamespace[t.Name] {
+			return false
+		}
 		newcfg := cfg
 		newcfg.namespace = append(cfg.namespace, t.Name)
 		newcfg.excludeFields = fieldMap
@@ -350,7 +355,7 @@ func writeAvroFields(cfg avroConfig, list *ast.FieldList) {
 
 func writeEmbeddedStructFields(cfg avroConfig) {
 	structName := cfg.namespace[len(cfg.namespace)-1]
-	spec, err := parseGoStruct(structName, filepath.Join(cfg.dir, strings.ToLower(structName)+".go"))
+	spec, err := parseGoStruct(structName, filepath.Join(cfg.dir, structToFilename(structName)))
 	if err != nil {
 		fmt.Fprint(cfg.writer, `{"type":"embedded struct not found"}`)
 		return
@@ -364,6 +369,9 @@ func writeEmbeddedStructFields(cfg avroConfig) {
 		}
 		return true
 	}, nil)
+
+	// Avoid re-processing and duplicating fields in the case that this struct is nested elsewhere.
+	cfg.excludeNamespace[structName] = true
 }
 
 // convertToAvroType returns the avro type definition for a go type.

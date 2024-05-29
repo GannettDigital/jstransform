@@ -1,0 +1,16 @@
+{
+  "additionalProperties": false,
+  "description": "subtypeAllOf",
+  "type": "object",
+  "properties": {
+    "dField": {
+      "type": "integer"
+    },
+    "eField": {
+      "type": "string"
+    },
+    "fField": {
+      "type": "string"
+    }
+  }
+}
