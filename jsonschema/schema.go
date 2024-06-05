@@ -147,6 +147,12 @@ func schemaFromFile(schemaPath string, oneOfType string, flatten bool) (*Schema,
 		if s.Items == nil {
 			s.Items = one.Items
 		}
+		if flatten {
+			for _, a := range one.AllOf {
+				s.Properties = mergeProperties(s.Properties, a.Properties)
+				s.Required = append(s.Required, a.Required...)
+			}
+		}
 	}
 
 	return &s, nil
