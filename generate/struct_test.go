@@ -478,6 +478,11 @@ func TestGoType(t *testing.T) {
 		ef := extractedField{
 			array:    test.array,
 			jsonType: test.jsonType,
+			fields: extractedFields{
+				"string": {
+					jsonType: test.jsonType,
+				},
+			},
 		}
 		got := ef.goType(test.required, test.pointers)
 		if got != test.want {
