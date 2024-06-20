@@ -418,8 +418,12 @@ func (ef *extractedField) goType(required, pointers bool) string {
 			customType = true
 		}
 	case "object":
-		// This only happens with nested structures.
-		goType = "struct"
+		if len(ef.fields) == 0 {
+			goType = "map[string]string"
+		} else {
+			// This only happens with nested structures.
+			goType = "struct"
+		}
 	default:
 		goType = ef.jsonType
 		customType = true
