@@ -375,6 +375,7 @@ func TestGoType(t *testing.T) {
 		array       bool
 		required    bool
 		pointers    bool
+		emptyObject bool
 		want        string
 	}{
 		{
@@ -433,6 +434,12 @@ func TestGoType(t *testing.T) {
 			want:        "[]struct",
 		},
 		{
+			description: "JSON object",
+			jsonType:    "object",
+			emptyObject: true,
+			want:        "map[string]string",
+		},
+		{
 			description: "JSON string date-time",
 			jsonType:    "date-time",
 			array:       false,
@@ -478,11 +485,13 @@ func TestGoType(t *testing.T) {
 		ef := extractedField{
 			array:    test.array,
 			jsonType: test.jsonType,
-			fields: extractedFields{
+		}
+		if !test.emptyObject {
+			ef.fields = extractedFields{
 				"string": {
 					jsonType: test.jsonType,
 				},
-			},
+			}
 		}
 		got := ef.goType(test.required, test.pointers)
 		if got != test.want {
