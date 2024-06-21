@@ -375,68 +375,118 @@ func TestGoType(t *testing.T) {
 		array       bool
 		required    bool
 		pointers    bool
-		emptyObject bool
+		fields      extractedFields
 		want        string
 	}{
 		{
 			description: "JSON boolean",
 			jsonType:    "boolean",
-			want:        "bool",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "bool",
 		},
 		{
 			description: "JSON boolean",
 			jsonType:    "boolean",
 			array:       true,
-			want:        "[]bool",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "[]bool",
 		},
 		{
 			description: "JSON integer",
 			jsonType:    "integer",
-			want:        "int64",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "int64",
 		},
 		{
 			description: "JSON integer",
 			jsonType:    "integer",
 			array:       true,
-			want:        "[]int64",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "[]int64",
 		},
 		{
 			description: "JSON number",
 			jsonType:    "number",
-			want:        "float64",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "float64",
 		},
 		{
 			description: "JSON number",
 			jsonType:    "number",
 			array:       true,
-			want:        "[]float64",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "[]float64",
 		},
 		{
 			description: "JSON string",
 			jsonType:    "string",
-			want:        "string",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "string",
 		},
 		{
 			description: "JSON string",
 			jsonType:    "string",
 			array:       true,
-			want:        "[]string",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "[]string",
 		},
 		{
 			description: "JSON object",
 			jsonType:    "object",
-			want:        "struct",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "struct",
 		},
 		{
 			description: "JSON object",
 			jsonType:    "object",
 			array:       true,
-			want:        "[]struct",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "[]struct",
 		},
 		{
-			description: "JSON object",
+			description: "JSON empty object to map",
 			jsonType:    "object",
-			emptyObject: true,
+			fields:      nil,
 			want:        "map[string]string",
 		},
 		{
@@ -444,40 +494,70 @@ func TestGoType(t *testing.T) {
 			jsonType:    "date-time",
 			array:       false,
 			required:    true,
-			want:        "time.Time",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "time.Time",
 		},
 		{
 			description: "JSON string date-time array",
 			jsonType:    "date-time",
 			array:       true,
 			required:    true,
-			want:        "[]time.Time",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "[]time.Time",
 		},
 		{
 			description: "JSON string date-time, omitempty",
 			jsonType:    "date-time",
 			array:       false,
-			want:        "time.Time",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "time.Time",
 		},
 		{
 			description: "JSON string date-time array, omitempty",
 			jsonType:    "date-time",
 			array:       true,
-			want:        "[]time.Time",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "[]time.Time",
 		},
 		{
 			description: "JSON string date-time, omitempty, pointers",
 			jsonType:    "date-time",
 			array:       false,
 			pointers:    true,
-			want:        "*time.Time",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "*time.Time",
 		},
 		{
 			description: "JSON string date-time array, omitempty, pointers",
 			jsonType:    "date-time",
 			array:       true,
 			pointers:    true,
-			want:        "[]*time.Time",
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "[]*time.Time",
 		},
 	}
 
@@ -485,13 +565,7 @@ func TestGoType(t *testing.T) {
 		ef := extractedField{
 			array:    test.array,
 			jsonType: test.jsonType,
-		}
-		if !test.emptyObject {
-			ef.fields = extractedFields{
-				"string": {
-					jsonType: test.jsonType,
-				},
-			}
+			fields:   test.fields,
 		}
 		got := ef.goType(test.required, test.pointers)
 		if got != test.want {

@@ -418,7 +418,8 @@ func (ef *extractedField) goType(required, pointers bool) string {
 			customType = true
 		}
 	case "object":
-		if len(ef.fields) == 0 {
+		// TODO: use additionalProperties JSON schema value to more intelligently create the target type
+		if len(ef.fields) == 0 || ef.fields == nil {
 			goType = "map[string]string"
 		} else {
 			// This only happens with nested structures.
