@@ -15,6 +15,13 @@
       "type": "boolean"
     },
     {
+      "name": "aMap",
+      "type": {
+        "type": "map",
+        "values": "string"
+      }
+    },
+    {
       "name": "contributors",
       "type": {
         "type": "array",

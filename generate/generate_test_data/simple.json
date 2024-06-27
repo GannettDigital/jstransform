@@ -26,6 +26,11 @@
         }
       }
     },
+    "aMap": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {}
+    },
     "contributors": {
       "type": "array",
       "items": {
