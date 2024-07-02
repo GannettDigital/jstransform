@@ -413,6 +413,13 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 		} else {
 			return fmt.Sprintf(`%q`, typeName)
 		}
+	case *ast.MapType:
+		keyType := convertToAvroType(cfg, t.Key, name, false)
+		if reflect.TypeOf(keyType).Kind() != reflect.String {
+			return "key type not string"
+		}
+		valueType := convertToAvroType(cfg, t.Value, name, false)
+		return fmt.Sprintf(`{"type": "map", "values": %s}`, valueType)
 	case *ast.ArrayType:
 		itemType := convertToAvroType(cfg, t.Elt, name, false)
 		if strings.HasPrefix(itemType, "{") {
