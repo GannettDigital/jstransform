@@ -419,6 +419,7 @@ func (ef *extractedField) goType(required, pointers bool) string {
 		}
 	case "object":
 		// TODO: use additionalProperties JSON schema value to more intelligently create the target type
+		// when nested struct
 		if len(ef.fields) == 0 || ef.fields == nil {
 			goType = "map[string]string"
 		} else {
@@ -426,8 +427,14 @@ func (ef *extractedField) goType(required, pointers bool) string {
 			goType = "struct"
 		}
 	default:
-		goType = ef.jsonType
-		customType = true
+		// TODO: use additionalProperties JSON schema value to more intelligently create the target type\
+		// when no nested struct
+		if len(ef.fields) == 0 || ef.fields == nil {
+			goType = "map[string]string"
+		} else {
+			goType = ef.jsonType
+			customType = true
+		}
 	}
 	if !customType && ef.nullable {
 		goType = "*" + goType

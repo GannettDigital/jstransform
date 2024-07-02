@@ -5,11 +5,12 @@ package generated
 import "time"
 
 type Simple_no_nested struct {
-	Contributors []Simple_no_nestedContributors `json:"contributors,omitempty"`
-	Height       int64                          `json:"height,omitempty"`
-	SomeDateObj  Simple_no_nestedSomeDateObj    `json:"someDateObj,omitempty"`
-	Visible      bool                           `json:"visible,omitempty"`
-	Width        float64                        `json:"width,omitempty"`
+	AMap         map[string]string   `json:"aMap,omitempty"`
+	Contributors []map[string]string `json:"contributors,omitempty"`
+	Height       int64               `json:"height,omitempty"`
+	SomeDateObj  map[string]string   `json:"someDateObj,omitempty"`
+	Visible      bool                `json:"visible,omitempty"`
+	Width        float64             `json:"width,omitempty"`
 }
 
 type Simple_no_nestedContributors struct {

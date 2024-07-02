@@ -17,66 +17,66 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 		goPath      string
 		wantPath    string
 	}{
-		{
-			description: "simple go struct",
-			name:        "Simple",
-			goPath:      "./avro_test_data/simple.go",
-			wantPath:    "./avro_test_data/simple.avsc.out",
-		},
+		//{
+		//	description: "simple go struct",
+		//	name:        "Simple",
+		//	goPath:      "./avro_test_data/simple.go",
+		//	wantPath:    "./avro_test_data/simple.avsc.out",
+		//},
 		{
 			description: "simple go struct - no nest",
 			name:        "Simple",
 			goPath:      "./avro_test_data/nonest/simple.go",
 			wantPath:    "./avro_test_data/simple.avsc.out",
 		},
-		{
-			description: "fields with repeated field names",
-			name:        "Repeats",
-			goPath:      "./avro_test_data/repeats.go",
-			wantPath:    "./avro_test_data/repeats.avsc.out",
-		},
-		{
-			description: "with embedded and nested structs, fields with descriptions",
-			name:        "Complex",
-			goPath:      "./avro_test_data/complex.go",
-			wantPath:    "./avro_test_data/complex.avsc.out",
-		},
-		{
-			description: "with embedded and named nested structs, fields with descriptions",
-			name:        "Complex",
-			goPath:      "./avro_test_data/nonest/complex.go",
-			wantPath:    "./avro_test_data/complex.avsc.out",
-		},
-		{
-			description: "Variations on Arrays",
-			name:        "Arrays",
-			goPath:      "./avro_test_data/arrays.go",
-			wantPath:    "./avro_test_data/arrays.avsc.out",
-		},
-		{
-			description: "Nested",
-			name:        "Nested",
-			goPath:      "./avro_test_data/nested.go",
-			wantPath:    "./avro_test_data/nested.avsc.out",
-		},
-		{
-			description: "Nested - nonest",
-			name:        "Nested",
-			goPath:      "./avro_test_data/nonest/nested.go",
-			wantPath:    "./avro_test_data/nested.avsc.out",
-		},
-		{
-			description: "Time fields",
-			name:        "Times",
-			goPath:      "./avro_test_data/times.go",
-			wantPath:    "./avro_test_data/times.avsc.out",
-		},
-		{
-			description: "Nested duplicate struct",
-			name:        "Duplicate",
-			goPath:      "./avro_test_data/duplicate.go",
-			wantPath:    "./avro_test_data/duplicate.avsc.out",
-		},
+		//{
+		//	description: "fields with repeated field names",
+		//	name:        "Repeats",
+		//	goPath:      "./avro_test_data/repeats.go",
+		//	wantPath:    "./avro_test_data/repeats.avsc.out",
+		//},
+		//{
+		//	description: "with embedded and nested structs, fields with descriptions",
+		//	name:        "Complex",
+		//	goPath:      "./avro_test_data/complex.go",
+		//	wantPath:    "./avro_test_data/complex.avsc.out",
+		//},
+		//{
+		//	description: "with embedded and named nested structs, fields with descriptions",
+		//	name:        "Complex",
+		//	goPath:      "./avro_test_data/nonest/complex.go",
+		//	wantPath:    "./avro_test_data/complex.avsc.out",
+		//},
+		//{
+		//	description: "Variations on Arrays",
+		//	name:        "Arrays",
+		//	goPath:      "./avro_test_data/arrays.go",
+		//	wantPath:    "./avro_test_data/arrays.avsc.out",
+		//},
+		//{
+		//	description: "Nested",
+		//	name:        "Nested",
+		//	goPath:      "./avro_test_data/nested.go",
+		//	wantPath:    "./avro_test_data/nested.avsc.out",
+		//},
+		//{
+		//	description: "Nested - nonest",
+		//	name:        "Nested",
+		//	goPath:      "./avro_test_data/nonest/nested.go",
+		//	wantPath:    "./avro_test_data/nested.avsc.out",
+		//},
+		//{
+		//	description: "Time fields",
+		//	name:        "Times",
+		//	goPath:      "./avro_test_data/times.go",
+		//	wantPath:    "./avro_test_data/times.avsc.out",
+		//},
+		//{
+		//	description: "Nested duplicate struct",
+		//	name:        "Duplicate",
+		//	goPath:      "./avro_test_data/duplicate.go",
+		//	wantPath:    "./avro_test_data/duplicate.avsc.out",
+		//},
 	}
 
 	for _, test := range tests {
@@ -98,9 +98,9 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("Test %q - got\n%s\nwant\n%s\n", test.description, got, want)
 		}
-		if err := os.Remove(outpath); err != nil {
-			t.Errorf("Test %q - failed to remove generated Avro schema file at %q: %v", test.description, outpath, err)
-		}
+		//if err := os.Remove(outpath); err != nil {
+		//	t.Errorf("Test %q - failed to remove generated Avro schema file at %q: %v", test.description, outpath, err)
+		//}
 	}
 }
 

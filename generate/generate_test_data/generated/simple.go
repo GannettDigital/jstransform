@@ -5,6 +5,7 @@ package generated
 import "time"
 
 type Simple struct {
+	AMap         map[string]string `json:"aMap,omitempty"`
 	Contributors []struct {
 		ContributorId string `json:"contributorId,omitempty"`
 		Id            string `json:"id"`
