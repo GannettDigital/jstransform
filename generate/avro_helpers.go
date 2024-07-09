@@ -292,6 +292,14 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 		}, nil
 	case *ast.StructType: // This handles anonymous structs in the Avro struct but the generated code never has those
 		return mappedFields{}, errors.New("anonymous structs in the Avro struct are not handled")
+	case *ast.MapType:
+		if _, ok := generatedField.Type.(*ast.MapType); !ok {
+			return mappedFields{}, fmt.Errorf("avro type is map but generated isn't for field %q", name)
+		}
+		if ptr, ok := f.Value.(*ast.StarExpr); ok {
+			fm.generateFieldValue(name, prefix, ptr.X, generatedField)
+		}
+		return fm.generateFieldValue(name, prefix, f.Value, generatedField)
 	case *ast.ArrayType:
 		if _, ok := generatedField.Type.(*ast.ArrayType); !ok {
 			return mappedFields{}, fmt.Errorf("avro type is array but generated isn't for field %q", name)
