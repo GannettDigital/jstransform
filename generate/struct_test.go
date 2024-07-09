@@ -223,7 +223,8 @@ func TestExtractedField_Write(t *testing.T) {
 
 	for _, test := range tests {
 		buf := &bytes.Buffer{}
-		if err := test.ef.write(buf, test.prefix, test.required, test.descriptionAsStructTag, false, nil); err != nil {
+		emptyMap := make(map[string]*generatedStruct)
+		if err := test.ef.write(buf, test.prefix, test.required, test.descriptionAsStructTag, false, nil, emptyMap); err != nil {
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
 		}
 		if got, want := string(buf.Bytes()), test.want; got != want {
@@ -561,7 +562,8 @@ func TestGoType(t *testing.T) {
 			jsonType: test.jsonType,
 			fields:   test.fields,
 		}
-		got := ef.goType(test.required, test.pointers)
+		emptyMap := make(map[string]*generatedStruct)
+		got := ef.goType(test.required, test.pointers, emptyMap)
 		if got != test.want {
 			t.Errorf("Test %q - got %q, want %q", test.description, got, test.want)
 		}

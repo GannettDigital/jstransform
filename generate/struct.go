@@ -30,7 +30,7 @@ type extractedField struct {
 // write outputs the Golang representation of this field to the writer with prefix before each line.
 // It handles inline structs by calling this method recursively adding a new \t to the prefix for each layer.
 // If required is set to false 'omitempty' is added in the JSON struct tag for the field.
-func (ef *extractedField) write(w io.Writer, prefix string, required, descriptionAsStructTag, pointers bool, excludeNested map[string]bool) error {
+func (ef *extractedField) write(w io.Writer, prefix string, required, descriptionAsStructTag, pointers bool, excludeNested map[string]bool, nestedStructs map[string]*generatedStruct) error {
 	var omitempty string
 	if !required {
 		omitempty = ",omitempty"
@@ -50,7 +50,7 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 		}
 	}
 
-	fieldGoType := ef.goType(required, pointers)
+	fieldGoType := ef.goType(required, pointers, nestedStructs)
 	if excludeNested[fieldGoType] || fieldGoType == "[]" {
 		// Sometimes the schema has only GraphQL hydration fields at a particular level.
 		// `excludeNested` ignores objects.
@@ -69,7 +69,7 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 
 	for _, field := range ef.fields.Sorted() {
 		fieldRequired := ef.requiredFields[field.jsonName]
-		if err := field.write(w, prefix+"\t", fieldRequired, descriptionAsStructTag, pointers, excludeNested); err != nil {
+		if err := field.write(w, prefix+"\t", fieldRequired, descriptionAsStructTag, pointers, excludeNested, nestedStructs); err != nil {
 			return fmt.Errorf("failed writing field %q: %v", field.name, err)
 		}
 	}
@@ -270,7 +270,7 @@ func (gof *goFile) write(w io.Writer) error {
 		if _, err := buf.Write([]byte("\n\n")); err != nil {
 			return fmt.Errorf("failed writing struct %q: %v", s.name, err)
 		}
-		if err := s.write(buf, excludeNested); err != nil {
+		if err := s.write(buf, excludeNested, gof.nestedStructs); err != nil {
 			return fmt.Errorf("failed writing struct %q: %v", s.name, err)
 		}
 	}
@@ -294,7 +294,7 @@ type generatedStruct struct {
 }
 
 // write will write the generated file to the given io.Writer.
-func (gen *generatedStruct) write(w io.Writer, excludeNested map[string]bool) error {
+func (gen *generatedStruct) write(w io.Writer, excludeNested map[string]bool, nestedStructs map[string]*generatedStruct) error {
 	embeds := strings.Join(gen.embededStructs, "\n")
 	if embeds != "" {
 		embeds += "\n\n"
@@ -305,7 +305,7 @@ func (gen *generatedStruct) write(w io.Writer, excludeNested map[string]bool) er
 
 	for _, field := range gen.fields.Sorted() {
 		req := gen.requiredFields[field.jsonName]
-		if err := field.write(w, "\t", req, gen.args.DescriptionAsStructTag, gen.args.Pointers, excludeNested); err != nil {
+		if err := field.write(w, "\t", req, gen.args.DescriptionAsStructTag, gen.args.Pointers, excludeNested, nestedStructs); err != nil {
 			return fmt.Errorf("failed writing field %q: %v", field.name, err)
 		}
 	}
@@ -398,7 +398,7 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 // If the JSON Schema had a type of "string" and a format of "date-time" it is expected the input jsonType will be
 // "date-time".
 // Non-required times are added as pointers to allow for their values to missing go marshalled JSON.
-func (ef *extractedField) goType(required, pointers bool) string {
+func (ef *extractedField) goType(required, pointers bool, nestedStructs map[string]*generatedStruct) string {
 	// Simple types aren't pointers unless explicitly typed to nullable.
 	var goType string
 	var customType bool
@@ -429,7 +429,7 @@ func (ef *extractedField) goType(required, pointers bool) string {
 	default:
 		// TODO: use additionalProperties JSON schema value to more intelligently create the target type\
 		// when no nested struct
-		if (len(ef.fields) == 0 || ef.fields == nil) && !ef.array {
+		if ns := nestedStructs[ef.jsonType]; ns != nil && len(ns.fields) == 0 && !ns.array {
 			goType = "map[string]string"
 		} else {
 			goType = ef.jsonType
