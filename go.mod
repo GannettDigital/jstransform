@@ -1,8 +1,8 @@
 module github.com/GannettDigital/jstransform
 
-go 1.21
+go 1.22
 
-toolchain go1.21.0
+toolchain go1.22.0
 
 require (
 	github.com/GannettDigital/PaesslerAG_jsonpath v0.0.0-20230913165611-a0c86cbdaddb
