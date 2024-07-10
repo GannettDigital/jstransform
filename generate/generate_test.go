@@ -222,6 +222,18 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"simple_no_nested.go", "embedded.go"},
 		},
+		{
+			description: "simple map",
+			buildArgs: BuildArgs{
+				SchemaPath:             filepath.Join(testdir, "simple_map.json"),
+				OutputDir:              "generated",
+				GenerateMessagePack:    false,
+				StructNameMap:          nil,
+				DescriptionAsStructTag: false,
+				NoNestedStructs:        true,
+			},
+			files: []string{"simple_map.go"},
+		},
 	}
 
 	for _, test := range tests {
