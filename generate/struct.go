@@ -420,7 +420,7 @@ func (ef *extractedField) goType(required, pointers bool, nestedStructs map[stri
 	case "object":
 		// TODO: use additionalProperties JSON schema value to more intelligently create the target type
 		// when nested struct
-		if len(ef.fields) == 0 || ef.fields == nil {
+		if len(ef.fields) == 0 {
 			goType = "map[string]string"
 		} else {
 			// This only happens with nested structures.
