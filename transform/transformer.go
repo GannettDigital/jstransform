@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/GannettDigital/jsonparser"
 	"github.com/GannettDigital/jstransform/jsonschema"
 
 	"github.com/antchfx/xmlquery"
@@ -214,7 +215,15 @@ func (tr *Transformer) walker(path string, value json.RawMessage) error {
 	var iTransformer instanceTransformer
 	switch instanceType {
 	case "object":
-		iTransformer, err = newObjectTransformer(path, tr.transformIdentifier, value, tr.format)
+		properties, _, _, err := jsonparser.Get(value, "properties")
+		if err != nil {
+			return fmt.Errorf("failed to extract properties: %v", err)
+		}
+		if string(properties) == "{}" { // Checks for empty "properties"
+			iTransformer, err = newScalarTransformer(path, tr.transformIdentifier, value, instanceType, tr.format)
+		} else {
+			iTransformer, err = newObjectTransformer(path, tr.transformIdentifier, value, tr.format)
+		}
 	case "array":
 		iTransformer, err = newArrayTransformer(path, tr.transformIdentifier, value, tr.format)
 	default:
