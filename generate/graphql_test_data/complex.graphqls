@@ -27,6 +27,9 @@ interface Complex @goModel(model: ".Complex") {
 
   datePhotoTaken: DateTime
 
+  "empty map"
+  inlineLink: Any
+
   orientation: String!
 
   originalSize	(! {
