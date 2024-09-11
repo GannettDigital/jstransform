@@ -83,6 +83,12 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 		return fmt.Errorf("failed writing GraphQL: %w", err)
 	}
 
+	if args.ScalarAny {
+		if _, err := fmt.Fprintf(gfile, "\n%s\n", scalarAny); err != nil {
+			return fmt.Errorf("failed writing GraphQL: %w", err)
+		}
+	}
+
 	if !filepath.IsAbs(schemaPath) {
 		schemaPath = filepath.Join(filepath.Dir(args.SchemaPath), schemaPath)
 	}
@@ -475,6 +481,13 @@ func (gof *goGQL) walkFunc(path string, i jsonschema.Instance) error {
 			gqlTypeList = append(gqlTypeList, "null")
 		}
 
+		// Special case for when the properties field of an object is `{}`. Put `Any` instead of the struct name and
+		// ignore the empty child struct.
+		if len(i.Properties) == 0 {
+			gqlTypeList = []string{"Any"}
+			obj.buildType = "ignored"
+		}
+
 		return gen.addField([]string{name}, gqlTypeList, jsonschema.Instance{Description: i.Description, Type: []string{structType}, Target: i.Target, GraphQLArguments: i.GraphQLArguments})
 	}
 
@@ -653,6 +666,11 @@ func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst
 			gen.fieldOrder = append(gen.fieldOrder, totalName)
 			gen.requiredFields[totalName] = true
 		case "object":
+			// Special case for when the properties field of an object is `{}`. Put `Any` instead of an empty field name.
+			if len(inst.Properties) == 0 {
+				f.jsonType = "Any"
+			}
+
 			f.requiredFields = make(map[string]bool, len(inst.Required))
 			for _, name := range inst.Required {
 				f.requiredFields[name] = true
@@ -702,7 +720,9 @@ func (ef *gqlExtractedField) graphqlType(required, pointers bool) (string, strin
 		graphqlType = ef.jsonType
 	}
 	if graphqlType != "DateTime" && (regularType && !ef.nullable || required || !pointers) {
-		graphqlType += "!"
+		if ef.jsonType != "Any" {
+			graphqlType += "!"
+		}
 	}
 
 	var graphqlArguments string

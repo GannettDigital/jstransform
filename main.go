@@ -53,6 +53,7 @@ func main() {
 	genAvro := flag.Bool("avro", false, "generate Avro schema and serialization methods")
 	genMessagePack := flag.Bool("msgp", false, "generate MessagePack serialization methods")
 	genGraphQL := flag.Bool("graphql", false, "generate GraphQL schema")
+	scalarAny := flag.Bool("scalarAny", false, "write `scalar Any` to the top of the graphql file")
 	outputPathGraphQL := flag.String("outputPathGraphQL", "", "The output path where to write GraphQL schema.")
 	importPath := flag.String("importPath", "", "The import path used as the base for generated code, required for Avro")
 
@@ -107,6 +108,7 @@ func main() {
 		FieldNameMap:           renameFields.kv,
 		GraphQLTypeNameMap:     renameGQLType.kv,
 		EmbedAllOf:             *embedAllOf,
+		ScalarAny:              *scalarAny,
 	}); err != nil {
 		fmt.Printf("Golang Struct generation failed: %v\n", err)
 		os.Exit(4)

@@ -328,6 +328,13 @@
                     ]
                 }
             }
+        },
+        "inlineLink": {
+            "$id":"/properties/attributes/properties/inlineLink",
+            "type": "object",
+            "description": "empty map",
+            "additionalProperties": true,
+            "properties": {}
         }
     },
     "required": [

@@ -3,6 +3,7 @@ package generate
 // For now a direct copy of 'struct_test.go' tests.
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"reflect"
 	"strings"
@@ -77,7 +78,10 @@ func TestGraphQLAddField(t *testing.T) {
 			description: "Struct field",
 			fields:      make(map[string]*gqlExtractedField),
 			tree:        []string{"structfield"},
-			instance:    jsonschema.Instance{Type: []string{"object"}},
+			instance: jsonschema.Instance{
+				Type:       []string{"object"},
+				Properties: map[string]json.RawMessage{"test": nil},
+			},
 			want: gqlExtractedFields{
 				"structfield": &gqlExtractedField{
 					name:           "Structfield",
@@ -375,8 +379,9 @@ func TestGraphQLGeneratedStruct(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(got, want) {
+			_ = os.WriteFile(test.wantFilePath+".got", got, 0600)
 			t.Errorf("Test %q\nwant: %s\ngot:  %s", test.description, want, got)
-			t.Errorf("Test %q\nwant: %v\ngot:  %v", test.description, []byte(want), []byte(got))
+			t.Errorf("Test %q\nwant: %v\ngot:  %v", test.description, want, got)
 			lwant := strings.Split(string(want), "\n")
 			lgot := strings.Split(string(got), "\n")
 			for idx := range lwant {
@@ -385,6 +390,8 @@ func TestGraphQLGeneratedStruct(t *testing.T) {
 					t.Logf("line %d\nwant: %v\ngot:  %v", idx, []byte(lwant[idx]), []byte(lgot[idx]))
 				}
 			}
+		} else {
+			_ = os.Remove(test.wantFilePath + ".got")
 		}
 	}
 }
