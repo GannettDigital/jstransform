@@ -127,7 +127,17 @@ func convertDateTime(raw interface{}) (interface{}, error) {
 		if t == "" {
 			return nil, nil
 		}
-		return time.Parse(time.RFC3339, t)
+
+		tParsed, err := time.Parse(time.RFC3339, t)
+		if err != nil {
+			return nil, err
+		}
+
+		if tParsed.IsZero() {
+			return nil, nil
+		}
+
+		return tParsed, nil
 	case int:
 		return time.Unix(int64(t), 0).UTC(), nil
 	case float64:
