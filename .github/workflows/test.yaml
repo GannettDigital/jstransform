@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   golang:
     env:
-      WORKFLOW_GO_VERSION: "1.22.3"
+      WORKFLOW_GO_VERSION: "1.23.4"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout app repo
