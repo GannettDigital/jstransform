@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAddField(t *testing.T) {
@@ -206,7 +208,7 @@ func TestExtractedField_Write(t *testing.T) {
 		{
 			description: "Write struct",
 			ef:          &extractedField{name: "Field", jsonName: "field", jsonType: "object", fields: extractedFields{"a": a, "b": b}},
-			want:        "Field\tstruct {\n\tA\t[]string\t`json:\"a,omitempty\"`\n\tB\tbool\t`json:\"b,omitempty\"`\n\t}\t`json:\"field,omitempty\"`\n",
+			want:        "Field\tstruct {\n\tA\t[]string\t`json:\"a,omitempty\"`\n\tB\tbool\t`json:\"b,omitempty\"`\n\t}\t`json:\"field,omitzero\"`\n",
 		},
 		{
 			description: "Write struct, required children",
@@ -217,7 +219,7 @@ func TestExtractedField_Write(t *testing.T) {
 				fields:         extractedFields{"a": a, "b": b},
 				requiredFields: map[string]bool{"a": true, "b": true},
 			},
-			want: "Field\tstruct {\n\tA\t[]string\t`json:\"a\"`\n\tB\tbool\t`json:\"b\"`\n\t}\t`json:\"field,omitempty\"`\n",
+			want: "Field\tstruct {\n\tA\t[]string\t`json:\"a\"`\n\tB\tbool\t`json:\"b\"`\n\t}\t`json:\"field,omitzero\"`\n",
 		},
 	}
 
@@ -363,6 +365,7 @@ func TestGeneratedStruct(t *testing.T) {
 			t.Fatalf("Test %q - failed to read result file: %v", test.description, err)
 		}
 
+		assert.Equal(t, string(want), string(got), test.description)
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, want)
 		}

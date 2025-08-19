@@ -13,7 +13,7 @@ type TotallySimple struct {
 	Height      int64 `json:"height,omitempty"`
 	SomeDateObj struct {
 		Dates []time.Time `json:"dates,omitempty"`
-	} `json:"someDateObj,omitempty"`
+	} `json:"someDateObj,omitzero"`
 	Type    string  `json:"type"`
 	Visible bool    `json:"visible,omitempty"`
 	Width   float64 `json:"width,omitempty"`

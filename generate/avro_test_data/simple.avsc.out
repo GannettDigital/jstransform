@@ -54,27 +54,24 @@
     },
     {
       "name": "someDateObj",
-      "type": [
-        "null",
-        {
-          "name": "someDateObj_record",
-          "namespace": "someDateObj",
-          "type": "record",
-          "fields": [
-            {
-              "name": "dates",
-              "namespace": "someDateObj",
-              "type": {
-                "type": "array",
-                "items": {
-                  "type": "long",
-                  "logicalType": "timestamp-millis"
-                }
+      "type": {
+        "name": "someDateObj_record",
+        "namespace": "someDateObj",
+        "type": "record",
+        "fields": [
+          {
+            "name": "dates",
+            "namespace": "someDateObj",
+            "type": {
+              "type": "array",
+              "items": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
               }
             }
-          ]
-        }
-      ]
+          }
+        ]
+      }
     },
     {
       "name": "type",

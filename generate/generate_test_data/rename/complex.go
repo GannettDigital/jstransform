@@ -27,7 +27,7 @@ type ReallyComplex struct {
 		Meta     struct {
 			Description string `json:"description"`
 			SiteName    string `json:"siteName"`
-		} `json:"meta,omitempty"`
+		} `json:"meta,omitzero"`
 		Publish string `json:"publish"`
 	} `json:"URL" description:"Universal Resource Locator"`
 }

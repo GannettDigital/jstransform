@@ -33,7 +33,11 @@ type extractedField struct {
 func (ef *extractedField) write(w io.Writer, prefix string, required, descriptionAsStructTag, pointers bool, excludeNested map[string]bool, nestedStructs map[string]*generatedStruct) error {
 	var omitempty string
 	if !required {
-		omitempty = ",omitempty"
+		if !ef.array && !ef.nullable && (len(ef.fields) != 0 || nestedStructs[ef.jsonType] != nil && len(nestedStructs[ef.jsonType].fields) != 0) {
+			omitempty = ",omitzero"
+		} else {
+			omitempty = ",omitempty"
+		}
 	}
 	jsonTag := fmt.Sprintf(`json:"%s%s"`, ef.jsonName, omitempty)
 	var description string

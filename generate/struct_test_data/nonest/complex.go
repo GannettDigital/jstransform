@@ -40,7 +40,7 @@ type ComplexOriginalSize struct {
 type ComplexURL struct {
 	// The full Canonical URL
 	Absolute string         `json:"absolute"`
-	Meta     ComplexURLMeta `json:"meta,omitempty"`
+	Meta     ComplexURLMeta `json:"meta,omitzero"`
 	Publish  string         `json:"publish"`
 }
 

@@ -8,6 +8,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBuildAvroSchemaFile(t *testing.T) {
@@ -95,6 +97,7 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 			t.Errorf("Test %q - failed to read want Avro schema file: %v", test.description, err)
 		}
 
+		assert.Equal(t, string(want), string(got), test.description)
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("Test %q - got\n%s\nwant\n%s\n", test.description, got, want)
 		}

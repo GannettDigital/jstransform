@@ -15,7 +15,7 @@ type All_of_with_properties struct {
 	Season      string `json:"season,omitempty"`
 	SomeDateObj struct {
 		Dates []time.Time `json:"dates,omitempty"`
-	} `json:"someDateObj,omitempty"`
+	} `json:"someDateObj,omitzero"`
 	Type    string  `json:"type"`
 	Visible bool    `json:"visible,omitempty"`
 	Width   float64 `json:"width,omitempty"`
