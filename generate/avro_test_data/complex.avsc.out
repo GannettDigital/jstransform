@@ -57,27 +57,24 @@
     {
       "name": "someDateObj",
       "namespace": "Simple",
-      "type": [
-        "null",
-        {
-          "name": "someDateObj_record",
-          "namespace": "Simple.someDateObj",
-          "type": "record",
-          "fields": [
-            {
-              "name": "dates",
-              "namespace": "Simple.someDateObj",
-              "type": {
-                "type": "array",
-                "items": {
-                  "type": "long",
-                  "logicalType": "timestamp-millis"
-                }
+      "type": {
+        "name": "someDateObj_record",
+        "namespace": "Simple.someDateObj",
+        "type": "record",
+        "fields": [
+          {
+            "name": "dates",
+            "namespace": "Simple.someDateObj",
+            "type": {
+              "type": "array",
+              "items": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
               }
             }
-          ]
-        }
-      ]
+          }
+        ]
+      }
     },
     {
       "name": "visible",
@@ -196,26 +193,23 @@
           {
             "name": "meta",
             "namespace": "URL",
-            "type": [
-              "null",
-              {
-                "name": "meta_record",
-                "namespace": "URL.meta",
-                "type": "record",
-                "fields": [
-                  {
-                    "name": "description",
-                    "namespace": "URL.meta",
-                    "type": "string"
-                  },
-                  {
-                    "name": "siteName",
-                    "namespace": "URL.meta",
-                    "type": "string"
-                  }
-                ]
-              }
-            ]
+            "type": {
+              "name": "meta_record",
+              "namespace": "URL.meta",
+              "type": "record",
+              "fields": [
+                {
+                  "name": "description",
+                  "namespace": "URL.meta",
+                  "type": "string"
+                },
+                {
+                  "name": "siteName",
+                  "namespace": "URL.meta",
+                  "type": "string"
+                }
+              ]
+            }
           },
           {
             "name": "publish",

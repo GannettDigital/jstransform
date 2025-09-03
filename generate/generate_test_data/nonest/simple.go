@@ -7,7 +7,7 @@ import "time"
 type Simple struct {
 	Contributors []SimpleContributors `json:"contributors,omitempty"`
 	Height       int64                `json:"height,omitempty"`
-	SomeDateObj  SimpleSomeDateObj    `json:"someDateObj,omitempty"`
+	SomeDateObj  SimpleSomeDateObj    `json:"someDateObj,omitzero"`
 	Type         string               `json:"type"`
 	Visible      bool                 `json:"visible,omitempty"`
 	Width        float64              `json:"width,omitempty"`

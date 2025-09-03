@@ -7,7 +7,7 @@ type Repeats struct {
 	SomeDateObj struct {
 		Type    string `json:"type"`
 		Visible bool   `json:"visible,omitempty"`
-	} `json:"someDateObj,omitempty"`
+	} `json:"someDateObj,omitzero"`
 	Type    string  `json:"type"`
 	Visible bool    `json:"visible,omitempty"`
 	Width   float64 `json:"width,omitempty"`

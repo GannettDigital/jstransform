@@ -16,7 +16,7 @@ type Repeats struct {
 
 	Height *UnionNullLong `json:"height"`
 
-	SomeDateObj *UnionNullSomeDateObj_record `json:"someDateObj"`
+	SomeDateObj *SomeDateObj_record `json:"someDateObj"`
 
 	Type string `json:"type"`
 
@@ -25,7 +25,7 @@ type Repeats struct {
 	Width *UnionNullDouble `json:"width"`
 }
 
-const RepeatsAvroCRC64Fingerprint = "\xb4\xd3\x17r\x13\xfe\x91\x8c"
+const RepeatsAvroCRC64Fingerprint = "\xc5L//\xb7\xf4l\xa7"
 
 func NewRepeats() *Repeats {
 	return &Repeats{}
@@ -74,7 +74,7 @@ func writeRepeats(r *Repeats, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	err = writeUnionNullSomeDateObj_record(r.SomeDateObj, w)
+	err = writeSomeDateObj_record(r.SomeDateObj, w)
 	if err != nil {
 		return err
 	}
@@ -98,7 +98,7 @@ func (r *Repeats) Serialize(w io.Writer) error {
 }
 
 func (r *Repeats) Schema() string {
-	return "{\"fields\":[{\"doc\":\"The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.\",\"logicalType\":\"timestamp-millis\",\"name\":\"AvroWriteTime\",\"type\":\"long\"},{\"default\":false,\"doc\":\"This is set to true when the Avro data is recording a delete in the source data.\",\"name\":\"AvroDeleted\",\"type\":\"boolean\"},{\"name\":\"height\",\"type\":[\"null\",\"long\"]},{\"name\":\"someDateObj\",\"type\":[\"null\",{\"fields\":[{\"name\":\"type\",\"namespace\":\"someDateObj\",\"type\":\"string\"},{\"default\":false,\"name\":\"visible\",\"namespace\":\"someDateObj\",\"type\":\"boolean\"}],\"name\":\"someDateObj_record\",\"namespace\":\"someDateObj\",\"type\":\"record\"}]},{\"name\":\"type\",\"type\":\"string\"},{\"default\":false,\"name\":\"visible\",\"type\":\"boolean\"},{\"name\":\"width\",\"type\":[\"null\",\"double\"]}],\"name\":\"Repeats\",\"type\":\"record\"}"
+	return "{\"fields\":[{\"doc\":\"The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.\",\"logicalType\":\"timestamp-millis\",\"name\":\"AvroWriteTime\",\"type\":\"long\"},{\"default\":false,\"doc\":\"This is set to true when the Avro data is recording a delete in the source data.\",\"name\":\"AvroDeleted\",\"type\":\"boolean\"},{\"name\":\"height\",\"type\":[\"null\",\"long\"]},{\"name\":\"someDateObj\",\"type\":{\"fields\":[{\"name\":\"type\",\"namespace\":\"someDateObj\",\"type\":\"string\"},{\"default\":false,\"name\":\"visible\",\"namespace\":\"someDateObj\",\"type\":\"boolean\"}],\"name\":\"someDateObj_record\",\"namespace\":\"someDateObj\",\"type\":\"record\"}},{\"name\":\"type\",\"type\":\"string\"},{\"default\":false,\"name\":\"visible\",\"type\":\"boolean\"},{\"name\":\"width\",\"type\":[\"null\",\"double\"]}],\"name\":\"Repeats\",\"type\":\"record\"}"
 }
 
 func (r *Repeats) SchemaName() string {
@@ -125,7 +125,7 @@ func (r *Repeats) Get(i int) types.Field {
 
 		return r.Height
 	case 3:
-		r.SomeDateObj = NewUnionNullSomeDateObj_record()
+		r.SomeDateObj = NewSomeDateObj_record()
 
 		return r.SomeDateObj
 	case 4:
@@ -156,9 +156,6 @@ func (r *Repeats) NullField(i int) {
 	switch i {
 	case 2:
 		r.Height = nil
-		return
-	case 3:
-		r.SomeDateObj = nil
 		return
 	case 6:
 		r.Width = nil

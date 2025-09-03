@@ -18,7 +18,7 @@ type Complex struct {
 
 	Height *UnionNullLong `json:"height"`
 
-	SomeDateObj *UnionNullSomeDateObj_record `json:"someDateObj"`
+	SomeDateObj *SomeDateObj_record `json:"someDateObj"`
 
 	Visible bool `json:"visible"`
 
@@ -43,7 +43,7 @@ type Complex struct {
 	URL *URL_record `json:"URL"`
 }
 
-const ComplexAvroCRC64Fingerprint = "\xf5E\x82gB?|U"
+const ComplexAvroCRC64Fingerprint = "\x93\xbb\xa6z\xe2&z$"
 
 func NewComplex() *Complex {
 	return &Complex{}
@@ -96,7 +96,7 @@ func writeComplex(r *Complex, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	err = writeUnionNullSomeDateObj_record(r.SomeDateObj, w)
+	err = writeSomeDateObj_record(r.SomeDateObj, w)
 	if err != nil {
 		return err
 	}
@@ -152,7 +152,7 @@ func (r *Complex) Serialize(w io.Writer) error {
 }
 
 func (r *Complex) Schema() string {
-	return "{\"fields\":[{\"doc\":\"The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.\",\"logicalType\":\"timestamp-millis\",\"name\":\"AvroWriteTime\",\"type\":\"long\"},{\"default\":false,\"doc\":\"This is set to true when the Avro data is recording a delete in the source data.\",\"name\":\"AvroDeleted\",\"type\":\"boolean\"},{\"name\":\"contributors\",\"namespace\":\"Simple\",\"type\":{\"items\":{\"fields\":[{\"name\":\"contributorId\",\"namespace\":\"Simple.contributors\",\"type\":[\"null\",\"string\"]},{\"name\":\"id\",\"namespace\":\"Simple.contributors\",\"type\":\"string\"},{\"name\":\"name\",\"namespace\":\"Simple.contributors\",\"type\":\"string\"}],\"name\":\"contributors_record\",\"namespace\":\"Simple.contributors\",\"type\":\"record\"},\"type\":\"array\"}},{\"name\":\"height\",\"namespace\":\"Simple\",\"type\":[\"null\",\"long\"]},{\"name\":\"someDateObj\",\"namespace\":\"Simple\",\"type\":[\"null\",{\"fields\":[{\"name\":\"dates\",\"namespace\":\"Simple.someDateObj\",\"type\":{\"items\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"},\"type\":\"array\"}}],\"name\":\"someDateObj_record\",\"namespace\":\"Simple.someDateObj\",\"type\":\"record\"}]},{\"default\":false,\"name\":\"visible\",\"namespace\":\"Simple\",\"type\":\"boolean\"},{\"name\":\"width\",\"namespace\":\"Simple\",\"type\":[\"null\",\"double\"]},{\"name\":\"caption\",\"type\":\"string\"},{\"name\":\"credit\",\"type\":\"string\"},{\"name\":\"crops\",\"type\":{\"items\":{\"fields\":[{\"name\":\"height\",\"namespace\":\"crops\",\"type\":\"double\"},{\"name\":\"name\",\"namespace\":\"crops\",\"type\":\"string\"},{\"name\":\"path\",\"namespace\":\"crops\",\"type\":\"string\"},{\"name\":\"relativePath\",\"namespace\":\"crops\",\"type\":\"string\"},{\"name\":\"width\",\"namespace\":\"crops\",\"type\":\"double\"}],\"name\":\"crops_record\",\"namespace\":\"crops\",\"type\":\"record\"},\"type\":\"array\"}},{\"name\":\"cutline\",\"type\":[\"null\",\"string\"]},{\"name\":\"datePhotoTaken\",\"type\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"}},{\"name\":\"orientation\",\"type\":\"string\"},{\"name\":\"originalSize\",\"type\":{\"fields\":[{\"name\":\"height\",\"namespace\":\"originalSize\",\"type\":\"double\"},{\"name\":\"width\",\"namespace\":\"originalSize\",\"type\":\"double\"}],\"name\":\"originalSize_record\",\"namespace\":\"originalSize\",\"type\":\"record\"}},{\"name\":\"type\",\"type\":\"string\"},{\"name\":\"URL\",\"type\":{\"fields\":[{\"name\":\"absolute\",\"namespace\":\"URL\",\"type\":\"string\"},{\"name\":\"meta\",\"namespace\":\"URL\",\"type\":[\"null\",{\"fields\":[{\"name\":\"description\",\"namespace\":\"URL.meta\",\"type\":\"string\"},{\"name\":\"siteName\",\"namespace\":\"URL.meta\",\"type\":\"string\"}],\"name\":\"meta_record\",\"namespace\":\"URL.meta\",\"type\":\"record\"}]},{\"name\":\"publish\",\"namespace\":\"URL\",\"type\":\"string\"}],\"name\":\"URL_record\",\"namespace\":\"URL\",\"type\":\"record\"}}],\"name\":\"Complex\",\"type\":\"record\"}"
+	return "{\"fields\":[{\"doc\":\"The timestamp when this avro data is written. Useful for identifying the newest row of data sharing keys.\",\"logicalType\":\"timestamp-millis\",\"name\":\"AvroWriteTime\",\"type\":\"long\"},{\"default\":false,\"doc\":\"This is set to true when the Avro data is recording a delete in the source data.\",\"name\":\"AvroDeleted\",\"type\":\"boolean\"},{\"name\":\"contributors\",\"namespace\":\"Simple\",\"type\":{\"items\":{\"fields\":[{\"name\":\"contributorId\",\"namespace\":\"Simple.contributors\",\"type\":[\"null\",\"string\"]},{\"name\":\"id\",\"namespace\":\"Simple.contributors\",\"type\":\"string\"},{\"name\":\"name\",\"namespace\":\"Simple.contributors\",\"type\":\"string\"}],\"name\":\"contributors_record\",\"namespace\":\"Simple.contributors\",\"type\":\"record\"},\"type\":\"array\"}},{\"name\":\"height\",\"namespace\":\"Simple\",\"type\":[\"null\",\"long\"]},{\"name\":\"someDateObj\",\"namespace\":\"Simple\",\"type\":{\"fields\":[{\"name\":\"dates\",\"namespace\":\"Simple.someDateObj\",\"type\":{\"items\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"},\"type\":\"array\"}}],\"name\":\"someDateObj_record\",\"namespace\":\"Simple.someDateObj\",\"type\":\"record\"}},{\"default\":false,\"name\":\"visible\",\"namespace\":\"Simple\",\"type\":\"boolean\"},{\"name\":\"width\",\"namespace\":\"Simple\",\"type\":[\"null\",\"double\"]},{\"name\":\"caption\",\"type\":\"string\"},{\"name\":\"credit\",\"type\":\"string\"},{\"name\":\"crops\",\"type\":{\"items\":{\"fields\":[{\"name\":\"height\",\"namespace\":\"crops\",\"type\":\"double\"},{\"name\":\"name\",\"namespace\":\"crops\",\"type\":\"string\"},{\"name\":\"path\",\"namespace\":\"crops\",\"type\":\"string\"},{\"name\":\"relativePath\",\"namespace\":\"crops\",\"type\":\"string\"},{\"name\":\"width\",\"namespace\":\"crops\",\"type\":\"double\"}],\"name\":\"crops_record\",\"namespace\":\"crops\",\"type\":\"record\"},\"type\":\"array\"}},{\"name\":\"cutline\",\"type\":[\"null\",\"string\"]},{\"name\":\"datePhotoTaken\",\"type\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"}},{\"name\":\"orientation\",\"type\":\"string\"},{\"name\":\"originalSize\",\"type\":{\"fields\":[{\"name\":\"height\",\"namespace\":\"originalSize\",\"type\":\"double\"},{\"name\":\"width\",\"namespace\":\"originalSize\",\"type\":\"double\"}],\"name\":\"originalSize_record\",\"namespace\":\"originalSize\",\"type\":\"record\"}},{\"name\":\"type\",\"type\":\"string\"},{\"name\":\"URL\",\"type\":{\"fields\":[{\"name\":\"absolute\",\"namespace\":\"URL\",\"type\":\"string\"},{\"name\":\"meta\",\"namespace\":\"URL\",\"type\":{\"fields\":[{\"name\":\"description\",\"namespace\":\"URL.meta\",\"type\":\"string\"},{\"name\":\"siteName\",\"namespace\":\"URL.meta\",\"type\":\"string\"}],\"name\":\"meta_record\",\"namespace\":\"URL.meta\",\"type\":\"record\"}},{\"name\":\"publish\",\"namespace\":\"URL\",\"type\":\"string\"}],\"name\":\"URL_record\",\"namespace\":\"URL\",\"type\":\"record\"}}],\"name\":\"Complex\",\"type\":\"record\"}"
 }
 
 func (r *Complex) SchemaName() string {
@@ -183,7 +183,7 @@ func (r *Complex) Get(i int) types.Field {
 
 		return r.Height
 	case 4:
-		r.SomeDateObj = NewUnionNullSomeDateObj_record()
+		r.SomeDateObj = NewSomeDateObj_record()
 
 		return r.SomeDateObj
 	case 5:
@@ -238,9 +238,6 @@ func (r *Complex) NullField(i int) {
 	switch i {
 	case 3:
 		r.Height = nil
-		return
-	case 4:
-		r.SomeDateObj = nil
 		return
 	case 6:
 		r.Width = nil

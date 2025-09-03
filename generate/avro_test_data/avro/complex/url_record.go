@@ -11,12 +11,12 @@ import (
 type URL_record struct {
 	Absolute string `json:"absolute"`
 
-	Meta *UnionNullMeta_record `json:"meta"`
+	Meta *Meta_record `json:"meta"`
 
 	Publish string `json:"publish"`
 }
 
-const URL_recordAvroCRC64Fingerprint = "\x01\xe05\xab[+r6"
+const URL_recordAvroCRC64Fingerprint = "\xc92=\x82>\x9e\v\xa4"
 
 func NewURL_record() *URL_record {
 	return &URL_record{}
@@ -57,7 +57,7 @@ func writeURL_record(r *URL_record, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	err = writeUnionNullMeta_record(r.Meta, w)
+	err = writeMeta_record(r.Meta, w)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (r *URL_record) Serialize(w io.Writer) error {
 }
 
 func (r *URL_record) Schema() string {
-	return "{\"fields\":[{\"name\":\"absolute\",\"namespace\":\"URL\",\"type\":\"string\"},{\"name\":\"meta\",\"namespace\":\"URL\",\"type\":[\"null\",{\"fields\":[{\"name\":\"description\",\"namespace\":\"URL.meta\",\"type\":\"string\"},{\"name\":\"siteName\",\"namespace\":\"URL.meta\",\"type\":\"string\"}],\"name\":\"meta_record\",\"namespace\":\"URL.meta\",\"type\":\"record\"}]},{\"name\":\"publish\",\"namespace\":\"URL\",\"type\":\"string\"}],\"name\":\"URL.URL_record\",\"type\":\"record\"}"
+	return "{\"fields\":[{\"name\":\"absolute\",\"namespace\":\"URL\",\"type\":\"string\"},{\"name\":\"meta\",\"namespace\":\"URL\",\"type\":{\"fields\":[{\"name\":\"description\",\"namespace\":\"URL.meta\",\"type\":\"string\"},{\"name\":\"siteName\",\"namespace\":\"URL.meta\",\"type\":\"string\"}],\"name\":\"meta_record\",\"namespace\":\"URL.meta\",\"type\":\"record\"}},{\"name\":\"publish\",\"namespace\":\"URL\",\"type\":\"string\"}],\"name\":\"URL.URL_record\",\"type\":\"record\"}"
 }
 
 func (r *URL_record) SchemaName() string {
@@ -94,7 +94,7 @@ func (r *URL_record) Get(i int) types.Field {
 	case 0:
 		return &types.String{Target: &r.Absolute}
 	case 1:
-		r.Meta = NewUnionNullMeta_record()
+		r.Meta = NewMeta_record()
 
 		return r.Meta
 	case 2:
@@ -111,9 +111,6 @@ func (r *URL_record) SetDefault(i int) {
 
 func (r *URL_record) NullField(i int) {
 	switch i {
-	case 1:
-		r.Meta = nil
-		return
 	}
 	panic("Not a nullable field index")
 }
