@@ -10,6 +10,8 @@ import (
 	"github.com/GannettDigital/gojsonschema"
 )
 
+var validatorCache Cache[*gojsonschema.Schema]
+
 // Validator defines an interface for validating JSON matches a JSON schema.
 type Validator interface {
 	Validate(raw json.RawMessage) (bool, error)
@@ -43,12 +45,11 @@ func loadSchema(schemasDir string) (*gojsonschema.Schema, error) {
 		// http://blogs.msdn.com/b/ie/archive/2006/12/06/file-uris-in-windows.aspx
 		filePrefix += "/"
 	}
-	l := gojsonschema.NewReferenceLoader(filePrefix + path)
-	schema, err := gojsonschema.NewSchema(l)
-	if err != nil {
-		return nil, err
-	}
-	return schema, nil
+	schemaRef := filePrefix + path
+
+	return validatorCache.Load(schemaRef, func() (*gojsonschema.Schema, error) {
+		return gojsonschema.NewSchema(gojsonschema.NewReferenceLoader(schemaRef))
+	})
 }
 
 // Validate will check that the given json is validate according the schema loaded by the Validator.

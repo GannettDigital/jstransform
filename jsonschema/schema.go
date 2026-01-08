@@ -7,10 +7,13 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/GannettDigital/jsonparser"
 )
+
+var schemaCache Cache[*Schema]
 
 // Instance represents a JSON Schema instance.
 type Instance struct {
@@ -91,65 +94,72 @@ func SchemaFromFile(schemaPath, oneOfType string) (*Schema, error) {
 	return schemaFromFile(schemaPath, oneOfType, true)
 }
 
-func schemaFromFile(schemaPath string, oneOfType string, flatten bool) (*Schema, error) {
-	data, err := os.ReadFile(schemaPath)
+func schemaFromFile(schemaLoadPath string, oneOfType string, flatten bool) (*Schema, error) {
+	schemaPath, err := filepath.Abs(schemaLoadPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
+		return nil, err
 	}
-	v, err := NewValidator(schemaPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize schema validator: %v", err)
-	}
-
-	// dereferencing during walking is more efficient but more complicated so all dereferencing for a file is done immediately
-	data, err = dereference(schemaPath, data, oneOfType, flatten)
-	if err != nil {
-		return nil, fmt.Errorf("failed to Dereference Schema: %v", err)
-	}
-
-	// json schema's default behavior is additionalProperties: true if the field is missing so mimic that behavior here
-	var sj = Instance{
-		AdditionalProperties: true,
-	}
-	if err := json.Unmarshal(data, &sj); err != nil {
-		return nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
-	}
-
-	s := Schema{
-		Instance:  sj,
-		Validator: v,
-	}
-
-	// TODO this behavior is not spec compatible, according to the spec it is possible to have multiple allOf instances
-	// that conflict. The legit use case for that is rare but it is in the spec. Rather than merge these the walk
-	// should go through each set of files but this makes the raw walking much more complicated.
-	for _, all := range sj.AllOf {
-		// If not flattening, check that the schema also has properties in order to avoid issues with schemas that only
-		// contain oneOf/allOf references.
-		if !flatten && s.Properties != nil {
-			continue
+	schemaKey := schemaPath + "|" + oneOfType + "|" + strconv.FormatBool(flatten)
+	return schemaCache.Load(schemaKey, func() (*Schema, error) {
+		data, err := os.ReadFile(schemaPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
 		}
-		s.Properties = mergeProperties(s.Properties, all.Properties)
-		s.Required = append(s.Required, all.Required...)
-		if s.Items == nil {
-			s.Items = all.Items
-		}
-	}
-
-	for _, one := range sj.OneOf {
-		subName := strings.Split(filepath.Base(one.FromRef), ".")[0]
-		if subName != oneOfType {
-			continue
+		v, err := NewValidator(schemaPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize schema validator: %v", err)
 		}
 
-		s.Properties = mergeProperties(s.Properties, one.Properties)
-		s.Required = append(s.Required, one.Required...)
-		if s.Items == nil {
-			s.Items = one.Items
+		// dereferencing during walking is more efficient but more complicated so all dereferencing for a file is done immediately
+		data, err = dereference(schemaPath, data, oneOfType, flatten)
+		if err != nil {
+			return nil, fmt.Errorf("failed to Dereference Schema: %v", err)
 		}
-	}
 
-	return &s, nil
+		// json schema's default behavior is additionalProperties: true if the field is missing so mimic that behavior here
+		var sj = Instance{
+			AdditionalProperties: true,
+		}
+		if err := json.Unmarshal(data, &sj); err != nil {
+			return nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
+		}
+
+		s := Schema{
+			Instance:  sj,
+			Validator: v,
+		}
+
+		// TODO this behavior is not spec compatible, according to the spec it is possible to have multiple allOf instances
+		// that conflict. The legit use case for that is rare but it is in the spec. Rather than merge these the walk
+		// should go through each set of files but this makes the raw walking much more complicated.
+		for _, all := range sj.AllOf {
+			// If not flattening, check that the schema also has properties in order to avoid issues with schemas that only
+			// contain oneOf/allOf references.
+			if !flatten && s.Properties != nil {
+				continue
+			}
+			s.Properties = mergeProperties(s.Properties, all.Properties)
+			s.Required = append(s.Required, all.Required...)
+			if s.Items == nil {
+				s.Items = all.Items
+			}
+		}
+
+		for _, one := range sj.OneOf {
+			subName := strings.Split(filepath.Base(one.FromRef), ".")[0]
+			if subName != oneOfType {
+				continue
+			}
+
+			s.Properties = mergeProperties(s.Properties, one.Properties)
+			s.Required = append(s.Required, one.Required...)
+			if s.Items == nil {
+				s.Items = one.Items
+			}
+		}
+
+		return &s, nil
+	})
 }
 
 // SchemaTypes will parse the given file and report which top level allOfTypes, oneOfTypes, and properties are found in the schema.
