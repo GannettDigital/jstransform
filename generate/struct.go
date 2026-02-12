@@ -6,12 +6,11 @@ import (
 	"go/format"
 	"io"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
-
-	"golang.org/x/exp/slices"
 )
 
 // extractedField represents a Golang struct field as extracted from a JSON schema file. It is an intermediate format

@@ -4,11 +4,10 @@ package jsonschema
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/GannettDigital/jsonparser"
-
-	"golang.org/x/exp/slices"
 )
 
 // WalkFunc processes a single Instance within a JSON schema file returning an error on any problems.
