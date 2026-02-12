@@ -6,12 +6,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
-
-	"golang.org/x/exp/slices"
 )
 
 var (
