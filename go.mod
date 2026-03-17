@@ -1,6 +1,6 @@
 module github.com/GannettDigital/jstransform
 
-go 1.25.5
+go 1.26.1
 
 require (
 	github.com/GannettDigital/PaesslerAG_jsonpath v0.0.0-20230913165611-a0c86cbdaddb
@@ -11,13 +11,13 @@ require (
 	github.com/antchfx/xmlquery v1.5.0
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/sync v0.19.0
-	golang.org/x/tools v0.40.0
+	golang.org/x/sync v0.20.0
+	golang.org/x/tools v0.43.0
 )
 
 require (
 	github.com/PaesslerAG/gval v1.2.4 // indirect
-	github.com/antchfx/xpath v1.3.5 // indirect
+	github.com/antchfx/xpath v1.3.6 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
@@ -28,8 +28,8 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
-	golang.org/x/mod v0.31.0 // indirect
-	golang.org/x/net v0.48.0 // indirect
-	golang.org/x/text v0.32.0 // indirect
+	golang.org/x/mod v0.34.0 // indirect
+	golang.org/x/net v0.52.0 // indirect
+	golang.org/x/text v0.35.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
