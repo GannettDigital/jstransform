@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	jsonpath "github.com/GannettDigital/PaesslerAG_jsonpath"
-	"github.com/GannettDigital/jsonparser"
+	"github.com/buger/jsonparser"
 
 	"github.com/antchfx/xmlquery"
 )

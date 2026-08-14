@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/GannettDigital/jsonparser"
+	"github.com/buger/jsonparser"
 )
 
 const (

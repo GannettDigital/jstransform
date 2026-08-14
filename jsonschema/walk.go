@@ -7,7 +7,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/GannettDigital/jsonparser"
+	"github.com/buger/jsonparser"
 )
 
 // WalkFunc processes a single Instance within a JSON schema file returning an error on any problems.

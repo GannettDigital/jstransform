@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/GannettDigital/jsonparser"
 	"github.com/GannettDigital/jstransform/jsonschema"
+	"github.com/buger/jsonparser"
 
 	"github.com/antchfx/xmlquery"
 )

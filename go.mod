@@ -1,14 +1,14 @@
 module github.com/GannettDigital/jstransform
 
-go 1.25.5
+go 1.26.6
 
 require (
 	github.com/GannettDigital/PaesslerAG_jsonpath v0.0.0-20230913165611-a0c86cbdaddb
 	github.com/GannettDigital/gojsonschema v0.0.0-20230605143309-773ed8aacc5c
-	github.com/GannettDigital/jsonparser v0.0.0-20200924160044-4a0259e915f8
 	github.com/GannettDigital/msgp v1.2.0-gannett
 	github.com/actgardner/gogen-avro/v7 v7.3.1
 	github.com/antchfx/xmlquery v1.5.0
+	github.com/buger/jsonparser v1.6.1
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/sync v0.19.0
@@ -17,7 +17,7 @@ require (
 
 require (
 	github.com/PaesslerAG/gval v1.2.4 // indirect
-	github.com/antchfx/xpath v1.3.5 // indirect
+	github.com/antchfx/xpath v1.3.6 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect

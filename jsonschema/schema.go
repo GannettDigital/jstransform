@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/GannettDigital/jsonparser"
+	"github.com/buger/jsonparser"
 )
 
 var schemaCache Cache[*Schema]
