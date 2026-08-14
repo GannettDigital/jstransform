@@ -11,9 +11,9 @@ import (
 	"strings"
 
 	"github.com/GannettDigital/jstransform/jsonschema"
-	"github.com/buger/jsonparser"
 
 	"github.com/antchfx/xmlquery"
+	"github.com/buger/jsonparser"
 )
 
 // inputFormat denotes the type of transform to perfrom, the options are 'JSON' or 'XML'.
