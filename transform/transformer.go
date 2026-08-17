@@ -10,10 +10,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/GannettDigital/jsonparser"
 	"github.com/GannettDigital/jstransform/jsonschema"
 
 	"github.com/antchfx/xmlquery"
+	"github.com/buger/jsonparser"
 )
 
 // inputFormat denotes the type of transform to perfrom, the options are 'JSON' or 'XML'.

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GannettDigital/jsonparser"
+	"github.com/buger/jsonparser"
 )
 
 var indexRe = regexp.MustCompile(`\[([\d]+)\]`)
