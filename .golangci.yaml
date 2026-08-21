@@ -1,0 +1,318 @@
+# Source of truth for this configuration is:
+# https://github.com/GannettDigital/api-services-tools/blob/master/.golangci.yaml
+version: "2"
+run:
+  timeout: 30m
+issues:
+  new: false
+  fix: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+output:
+  sort-order:
+    - file
+    - severity
+    - linter
+linters:
+#  enable:
+#    - errorlint
+#    - gocritic
+#    - godot
+#    - gosec
+#    - misspell
+#    - nonamedreturns
+#    - spancheck
+#    - unconvert
+#    - whitespace
+  enable:
+#    - arangolint
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - copyloopvar
+#    - cyclop
+    - decorder
+#    - depguard
+#    - dogsled
+#    - dupl
+    - dupword
+    - durationcheck
+    - embeddedstructfieldcheck
+#    - err113
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+#    - exhaustruct
+    - exptostd
+    - fatcontext
+    - forbidigo
+    - forcetypeassert
+#    - funcorder
+#    - funlen
+    - ginkgolinter
+    - gocheckcompilerdirectives
+#    - gochecknoglobals
+#    - gochecknoinits
+    - gochecksumtype
+#    - gocognit
+#    - goconst
+    - gocritic
+#    - gocyclo
+    - godoclint
+    - godot
+#    - godox
+    - goheader
+#    - gomoddirectives
+    - gomodguard_v2
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - govet
+    - grouper
+    - iface
+    - importas
+#    - inamedparam
+    - ineffassign
+    - interfacebloat
+#    - intrange
+    - iotamixing
+#    - ireturn
+#    - lll
+    - loggercheck
+#    - maintidx
+    - makezero
+    - mirror
+    - misspell
+#    - mnd
+    - musttag
+    - nakedret
+#    - nestif
+    - nilerr
+    - nilnesserr
+#    - nilnil
+#    - nlreturn
+    - noctx
+#    - noinlineerr
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - tagalign
+#    - tagliatelle
+    - testableexamples
+    - testifylint
+#    - testpackage
+#    - thelper
+    - tparallel
+    - unconvert
+#    - unparam
+    - unqueryvet
+    - unused
+    - usestdlibvars
+    - usetesting
+#    - varnamelen
+    - wastedassign
+    - whitespace
+#    - wrapcheck
+#    - wsl
+#    - wsl_v5
+    - zerologlint
+  settings:
+    exhaustive:
+      default-signifies-exhaustive: true
+    gosec:
+      excludes:
+        - G117 # Potential exposure of secrets via JSON marshaling
+        - G304 # Potential file inclusion via variable
+        - G703 # Path traversal via taint analysis
+        - G704 # SSRF via taint analysis
+        - G705 # XSS via taint analysis
+        - G706 # Log injection via taint analysis
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment   # Noisy and unhelpful.
+        - shadow           # Too picky.
+        - deepequalerrors  # We do this pretty commonly for good reasons.
+    paralleltest:
+      ignore-missing: true
+    recvcheck:
+      exclusions:
+        - '*.DecodeMsg'     # github.com/GannettDigital/msgp/msgp.Decodable
+        - '*.EncodeMsg'     # github.com/GannettDigital/msgp/msgp.Encodable
+        - '*.MarshalMsg'    # github.com/GannettDigital/msgp/msgp.Marshaler
+        - '*.Msgsize'       # github.com/GannettDigital/msgp/msgp.Sizer
+        - '*.UnmarshalMsg'  # github.com/GannettDigital/msgp/msgp.Unmarshaler
+        - '*.WriteAvroCF'         # github.com/GannettDigital/jstransform/generate.AvroCFWriter
+        - '*.WriteAvroDeletedCF'  # github.com/GannettDigital/jstransform/generate.AvroCFDeleter
+        - '*.convertToAvro'       # github.com/GannettDigital/jstransform/generate/avro_template.go
+    revive:
+      enable-all-rules: true
+      rules:
+        - name: add-constant
+          disabled: true
+        - name: cognitive-complexity
+          disabled: true
+        - name: confusing-naming
+          disabled: true
+        - name: confusing-results
+          disabled: true
+        - name: cyclomatic
+          disabled: true
+        - name: exported
+          #severity: warning
+          disabled: true
+        - name: flag-parameter
+          disabled: true
+        - name: function-length
+          disabled: true
+        - name: function-result-limit
+          disabled: true
+        - name: import-alias-naming
+          disabled: true
+        - name: line-length-limit
+          disabled: true
+        - name: max-public-structs
+          disabled: true
+        - name: nested-structs
+          disabled: true
+        - name: package-comments
+          disabled: true
+        - name: package-naming
+          disabled: true
+        - name: redundant-test-main-exit
+          disabled: true
+        - name: unexported-return
+          #severity: warning
+          disabled: true
+        - name: unused-parameter
+          disabled: true
+        - name: unused-receiver
+          disabled: true
+    spancheck:
+      extra-start-span-signatures:
+        - "github.com/GannettDigital/content-pipeline/v2/instrument.Span:opentelemetry"
+    staticcheck:
+      checks:
+        - "all"
+        - "-ST1000"  # https://staticcheck.dev/docs/checks/#ST1000 | Incorrect or missing package comment.
+        - "-ST1006"  # https://staticcheck.dev/docs/checks/#ST1006 | Poorly chosen receiver name.
+    tagalign:
+      sort: false
+    testifylint:
+      enable-all: true
+      disable:
+        - require-error
+  exclusions:
+    generated: lax  # Special to this repository or else 'tagalign' triggers on all the 'generate/generate_test_data/*/*.go' generated files.
+    rules:
+      # Ignore this `gosec` TLS InsecureSkipVerify in test files.
+      - path: '_test\.go$'
+        text: "G402:"
+        linters:
+          - gosec
+      # The Content API applications start a profiler which is normal.
+      - path: '^main\.go$'
+        text: "G108:"
+        linters:
+          - gosec
+      # Tests cases often have a context provided for testing timeouts.
+      - path: '_test\.go$'
+        linters:
+          - containedctx
+      # Apply the prohibition on `fmt.Printf` to all files except test files.
+      - path: '_test\.go$'
+        linters:
+          - forbidigo
+      # Don't complain about method function/parameter naming from GraphQL generated resolvers.  Can't add "//nolint" because 'gqlgen' strips them.
+      - path: '^graph/[^.]+\.resolvers\.go$'
+        text: '^var-naming: method(?: parameter)? \w+Ids should be \w+IDs$'
+        linters:
+          - revive
+      # Don't complain about resolver type naming from GraphQL generated resolvers.  Can't add "//nolint" because 'gqlgen' strips them.
+      - path: '^graph/[^.]+\.resolvers\.go$'
+        text: '^var-naming: type \w+IdsResolver should be \w+IDsResolver$'
+        linters:
+          - revive
+      # Don't complain about method function parameter count from GraphQL generated resolvers.  Can't add "//nolint" because 'gqlgen' strips them.
+      - path: '^graph/[^.]+\.resolvers\.go$'
+        text: '^argument-limit: maximum number of arguments per function exceeded; max \d+ but got \d+$'
+        linters:
+          - revive
+      # Don't complain about file naming for GraphQL generated resolvers.
+      - path: '^graph/[^.]+\.resolvers\.go$'
+        text: '^filename-format:'
+        linters:
+          - revive
+      # The `jstransform` prefix for deprecated model fields confuses the linters thinking it is deprecated Go code.
+      - path: '^model/[^/]+/[^/]+\.go$'
+        text: '^deprecatedComment: use `Deprecated: ` \(note the casing\) instead of `DEPRECATED: `$'
+        linters:
+          - gocritic
+      # Using `defer` is sufficient signal that we don't want/need to check the error.
+      - source: '^\s+defer\s+'
+        linters:
+          - errcheck
+    paths:
+      - '_avro\.go$'
+      - '_avro_test\.go$'
+      - '_msgp\.go$'
+      - '_msgp_test\.go$'
+      - '^graph/generated/'
+#    presets:
+#      - comments
+#      - common-false-positives
+#      - legacy
+#      - std-error-handling
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+#    - golines
+  settings:
+    gci:
+      custom-order: true
+      sections: # Enforces the go imports order. At most three sections are allowed, defined below.
+        - standard # First, all built-in imports at the top.
+        - prefix(github.com/GannettDigital) # Second, the GannettDigital org imports.
+        - default # Third, all imports that could not be matched to another section type.
+    gofmt:
+      simplify: true
+      rewrite-rules:
+        - pattern: "interface{}"
+          replacement: "any"
+        - pattern: "a[b:len(a)]"
+          replacement: "a[b:]"
+    gofumpt:
+      extra-rules: true  # `func(aaa string, bbb string)` -> `func(aaa, bbb string)`
+  exclusions:
+    generated: strict
+    paths:
+      - '^graph/[^.]+\.resolvers\.go$'  # Incrementally-generated by github.com/99designs/gqlgen
+#severity:
+#  default: "@linter"
+#  rules:
+#    - severity: warning
+#      linters:
+#        - goconst
