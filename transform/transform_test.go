@@ -352,12 +352,13 @@ func TestTransformUnmarshal(t *testing.T) {
 	}
 }`,
 			),
-			want: transform{"cumulo": transformInstructions{
-				From: []*transformInstruction{
-					{jsonPath: "$.data.type", Operations: []transformOperation{}},
+			want: transform{
+				"cumulo": transformInstructions{
+					From: []*transformInstruction{
+						{jsonPath: "$.data.type", Operations: []transformOperation{}},
+					},
+					Method: first,
 				},
-				Method: first,
-			},
 			},
 		},
 		{
@@ -374,12 +375,13 @@ func TestTransformUnmarshal(t *testing.T) {
 	}
 }`,
 			),
-			want: transform{"cumulo": transformInstructions{
-				From: []*transformInstruction{
-					{jsonPath: "$.data.type", Operations: []transformOperation{}},
+			want: transform{
+				"cumulo": transformInstructions{
+					From: []*transformInstruction{
+						{jsonPath: "$.data.type", Operations: []transformOperation{}},
+					},
+					Method: last,
 				},
-				Method: last,
-			},
 			},
 		},
 		{
@@ -396,12 +398,13 @@ func TestTransformUnmarshal(t *testing.T) {
 	}
 }`,
 			),
-			want: transform{"cumulo": transformInstructions{
-				From: []*transformInstruction{
-					{jsonPath: "$.data.type", Operations: []transformOperation{}},
+			want: transform{
+				"cumulo": transformInstructions{
+					From: []*transformInstruction{
+						{jsonPath: "$.data.type", Operations: []transformOperation{}},
+					},
+					Method: concatenate,
 				},
-				Method: concatenate,
-			},
 			},
 		},
 		{
@@ -421,15 +424,16 @@ func TestTransformUnmarshal(t *testing.T) {
 	}
 }`,
 			),
-			want: transform{"cumulo": transformInstructions{
-				From: []*transformInstruction{
-					{jsonPath: "$.data.type", Operations: []transformOperation{}},
+			want: transform{
+				"cumulo": transformInstructions{
+					From: []*transformInstruction{
+						{jsonPath: "$.data.type", Operations: []transformOperation{}},
+					},
+					Method: concatenate,
+					MethodOptions: methodOptions{
+						ConcatenateDelimiter: "/",
+					},
 				},
-				Method: concatenate,
-				MethodOptions: methodOptions{
-					ConcatenateDelimiter: "/",
-				},
-			},
 			},
 		},
 		{

@@ -41,7 +41,7 @@ func Walk(s *Schema, walkFn WalkInstanceFunc) error {
 
 // prependJSONPath a parent JSONPath to the beginning of a JSONPath.
 // This allows for incrementally building up the full JSONPath.
-func prependJSONPath(parent string, child string) string {
+func prependJSONPath(parent, child string) string {
 	newPath := parent
 	if parent == "" {
 		newPath = child
@@ -54,7 +54,7 @@ func prependJSONPath(parent string, child string) string {
 
 // walkInstance will recursively walk JSON Schema Instance calling defined walk functions for the root and for each
 // property within an object and each item in an array.
-// For each layer of depth the the JSONPath is added to so the walkFn received the full path of the JSON instance.
+// For each layer of depth the JSONPath is added to so the walkFn received the full path of the JSON instance.
 // Any error will halt the progress.
 func walkInstance(raw json.RawMessage, path string, walkFn WalkInstanceFunc) error {
 	var i Instance
@@ -122,7 +122,7 @@ func walkRaw(raw json.RawMessage, path string, walkFn WalkRawFunc) error {
 
 	switch iType {
 	case "object":
-		if err := jsonparser.ObjectEach(raw, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
+		if err := jsonparser.ObjectEach(raw, func(key, value []byte, dataType jsonparser.ValueType, offset int) error {
 			return walkRaw(value, prependJSONPath(path, string(key)), walkFn)
 		}, "properties"); err != nil {
 			return fmt.Errorf("failed processing properties at path %q: %w", path, err)

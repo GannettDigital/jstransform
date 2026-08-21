@@ -82,7 +82,7 @@ func TestDereference(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		var want interface{}
+		var want any
 		if !test.wantErr {
 			wantPath := strings.Replace(test.schemaPath, "/jsref_", "/deref_", 1)
 			wantJson, err := os.ReadFile(wantPath)
@@ -92,7 +92,7 @@ func TestDereference(t *testing.T) {
 			json.Unmarshal(wantJson, &want)
 		}
 
-		var got interface{}
+		var got any
 		gotJson, err := os.ReadFile(test.schemaPath)
 		if err != nil {
 			t.Errorf("Test %q - failed to read json got file %q: %v", test.description, test.schemaPath, err)

@@ -252,7 +252,7 @@ func TestGraphQLExtractedField_Write(t *testing.T) {
 		if err := test.ef.write(buf, test.prefix, test.required); err != nil {
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
 		}
-		if got, want := string(buf.Bytes()), test.want; got != want {
+		if got, want := buf.String(), test.want; got != want {
 			t.Errorf("Test %q\nwant: %s\ngot:  %s", test.description, want, got)
 		}
 	}
@@ -379,7 +379,7 @@ func TestGraphQLGeneratedStruct(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(got, want) {
-			_ = os.WriteFile(test.wantFilePath+".got", got, 0600)
+			_ = os.WriteFile(test.wantFilePath+".got", got, 0o600)
 			t.Errorf("Test %q\nwant: %s\ngot:  %s", test.description, want, got)
 			t.Errorf("Test %q\nwant: %v\ngot:  %v", test.description, want, got)
 			lwant := strings.Split(string(want), "\n")

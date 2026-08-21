@@ -2,6 +2,7 @@ package jsonschema
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -45,7 +46,7 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string, flat
 			// Attempt to read the object from the source data so that we can apply it after the ref resolving
 			// wipes out that object in the data.
 			prior, dataType, _, err := jsonparser.Get(data, destPath...)
-			if err != nil && err != jsonparser.KeyPathNotFoundError {
+			if err != nil && !errors.Is(err, jsonparser.KeyPathNotFoundError) {
 				return nil, fmt.Errorf("failed to read object on source data at path %v: %w", destPath, err)
 			}
 			if prior != nil && dataType != jsonparser.Object {
@@ -61,7 +62,7 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string, flat
 			// If we found other keys inside that object in the source data, apply that back since setting of the ref
 			// would have cleared it.  This wasn't true in JSON Schema draft 4 through 7 but is the current standard.
 			if prior != nil {
-				err := jsonparser.ObjectEach(prior, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
+				err := jsonparser.ObjectEach(prior, func(key, value []byte, dataType jsonparser.ValueType, offset int) error {
 					var err error
 					keyPath := destPath
 					keyPath = append(keyPath, string(key))
@@ -102,7 +103,7 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string, flat
 func findRefs(data json.RawMessage) ([][]string, error) {
 	refs := make([][]string, 0)
 
-	err := jsonparser.ObjectEach(data, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
+	err := jsonparser.ObjectEach(data, func(key, value []byte, dataType jsonparser.ValueType, offset int) error {
 		sKey := string(key)
 		switch dataType {
 		case jsonparser.String:
@@ -152,7 +153,7 @@ func findRefs(data json.RawMessage) ([][]string, error) {
 // The reference may refer to a definition within the given data or a file reference.
 // For files schemaPath is used to resolve relative references then SchemaFromFile is used to build the file.
 // oneOfType is used by schemaFromFile to select a specific oneOfType.
-func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType string, flatten bool) (json.RawMessage, error) {
+func resolveRef(ref string, data json.RawMessage, schemaPath, oneOfType string, flatten bool) (json.RawMessage, error) {
 	// TODO there is nothing here to stop circular references other than self references
 	var sourcePath, target string
 	splits := strings.SplitN(ref, "#", 2)

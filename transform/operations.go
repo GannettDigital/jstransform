@@ -10,6 +10,7 @@ import (
 	"time"
 
 	jsonpath "github.com/GannettDigital/PaesslerAG_jsonpath"
+
 	"github.com/antchfx/xmlquery"
 	"github.com/microcosm-cc/bluemonday"
 )

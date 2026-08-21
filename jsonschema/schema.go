@@ -95,7 +95,7 @@ func SchemaFromFile(schemaPath, oneOfType string) (*Schema, error) {
 	return schemaFromFile(schemaPath, oneOfType, true)
 }
 
-func schemaFromFile(schemaLoadPath string, oneOfType string, flatten bool) (*Schema, error) {
+func schemaFromFile(schemaLoadPath, oneOfType string, flatten bool) (*Schema, error) {
 	schemaPath, err := filepath.Abs(schemaLoadPath)
 	if err != nil {
 		return nil, err
@@ -118,7 +118,7 @@ func schemaFromFile(schemaLoadPath string, oneOfType string, flatten bool) (*Sch
 		}
 
 		// json schema's default behavior is additionalProperties: true if the field is missing so mimic that behavior here
-		var sj = Instance{
+		sj := Instance{
 			AdditionalProperties: true,
 		}
 		if err := json.Unmarshal(data, &sj); err != nil {

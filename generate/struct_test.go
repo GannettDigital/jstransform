@@ -229,7 +229,7 @@ func TestExtractedField_Write(t *testing.T) {
 		if err := test.ef.write(buf, test.prefix, test.required, test.descriptionAsStructTag, false, nil, emptyMap); err != nil {
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
 		}
-		if got, want := string(buf.Bytes()), test.want; got != want {
+		if got, want := buf.String(), test.want; got != want {
 			t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, want)
 		}
 	}

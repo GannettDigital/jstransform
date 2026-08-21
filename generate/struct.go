@@ -47,7 +47,7 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 
 	if !descriptionAsStructTag && ef.description != "" {
 		for _, line := range strings.Split(ef.description, "\n") {
-			if _, err := w.Write([]byte(fmt.Sprintf("// %s\n", line))); err != nil {
+			if _, err := fmt.Fprintf(w, "// %s\n", line); err != nil {
 				return err
 			}
 		}
@@ -62,11 +62,11 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 		return nil
 	}
 	if ef.jsonType != "object" || len(ef.fields) == 0 {
-		_, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s\t%s", prefix, ef.name, fieldGoType, structTag)))
+		_, err := fmt.Fprintf(w, "%s%s\t%s\t%s", prefix, ef.name, fieldGoType, structTag)
 		return err
 	}
 
-	if _, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s {\n", prefix, ef.name, fieldGoType))); err != nil {
+	if _, err := fmt.Fprintf(w, "%s%s\t%s {\n", prefix, ef.name, fieldGoType); err != nil {
 		return err
 	}
 
@@ -77,7 +77,7 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 		}
 	}
 
-	if _, err := w.Write([]byte(fmt.Sprintf("%s\t}\t%s", prefix, structTag))); err != nil {
+	if _, err := fmt.Fprintf(w, "%s\t}\t%s", prefix, structTag); err != nil {
 		return err
 	}
 	return nil
@@ -245,7 +245,7 @@ func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 func (gof *goFile) write(w io.Writer) error {
 	buf := &bytes.Buffer{} // the formatter uses the entire output, so buffer for that
 
-	if _, err := buf.Write([]byte(fmt.Sprintf("package %s\n\n%s\n\n", gof.packageName, disclaimer))); err != nil {
+	if _, err := fmt.Fprintf(buf, "package %s\n\n%s\n\n", gof.packageName, disclaimer); err != nil {
 		return fmt.Errorf("failed writing struct: %w", err)
 	}
 
@@ -302,7 +302,7 @@ func (gen *generatedStruct) write(w io.Writer, excludeNested map[string]bool, ne
 	if embeds != "" {
 		embeds += "\n\n"
 	}
-	if _, err := w.Write([]byte(fmt.Sprintf("type %s struct {\n%s", exportedName(gen.name), embeds))); err != nil {
+	if _, err := fmt.Fprintf(w, "type %s struct {\n%s", exportedName(gen.name), embeds); err != nil {
 		return fmt.Errorf("failed writing struct: %w", err)
 	}
 

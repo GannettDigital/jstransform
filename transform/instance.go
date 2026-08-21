@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	jsonpath "github.com/GannettDigital/PaesslerAG_jsonpath"
-	"github.com/buger/jsonparser"
 
 	"github.com/antchfx/xmlquery"
+	"github.com/buger/jsonparser"
 )
 
 // pathModifier is used to modify the JSON path of an instance to indicate.

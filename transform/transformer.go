@@ -183,7 +183,7 @@ func (tr *Transformer) baseXMLTransform(raw []byte) ([]byte, error) {
 
 // findParent walks the instanceTransformer tree to find the parent of the given path.
 func (tr *Transformer) findParent(path string) (instanceTransformer, error) {
-	path = strings.Replace(path, "[", ".[", -1)
+	path = strings.ReplaceAll(path, "[", ".[")
 	splits := strings.Split(path, ".")
 	if splits[0] != "$" {
 		// TODO this will probably choke on a root level array

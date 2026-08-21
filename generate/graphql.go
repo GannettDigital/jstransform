@@ -13,16 +13,14 @@ import (
 	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
-var (
-	typeJSONGraphQL = map[string]string{
-		"boolean":   "Boolean",
-		"number":    "Float",
-		"integer":   "Int",
-		"string":    "String",
-		"date-time": "DateTime",
-		"object":    "(",
-	}
-)
+var typeJSONGraphQL = map[string]string{
+	"boolean":   "Boolean",
+	"number":    "Float",
+	"integer":   "Int",
+	"string":    "String",
+	"date-time": "DateTime",
+	"object":    "(",
+}
 
 // Developer Note
 // This file started as a copy of `struct.go` and inherits some of its behavior
@@ -136,14 +134,14 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 			nestedStructs: map[string]*generatedGraphQLObject{},
 		}
 		if len(common) != 0 {
-			obj.rootStruct.gqlExtractedField.jsonName = exportedName(packageName)
+			obj.rootStruct.jsonName = exportedName(packageName)
 			name := strings.Split(filepath.Base(schema.AllOf[0].FromRef), ".")[0]
 			if newName, ok := args.StructNameMap[name]; ok {
 				name = newName
 			} else {
 				name = exportedName(name)
 			}
-			obj.rootStruct.gqlExtractedField.name = name
+			obj.rootStruct.name = name
 			for _, com := range common {
 				commonFields += len(com.rootStruct.fields)
 				for fk, fv := range com.rootStruct.fields {
@@ -159,11 +157,11 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 			}
 			if len(schema.OneOf) != 0 {
 				if newName, ok := args.GraphQLTypeNameMap[packageName]; ok {
-					obj.rootStruct.gqlExtractedField.jsonName = newName
+					obj.rootStruct.jsonName = newName
 				} else {
-					obj.rootStruct.gqlExtractedField.jsonName = exportedName(packageName)
+					obj.rootStruct.jsonName = exportedName(packageName)
 				}
-				obj.rootStruct.gqlExtractedField.name = obj.rootStruct.gqlExtractedField.jsonName
+				obj.rootStruct.name = obj.rootStruct.jsonName
 				obj.rootStruct.buildType = "interface"
 			}
 		}
@@ -499,7 +497,7 @@ func (gof *goGQL) write(w io.Writer) error {
 
 	for _, s := range gof.structs() {
 		if s.target == "" && s.buildType != "ignored" {
-			if _, err := buf.Write([]byte("\n")); err != nil {
+			if _, err := buf.WriteString("\n"); err != nil {
 				return fmt.Errorf("failed writing GraphQL %q: %w", s.name, err)
 			}
 			if err := s.write(buf); err != nil {
@@ -565,7 +563,7 @@ func (gen *generatedGraphQLObject) write(w io.Writer) error {
 // For all fields the name and jsonType are set, for arrays the array bool is set for true and for JSON objects,
 // the fields map is created and if it exists the requiredFields section populated.
 // fields will be renamed if a matching entry is supplied in the fieldRenameMap.
-func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst jsonschema.Instance) error {
+func (gen *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonschema.Instance) error {
 	if len(tree) > 1 {
 		if f, ok := gen.fields[tree[0]]; ok {
 			return f.addField(tree[1:], nil, inst)
@@ -628,7 +626,7 @@ func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst
 			// Need to preserve the value if this array's item type had a GraphQL hydration target.
 			if f.target == "" && inst.Target != "" {
 				f.target = "[" + inst.Target + "]"
-				if !(f.nullable || gen.args.Pointers && !gen.requiredFields[f.jsonName]) {
+				if !f.nullable && (!gen.args.Pointers || gen.requiredFields[f.jsonName]) {
 					f.target += "!"
 				}
 			}
@@ -744,16 +742,18 @@ func (ef *gqlExtractedField) graphqlType(required bool) (string, string) {
 
 // graphqlComment takes a string and returns GraphQL comment syntax.
 func graphqlComment(prefix, description string) string {
-	if strings.IndexRune(description, '\n') < 0 {
+	if !strings.ContainsRune(description, '\n') {
 		return fmt.Sprintf("%s\"%s\"\n", prefix, description)
 	}
 	// Multi-line descriptions get the """ comment syntax.
 	newDescription := prefix + `"""` + "\n"
+	var newDescriptionSb752 strings.Builder
 	for _, line := range strings.Split(description, "\n") {
 		if line != "" {
-			newDescription += prefix + line
+			newDescriptionSb752.WriteString(prefix + line)
 		}
-		newDescription += "\n"
+		newDescriptionSb752.WriteString("\n")
 	}
+	newDescription += newDescriptionSb752.String()
 	return newDescription + prefix + `"""` + "\n"
 }

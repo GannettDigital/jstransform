@@ -170,7 +170,7 @@ func convertString(raw any) (any, error) {
 	}
 }
 
-func extractTransformInstructions(raw json.RawMessage, transformIdentifier, path string, instanceType string) (*transformInstructions, error) {
+func extractTransformInstructions(raw json.RawMessage, transformIdentifier, path, instanceType string) (*transformInstructions, error) {
 	rawTransformInstruction, _, _, err := jsonparser.Get(raw, "transform", transformIdentifier)
 	if err != nil && !errors.Is(err, jsonparser.KeyPathNotFoundError) {
 		return nil, fmt.Errorf("failed to extract raw instance transform: %w", err)

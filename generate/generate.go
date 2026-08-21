@@ -67,7 +67,7 @@ type BuildArgs struct {
 }
 
 // BuildStructs is a backward-compatibility wrapper for BuildStructsWithArgs.
-func BuildStructs(schemaPath string, outputDir string, useMessagePack bool) error {
+func BuildStructs(schemaPath, outputDir string, useMessagePack bool) error {
 	return BuildStructsWithArgs(BuildArgs{
 		SchemaPath:             schemaPath,
 		OutputDir:              outputDir,
@@ -77,7 +77,7 @@ func BuildStructs(schemaPath string, outputDir string, useMessagePack bool) erro
 }
 
 // BuildStructsRename is a backward-compatibility wrapper for BuildStructsWithArgs.
-func BuildStructsRename(schemaPath string, outputDir string, useMessagePack bool, nameMap map[string]string) error {
+func BuildStructsRename(schemaPath, outputDir string, useMessagePack bool, nameMap map[string]string) error {
 	return BuildStructsWithArgs(BuildArgs{
 		SchemaPath:             schemaPath,
 		OutputDir:              outputDir,
