@@ -12,6 +12,9 @@ import (
 	"github.com/GannettDigital/msgp/gen"
 	"github.com/GannettDigital/msgp/parse"
 	"github.com/GannettDigital/msgp/printer"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 const (
@@ -258,7 +261,7 @@ func buildStructFile(childPath, name, packageName string, embeds []string, args 
 // Only minimal checking on naming is done rather it is assumed the name from the JSON schema is reasonable any
 // unacceptable names will likely fail during formatting.
 func exportedName(name string) string {
-	return strings.Title(name)
+	return cases.Title(language.Und, cases.NoLower).String(name)
 }
 
 // splitJSONPath takes a JSON path and returns an array of path items each of which represents a JSON object with the

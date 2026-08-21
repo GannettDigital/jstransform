@@ -302,7 +302,7 @@ func TestMax(t *testing.T) {
 		},
 	}
 
-	runOpTests(t, func() transformOperation { return &max{} }, tests)
+	runOpTests(t, func() transformOperation { return &maxOp{} }, tests)
 }
 
 func TestReplace(t *testing.T) {
@@ -656,14 +656,13 @@ func TestConvertToBool(t *testing.T) {
 }
 
 func compareWantErrs(gotErr error, wantErr bool) error {
-	switch {
-	case wantErr && gotErr == nil:
-		return errors.New("expected error and didn't get one")
-	case wantErr && gotErr != nil:
+	if wantErr {
+		if gotErr == nil {
+			return errors.New("expected error and didn't get one")
+		}
 		return nil
-	case !wantErr && gotErr == nil:
-		return nil
-	case !wantErr && gotErr != nil:
+	}
+	if gotErr != nil {
 		return fmt.Errorf("got error unexpected error: %w", gotErr)
 	}
 	return nil

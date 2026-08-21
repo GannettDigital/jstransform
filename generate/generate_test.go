@@ -239,7 +239,7 @@ func TestBuildStructs(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 			outDir := test.buildArgs.OutputDir
-			if err := os.Mkdir(outDir, os.ModePerm|os.ModePerm); err != nil {
+			if err := os.Mkdir(outDir, 0o750); err != nil {
 				t.Fatalf("Test %q - failed to create outDir %q: %v", test.description, outDir, err)
 			}
 			defer func() {

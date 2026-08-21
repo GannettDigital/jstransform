@@ -72,7 +72,7 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 		case "inverse":
 			op = &inverse{}
 		case "max":
-			op = &max{}
+			op = &maxOp{}
 		case "replace":
 			op = &replace{}
 		case "split":
@@ -111,7 +111,7 @@ func (ti *transformInstruction) xmlTransform(in any, fieldType string, modifier 
 
 	node, ok := in.(*xmlquery.Node)
 	if !ok {
-		return nil, errors.New("Error converting input to *xmlquery.Node")
+		return nil, errors.New("error converting input to *xmlquery.Node")
 	}
 
 	xmlNode := xmlquery.Find(node, path)
@@ -133,6 +133,9 @@ func (ti *transformInstruction) xmlTransform(in any, fieldType string, modifier 
 	// if only numElementsWithoutChild has results then the nodes are leaf nodes and can extract value
 	if numElementsWithChild == 0 && numElementsWithoutChild == 1 {
 		value, err = convert(xmlNode[0].InnerText(), fieldType)
+		if err != nil {
+			value = xmlNode
+		}
 	} else {
 		switch fieldType {
 		case "array", "object":
@@ -170,29 +173,22 @@ func (ti *transformInstruction) jsonTransform(in any, fieldType string, modifier
 		path = modifier(path)
 	}
 	rawValue, err := jsonpath.Get(path, in)
-	if err != nil {
-		return nil, nil
-	}
-	if rawValue == nil {
-		return nil, nil
-	}
-
-	value, err := convert(rawValue, fieldType)
-	if err != nil {
-		// In some cases the conversion is helpful but in others like before a max operation it isn't
-		value = rawValue
-	}
-	if value == nil {
-		return nil, nil
-	}
-
-	for _, op := range ti.Operations {
-		value, err = op.transform(value)
+	if err == nil && rawValue != nil {
+		value, err := convert(rawValue, fieldType)
 		if err != nil {
-			return nil, fmt.Errorf("failed operation on value from jsonPath %q: %w", path, err)
+			value = rawValue
+		}
+		if value != nil {
+			for _, op := range ti.Operations {
+				value, err = op.transform(value)
+				if err != nil {
+					return nil, fmt.Errorf("failed operation on value from jsonPath %q: %w", path, err)
+				}
+			}
+			return value, nil
 		}
 	}
-	return value, nil
+	return nil, nil
 }
 
 // transform runs the instructions in this object returning the new transformed value or an error if unable to.
@@ -267,6 +263,7 @@ func (tis *transformInstructions) transform(in any, fieldType string, modifier p
 		tis.From = newFrom
 	case concatenate:
 		concatResult = true
+	default:
 	}
 
 	var result any
@@ -293,15 +290,15 @@ func (tis *transformInstructions) transform(in any, fieldType string, modifier p
 	return result, nil
 }
 
-// replaceJSONPathPrefix will switch old for new in the path of the transform instructions if the path starts with
+// replaceJSONPathPrefix will switch old for newPrefix in the path of the transform instructions if the path starts with
 // old.
-func (tis *transformInstructions) replaceJSONPathPrefix(old, new string) {
+func (tis *transformInstructions) replaceJSONPathPrefix(old, newPrefix string) {
 	for _, instruction := range tis.From {
 		if strings.HasPrefix(instruction.jsonPath, old) {
-			instruction.jsonPath = strings.Replace(instruction.jsonPath, old, new, 1)
+			instruction.jsonPath = strings.Replace(instruction.jsonPath, old, newPrefix, 1)
 		}
 		if strings.HasPrefix(instruction.xmlPath, old) {
-			instruction.xmlPath = strings.Replace(instruction.xmlPath, old, new, 1)
+			instruction.xmlPath = strings.Replace(instruction.xmlPath, old, newPrefix, 1)
 		}
 	}
 }

@@ -432,6 +432,7 @@ func TestWalkJSONSchema(t *testing.T) {
 			case !test.wantErr && err != nil:
 				t.Errorf("Test %q - got error: %v", test.description, err)
 				return
+			default:
 			}
 			if got, want := len(walker.calls), len(test.want); got != want {
 				t.Errorf("Test %q - got %d calls, want %d", test.description, got, want)
@@ -852,6 +853,7 @@ func TestWalkJSONSchemaRaw(t *testing.T) {
 		case !test.wantErr && err != nil:
 			t.Errorf("Test %q - got error: %v", test.description, err)
 			continue
+		default:
 		}
 		if got, want := len(walker.rawCalls), len(test.want); got != want {
 			t.Errorf("Test %q - got %d calls, want %d", test.description, got, want)

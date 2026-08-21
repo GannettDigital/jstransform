@@ -85,6 +85,7 @@ func walkInstance(raw json.RawMessage, path string, walkFn WalkInstanceFunc) err
 				return err
 			}
 		}
+	default:
 	}
 	return nil
 }
@@ -135,6 +136,7 @@ func walkRaw(raw json.RawMessage, path string, walkFn WalkRawFunc) error {
 		if err := walkRaw(items, path+"[*]", walkFn); err != nil {
 			return fmt.Errorf("failed processing items at path %q: %w", path, err)
 		}
+	default:
 	}
 	return nil
 }

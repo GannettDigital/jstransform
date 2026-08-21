@@ -94,6 +94,7 @@ func TestConcat(t *testing.T) {
 			t.Errorf("Test %q - got error, want nil: %v", test.description, err)
 		case !reflect.DeepEqual(got, test.want):
 			t.Errorf("Test %q - got %v, want %v", test.description, got, test.want)
+		default:
 		}
 	}
 }
@@ -371,6 +372,7 @@ func TestConvert(t *testing.T) {
 			t.Errorf("Test %q - got error, want nil: %v", test.description, err)
 		case !reflect.DeepEqual(got, test.want):
 			t.Errorf("Test %q - got %v, want %v", test.description, got, test.want)
+		default:
 		}
 	}
 }

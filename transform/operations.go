@@ -13,6 +13,8 @@ import (
 
 	"github.com/antchfx/xmlquery"
 	"github.com/microcosm-cc/bluemonday"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var durationRe = regexp.MustCompile(`^([\d]*?):?([\d]*):([\d]*)$`)
@@ -98,15 +100,13 @@ func (c *changeCase) transform(raw any) (any, error) {
 }
 
 // notEmpty is a transformOperation which returns a boolean depending on if the passed in value is considered "empty", as the definition changes on a per-type basis.
-type valueExists struct {
-	args map[string]string
-}
+type valueExists struct{}
 
-func (n *valueExists) init(args map[string]string) error {
+func (v *valueExists) init(args map[string]string) error {
 	return nil
 }
 
-func (c *valueExists) transform(raw any) (any, error) {
+func (v *valueExists) transform(raw any) (any, error) {
 	switch v := raw.(type) {
 	case string:
 		if len(v) > 0 {
@@ -124,9 +124,7 @@ func (c *valueExists) transform(raw any) (any, error) {
 }
 
 // inverse is a transformOperation which flips the value of a boolean.
-type inverse struct {
-	args map[string]string
-}
+type inverse struct{}
 
 func (i *inverse) init(args map[string]string) error {
 	return nil
@@ -140,14 +138,14 @@ func (i *inverse) transform(raw any) (any, error) {
 	return !in, nil
 }
 
-// max is a transformOperation which retrieves a field from the maximum item in
+// maxOp is a transformOperation which retrieves a field from the maximum item in
 // an array. The maxiumum item is determined by comparing values in a defined
 // number field on the array items.
-type max struct {
+type maxOp struct {
 	args map[string]string
 }
 
-func (m *max) init(args map[string]string) error {
+func (m *maxOp) init(args map[string]string) error {
 	if err := requiredArgs([]string{"by", "return"}, args); err != nil {
 		return err
 	}
@@ -155,7 +153,7 @@ func (m *max) init(args map[string]string) error {
 	return nil
 }
 
-func (m *max) transform(in any) (any, error) {
+func (m *maxOp) transform(in any) (any, error) {
 	inArray, ok := in.([]any)
 	if !ok {
 		return nil, errors.New("input must be an array")
@@ -304,8 +302,7 @@ func (c *currentTime) init(args map[string]string) error {
 
 func (c *currentTime) transform(_ any) (any, error) {
 	timeFmt := c.args["format"]
-	switch c.args["format"] {
-	case "RFC3339":
+	if c.args["format"] == "RFC3339" {
 		timeFmt = time.RFC3339
 	}
 	return time.Now().Format(timeFmt), nil
@@ -337,16 +334,14 @@ func (c *toCamelCase) transform(raw any) (any, error) {
 			arr[0] = strings.ToLower(cap)
 			continue
 		}
-		arr[i] = strings.Title(cap)
+		arr[i] = cases.Title(language.Und, cases.NoLower).String(cap)
 	}
 
 	return strings.Join(arr, ""), nil
 }
 
 // removeHTML is a transformOperation which removes all html from a string.
-type removeHTML struct {
-	args map[string]string
-}
+type removeHTML struct{}
 
 func (c *removeHTML) init(args map[string]string) error {
 	return nil
@@ -366,9 +361,7 @@ func (c *removeHTML) transform(raw any) (any, error) {
 }
 
 // convertToFloat64 is a transformOperation which converts various types to float64.
-type convertToFloat64 struct {
-	args map[string]string
-}
+type convertToFloat64 struct{}
 
 func (c *convertToFloat64) init(args map[string]string) error {
 	return nil
@@ -388,9 +381,7 @@ func (c *convertToFloat64) transform(raw any) (any, error) {
 }
 
 // convertToInt64 is a transformOperation which converts various types to int64.
-type convertToInt64 struct {
-	args map[string]string
-}
+type convertToInt64 struct{}
 
 func (c *convertToInt64) init(args map[string]string) error {
 	return nil
@@ -420,9 +411,7 @@ func (c *convertToInt64) transform(raw any) (any, error) {
 }
 
 // convertToBool is a transformOperation which converts various types to boolean.
-type convertToBool struct {
-	args map[string]string
-}
+type convertToBool struct{}
 
 func (c *convertToBool) init(args map[string]string) error {
 	return nil

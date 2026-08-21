@@ -351,12 +351,14 @@ func TestGeneratedStruct(t *testing.T) {
 
 		buf := &bytes.Buffer{}
 		err = g.write(buf)
-		if !test.wantWriteError && err != nil {
+		switch {
+		case !test.wantWriteError && err != nil:
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
-		} else if test.wantWriteError && err == nil {
+		case test.wantWriteError && err == nil:
 			t.Fatalf("Test %q - expected failure but succeeded to write", test.description)
-		} else if test.wantWriteError {
+		case test.wantWriteError:
 			continue
+		default:
 		}
 		got := buf.Bytes()
 

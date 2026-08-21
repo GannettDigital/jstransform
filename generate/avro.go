@@ -250,16 +250,17 @@ func filterPackage(name, path string) (*ast.File, error) {
 	return goFile, nil
 }
 
-func parseStructTag(literal *ast.BasicLit) (name, description string, omitEmpty bool) {
+func parseStructTag(literal *ast.BasicLit) (string, string, bool) {
 	if literal == nil {
 		return "", "", false
 	}
 	tag := reflect.StructTag(strings.Trim(literal.Value, "`"))
 
-	description = tag.Get("description")
+	description := tag.Get("description")
 	jsonValue := tag.Get("json")
 	jsonSplits := strings.Split(jsonValue, ",")
-	name = jsonSplits[0]
+	name := jsonSplits[0]
+	omitEmpty := false
 	if len(jsonSplits) > 1 {
 		for _, split := range jsonSplits[1:] {
 			if strings.ToLower(split) == "omitempty" {

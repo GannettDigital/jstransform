@@ -32,12 +32,16 @@ func concat(a, b any, delimiter string) (any, error) {
 		return nil, fmt.Errorf("can't concat types %q and %q", atype, btype)
 	}
 
-	switch a.(type) {
+	switch valA := a.(type) {
 	case string:
-		if delimiter != "" && a.(string) != "" && b.(string) != "" {
-			return a.(string) + delimiter + b.(string), nil
+		valB, ok := b.(string)
+		if !ok {
+			return nil, fmt.Errorf("expected string for b but got %T", b)
 		}
-		return a.(string) + b.(string), nil
+		if delimiter != "" && valA != "" && valB != "" {
+			return valA + delimiter + valB, nil
+		}
+		return valA + valB, nil
 	default:
 		return nil, fmt.Errorf("concatenation of types %q not supported", atype)
 	}

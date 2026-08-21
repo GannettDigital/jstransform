@@ -1,6 +1,7 @@
 package jsonschema
 
 import (
+	"context"
 	"encoding/json"
 	"net"
 	"net/http"
@@ -14,7 +15,8 @@ import (
 func TestDereference(t *testing.T) {
 	// create listener with desired port
 	custom := "127.0.0.1:12345"
-	tl, err := net.Listen("tcp", custom)
+	var lc net.ListenConfig
+	tl, err := lc.Listen(context.Background(), "tcp", custom)
 	if err != nil {
 		t.Errorf("Test failed to create listener on %s %v", custom, err)
 	}
@@ -25,7 +27,7 @@ func TestDereference(t *testing.T) {
 	}))
 
 	// Close listener, replace and start
-	ts.Listener.Close()
+	_ = ts.Listener.Close()
 	ts.Listener = tl
 	ts.Start()
 	defer ts.Close()
@@ -85,30 +87,40 @@ func TestDereference(t *testing.T) {
 		var want any
 		if !test.wantErr {
 			wantPath := strings.Replace(test.schemaPath, "/jsref_", "/deref_", 1)
-			wantJson, err := os.ReadFile(wantPath)
+			wantJSON, err := os.ReadFile(wantPath)
 			if err != nil {
 				t.Errorf("Test %q - failed to read json want file %q: %v", test.description, wantPath, err)
 			}
-			json.Unmarshal(wantJson, &want)
+			if err := json.Unmarshal(wantJSON, &want); err != nil {
+				t.Errorf("Test %q - failed to unmarshal want file %q: %v", test.description, wantPath, err)
+			}
 		}
 
 		var got any
-		gotJson, err := os.ReadFile(test.schemaPath)
+		gotJSON, err := os.ReadFile(test.schemaPath)
 		if err != nil {
 			t.Errorf("Test %q - failed to read json got file %q: %v", test.description, test.schemaPath, err)
 		}
 
-		gotJson, err = dereference(test.schemaPath, gotJson, "", true)
-		if err != nil && !test.wantErr {
+		gotJSON, err = dereference(test.schemaPath, gotJSON, "", true)
+		if err != nil {
+			if test.wantErr {
+				continue
+			}
 			t.Errorf("Test %q - failed to dereference json file %q: %v", test.description, test.schemaPath, err)
 		}
-		json.Unmarshal(gotJson, &got)
+		if test.wantErr {
+			t.Errorf("Test %q - expected error but got none", test.description)
+			continue
+		}
+		if err := json.Unmarshal(gotJSON, &got); err != nil {
+			t.Errorf("Test %q - failed to unmarshal got file %q: %v", test.description, test.schemaPath, err)
+		}
 
 		switch {
-		case test.wantErr && err != nil:
-			continue
 		case !reflect.DeepEqual(got, want):
 			t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, want)
+		default:
 		}
 	}
 }

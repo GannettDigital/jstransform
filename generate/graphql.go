@@ -296,7 +296,7 @@ func (ef *gqlExtractedField) write(w io.Writer, prefix string, required bool) er
 		return err
 	}
 
-	sort.Strings(ef.fieldOrder)
+	slices.Sort(ef.fieldOrder)
 	for _, fieldName := range ef.fieldOrder {
 		field := ef.fields[fieldName]
 		if err := field.write(w, prefix+"\t", ef.requiredFields[field.jsonName]); err != nil {
@@ -312,7 +312,7 @@ func (ef *gqlExtractedField) write(w io.Writer, prefix string, required bool) er
 
 // Sorted will return the fields in a sorted list. The sort is a string sort on the keys.
 func (efs gqlExtractedFields) Sorted() []*gqlExtractedField {
-	var sortedKeys sort.StringSlice
+	sortedKeys := make(sort.StringSlice, 0, len(efs))
 	fieldsByName := make(map[string]*gqlExtractedField, len(efs))
 	for _, f := range efs {
 		sortedKeys = append(sortedKeys, f.name)
@@ -399,10 +399,11 @@ func (gof *goGQL) structs() []*generatedGraphQLObject {
 	}
 
 	// order with root first and nested in a consistent following order
-	sort.Slice(nested, func(i, j int) bool {
-		return nested[i].name < nested[j].name
+	slices.SortFunc(nested, func(i, j *generatedGraphQLObject) int {
+		return strings.Compare(i.name, j.name)
 	})
-	structs := []*generatedGraphQLObject{gof.rootStruct}
+	structs := make([]*generatedGraphQLObject, 0, 1+len(nested))
+	structs = append(structs, gof.rootStruct)
 	structs = append(structs, nested...)
 
 	return structs
@@ -563,9 +564,9 @@ func (gen *generatedGraphQLObject) write(w io.Writer) error {
 // For all fields the name and jsonType are set, for arrays the array bool is set for true and for JSON objects,
 // the fields map is created and if it exists the requiredFields section populated.
 // fields will be renamed if a matching entry is supplied in the fieldRenameMap.
-func (gen *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonschema.Instance) error {
+func (ef *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonschema.Instance) error {
 	if len(tree) > 1 {
-		if f, ok := gen.fields[tree[0]]; ok {
+		if f, ok := ef.fields[tree[0]]; ok {
 			return f.addField(tree[1:], nil, inst)
 		}
 		f := &gqlExtractedField{
@@ -573,12 +574,12 @@ func (gen *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonsche
 			jsonType:  "object",
 			name:      exportedName(tree[0]),
 			fields:    make(map[string]*gqlExtractedField),
-			args:      gen.args,
+			args:      ef.args,
 			target:    inst.Target,
 			arguments: inst.GraphQLArguments,
 		}
-		gen.fields[tree[0]] = f
-		gen.fieldOrder = append(gen.fieldOrder, tree[0])
+		ef.fields[tree[0]] = f
+		ef.fieldOrder = append(ef.fieldOrder, tree[0])
 		if err := f.addField(tree[1:], nil, inst); err != nil {
 			return fmt.Errorf("failed field %q: %w", tree[0], err)
 		}
@@ -586,7 +587,7 @@ func (gen *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonsche
 	}
 
 	if len(tree) > 0 {
-		fieldName, ok := gen.args.FieldNameMap[tree[0]]
+		fieldName, ok := ef.args.FieldNameMap[tree[0]]
 		if !ok {
 			fieldName = tree[0]
 		}
@@ -609,13 +610,13 @@ func (gen *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonsche
 			name:        exportedName(fieldName),
 			jsonName:    tree[0],
 			jsonType:    jsonType,
-			args:        gen.args,
+			args:        ef.args,
 			target:      inst.Target,
 			arguments:   inst.GraphQLArguments,
 			nullable:    slices.Contains(inst.Type, "null"),
 		}
 		// Second processing of an array type
-		if exists, ok := gen.fields[f.jsonName]; ok {
+		if exists, ok := ef.fields[f.jsonName]; ok {
 			f = exists
 			if !f.array {
 				return fmt.Errorf("field %q already exists but is not an array field", f.name)
@@ -626,7 +627,7 @@ func (gen *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonsche
 			// Need to preserve the value if this array's item type had a GraphQL hydration target.
 			if f.target == "" && inst.Target != "" {
 				f.target = "[" + inst.Target + "]"
-				if !f.nullable && (!gen.args.Pointers || gen.requiredFields[f.jsonName]) {
+				if !f.nullable && (!ef.args.Pointers || ef.requiredFields[f.jsonName]) {
 					f.target += "!"
 				}
 			}
@@ -650,17 +651,17 @@ func (gen *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonsche
 				totalDescription = lines[0] + "\n" + totalDescription
 			}
 			totalName := "total" + f.name
-			gen.fields[totalName] = &gqlExtractedField{
+			ef.fields[totalName] = &gqlExtractedField{
 				description: totalDescription,
 				name:        exportedName(totalName),
 				jsonName:    totalName,
 				jsonType:    "integer",
-				args:        gen.args,
+				args:        ef.args,
 				target:      "",
 				arguments:   nil,
 			}
-			gen.fieldOrder = append(gen.fieldOrder, totalName)
-			gen.requiredFields[totalName] = true
+			ef.fieldOrder = append(ef.fieldOrder, totalName)
+			ef.requiredFields[totalName] = true
 		case "object":
 			// Special case for when the properties field of an object is `{}`. Put `Any` instead of an empty field name.
 			if len(inst.Properties) == 0 {
@@ -672,10 +673,11 @@ func (gen *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonsche
 				f.requiredFields[name] = true
 			}
 			f.fields = make(map[string]*gqlExtractedField)
+		default:
 		}
 
-		gen.fields[tree[0]] = f
-		gen.fieldOrder = append(gen.fieldOrder, tree[0])
+		ef.fields[tree[0]] = f
+		ef.fieldOrder = append(ef.fieldOrder, tree[0])
 	}
 
 	return nil

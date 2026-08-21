@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -62,24 +63,24 @@ func main() {
 	args := flag.Args()
 
 	if len(args) < 1 {
-		fmt.Printf("Usage: %s [-avro] [-importPath a/b/c] [-msgp] [-rename k=v] [-renameFields k=v] [-renameGraphQLType k=v] [-graphql] [-outputPathGraphQL a/b/c] <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
+		log.Printf("Usage: %s [-avro] [-importPath a/b/c] [-msgp] [-rename k=v] [-renameFields k=v] [-renameGraphQLType k=v] [-graphql] [-outputPathGraphQL a/b/c] <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 	if *genAvro && *importPath == "" {
-		fmt.Println("Avro requires specifying an import path.")
+		log.Println("Avro requires specifying an import path.")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 	if *genGraphQL && *importPath == "" {
-		fmt.Println("GraphQL requires specifying an import path.")
+		log.Println("GraphQL requires specifying an import path.")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
 	inputPath, err := filepath.Abs(args[0])
 	if err != nil {
-		fmt.Printf("Input directory %q error: %v", args[0], err)
+		log.Printf("Input directory %q error: %v", args[0], err)
 		os.Exit(2)
 	}
 
@@ -87,7 +88,7 @@ func main() {
 	if len(args) > 1 {
 		outputPath, err = filepath.Abs(args[1])
 		if err != nil {
-			fmt.Printf("Output directory %q error: %v", args[1], err)
+			log.Printf("Output directory %q error: %v", args[1], err)
 			os.Exit(3)
 		}
 	}
@@ -110,7 +111,7 @@ func main() {
 		EmbedAllOf:             *embedAllOf,
 		ScalarAny:              *scalarAny,
 	}); err != nil {
-		fmt.Printf("Golang Struct generation failed: %v\n", err)
+		log.Printf("Golang Struct generation failed: %v\n", err)
 		os.Exit(4)
 	}
 }

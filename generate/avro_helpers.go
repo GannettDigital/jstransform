@@ -571,6 +571,8 @@ func printFields(list *ast.FieldList) string {
 			out += fmt.Sprintf("%s time.Time %s\n", name, f.Tag.Value)
 		case *ast.StructType:
 			out += fmt.Sprintf("%s struct{\n%s} %s\n", name, printFields(fType.Fields), f.Tag.Value)
+		default:
+			return fmt.Sprintf("unsupported type %T", fType)
 		}
 	}
 	return out

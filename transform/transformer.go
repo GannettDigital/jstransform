@@ -58,11 +58,12 @@ func newTransformer(schema *jsonschema.Schema, tranformIdentifier string, format
 	tr := &Transformer{schema: schema, transformIdentifier: tranformIdentifier, format: format}
 	emptyJSON := []byte(`{}`)
 	var err error
-	if schema.Properties != nil {
+	switch {
+	case schema.Properties != nil:
 		tr.root, err = newObjectTransformer("$", tranformIdentifier, emptyJSON, format)
-	} else if schema.Items != nil {
+	case schema.Items != nil:
 		tr.root, err = newArrayTransformer("$", tranformIdentifier, emptyJSON, format)
-	} else {
+	default:
 		return nil, errors.New("no Properties nor Items found for schema")
 	}
 	if err != nil {
@@ -215,9 +216,11 @@ func (tr *Transformer) walker(path string, value json.RawMessage) error {
 	var iTransformer instanceTransformer
 	switch instanceType {
 	case "object":
-		properties, _, _, err := jsonparser.Get(value, "properties")
-		if err != nil {
-			return fmt.Errorf("failed to extract properties: %w", err)
+		var properties []byte
+		var parseErr error
+		properties, _, _, parseErr = jsonparser.Get(value, "properties")
+		if parseErr != nil {
+			return fmt.Errorf("failed to extract properties: %w", parseErr)
 		}
 		if string(properties) == "{}" { // Checks for empty "properties"
 			iTransformer, err = newScalarTransformer(path, tr.transformIdentifier, value, instanceType, tr.format)
@@ -237,11 +240,7 @@ func (tr *Transformer) walker(path string, value json.RawMessage) error {
 	if err != nil {
 		return err
 	}
-	if err := parent.addChild(iTransformer); err != nil {
-		return err
-	}
-
-	return nil
+	return parent.addChild(iTransformer)
 }
 
 // saveInTree is used recursively to add values the tree based on the path even if the parents are nil.
@@ -252,7 +251,6 @@ func saveInTree(tree map[string]any, path string, value any) error {
 
 	splits := strings.Split(path, ".")
 	if splits[0] == "$" {
-		path = path[2:]
 		splits = splits[1:]
 	}
 
@@ -264,7 +262,11 @@ func saveInTree(tree map[string]any, path string, value any) error {
 	if len(arraySplits) != 1 { // the case of an array or nested arrays with an object in them
 		var sValue []any
 		if rawSlice, ok := tree[arraySplits[0]]; ok {
-			sValue = rawSlice.([]any)
+			var okAssert bool
+			sValue, okAssert = rawSlice.([]any)
+			if !okAssert {
+				return fmt.Errorf("value at %q is not a slice", arraySplits[0])
+			}
 		}
 
 		newTreeMap := make(map[string]any)
@@ -303,7 +305,11 @@ func saveLeaf(tree map[string]any, path string, value any) error {
 
 	var sValue []any
 	if rawSlice, ok := tree[arraySplits[0]]; ok {
-		sValue = rawSlice.([]any)
+		var okAssert bool
+		sValue, okAssert = rawSlice.([]any)
+		if !okAssert {
+			return fmt.Errorf("value at %q is not a slice", arraySplits[0])
+		}
 	}
 
 	newValue, err := saveInSlice(sValue, arraySplits[1:], value)
@@ -352,6 +358,9 @@ func saveInSlice(current []any, arraySplits []string, value any) ([]any, error) 
 	}
 
 	newValue, err := saveInSlice(nested, arraySplits[1:], value)
+	if err != nil {
+		return nil, err
+	}
 	current[index] = newValue
 	return current, nil
 }

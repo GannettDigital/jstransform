@@ -289,6 +289,7 @@ func TestSchemaFromFile(t *testing.T) {
 				t.Errorf("Test %q - got Items\n%s\nwant\n%s", test.description, got.Items, test.want.Items)
 			case !reflect.DeepEqual(got.Required, test.want.Required):
 				t.Errorf("Test %q - got Required\n%s\nwant\n%s", test.description, got.Required, test.want.Required)
+			default:
 			}
 		})
 	}
@@ -398,6 +399,7 @@ func TestSchemaFromFileNoFlatten(t *testing.T) {
 				t.Errorf("Test %q - got Items\n%s\nwant\n%s", test.description, got.Items, test.want.Items)
 			case !reflect.DeepEqual(got.Required, test.want.Required):
 				t.Errorf("Test %q - got Required\n%s\nwant\n%s", test.description, got.Required, test.want.Required)
+			default:
 			}
 		})
 	}

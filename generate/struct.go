@@ -103,7 +103,7 @@ func (efs extractedFields) IncludeTime() bool {
 
 // Sorted will return the fields in a sorted list. The sort is a string sort on the keys.
 func (efs extractedFields) Sorted() []*extractedField {
-	var sortedKeys sort.StringSlice
+	sortedKeys := make(sort.StringSlice, 0, len(efs))
 	fieldsByName := make(map[string]*extractedField)
 	for _, f := range efs {
 		sortedKeys = append(sortedKeys, f.name)
@@ -188,10 +188,11 @@ func (gof *goFile) structs() []*generatedStruct {
 	}
 
 	// order with root first and nested in a consistent following order
-	sort.Slice(nested, func(i, j int) bool {
-		return nested[i].name < nested[j].name
+	slices.SortFunc(nested, func(i, j *generatedStruct) int {
+		return strings.Compare(i.name, j.name)
 	})
-	structs := []*generatedStruct{gof.rootStruct}
+	structs := make([]*generatedStruct, 0, 1+len(nested))
+	structs = append(structs, gof.rootStruct)
 	structs = append(structs, nested...)
 
 	return structs
@@ -368,11 +369,10 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 		// Second processing of an array type
 		if exists, ok := fields[f.jsonName]; ok {
 			f = exists
-			if f.array && f.jsonType == "" {
-				f.jsonType = jsonType
-			} else {
+			if !f.array || f.jsonType != "" {
 				return fmt.Errorf("field %q already exists but is not an array field: %q", f.name, f.jsonType)
 			}
+			f.jsonType = jsonType
 		}
 		if slices.Contains(inst.Type, "string") && inst.Format == "date-time" {
 			f.jsonType = "date-time"
@@ -388,6 +388,7 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 				f.requiredFields[name] = true
 			}
 			f.fields = make(map[string]*extractedField)
+		default:
 		}
 
 		fields[tree[0]] = f

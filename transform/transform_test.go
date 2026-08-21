@@ -101,6 +101,7 @@ func TestTransformInstruction(t *testing.T) {
 			t.Errorf("Test %q - got error, want nil: %v", test.description, err)
 		case !reflect.DeepEqual(got, test.want):
 			t.Errorf("Test %q - got %v, want %v", test.description, got, test.want)
+		default:
 		}
 	}
 }
@@ -323,6 +324,7 @@ func TestTransformInstructions(t *testing.T) {
 			t.Errorf("Test %q - got error, want nil: %v", test.description, err)
 		case !reflect.DeepEqual(got, test.want):
 			t.Errorf("Test %q - got %v, want %v", test.description, got, test.want)
+		default:
 		}
 	}
 }
@@ -558,7 +560,7 @@ func TestTransformUnmarshal(t *testing.T) {
 				"cumulo": transformInstructions{
 					From: []*transformInstruction{
 						{jsonPath: "$.data.renditions[*]", Operations: []transformOperation{
-							&max{args: map[string]string{"by": "@.encodingRate", "return": "@.url"}},
+							&maxOp{args: map[string]string{"by": "@.encodingRate", "return": "@.url"}},
 							&replace{args: map[string]string{"regex": `(http://.*net)/`, "new": "https://media.gannett-cdn.com"}},
 						}},
 					},
@@ -609,6 +611,7 @@ func TestTransformUnmarshal(t *testing.T) {
 					}
 				}
 			}
+		default:
 		}
 	}
 }

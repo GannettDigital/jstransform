@@ -15,12 +15,12 @@ import (
 // pathModifier is used to modify the JSON path of an instance to indicate.
 type pathModifier func(string) string
 
-func pathReplace(old, new string, modifier pathModifier) pathModifier {
+func pathReplace(old, newPath string, modifier pathModifier) pathModifier {
 	return func(path string) string {
 		if modifier != nil {
 			path = modifier(path)
 		}
-		path = strings.Replace(path, old, new, 1)
+		path = strings.Replace(path, old, newPath, 1)
 		return path
 	}
 }
@@ -260,7 +260,7 @@ func (at *arrayTransformer) transform(in any, modifier pathModifier) (any, error
 	if at.format == xmlInput {
 		return at.arrayTransformXML(in, modifier)
 	}
-	return nil, fmt.Errorf("Unrecognized transform type %s in arraytransformer transform, must be 'JSON' or 'XML' ", at.format)
+	return nil, fmt.Errorf("unrecognized transform type %s in arraytransformer transform, must be 'JSON' or 'XML' ", at.format)
 }
 
 // objectTransformer represents a JSON instance of type object and associated transforms.
@@ -319,10 +319,6 @@ func (ot *objectTransformer) selectChild(key string) instanceTransformer { retur
 // objectTransformJSON retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields.
 func (ot *objectTransformer) objectTransformJSON(in any, modifier pathModifier) (any, error) {
-	path := ot.jsonPath
-	if modifier != nil {
-		path = modifier(path)
-	}
 	var newValue map[string]any
 
 	// For the object use a transform if it exists or the default or an empty map
@@ -371,11 +367,6 @@ func (ot *objectTransformer) objectTransformJSON(in any, modifier pathModifier) 
 // transforms for all defined child fields. If a transform is provided it transforms the children relative to the
 // passed in node. If a transform is provided and not found the children of the object are skipped.
 func (ot *objectTransformer) objectTransformXML(in any, modifier pathModifier) (any, error) {
-	path := ot.jsonPath
-	if modifier != nil {
-		path = modifier(path)
-	}
-
 	// For the object use a transform if it exists, if the transform does not find a node it will return nil unless a
 	// default value is specified in which case the default value will be returned
 	if ot.transforms != nil {
@@ -445,7 +436,7 @@ func (ot *objectTransformer) transform(in any, modifier pathModifier) (any, erro
 	if ot.format == xmlInput {
 		return ot.objectTransformXML(in, modifier)
 	}
-	return nil, fmt.Errorf("Unrecognized transform type %s in objecttransformer transform, must be 'JSON' or 'XML' ", ot.format)
+	return nil, fmt.Errorf("unrecognized transform type %s in objecttransformer transform, must be 'JSON' or 'XML' ", ot.format)
 }
 
 // scalarTransformer represents a JSON instance for a scalar type.
@@ -536,11 +527,6 @@ func (st *scalarTransformer) transformScalarJSON(in any, modifier pathModifier) 
 //
 // 2. If transform does not exist or returns no value send back default.
 func (st *scalarTransformer) transformScalarXML(in any, modifier pathModifier) (any, error) {
-	path := st.jsonPath
-	if modifier != nil {
-		path = modifier(path)
-	}
-
 	// 1. Use a Transform if it exists.
 	if st.transforms != nil {
 		newValue, err := st.transforms.transform(in, st.jsonType, modifier, st.format)
@@ -564,5 +550,5 @@ func (st *scalarTransformer) transform(in any, modifier pathModifier) (any, erro
 	if st.format == xmlInput {
 		return st.transformScalarXML(in, modifier)
 	}
-	return nil, fmt.Errorf("Unrecognized transform type %s in scalartransformer transform, must be 'JSON' or 'XML' ", st.format)
+	return nil, fmt.Errorf("unrecognized transform type %s in scalartransformer transform, must be 'JSON' or 'XML' ", st.format)
 }
