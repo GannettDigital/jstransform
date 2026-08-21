@@ -746,14 +746,14 @@ func graphqlComment(prefix, description string) string {
 		return fmt.Sprintf("%s\"%s\"\n", prefix, description)
 	}
 	// Multi-line descriptions get the """ comment syntax.
-	newDescription := prefix + `"""` + "\n"
-	var newDescriptionSb752 strings.Builder
+	var newDescription strings.Builder
+	newDescription.WriteString(prefix + `"""` + "\n")
 	for _, line := range strings.Split(description, "\n") {
 		if line != "" {
-			newDescriptionSb752.WriteString(prefix + line)
+			newDescription.WriteString(prefix + line)
 		}
-		newDescriptionSb752.WriteString("\n")
+		newDescription.WriteString("\n")
 	}
-	newDescription += newDescriptionSb752.String()
-	return newDescription + prefix + `"""` + "\n"
+	newDescription.WriteString(prefix + `"""` + "\n")
+	return newDescription.String()
 }
