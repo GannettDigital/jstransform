@@ -1,6 +1,7 @@
 package generate
 
 import (
+	"context"
 	"os/exec"
 	"path/filepath"
 	"testing"
@@ -84,7 +85,8 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 			t.Errorf("Test %q - failed: %v", test.description, err)
 		}
 
-		git := exec.Command("git", "diff", "--quiet", test.wantPath)
+		//nolint:gosec
+		git := exec.CommandContext(context.Background(), "git", "diff", "--quiet", test.wantPath)
 		git.Dir = testPath
 		if err := git.Run(); err != nil {
 			t.Errorf("Test %q - failed git diff of generated file: %v", test.description, err)

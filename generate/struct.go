@@ -337,10 +337,7 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 		if err := addField(f.fields, tree[1:], inst, fieldRenameMap); err != nil {
 			return fmt.Errorf("failed field %q: %w", tree[0], err)
 		}
-		return nil
-	}
-
-	if len(tree) > 0 {
+	} else if len(tree) == 1 {
 		fieldName, ok := fieldRenameMap[tree[0]]
 		if !ok {
 			fieldName = tree[0]

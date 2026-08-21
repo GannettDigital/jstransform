@@ -579,10 +579,7 @@ func (ef *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonschem
 		if err := f.addField(tree[1:], nil, inst); err != nil {
 			return fmt.Errorf("failed field %q: %w", tree[0], err)
 		}
-		return nil
-	}
-
-	if len(tree) > 0 {
+	} else if len(tree) == 1 {
 		fieldName, ok := ef.args.FieldNameMap[tree[0]]
 		if !ok {
 			fieldName = tree[0]
@@ -675,7 +672,6 @@ func (ef *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonschem
 		ef.fields[tree[0]] = f
 		ef.fieldOrder = append(ef.fieldOrder, tree[0])
 	}
-
 	return nil
 }
 

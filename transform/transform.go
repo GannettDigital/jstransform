@@ -133,6 +133,9 @@ func (ti *transformInstruction) xmlTransform(in any, fieldType string, modifier 
 	// if only numElementsWithoutChild has results then the nodes are leaf nodes and can extract value
 	if numElementsWithChild == 0 && numElementsWithoutChild == 1 {
 		value, err = convert(xmlNode[0].InnerText(), fieldType)
+		if err != nil {
+			value = xmlNode
+		}
 	} else {
 		switch fieldType {
 		case "array", "object":
@@ -264,7 +267,7 @@ func (tis *transformInstructions) transform(in any, fieldType string, modifier p
 	case first:
 		// Nothing special.
 	default:
-		return nil, fmt.Errorf("unknown concatenation method: %s", tis.Method)
+		return nil, fmt.Errorf("unknown concatenation method: %v", tis.Method)
 	}
 
 	var result any

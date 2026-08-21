@@ -1,6 +1,7 @@
 package jsonschema
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -175,10 +176,15 @@ func resolveRef(ref string, data json.RawMessage, schemaPath, oneOfType string, 
 	case sourcePath == "":
 		source = data
 	case strings.HasPrefix(sourcePath, "http"):
-		resp, err := http.Get(sourcePath)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, sourcePath, nil)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create request for %q: %w", sourcePath, err)
+		}
+		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return nil, fmt.Errorf("unable to get reference from %q: %w", sourcePath, err)
 		}
+		defer resp.Body.Close()
 		source, err = io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read body from %q: %w", sourcePath, err)
