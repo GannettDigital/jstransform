@@ -132,10 +132,8 @@ func (ti *transformInstruction) xmlTransform(in any, fieldType string, modifier 
 
 	// if only numElementsWithoutChild has results then the nodes are leaf nodes and can extract value
 	if numElementsWithChild == 0 && numElementsWithoutChild == 1 {
-		value, err = convert(xmlNode[0].InnerText(), fieldType)
-		if err != nil {
-			value = xmlNode
-		}
+		// Errors are ignored to treat the value as absent.
+		value, _ = convert(xmlNode[0].InnerText(), fieldType)
 	} else {
 		switch fieldType {
 		case "array", "object":
@@ -174,7 +172,7 @@ func (ti *transformInstruction) jsonTransform(in any, fieldType string, modifier
 	}
 	rawValue, err := jsonpath.Get(path, in)
 	if err != nil || rawValue == nil {
-		return nil, nil
+		return nil, nil //nolint:nilerr // error is not nil but it returns nil (nilerr) // Ignore any errors during a transform.
 	}
 	value, err := convert(rawValue, fieldType)
 	if err != nil {
@@ -294,15 +292,15 @@ func (tis *transformInstructions) transform(in any, fieldType string, modifier p
 	return result, nil
 }
 
-// replaceJSONPathPrefix will switch old for newPrefix in the path of the transform instructions if the path starts with
+// replaceJSONPathPrefix will switch oldPrefix for newPrefix in the path of the transform instructions if the path starts with
 // old.
-func (tis *transformInstructions) replaceJSONPathPrefix(old, newPrefix string) {
+func (tis *transformInstructions) replaceJSONPathPrefix(oldPrefix, newPrefix string) {
 	for _, instruction := range tis.From {
-		if strings.HasPrefix(instruction.jsonPath, old) {
-			instruction.jsonPath = strings.Replace(instruction.jsonPath, old, newPrefix, 1)
+		if strings.HasPrefix(instruction.jsonPath, oldPrefix) {
+			instruction.jsonPath = strings.Replace(instruction.jsonPath, oldPrefix, newPrefix, 1)
 		}
-		if strings.HasPrefix(instruction.xmlPath, old) {
-			instruction.xmlPath = strings.Replace(instruction.xmlPath, old, newPrefix, 1)
+		if strings.HasPrefix(instruction.xmlPath, oldPrefix) {
+			instruction.xmlPath = strings.Replace(instruction.xmlPath, oldPrefix, newPrefix, 1)
 		}
 	}
 }

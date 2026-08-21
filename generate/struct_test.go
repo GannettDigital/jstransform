@@ -359,6 +359,7 @@ func TestGeneratedStruct(t *testing.T) {
 		case test.wantWriteError:
 			continue
 		default:
+			// Pass.
 		}
 		got := buf.Bytes()
 

@@ -216,9 +216,10 @@ func (tr *Transformer) walker(path string, value json.RawMessage) error {
 	var iTransformer instanceTransformer
 	switch instanceType {
 	case "object":
-		properties, _, _, jerr := jsonparser.Get(value, "properties")
-		if jerr != nil {
-			return fmt.Errorf("failed to extract properties: %w", jerr)
+		var properties []byte
+		properties, _, _, err = jsonparser.Get(value, "properties")
+		if err != nil {
+			return fmt.Errorf("failed to extract properties: %w", err)
 		}
 		if string(properties) == "{}" { // Checks for empty "properties"
 			iTransformer, err = newScalarTransformer(path, tr.transformIdentifier, value, instanceType, tr.format)

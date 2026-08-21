@@ -301,9 +301,12 @@ func (c *currentTime) init(args map[string]string) error {
 }
 
 func (c *currentTime) transform(_ any) (any, error) {
-	timeFmt := c.args["format"]
-	if c.args["format"] == "RFC3339" {
+	var timeFmt string
+	switch c.args["format"] {
+	case "RFC3339":
 		timeFmt = time.RFC3339
+	default:
+		timeFmt = c.args["format"]
 	}
 	return time.Now().Format(timeFmt), nil
 }

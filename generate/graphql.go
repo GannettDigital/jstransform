@@ -579,7 +579,11 @@ func (ef *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonschem
 		if err := f.addField(tree[1:], nil, inst); err != nil {
 			return fmt.Errorf("failed field %q: %w", tree[0], err)
 		}
-	} else if len(tree) == 1 {
+		return nil
+	}
+
+	//nolint:gosec // G602: slice index out of range (gosec) // Spurious warnings.
+	if len(tree) == 1 {
 		fieldName, ok := ef.args.FieldNameMap[tree[0]]
 		if !ok {
 			fieldName = tree[0]
@@ -741,13 +745,13 @@ func graphqlComment(prefix, description string) string {
 	}
 	// Multi-line descriptions get the """ comment syntax.
 	var newDescription strings.Builder
-	newDescription.WriteString(prefix + `"""` + "\n")
+	_, _ = newDescription.WriteString(prefix + `"""` + "\n")
 	for _, line := range strings.Split(description, "\n") {
 		if line != "" {
-			newDescription.WriteString(prefix + line)
+			_, _ = newDescription.WriteString(prefix + line)
 		}
-		newDescription.WriteString("\n")
+		_, _ = newDescription.WriteString("\n")
 	}
-	newDescription.WriteString(prefix + `"""` + "\n")
+	_, _ = newDescription.WriteString(prefix + `"""` + "\n")
 	return newDescription.String()
 }

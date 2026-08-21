@@ -372,6 +372,7 @@ func TestGraphQLGeneratedStruct(t *testing.T) {
 		case test.wantWriteError:
 			continue
 		default:
+			// Pass.
 		}
 		got := buf.Bytes()
 
@@ -381,7 +382,9 @@ func TestGraphQLGeneratedStruct(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(got, want) {
-			_ = os.WriteFile(test.wantFilePath+".got", got, 0o600)
+			if err := os.WriteFile(test.wantFilePath+".got", got, 0o600); err != nil {
+				t.Errorf("error removing %q: %v", test.wantFilePath+".got", err)
+			}
 			t.Errorf("Test %q\nwant: %s\ngot:  %s", test.description, want, got)
 			t.Errorf("Test %q\nwant: %v\ngot:  %v", test.description, want, got)
 			lwant := strings.Split(string(want), "\n")
@@ -392,8 +395,8 @@ func TestGraphQLGeneratedStruct(t *testing.T) {
 					t.Logf("line %d\nwant: %v\ngot:  %v", idx, []byte(lwant[idx]), []byte(lgot[idx]))
 				}
 			}
-		} else {
-			_ = os.Remove(test.wantFilePath + ".got")
+		} else if err := os.Remove(test.wantFilePath + ".got"); err != nil && !os.IsNotExist(err) {
+			t.Errorf("error removing %q: %v", test.wantFilePath+".got", err)
 		}
 	}
 }

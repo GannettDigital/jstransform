@@ -15,12 +15,12 @@ import (
 // pathModifier is used to modify the JSON path of an instance to indicate.
 type pathModifier func(string) string
 
-func pathReplace(old, newPath string, modifier pathModifier) pathModifier {
+func pathReplace(oldPath, newPath string, modifier pathModifier) pathModifier {
 	return func(path string) string {
 		if modifier != nil {
 			path = modifier(path)
 		}
-		path = strings.Replace(path, old, newPath, 1)
+		path = strings.Replace(path, oldPath, newPath, 1)
 		return path
 	}
 }

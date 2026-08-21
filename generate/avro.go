@@ -193,30 +193,28 @@ func filterPackage(name, path string) (*ast.File, error) {
 	cfg := &packages.Config{
 		Mode:  packages.NeedName | packages.NeedFiles | packages.NeedSyntax,
 		Dir:   path,
-		Tests: false, // Don't include test files
+		Tests: false, // Don't include test files.
 	}
-	pkgs, err := packages.Load(cfg, ".")
+	pkgs, err := packages.Load(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse go files at path %q: %w", path, err)
 	}
 	if len(pkgs) == 0 {
 		return nil, fmt.Errorf("no packages found for go files at path %q", path)
 	}
-	if len(pkgs) > 1 {
-		return nil, fmt.Errorf("expected 1 package for go files at path %q, found %d", path, len(pkgs))
+	if length := len(pkgs); length != 1 {
+		return nil, fmt.Errorf("expected 1 package for go files at path %q, found %d", path, length)
 	}
 	pkg := pkgs[0]
-	var matched bool
 	var filteredFiles []*ast.File
 	for i, f := range pkg.Syntax {
 		if i < len(pkg.GoFiles) {
 			if ast.FilterFile(f, func(itemName string) bool { return itemName == name }) {
-				matched = true
+				filteredFiles = append(filteredFiles, f)
 			}
-			filteredFiles = append(filteredFiles, f)
 		}
 	}
-	if !matched {
+	if len(filteredFiles) == 0 {
 		return nil, fmt.Errorf("a struct named %q was not found in file %q", name, path)
 	}
 	var goFile *ast.File
@@ -255,21 +253,18 @@ func parseStructTag(literal *ast.BasicLit) (string, string, bool) {
 		return "", "", false
 	}
 	tag := reflect.StructTag(strings.Trim(literal.Value, "`"))
-
 	description := tag.Get("description")
 	jsonValue := tag.Get("json")
 	jsonSplits := strings.Split(jsonValue, ",")
 	name := jsonSplits[0]
-	omitEmpty := false
 	if len(jsonSplits) > 1 {
 		for _, split := range jsonSplits[1:] {
 			if strings.ToLower(split) == "omitempty" {
-				omitEmpty = true
-				return name, description, omitEmpty
+				return name, description, true
 			}
 		}
 	}
-	return name, description, omitEmpty
+	return name, description, false
 }
 
 // writeAvroStruct returns an apply function intended to be called for the start of each node.

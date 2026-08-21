@@ -337,7 +337,11 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 		if err := addField(f.fields, tree[1:], inst, fieldRenameMap); err != nil {
 			return fmt.Errorf("failed field %q: %w", tree[0], err)
 		}
-	} else if len(tree) == 1 {
+		return nil
+	}
+
+	//nolint:gosec // G602: slice index out of range (gosec) // Spurious warnings.
+	if len(tree) == 1 {
 		fieldName, ok := fieldRenameMap[tree[0]]
 		if !ok {
 			fieldName = tree[0]
