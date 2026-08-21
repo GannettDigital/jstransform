@@ -261,7 +261,7 @@ func (gof *goFile) write(w io.Writer) error {
 	}
 
 	if includeTime {
-		if _, err := buf.Write([]byte("import \"time\"\n")); err != nil {
+		if _, err := buf.WriteString("import \"time\"\n"); err != nil {
 			return fmt.Errorf("failed writing imports: %w", err)
 		}
 	}
@@ -270,7 +270,7 @@ func (gof *goFile) write(w io.Writer) error {
 		if len(s.fields) == 0 {
 			continue
 		}
-		if _, err := buf.Write([]byte("\n\n")); err != nil {
+		if _, err := buf.WriteString("\n\n"); err != nil {
 			return fmt.Errorf("failed writing struct %q: %w", s.name, err)
 		}
 		if err := s.write(buf, excludeNested, gof.nestedStructs); err != nil {

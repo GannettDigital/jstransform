@@ -65,7 +65,8 @@ func TestWalkJSONSchema(t *testing.T) {
           "path",
           "relativePath"
         ]
-			}`)},
+			}`),
+				},
 				"$.crops[*]": {
 					Type: []string{"object"},
 					Properties: map[string]json.RawMessage{
@@ -155,7 +156,8 @@ func TestWalkJSONSchema(t *testing.T) {
 			          "path",
 			          "relativePath"
 			        ]
-			    }`)},
+			    }`),
+				},
 				"$.crops[*]": {
 					Type: []string{"object"},
 					Properties: map[string]json.RawMessage{
@@ -237,7 +239,8 @@ func TestWalkJSONSchema(t *testing.T) {
 			            }
 			          }
 			        }
-			    }`)},
+			    }`),
+				},
 				"$.crops[*]": {
 					Type: []string{"array"},
 					Items: []byte(`{
@@ -247,7 +250,8 @@ func TestWalkJSONSchema(t *testing.T) {
 			              "type": "string"
 			            }
 			          }
-			      }`)},
+			      }`),
+				},
 				"$.crops[*][*]": {
 					Type: []string{"object"},
 					Properties: map[string]json.RawMessage{
@@ -314,7 +318,8 @@ func TestWalkJSONSchema(t *testing.T) {
 			          "path",
 			          "relativePath"
 			        ]
-			    }`)},
+			    }`),
+				},
 				"$.crops[*]": {
 					Type: []string{"object"},
 					Properties: map[string]json.RawMessage{
