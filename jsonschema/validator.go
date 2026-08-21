@@ -62,8 +62,8 @@ func (v *validator) Validate(raw json.RawMessage) (bool, error) {
 		return false, err
 	}
 	if len(result.Errors()) > 0 {
-		slices.SortFunc(result.Errors(), func(i, j gojsonschema.ResultError) int {
-			return strings.Compare(i.String(), j.String())
+		slices.SortFunc(result.Errors(), func(a, b gojsonschema.ResultError) int {
+			return strings.Compare(a.String(), b.String())
 		})
 		return false, fmt.Errorf("invalid schema: %v", result.Errors())
 	}

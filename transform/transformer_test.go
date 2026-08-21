@@ -501,6 +501,7 @@ func TestSaveValue(t *testing.T) {
 		case !reflect.DeepEqual(test.tree, test.want):
 			t.Errorf("Test %q - got %v, want %v", test.description, test.tree, test.want)
 		default:
+			// Pass.
 		}
 	}
 }
@@ -527,6 +528,7 @@ func TestTransformer(t *testing.T) {
 				case !reflect.DeepEqual(got, want):
 					t.Errorf("Test %q - got\n%s\nwant\n%s", description, got, want)
 				default:
+					// Pass.
 				}
 			}
 		}

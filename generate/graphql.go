@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -391,16 +392,11 @@ func (gof *goGQL) structs() []*generatedGraphQLObject {
 	if len(gof.nestedStructs) == 0 {
 		return []*generatedGraphQLObject{gof.rootStruct}
 	}
-	nested := make([]*generatedGraphQLObject, len(gof.nestedStructs))
-	var i int
-	for _, s := range gof.nestedStructs {
-		nested[i] = s
-		i++
-	}
+	nested := slices.Collect(maps.Values(gof.nestedStructs))
 
 	// order with root first and nested in a consistent following order
-	slices.SortFunc(nested, func(i, j *generatedGraphQLObject) int {
-		return strings.Compare(i.name, j.name)
+	slices.SortFunc(nested, func(a, b *generatedGraphQLObject) int {
+		return strings.Compare(a.name, b.name)
 	})
 	structs := make([]*generatedGraphQLObject, 0, 1+len(nested))
 	structs = append(structs, gof.rootStruct)
@@ -673,7 +669,7 @@ func (ef *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonschem
 				f.requiredFields[name] = true
 			}
 			f.fields = make(map[string]*gqlExtractedField)
-		default:
+		default: // No special structure logic.
 		}
 
 		ef.fields[tree[0]] = f

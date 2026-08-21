@@ -1,7 +1,6 @@
 package generate
 
 import (
-	"context"
 	"go/ast"
 	"os"
 	"os/exec"
@@ -145,7 +144,7 @@ func TestBuildAvroSerializationFunctions(t *testing.T) {
 				t.Errorf("Test %q - failed: %v", test.description, err)
 			}
 
-			git := exec.CommandContext(context.Background(), "git", "diff", "--quiet", "*.go")
+			git := exec.CommandContext(t.Context(), "git", "diff", "--quiet", "*.go")
 			schemaName := strings.Split(filepath.Base(test.path), ".")[0]
 			git.Dir = filepath.Join("./avro_test_data/avro", schemaName)
 			if err := git.Run(); err != nil {

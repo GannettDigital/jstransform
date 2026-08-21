@@ -95,6 +95,7 @@ func TestConcat(t *testing.T) {
 		case !reflect.DeepEqual(got, test.want):
 			t.Errorf("Test %q - got %v, want %v", test.description, got, test.want)
 		default:
+			// Pass.
 		}
 	}
 }
@@ -373,6 +374,7 @@ func TestConvert(t *testing.T) {
 		case !reflect.DeepEqual(got, test.want):
 			t.Errorf("Test %q - got %v, want %v", test.description, got, test.want)
 		default:
+			// Pass.
 		}
 	}
 }

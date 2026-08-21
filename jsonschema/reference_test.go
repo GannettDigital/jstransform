@@ -1,7 +1,6 @@
 package jsonschema
 
 import (
-	"context"
 	"encoding/json"
 	"net"
 	"net/http"
@@ -16,7 +15,7 @@ func TestDereference(t *testing.T) {
 	// create listener with desired port
 	custom := "127.0.0.1:12345"
 	var lc net.ListenConfig
-	tl, err := lc.Listen(context.Background(), "tcp", custom)
+	tl, err := lc.Listen(t.Context(), "tcp", custom)
 	if err != nil {
 		t.Errorf("Test failed to create listener on %s %v", custom, err)
 	}
@@ -27,7 +26,9 @@ func TestDereference(t *testing.T) {
 	}))
 
 	// Close listener, replace and start
-	_ = ts.Listener.Close()
+	if err := ts.Listener.Close(); err != nil {
+		t.Fatal(err)
+	}
 	ts.Listener = tl
 	ts.Start()
 	defer ts.Close()
@@ -116,11 +117,8 @@ func TestDereference(t *testing.T) {
 		if err := json.Unmarshal(gotJSON, &got); err != nil {
 			t.Errorf("Test %q - failed to unmarshal got file %q: %v", test.description, test.schemaPath, err)
 		}
-
-		switch {
-		case !reflect.DeepEqual(got, want):
+		if !reflect.DeepEqual(got, want) {
 			t.Errorf("Test %q - got\n%s\nwant\n%s", test.description, got, want)
-		default:
 		}
 	}
 }

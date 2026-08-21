@@ -133,9 +133,6 @@ func (ti *transformInstruction) xmlTransform(in any, fieldType string, modifier 
 	// if only numElementsWithoutChild has results then the nodes are leaf nodes and can extract value
 	if numElementsWithChild == 0 && numElementsWithoutChild == 1 {
 		value, err = convert(xmlNode[0].InnerText(), fieldType)
-		if err != nil {
-			value = xmlNode
-		}
 	} else {
 		switch fieldType {
 		case "array", "object":
@@ -173,22 +170,23 @@ func (ti *transformInstruction) jsonTransform(in any, fieldType string, modifier
 		path = modifier(path)
 	}
 	rawValue, err := jsonpath.Get(path, in)
-	if err == nil && rawValue != nil {
-		value, err := convert(rawValue, fieldType)
+	if err != nil || rawValue == nil {
+		return nil, nil
+	}
+	value, err := convert(rawValue, fieldType)
+	if err != nil {
+		// In some cases the conversion is helpful but in others like before a max operation it isn't.
+		value = rawValue
+	} else if value == nil {
+		return nil, nil
+	}
+	for _, op := range ti.Operations {
+		value, err = op.transform(value)
 		if err != nil {
-			value = rawValue
-		}
-		if value != nil {
-			for _, op := range ti.Operations {
-				value, err = op.transform(value)
-				if err != nil {
-					return nil, fmt.Errorf("failed operation on value from jsonPath %q: %w", path, err)
-				}
-			}
-			return value, nil
+			return nil, fmt.Errorf("failed operation on value from jsonPath %q: %w", path, err)
 		}
 	}
-	return nil, nil
+	return value, nil
 }
 
 // transform runs the instructions in this object returning the new transformed value or an error if unable to.
@@ -263,7 +261,10 @@ func (tis *transformInstructions) transform(in any, fieldType string, modifier p
 		tis.From = newFrom
 	case concatenate:
 		concatResult = true
+	case first:
+		// Nothing special.
 	default:
+		return nil, fmt.Errorf("unknown concatenation method: %s", tis.Method)
 	}
 
 	var result any

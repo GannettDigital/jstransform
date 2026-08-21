@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/format"
 	"io"
+	"maps"
 	"path/filepath"
 	"slices"
 	"sort"
@@ -180,16 +181,11 @@ func (gof *goFile) structs() []*generatedStruct {
 	if len(gof.nestedStructs) < 1 {
 		return []*generatedStruct{gof.rootStruct}
 	}
-	nested := make([]*generatedStruct, len(gof.nestedStructs))
-	var i int
-	for _, s := range gof.nestedStructs {
-		nested[i] = s
-		i++
-	}
+	nested := slices.Collect(maps.Values(gof.nestedStructs))
 
 	// order with root first and nested in a consistent following order
-	slices.SortFunc(nested, func(i, j *generatedStruct) int {
-		return strings.Compare(i.name, j.name)
+	slices.SortFunc(nested, func(a, b *generatedStruct) int {
+		return strings.Compare(a.name, b.name)
 	})
 	structs := make([]*generatedStruct, 0, 1+len(nested))
 	structs = append(structs, gof.rootStruct)
@@ -388,7 +384,7 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 				f.requiredFields[name] = true
 			}
 			f.fields = make(map[string]*extractedField)
-		default:
+		default: // No special structure logic.
 		}
 
 		fields[tree[0]] = f

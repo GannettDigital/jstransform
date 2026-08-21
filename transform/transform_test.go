@@ -102,6 +102,7 @@ func TestTransformInstruction(t *testing.T) {
 		case !reflect.DeepEqual(got, test.want):
 			t.Errorf("Test %q - got %v, want %v", test.description, got, test.want)
 		default:
+			// Pass.
 		}
 	}
 }
@@ -325,6 +326,7 @@ func TestTransformInstructions(t *testing.T) {
 		case !reflect.DeepEqual(got, test.want):
 			t.Errorf("Test %q - got %v, want %v", test.description, got, test.want)
 		default:
+			// Pass.
 		}
 	}
 }
@@ -612,6 +614,7 @@ func TestTransformUnmarshal(t *testing.T) {
 				}
 			}
 		default:
+			// Pass.
 		}
 	}
 }

@@ -139,7 +139,7 @@ func findRefs(data json.RawMessage) ([][]string, error) {
 			if err != nil {
 				return err
 			}
-		default:
+		default: // Other types won't have references.
 		}
 		return nil
 	})
