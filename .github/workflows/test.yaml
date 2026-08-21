@@ -5,19 +5,19 @@ on: [push, pull_request]
 jobs:
   golang:
     env:
-      WORKFLOW_GO_VERSION: "1.25.0"
+      WORKFLOW_GO_VERSION: "1.27.0"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout app repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.inputs.version }}
       - name: Setup go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version: "~${{ env.WORKFLOW_GO_VERSION }}"
       - name: Build go cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cache/go-build
