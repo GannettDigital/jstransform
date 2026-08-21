@@ -2,6 +2,7 @@ package transform
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -15,7 +16,7 @@ import (
 var indexRe = regexp.MustCompile(`\[([\d]+)\]`)
 
 // Concat will combine any two arbitrary values, though only strings are supported for non-trivial concatenation.
-func concat(a, b interface{}, delimiter string) (interface{}, error) {
+func concat(a, b any, delimiter string) (any, error) {
 	switch {
 	case a == nil && b == nil:
 		return nil, nil
@@ -45,7 +46,7 @@ func concat(a, b interface{}, delimiter string) (interface{}, error) {
 // convert takes the raw value and checks to see if it matches the jsonType, if not it will attempt to convert it
 // to the correct type. The function does not set defaults so a nil value will be returned as nil not as the desired
 // types empty type.
-func convert(raw interface{}, jsonType string) (interface{}, error) {
+func convert(raw any, jsonType string) (any, error) {
 	if raw == nil {
 		return nil, nil
 	}
@@ -53,9 +54,9 @@ func convert(raw interface{}, jsonType string) (interface{}, error) {
 	// Since jsonpath returns an array from filters, we want to check if there's a single element that should be extracted
 	// for non-array return types being used.
 	// We also want to recursively handle nested arrays at the same time during this extraction
-	if rawArray, ok := raw.([]interface{}); ok && (len(rawArray) == 1 || (len(rawArray) > 0 && jsonType != "array")) {
+	if rawArray, ok := raw.([]any); ok && (len(rawArray) == 1 || (len(rawArray) > 0 && jsonType != "array")) {
 		raw = rawArray[0]
-		if nestedArray, ok := raw.([]interface{}); ok && len(nestedArray) > 0 {
+		if nestedArray, ok := raw.([]any); ok && len(nestedArray) > 0 {
 			return convert(nestedArray[0], jsonType)
 		}
 	} else if ok && len(rawArray) == 0 {
@@ -74,7 +75,7 @@ func convert(raw interface{}, jsonType string) (interface{}, error) {
 	return raw, nil
 }
 
-func convertBoolean(raw interface{}) (interface{}, error) {
+func convertBoolean(raw any) (any, error) {
 	switch t := raw.(type) {
 	case bool:
 		return raw, nil
@@ -96,7 +97,7 @@ func convertBoolean(raw interface{}) (interface{}, error) {
 	}
 }
 
-func convertNumber(raw interface{}) (interface{}, error) {
+func convertNumber(raw any) (any, error) {
 	switch t := raw.(type) {
 	case bool:
 		if t {
@@ -121,7 +122,7 @@ func convertNumber(raw interface{}) (interface{}, error) {
 	}
 }
 
-func convertDateTime(raw interface{}) (interface{}, error) {
+func convertDateTime(raw any) (any, error) {
 	switch t := raw.(type) {
 	case string:
 		if t == "" {
@@ -147,7 +148,7 @@ func convertDateTime(raw interface{}) (interface{}, error) {
 	}
 }
 
-func convertString(raw interface{}) (interface{}, error) {
+func convertString(raw any) (any, error) {
 	switch t := raw.(type) {
 	case bool:
 		return strconv.FormatBool(t), nil
@@ -171,9 +172,10 @@ func convertString(raw interface{}) (interface{}, error) {
 
 func extractTransformInstructions(raw json.RawMessage, transformIdentifier, path string, instanceType string) (*transformInstructions, error) {
 	rawTransformInstruction, _, _, err := jsonparser.Get(raw, "transform", transformIdentifier)
-	if err != nil && err != jsonparser.KeyPathNotFoundError {
-		return nil, fmt.Errorf("failed to extract raw instance transform: %v", err)
-	} else if len(rawTransformInstruction) == 0 {
+	if err != nil && !errors.Is(err, jsonparser.KeyPathNotFoundError) {
+		return nil, fmt.Errorf("failed to extract raw instance transform: %w", err)
+	}
+	if len(rawTransformInstruction) == 0 {
 		return nil, nil
 	}
 	var parentPath string
@@ -186,7 +188,7 @@ func extractTransformInstructions(raw json.RawMessage, transformIdentifier, path
 
 	var tis transformInstructions
 	if err := json.Unmarshal(rawTransformInstruction, &tis); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal instance transform: %v", err)
+		return nil, fmt.Errorf("failed to unmarshal instance transform: %w", err)
 	}
 	// replaces the @. format
 	tis.replaceJSONPathPrefix("@.", parentPath+".")
@@ -198,12 +200,12 @@ func extractTransformInstructions(raw json.RawMessage, transformIdentifier, path
 
 // schemaDefault determines the default for an instance based on the JSONSchema.
 // If no default is defined nil is returned.
-func schemaDefault(schema json.RawMessage) (interface{}, error) {
+func schemaDefault(schema json.RawMessage) (any, error) {
 	ifields := struct {
-		Default interface{} `json:"default"`
+		Default any `json:"default"`
 	}{}
 	if err := json.Unmarshal(schema, &ifields); err != nil {
-		return nil, fmt.Errorf("failed to extract schema default: %v", err)
+		return nil, fmt.Errorf("failed to extract schema default: %w", err)
 	}
 
 	// Try the default

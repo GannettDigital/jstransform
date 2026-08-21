@@ -10,10 +10,10 @@ import (
 func TestConcat(t *testing.T) {
 	tests := []struct {
 		description string
-		a           interface{}
-		b           interface{}
+		a           any
+		b           any
 		delimiter   string
-		want        interface{}
+		want        any
 		wantErr     bool
 	}{
 		{
@@ -101,9 +101,9 @@ func TestConcat(t *testing.T) {
 func TestConvert(t *testing.T) {
 	tests := []struct {
 		description string
-		raw         interface{}
+		raw         any
 		jsonType    string
-		want        interface{}
+		want        any
 		wantErr     bool
 	}{
 		{
@@ -233,32 +233,32 @@ func TestConvert(t *testing.T) {
 			want:        nil,
 		},
 		{
-			description: "[]interface{} with a single string in it -> string",
-			raw:         []interface{}{"hello"},
+			description: "[]any with a single string in it -> string",
+			raw:         []any{"hello"},
 			jsonType:    "string",
 			want:        "hello",
 		},
 		{
-			description: "[]interface{} with a single bool in it -> bool",
-			raw:         []interface{}{true},
+			description: "[]any with a single bool in it -> bool",
+			raw:         []any{true},
 			jsonType:    "boolean",
 			want:        true,
 		},
 		{
-			description: "[]interface{} with a single number in it -> number",
-			raw:         []interface{}{4.3},
+			description: "[]any with a single number in it -> number",
+			raw:         []any{4.3},
 			jsonType:    "number",
 			want:        4.3,
 		},
 		{
-			description: "[]interface{} returns nil",
-			raw:         []interface{}{},
+			description: "[]any returns nil",
+			raw:         []any{},
 			jsonType:    "string",
 			want:        nil,
 		},
 		{
-			description: "[]interface{nil} returns nil",
-			raw:         []interface{}{nil},
+			description: "[]any{nil} returns nil",
+			raw:         []any{nil},
 			jsonType:    "string",
 			want:        nil,
 		},
@@ -335,8 +335,8 @@ func TestConvert(t *testing.T) {
 			wantErr:     true,
 		},
 		{
-			description: "[]interface{} with a single number in it -> number",
-			raw:         []interface{}{4},
+			description: "[]any with a single number in it -> number",
+			raw:         []any{4},
 			jsonType:    "integer",
 			want:        4,
 		},
@@ -379,7 +379,7 @@ func TestSchemaDefault(t *testing.T) {
 	tests := []struct {
 		description string
 		schema      json.RawMessage
-		want        interface{}
+		want        any
 	}{
 		{
 			description: "String with default",

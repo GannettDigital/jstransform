@@ -66,7 +66,7 @@ func newTransformer(schema *jsonschema.Schema, tranformIdentifier string, format
 		return nil, errors.New("no Properties nor Items found for schema")
 	}
 	if err != nil {
-		return nil, fmt.Errorf("failed initializing root transformer: %v", err)
+		return nil, fmt.Errorf("failed initializing root transformer: %w", err)
 	}
 
 	if err := jsonschema.WalkRaw(schema, tr.walker); err != nil {
@@ -117,7 +117,7 @@ func (tr *Transformer) jsonTransform(raw json.RawMessage) (json.RawMessage, erro
 
 	valid, err := tr.schema.Validate(transformed)
 	if err != nil {
-		return nil, fmt.Errorf("input successfully transformed but did not match schema: %v", err)
+		return nil, fmt.Errorf("input successfully transformed but did not match schema: %w", err)
 	}
 	if !valid {
 		return nil, errors.New("schema validation of the transformed result reports invalid")
@@ -127,19 +127,19 @@ func (tr *Transformer) jsonTransform(raw json.RawMessage) (json.RawMessage, erro
 }
 
 func (tr *Transformer) baseJSONTransform(raw json.RawMessage) (json.RawMessage, error) {
-	var in interface{}
+	var in any
 	if err := json.Unmarshal(raw, &in); err != nil {
-		return nil, fmt.Errorf("failed to parse input JSON: %v", err)
+		return nil, fmt.Errorf("failed to parse input JSON: %w", err)
 	}
 
 	transformed, err := tr.root.transform(in, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed transformation: %v", err)
+		return nil, fmt.Errorf("failed transformation: %w", err)
 	}
 
 	out, err := json.Marshal(transformed)
 	if err != nil {
-		return nil, fmt.Errorf("failed to JSON marsal transformed data: %v", err)
+		return nil, fmt.Errorf("failed to JSON marsal transformed data: %w", err)
 	}
 
 	return out, nil
@@ -153,7 +153,7 @@ func (tr *Transformer) xmlTransform(raw []byte) ([]byte, error) {
 
 	valid, err := tr.schema.Validate(transformedXML)
 	if err != nil {
-		return nil, fmt.Errorf("transformed result validation error: %v", err)
+		return nil, fmt.Errorf("transformed result validation error: %w", err)
 	}
 	if !valid {
 		return nil, errors.New("schema validation of the transformed result reports invalid")
@@ -165,17 +165,17 @@ func (tr *Transformer) xmlTransform(raw []byte) ([]byte, error) {
 func (tr *Transformer) baseXMLTransform(raw []byte) ([]byte, error) {
 	xmlDoc, err := xmlquery.Parse(bytes.NewReader(raw))
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse input XML: %v", err)
+		return nil, fmt.Errorf("failed to parse input XML: %w", err)
 	}
 
 	transformed, err := tr.root.transform(xmlDoc, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed transformation: %v", err)
+		return nil, fmt.Errorf("failed transformation: %w", err)
 	}
 
 	out, err := json.Marshal(transformed)
 	if err != nil {
-		return nil, fmt.Errorf("failed to JSON marsal transformed data: %v", err)
+		return nil, fmt.Errorf("failed to JSON marsal transformed data: %w", err)
 	}
 
 	return out, nil
@@ -209,7 +209,7 @@ func (tr *Transformer) findParent(path string) (instanceTransformer, error) {
 func (tr *Transformer) walker(path string, value json.RawMessage) error {
 	instanceType, _, err := jsonschema.FieldType(value)
 	if err != nil {
-		return fmt.Errorf("failed to extract instance type: %v", err)
+		return fmt.Errorf("failed to extract instance type: %w", err)
 	}
 
 	var iTransformer instanceTransformer
@@ -217,7 +217,7 @@ func (tr *Transformer) walker(path string, value json.RawMessage) error {
 	case "object":
 		properties, _, _, err := jsonparser.Get(value, "properties")
 		if err != nil {
-			return fmt.Errorf("failed to extract properties: %v", err)
+			return fmt.Errorf("failed to extract properties: %w", err)
 		}
 		if string(properties) == "{}" { // Checks for empty "properties"
 			iTransformer, err = newScalarTransformer(path, tr.transformIdentifier, value, instanceType, tr.format)
@@ -230,7 +230,7 @@ func (tr *Transformer) walker(path string, value json.RawMessage) error {
 		iTransformer, err = newScalarTransformer(path, tr.transformIdentifier, value, instanceType, tr.format)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to initialize transformer: %v", err)
+		return fmt.Errorf("failed to initialize transformer: %w", err)
 	}
 
 	parent, err := tr.findParent(path)
@@ -245,7 +245,7 @@ func (tr *Transformer) walker(path string, value json.RawMessage) error {
 }
 
 // saveInTree is used recursively to add values the tree based on the path even if the parents are nil.
-func saveInTree(tree map[string]interface{}, path string, value interface{}) error {
+func saveInTree(tree map[string]any, path string, value any) error {
 	if value == nil {
 		return nil
 	}
@@ -262,12 +262,12 @@ func saveInTree(tree map[string]interface{}, path string, value interface{}) err
 
 	arraySplits := strings.Split(splits[0], "[")
 	if len(arraySplits) != 1 { // the case of an array or nested arrays with an object in them
-		var sValue []interface{}
+		var sValue []any
 		if rawSlice, ok := tree[arraySplits[0]]; ok {
-			sValue = rawSlice.([]interface{})
+			sValue = rawSlice.([]any)
 		}
 
-		newTreeMap := make(map[string]interface{})
+		newTreeMap := make(map[string]any)
 		newValue, err := saveInSlice(sValue, arraySplits[1:], newTreeMap)
 		if err != nil {
 			return err
@@ -277,14 +277,14 @@ func saveInTree(tree map[string]interface{}, path string, value interface{}) err
 		return saveInTree(newTreeMap, strings.Join(splits[1:], "."), value)
 	}
 
-	var newTreeMap map[string]interface{}
+	var newTreeMap map[string]any
 	newTree, ok := tree[splits[0]]
 	if !ok || newTree == nil {
-		newTreeMap = make(map[string]interface{})
+		newTreeMap = make(map[string]any)
 	} else {
-		newTreeMap, ok = newTree.(map[string]interface{})
+		newTreeMap, ok = newTree.(map[string]any)
 		if !ok {
-			return fmt.Errorf("value at %q is not a map[string]interface{}", splits[0])
+			return fmt.Errorf("value at %q is not a map[string]any", splits[0])
 		}
 	}
 	tree[splits[0]] = newTreeMap
@@ -294,16 +294,16 @@ func saveInTree(tree map[string]interface{}, path string, value interface{}) err
 // saveLeaf will save a leaf value in the tree at the given path. If the path specifies an array or set of nested
 // arrays it will build the array items as needed to reach the specified index. New array items are created as nil.
 // Any nested array items will be recursively treated the same way.
-func saveLeaf(tree map[string]interface{}, path string, value interface{}) error {
+func saveLeaf(tree map[string]any, path string, value any) error {
 	arraySplits := strings.Split(path, "[")
 	if len(arraySplits) == 1 {
 		tree[path] = value
 		return nil
 	}
 
-	var sValue []interface{}
+	var sValue []any
 	if rawSlice, ok := tree[arraySplits[0]]; ok {
-		sValue = rawSlice.([]interface{})
+		sValue = rawSlice.([]any)
 	}
 
 	newValue, err := saveInSlice(sValue, arraySplits[1:], value)
@@ -314,14 +314,14 @@ func saveLeaf(tree map[string]interface{}, path string, value interface{}) error
 	return nil
 }
 
-func saveInSlice(current []interface{}, arraySplits []string, value interface{}) ([]interface{}, error) {
+func saveInSlice(current []any, arraySplits []string, value any) ([]any, error) {
 	index, err := strconv.Atoi(strings.Trim(arraySplits[0], "]"))
 	if err != nil {
 		return nil, fmt.Errorf("failed to determine index of %q", arraySplits[0])
 	}
 
 	if current == nil {
-		current = make([]interface{}, 0, index)
+		current = make([]any, 0, index)
 	}
 
 	// fill up the slice slots with nil if the slice isn't the right size
@@ -331,8 +331,8 @@ func saveInSlice(current []interface{}, arraySplits []string, value interface{})
 
 	if len(arraySplits) == 1 {
 		// if this is the last array split save the value and break
-		if newValue, ok := value.(map[string]interface{}); ok { // special case combine existing values into new value if a map
-			if oldValue, ok := current[index].(map[string]interface{}); ok {
+		if newValue, ok := value.(map[string]any); ok { // special case combine existing values into new value if a map
+			if oldValue, ok := current[index].(map[string]any); ok {
 				for k, v := range oldValue {
 					if _, ok := newValue[k]; !ok {
 						newValue[k] = v
@@ -346,7 +346,7 @@ func saveInSlice(current []interface{}, arraySplits []string, value interface{})
 	}
 
 	// recurse as needed
-	nested, ok := current[index].([]interface{})
+	nested, ok := current[index].([]any)
 	if !ok {
 		nested = nil
 	}

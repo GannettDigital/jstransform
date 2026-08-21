@@ -23,18 +23,18 @@ const (
 func dereference(schemaPath string, data json.RawMessage, oneOfType string, flatten bool) (json.RawMessage, error) {
 	refs, err := findRefs(data)
 	if err != nil {
-		return nil, fmt.Errorf("failed when finding refs: %v", err)
+		return nil, fmt.Errorf("failed when finding refs: %w", err)
 	}
 
 	for _, refPath := range refs {
 		ref, err := jsonparser.GetString(data, refPath...)
 		if err != nil {
-			return nil, fmt.Errorf("failed to retrieve ref at path %v: %v", refPath, err)
+			return nil, fmt.Errorf("failed to retrieve ref at path %v: %w", refPath, err)
 		}
 
 		resolved, err := resolveRef(ref, data, schemaPath, oneOfType, flatten)
 		if err != nil {
-			return nil, fmt.Errorf("failed to resolve ref %q at path %v: %v", ref, refPath, err)
+			return nil, fmt.Errorf("failed to resolve ref %q at path %v: %w", ref, refPath, err)
 		}
 
 		destPath := refPath[:len(refPath)-1]
@@ -46,7 +46,7 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string, flat
 			// wipes out that object in the data.
 			prior, dataType, _, err := jsonparser.Get(data, destPath...)
 			if err != nil && err != jsonparser.KeyPathNotFoundError {
-				return nil, fmt.Errorf("failed to read object on source data at path %v: %v", destPath, err)
+				return nil, fmt.Errorf("failed to read object on source data at path %v: %w", destPath, err)
 			}
 			if prior != nil && dataType != jsonparser.Object {
 				return nil, fmt.Errorf("referencing object is wrong type %q, should be object", dataType)
@@ -55,7 +55,7 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string, flat
 			// Set the resolved ref contents on the data. This wipes out existing fields in that object
 			data, err = jsonparser.Set(data, resolved, destPath...)
 			if err != nil {
-				return nil, fmt.Errorf("failed to update data with resolved ref %q at path %v: %v", ref, refPath, err)
+				return nil, fmt.Errorf("failed to update data with resolved ref %q at path %v: %w", ref, refPath, err)
 			}
 
 			// If we found other keys inside that object in the source data, apply that back since setting of the ref
@@ -65,11 +65,13 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string, flat
 					keyPath := destPath
 					keyPath = append(keyPath, string(key))
 					if dataType == jsonparser.String {
+						var err error
 						value, err = json.Marshal(string(value))
 						if err != nil {
 							return fmt.Errorf("failed to marshal string %q to update data with ref %q at path %v key %q: %w", value, ref, refPath, key, err)
 						}
 					}
+					var err error
 					data, err = jsonparser.Set(data, value, keyPath...)
 					if err != nil {
 						return fmt.Errorf("failed to update data with ref %q at path %v key %q: %w", ref, refPath, key, err)
@@ -88,7 +90,7 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string, flat
 	// better than reprocessing would be nice
 	remaining, err := findRefs(data)
 	if err != nil {
-		return nil, fmt.Errorf("failed checking for remaining refs: %v", err)
+		return nil, fmt.Errorf("failed checking for remaining refs: %w", err)
 	}
 	if len(remaining) > 0 {
 		return dereference(schemaPath, data, oneOfType, flatten)
@@ -174,11 +176,11 @@ func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType s
 	case strings.HasPrefix(sourcePath, "http"):
 		resp, err := http.Get(sourcePath)
 		if err != nil {
-			return nil, fmt.Errorf("unable to get reference from %q: %v", sourcePath, err)
+			return nil, fmt.Errorf("unable to get reference from %q: %w", sourcePath, err)
 		}
 		source, err = io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read body from %q: %v", sourcePath, err)
+			return nil, fmt.Errorf("failed to read body from %q: %w", sourcePath, err)
 		}
 		// TODO since SchemaFromFile does the current allOf/oneOf processing this data does not go through that processing
 	default: // Default to assuming it is a file reference
@@ -186,7 +188,7 @@ func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType s
 		// target as it will currently reprocess the source file everytime
 		refPath, err := filepath.Abs(filepath.Join(filepath.Dir(schemaPath), sourcePath))
 		if err != nil {
-			return nil, fmt.Errorf("unable to expand reference filepath %q: %v", sourcePath, err)
+			return nil, fmt.Errorf("unable to expand reference filepath %q: %w", sourcePath, err)
 		}
 		if schemaPath == refPath {
 			source = data
@@ -199,11 +201,11 @@ func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType s
 			schema, err = SchemaFromFileNoFlatten(refPath, oneOfType)
 		}
 		if err != nil {
-			return nil, fmt.Errorf("failed to process reference file %q: %v", refPath, err)
+			return nil, fmt.Errorf("failed to process reference file %q: %w", refPath, err)
 		}
 		source, err = json.Marshal(schema)
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshal schema from file %q: %v", refPath, err)
+			return nil, fmt.Errorf("failed to marshal schema from file %q: %w", refPath, err)
 		}
 	}
 
@@ -213,14 +215,14 @@ func resolveRef(ref string, data json.RawMessage, schemaPath string, oneOfType s
 	} else {
 		data, _, _, err = jsonparser.Get(source, strings.Split(target, "/")...)
 		if err != nil {
-			return nil, fmt.Errorf("failed to retrieve ref %q: %v", target, err)
+			return nil, fmt.Errorf("failed to retrieve ref %q: %w", target, err)
 		}
 	}
 
 	data = []byte(strings.TrimSpace(string(data)))
 	data, err = jsonparser.Set(data, []byte(fmt.Sprintf("%q", ref)), fromRef)
 	if err != nil {
-		return nil, fmt.Errorf("failed to set fromRef for reference %q: %v", ref, err)
+		return nil, fmt.Errorf("failed to set fromRef for reference %q: %w", ref, err)
 	}
 
 	return data, nil

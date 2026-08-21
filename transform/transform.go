@@ -22,7 +22,7 @@ const (
 // within the transform schema.
 type transformOperation interface {
 	init(args map[string]string) error
-	transform(in interface{}) (interface{}, error)
+	transform(in any) (any, error)
 }
 
 type transformOperationJSON struct {
@@ -52,7 +52,7 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 	var jti transformInstructionJSON
 
 	if err := json.Unmarshal(data, &jti); err != nil {
-		return fmt.Errorf("failed to extract transform from JSON: %v", err)
+		return fmt.Errorf("failed to extract transform from JSON: %w", err)
 	}
 
 	ti.jsonPath = jti.JSONPath
@@ -95,14 +95,14 @@ func (ti *transformInstruction) UnmarshalJSON(data []byte) error {
 		}
 
 		if err := op.init(toj.Args); err != nil {
-			return fmt.Errorf("failed initializing transform operation: %v", err)
+			return fmt.Errorf("failed initializing transform operation: %w", err)
 		}
 		ti.Operations = append(ti.Operations, op)
 	}
 	return nil
 }
 
-func (ti *transformInstruction) xmlTransform(in interface{}, fieldType string, modifier pathModifier) (interface{}, error) {
+func (ti *transformInstruction) xmlTransform(in any, fieldType string, modifier pathModifier) (any, error) {
 	path := ti.xmlPath
 	if modifier != nil {
 		path = modifier(path)
@@ -119,7 +119,7 @@ func (ti *transformInstruction) xmlTransform(in interface{}, fieldType string, m
 	}
 
 	var (
-		value interface{}
+		value any
 		err   error
 	)
 
@@ -157,13 +157,13 @@ func (ti *transformInstruction) xmlTransform(in interface{}, fieldType string, m
 	for _, op := range ti.Operations {
 		value, err = op.transform(value)
 		if err != nil {
-			return nil, fmt.Errorf("failed operation on value from xmlPath %q: %v", path, err)
+			return nil, fmt.Errorf("failed operation on value from xmlPath %q: %w", path, err)
 		}
 	}
 	return value, nil
 }
 
-func (ti *transformInstruction) jsonTransform(in interface{}, fieldType string, modifier pathModifier) (interface{}, error) {
+func (ti *transformInstruction) jsonTransform(in any, fieldType string, modifier pathModifier) (any, error) {
 	path := ti.jsonPath
 	if modifier != nil {
 		path = modifier(path)
@@ -188,7 +188,7 @@ func (ti *transformInstruction) jsonTransform(in interface{}, fieldType string, 
 	for _, op := range ti.Operations {
 		value, err = op.transform(value)
 		if err != nil {
-			return nil, fmt.Errorf("failed operation on value from jsonPath %q: %v", path, err)
+			return nil, fmt.Errorf("failed operation on value from jsonPath %q: %w", path, err)
 		}
 	}
 	return value, nil
@@ -198,7 +198,7 @@ func (ti *transformInstruction) jsonTransform(in interface{}, fieldType string, 
 // It handles the logic for finding the value to be transformed and chaining the Operations.
 // It will not error if the value is not found, rather it returns nil for the value.
 // If a conversion or operation fails an error is returned.
-func (ti *transformInstruction) transform(in interface{}, fieldType string, modifier pathModifier, format inputFormat) (interface{}, error) {
+func (ti *transformInstruction) transform(in any, fieldType string, modifier pathModifier, format inputFormat) (any, error) {
 	if format == xmlInput {
 		return ti.xmlTransform(in, fieldType, modifier)
 	}
@@ -231,7 +231,7 @@ func (tis *transformInstructions) UnmarshalJSON(data []byte) error {
 	var jtis transformInstructionsJSON
 
 	if err := json.Unmarshal(data, &jtis); err != nil {
-		return fmt.Errorf("failed to extract transform from JSON: %v", err)
+		return fmt.Errorf("failed to extract transform from JSON: %w", err)
 	}
 
 	tis.From = jtis.From
@@ -255,7 +255,7 @@ func (tis *transformInstructions) UnmarshalJSON(data []byte) error {
 
 // transform runs the instructions in this object returning the new transformed value or nil if none is found.
 // It handles the logic for concatenation, first or last methods.
-func (tis *transformInstructions) transform(in interface{}, fieldType string, modifier pathModifier, format inputFormat) (interface{}, error) {
+func (tis *transformInstructions) transform(in any, fieldType string, modifier pathModifier, format inputFormat) (any, error) {
 	var concatResult bool
 	switch tis.Method {
 	case last:
@@ -268,7 +268,7 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string, mo
 		concatResult = true
 	}
 
-	var result interface{}
+	var result any
 
 	for _, from := range tis.From {
 		value, err := from.transform(in, fieldType, modifier, format)
@@ -279,7 +279,7 @@ func (tis *transformInstructions) transform(in interface{}, fieldType string, mo
 			delimiter := tis.MethodOptions.ConcatenateDelimiter
 			result, err = concat(result, value, delimiter)
 			if err != nil {
-				return nil, fmt.Errorf("failed to concat values: %v", err)
+				return nil, fmt.Errorf("failed to concat values: %w", err)
 			}
 			continue
 		}

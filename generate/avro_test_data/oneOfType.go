@@ -7,8 +7,8 @@ import "time"
 type OneOfType struct {
 	Basic
 
-	Caption        string `json:"caption"`
-	Credit         string `json:"credit"`
+	Caption        string    `json:"caption"`
+	Credit         string    `json:"credit"`
 	Cutline        string    `json:"cutline,omitempty"`
 	DatePhotoTaken time.Time `json:"datePhotoTaken"`
 	Orientation    string    `json:"orientation"`

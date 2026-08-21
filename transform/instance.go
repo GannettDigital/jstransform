@@ -34,14 +34,14 @@ type instanceTransformer interface {
 	child() instanceTransformer // Arrays return a child object all others nil
 	path() string
 	selectChild(string) instanceTransformer // This returns nil for everything except objects
-	transform(interface{}, pathModifier) (interface{}, error)
+	transform(any, pathModifier) (any, error)
 }
 
 // arrayTransformer represents a JSON instance type array in the case of a JSON transform or an array of xmlquery.Node in the case of an XML transform.
 // in both cases the output will be JSON.
 type arrayTransformer struct {
 	childTransformer instanceTransformer
-	defaultValue     []interface{}
+	defaultValue     []any
 	jsonPath         string
 	format           inputFormat
 	transforms       *transformInstructions
@@ -65,7 +65,7 @@ func newArrayTransformer(path, transformIdentifier string, raw json.RawMessage, 
 	}
 	if rawDefault != nil {
 		var ok bool
-		at.defaultValue, ok = rawDefault.([]interface{})
+		at.defaultValue, ok = rawDefault.([]any)
 		if !ok {
 			return nil, fmt.Errorf("default value for path %q is not an array", path)
 		}
@@ -79,7 +79,7 @@ func (at *arrayTransformer) addChild(child instanceTransformer) error {
 	return nil
 }
 
-func (at *arrayTransformer) baseValueJSON(in interface{}, path string, modifier pathModifier) ([]interface{}, bool, error) {
+func (at *arrayTransformer) baseValueJSON(in any, path string, modifier pathModifier) ([]any, bool, error) {
 	// 1. Use a transform if it exists
 	if at.transforms != nil {
 		rawValue, err := at.transforms.transform(in, "array", modifier, at.format)
@@ -87,9 +87,9 @@ func (at *arrayTransformer) baseValueJSON(in interface{}, path string, modifier 
 			return nil, false, err
 		}
 		if rawValue != nil {
-			newValue, ok := rawValue.([]interface{})
+			newValue, ok := rawValue.([]any)
 			if !ok {
-				newValue = []interface{}{rawValue}
+				newValue = []any{rawValue}
 			}
 			return newValue, true, nil
 		}
@@ -98,9 +98,9 @@ func (at *arrayTransformer) baseValueJSON(in interface{}, path string, modifier 
 	// 2. Look for the same jsonPath in the input and use directly if possible.
 	rawValue, err := jsonpath.Get(path, in)
 	if err == nil && rawValue != nil {
-		newValue, ok := rawValue.([]interface{})
+		newValue, ok := rawValue.([]any)
 		if !ok {
-			newValue = []interface{}{rawValue}
+			newValue = []any{rawValue}
 		}
 		return newValue, false, nil
 	}
@@ -112,7 +112,7 @@ func (at *arrayTransformer) baseValueJSON(in interface{}, path string, modifier 
 	return nil, false, nil
 }
 
-func (at *arrayTransformer) baseValueXML(in interface{}, path string, modifier pathModifier) ([]interface{}, bool, error) {
+func (at *arrayTransformer) baseValueXML(in any, path string, modifier pathModifier) ([]any, bool, error) {
 	// 1. Use a transform if it exists
 	if at.transforms != nil {
 		rawValue, err := at.transforms.transform(in, "array", modifier, at.format)
@@ -120,10 +120,10 @@ func (at *arrayTransformer) baseValueXML(in interface{}, path string, modifier p
 			return nil, false, err
 		}
 
-		// if rawValue is an array of xml nodes we need to append them to newValue for return as []interface{}
+		// if rawValue is an array of xml nodes we need to append them to newValue for return as []any
 		xmlNodeArray, ok := rawValue.([]*xmlquery.Node)
 		if ok {
-			newValue := make([]interface{}, len(xmlNodeArray))
+			newValue := make([]any, len(xmlNodeArray))
 			for i, item := range xmlNodeArray {
 				newValue[i] = item
 			}
@@ -131,9 +131,9 @@ func (at *arrayTransformer) baseValueXML(in interface{}, path string, modifier p
 		}
 
 		if rawValue != nil {
-			newValue, ok := rawValue.([]interface{})
+			newValue, ok := rawValue.([]any)
 			if !ok {
-				newValue = []interface{}{rawValue}
+				newValue = []any{rawValue}
 			}
 			return newValue, true, nil
 		}
@@ -147,7 +147,7 @@ func (at *arrayTransformer) baseValueXML(in interface{}, path string, modifier p
 }
 
 // baseValue routes to the correct arrayTransformer.baseValue format.
-func (at *arrayTransformer) baseValue(in interface{}, path string, modifier pathModifier) ([]interface{}, bool, error) {
+func (at *arrayTransformer) baseValue(in any, path string, modifier pathModifier) ([]any, bool, error) {
 	if at.format == jsonInput {
 		return at.baseValueJSON(in, path, modifier)
 	}
@@ -163,7 +163,7 @@ func (at *arrayTransformer) selectChild(key string) instanceTransformer { return
 
 // arrayTransformJSON retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields.
-func (at *arrayTransformer) arrayTransformJSON(in interface{}, modifier pathModifier) (interface{}, error) {
+func (at *arrayTransformer) arrayTransformJSON(in any, modifier pathModifier) (any, error) {
 	path := at.jsonPath
 	if modifier != nil {
 		path = modifier(path)
@@ -178,12 +178,12 @@ func (at *arrayTransformer) arrayTransformJSON(in interface{}, modifier pathModi
 		if path == "$" {
 			in = base
 		} else {
-			inMap, ok := in.(map[string]interface{})
+			inMap, ok := in.(map[string]any)
 			if !ok {
 				return nil, errors.New("input is neither a JSON array nor object")
 			}
 			if err := saveInTree(inMap, path, base); err != nil {
-				return nil, fmt.Errorf("failed to save array transform to input data: %v", err)
+				return nil, fmt.Errorf("failed to save array transform to input data: %w", err)
 			}
 		}
 	}
@@ -193,7 +193,7 @@ func (at *arrayTransformer) arrayTransformJSON(in interface{}, modifier pathModi
 	}
 
 	oldPath := path + "[*]"
-	newArray := make([]interface{}, 0, len(base))
+	newArray := make([]any, 0, len(base))
 
 	for i := range base {
 		currentPath := path + fmt.Sprintf("[%d]", i)
@@ -215,7 +215,7 @@ func (at *arrayTransformer) arrayTransformJSON(in interface{}, modifier pathModi
 
 // arrayTransformXML retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields.
-func (at *arrayTransformer) arrayTransformXML(in interface{}, modifier pathModifier) (interface{}, error) {
+func (at *arrayTransformer) arrayTransformXML(in any, modifier pathModifier) (any, error) {
 	path := at.jsonPath
 	if modifier != nil {
 		path = modifier(path)
@@ -230,7 +230,7 @@ func (at *arrayTransformer) arrayTransformXML(in interface{}, modifier pathModif
 	}
 
 	oldPath := path + "[*]"
-	newArray := make([]interface{}, 0, len(base))
+	newArray := make([]any, 0, len(base))
 
 	for i := range base {
 		currentPath := path + fmt.Sprintf("[%d]", i)
@@ -253,7 +253,7 @@ func (at *arrayTransformer) arrayTransformXML(in interface{}, modifier pathModif
 }
 
 // transform routes to the correct array transform type.
-func (at *arrayTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
+func (at *arrayTransformer) transform(in any, modifier pathModifier) (any, error) {
 	if at.format == jsonInput {
 		return at.arrayTransformJSON(in, modifier)
 	}
@@ -266,7 +266,7 @@ func (at *arrayTransformer) transform(in interface{}, modifier pathModifier) (in
 // objectTransformer represents a JSON instance of type object and associated transforms.
 type objectTransformer struct {
 	children     map[string]instanceTransformer
-	defaultValue map[string]interface{}
+	defaultValue map[string]any
 	jsonPath     string
 	format       inputFormat
 	transforms   *transformInstructions
@@ -291,7 +291,7 @@ func newObjectTransformer(path, transformIdentifier string, raw json.RawMessage,
 	}
 	if rawDefault != nil {
 		var ok bool
-		ot.defaultValue, ok = rawDefault.(map[string]interface{})
+		ot.defaultValue, ok = rawDefault.(map[string]any)
 		if !ok {
 			return nil, fmt.Errorf("invalid default for an object `%v`", rawDefault)
 		}
@@ -318,12 +318,12 @@ func (ot *objectTransformer) selectChild(key string) instanceTransformer { retur
 
 // objectTransformJSON retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields.
-func (ot *objectTransformer) objectTransformJSON(in interface{}, modifier pathModifier) (interface{}, error) {
+func (ot *objectTransformer) objectTransformJSON(in any, modifier pathModifier) (any, error) {
 	path := ot.jsonPath
 	if modifier != nil {
 		path = modifier(path)
 	}
-	var newValue map[string]interface{}
+	var newValue map[string]any
 
 	// For the object use a transform if it exists or the default or an empty map
 	if ot.transforms != nil {
@@ -333,7 +333,7 @@ func (ot *objectTransformer) objectTransformJSON(in interface{}, modifier pathMo
 		}
 		if rawValue != nil {
 			var ok bool
-			newValue, ok = rawValue.(map[string]interface{})
+			newValue, ok = rawValue.(map[string]any)
 			if !ok {
 				return nil, errors.New("transform returned non-object value")
 			}
@@ -341,7 +341,7 @@ func (ot *objectTransformer) objectTransformJSON(in interface{}, modifier pathMo
 	}
 	if newValue == nil {
 		if ot.defaultValue == nil {
-			newValue = make(map[string]interface{})
+			newValue = make(map[string]any)
 		} else {
 			newValue = ot.defaultValue
 		}
@@ -356,7 +356,7 @@ func (ot *objectTransformer) objectTransformJSON(in interface{}, modifier pathMo
 
 		savePath := strings.Replace(child.path(), ot.jsonPath, "$", 1)
 		if err := saveInTree(newValue, savePath, childValue); err != nil {
-			return nil, fmt.Errorf("path %q failed save: %v", child.path(), err)
+			return nil, fmt.Errorf("path %q failed save: %w", child.path(), err)
 		}
 	}
 
@@ -370,7 +370,7 @@ func (ot *objectTransformer) objectTransformJSON(in interface{}, modifier pathMo
 // objectTransformXML retrieves the value for this object by building the value for the base object and then adding in any
 // transforms for all defined child fields. If a transform is provided it transforms the children relative to the
 // passed in node. If a transform is provided and not found the children of the object are skipped.
-func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathModifier) (interface{}, error) {
+func (ot *objectTransformer) objectTransformXML(in any, modifier pathModifier) (any, error) {
 	path := ot.jsonPath
 	if modifier != nil {
 		path = modifier(path)
@@ -387,10 +387,10 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 		if rawValue == nil {
 			if ot.defaultValue == nil {
 				return nil, nil
-			} else {
-				return ot.defaultValue, nil
 			}
-		} else if val, ok := rawValue.(string); ok {
+			return ot.defaultValue, nil
+		}
+		if val, ok := rawValue.(string); ok {
 			// If the XML node is returned as an empty string, then it likely indicates that the transformer encountered an empty XML tag, e.g. <tag /> or <tag></tag>.
 			// While not particularly useful, it is also not an error. The end result is that the field won't show up in the output file.
 			if val == "" {
@@ -410,9 +410,9 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 		}
 	}
 
-	var newValue map[string]interface{}
+	var newValue map[string]any
 	if ot.defaultValue == nil {
-		newValue = make(map[string]interface{})
+		newValue = make(map[string]any)
 	} else {
 		newValue = ot.defaultValue
 	}
@@ -426,7 +426,7 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 
 		savePath := strings.Replace(child.path(), ot.jsonPath, "$", 1)
 		if err := saveInTree(newValue, savePath, childValue); err != nil {
-			return nil, fmt.Errorf("path %q failed save: %v", child.path(), err)
+			return nil, fmt.Errorf("path %q failed save: %w", child.path(), err)
 		}
 	}
 
@@ -438,7 +438,7 @@ func (ot *objectTransformer) objectTransformXML(in interface{}, modifier pathMod
 }
 
 // transform routes to the correct object transform type.
-func (ot *objectTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
+func (ot *objectTransformer) transform(in any, modifier pathModifier) (any, error) {
 	if ot.format == jsonInput {
 		return ot.objectTransformJSON(in, modifier)
 	}
@@ -450,7 +450,7 @@ func (ot *objectTransformer) transform(in interface{}, modifier pathModifier) (i
 
 // scalarTransformer represents a JSON instance for a scalar type.
 type scalarTransformer struct {
-	defaultValue interface{}
+	defaultValue any
 	jsonType     string
 	jsonPath     string
 	format       inputFormat
@@ -466,8 +466,8 @@ func newScalarTransformer(path, transformIdentifier string, raw json.RawMessage,
 
 	if instanceType == "string" {
 		instanceFormat, err := jsonparser.GetString(raw, "format")
-		if err != nil && err != jsonparser.KeyPathNotFoundError {
-			return nil, fmt.Errorf("failed to extract instance format: %v", err)
+		if err != nil && !errors.Is(err, jsonparser.KeyPathNotFoundError) {
+			return nil, fmt.Errorf("failed to extract instance format: %w", err)
 		}
 		if instanceFormat == "date-time" {
 			st.jsonType = "date-time"
@@ -500,7 +500,7 @@ func (st *scalarTransformer) selectChild(string) instanceTransformer { return ni
 // 2. Look for the same jsonPath in the input and use directly if possible.
 //
 // 3. Fall back to the JSON Schema default value.
-func (st *scalarTransformer) transformScalarJSON(in interface{}, modifier pathModifier) (interface{}, error) {
+func (st *scalarTransformer) transformScalarJSON(in any, modifier pathModifier) (any, error) {
 	path := st.jsonPath
 	if modifier != nil {
 		path = modifier(path)
@@ -535,7 +535,7 @@ func (st *scalarTransformer) transformScalarJSON(in interface{}, modifier pathMo
 // 1. Use a Transform if it exists.
 //
 // 2. If transform does not exist or returns no value send back default.
-func (st *scalarTransformer) transformScalarXML(in interface{}, modifier pathModifier) (interface{}, error) {
+func (st *scalarTransformer) transformScalarXML(in any, modifier pathModifier) (any, error) {
 	path := st.jsonPath
 	if modifier != nil {
 		path = modifier(path)
@@ -557,7 +557,7 @@ func (st *scalarTransformer) transformScalarXML(in interface{}, modifier pathMod
 }
 
 // transform routes to the correct scalar transform type.
-func (st *scalarTransformer) transform(in interface{}, modifier pathModifier) (interface{}, error) {
+func (st *scalarTransformer) transform(in any, modifier pathModifier) (any, error) {
 	if st.format == jsonInput {
 		return st.transformScalarJSON(in, modifier)
 	}

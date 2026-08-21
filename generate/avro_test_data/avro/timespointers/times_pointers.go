@@ -2,10 +2,11 @@
 package timespointers
 
 import (
+	"io"
+
 	"github.com/actgardner/gogen-avro/v7/compiler"
 	"github.com/actgardner/gogen-avro/v7/vm"
 	"github.com/actgardner/gogen-avro/v7/vm/types"
-	"io"
 )
 
 type TimesPointers struct {

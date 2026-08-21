@@ -249,7 +249,7 @@ func TestGraphQLExtractedField_Write(t *testing.T) {
 
 	for _, test := range tests {
 		buf := &bytes.Buffer{}
-		if err := test.ef.write(buf, test.prefix, test.required, test.descriptionAsStructTag, false); err != nil {
+		if err := test.ef.write(buf, test.prefix, test.required); err != nil {
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
 		}
 		if got, want := string(buf.Bytes()), test.want; got != want {
@@ -515,8 +515,9 @@ func TestGraphQLType(t *testing.T) {
 		ef := gqlExtractedField{
 			array:    test.array,
 			jsonType: test.jsonType,
+			args:     BuildArgs{Pointers: test.pointers},
 		}
-		gotArgs, gotType := ef.graphqlType(test.required, test.pointers)
+		gotArgs, gotType := ef.graphqlType(test.required)
 		if gotArgs != test.wantArgs {
 			t.Errorf("Test %q arguments\nwant: %q\ngot:  %q", test.description, test.wantArgs, gotArgs)
 		}

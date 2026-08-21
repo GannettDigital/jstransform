@@ -57,28 +57,28 @@ func buildAvroSerializationFunctions(schemaPath string, args BuildArgs) error {
 
 	schema, err := os.ReadFile(schemaPath)
 	if err != nil {
-		return fmt.Errorf("failed to read schema file at path %q: %v", schemaPath, err)
+		return fmt.Errorf("failed to read schema file at path %q: %w", schemaPath, err)
 	}
 
 	if _, err := namespace.TypeForSchema(schema); err != nil {
-		return fmt.Errorf("failed to decode schema file %q: %v", schemaPath, err)
+		return fmt.Errorf("failed to decode schema file %q: %w", schemaPath, err)
 	}
 
 	for _, def := range namespace.Roots {
 		if err := resolver.ResolveDefinition(def, namespace.Definitions); err != nil {
-			return fmt.Errorf("failed resolving Avro schema definition %q: %v", def.Name(), err)
+			return fmt.Errorf("failed resolving Avro schema definition %q: %w", def.Name(), err)
 		}
 		if err := gen.Add(def); err != nil {
-			return fmt.Errorf("failed generating Avro serialization code: %v", err)
+			return fmt.Errorf("failed generating Avro serialization code: %w", err)
 		}
 	}
 
 	destination := filepath.Join(filepath.Dir(schemaPath), "avro", schemaName)
 	if err := os.MkdirAll(destination, os.ModeDir|os.ModePerm); err != nil && !os.IsExist(err) {
-		return fmt.Errorf("failed to create directory %q: %v", destination, err)
+		return fmt.Errorf("failed to create directory %q: %w", destination, err)
 	}
 	if err := pkg.WriteFiles(destination); err != nil {
-		return fmt.Errorf("failed writing serialization source files to dir %q: %v", destination, err)
+		return fmt.Errorf("failed writing serialization source files to dir %q: %w", destination, err)
 	}
 
 	return nil
@@ -96,13 +96,13 @@ func buildAvroSerializationFunctions(schemaPath string, args BuildArgs) error {
 func buildAvroSchemaFile(name, goSourcePath string, pretty bool) (string, error) {
 	// Step 1 create the Avro Schema file
 	// there are 3 ways to approach this, walk the JSON schema, walk the AST for the go struct or load the Go struct up and do reflection
-	// reflection isn't generally clear but is probably the most compact, walking the JSON schema will likely require building a
+	// is probably the most compact, walking the JSON schema will likely require building a
 	// representation of the data in a new set of structs like is done for the go struct building initially.
 	// Walking the go AST is able to take advantage of all the standard library AST methods and though it has its share
 	// or complication is easier to do in one pass
 	spec, err := parseGoStruct(name, goSourcePath)
 	if err != nil {
-		return "", fmt.Errorf("failed to parse Go struct: %v", err)
+		return "", fmt.Errorf("failed to parse Go struct: %w", err)
 	}
 	if spec == nil {
 		return "", errors.New("type spec is nil")
@@ -111,7 +111,7 @@ func buildAvroSchemaFile(name, goSourcePath string, pretty bool) (string, error)
 	outPath := filepath.Join(dir, strings.ToLower(name)+".avsc")
 	specFile, err := os.Create(outPath)
 	if err != nil {
-		return outPath, fmt.Errorf("failed to open file %q: %v", outPath, err)
+		return outPath, fmt.Errorf("failed to open file %q: %w", outPath, err)
 	}
 
 	var writer io.Writer
@@ -128,21 +128,21 @@ func buildAvroSchemaFile(name, goSourcePath string, pretty bool) (string, error)
 		excludeNamespace: make(map[string]bool),
 	}
 
-	fmt.Fprint(cfg.writer, "{")
+	_, _ = fmt.Fprint(cfg.writer, "{")
 	astutil.Apply(spec, writeAvroStruct(cfg, name, metadataFields), nil)
-	fmt.Fprint(cfg.writer, "]}")
+	_, _ = fmt.Fprint(cfg.writer, "]}")
 
 	if pretty {
 		rawJSON := json.RawMessage(buf.Bytes())
 		enc := json.NewEncoder(specFile)
 		enc.SetIndent("", "  ")
 		if err := enc.Encode(rawJSON); err != nil {
-			return "", fmt.Errorf("failed writing pretty output to file: %v", err)
+			return "", fmt.Errorf("failed writing pretty output to file: %w", err)
 		}
 	}
 
 	if err := specFile.Close(); err != nil {
-		return "", fmt.Errorf("failed closing file: %v", err)
+		return "", fmt.Errorf("failed closing file: %w", err)
 	}
 
 	return outPath, nil
@@ -157,7 +157,7 @@ func parseGoStruct(name, path string) (*ast.TypeSpec, error) {
 		var err error
 		goFile, err = parser.ParseFile(fileSet, path, nil, parser.AllErrors)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse go file %q: %v", path, err)
+			return nil, fmt.Errorf("failed to parse go file %q: %w", path, err)
 		}
 		if !ast.FilterFile(goFile, func(itemName string) bool { return itemName == name }) {
 			return nil, fmt.Errorf("a struct named %q was not found in file %q", name, path)
@@ -197,7 +197,7 @@ func filterPackage(name, path string) (*ast.File, error) {
 	}
 	pkgs, err := packages.Load(cfg, ".")
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse go files at path %q: %v", path, err)
+		return nil, fmt.Errorf("failed to parse go files at path %q: %w", path, err)
 	}
 	if len(pkgs) == 0 {
 		return nil, fmt.Errorf("no packages found for go files at path %q", path)
@@ -252,7 +252,7 @@ func filterPackage(name, path string) (*ast.File, error) {
 
 func parseStructTag(literal *ast.BasicLit) (name, description string, omitEmpty bool) {
 	if literal == nil {
-		return
+		return "", "", false
 	}
 	tag := reflect.StructTag(strings.Trim(literal.Value, "`"))
 
@@ -264,11 +264,11 @@ func parseStructTag(literal *ast.BasicLit) (name, description string, omitEmpty 
 		for _, split := range jsonSplits[1:] {
 			if strings.ToLower(split) == "omitempty" {
 				omitEmpty = true
-				return
+				return name, description, omitEmpty
 			}
 		}
 	}
-	return
+	return name, description, omitEmpty
 }
 
 // writeAvroStruct returns an apply function intended to be called for the start of each node.
@@ -316,7 +316,7 @@ func writeAvroField(cfg avroConfig, f *ast.Field, fieldMap map[string]bool) bool
 			return false
 		}
 		newcfg := cfg
-		newcfg.namespace = append(cfg.namespace, t.Name)
+		newcfg.namespace = append(newcfg.namespace, t.Name)
 		newcfg.excludeFields = fieldMap
 		writeEmbeddedStructFields(newcfg)
 		return true
@@ -333,7 +333,7 @@ func writeAvroField(cfg avroConfig, f *ast.Field, fieldMap map[string]bool) bool
 		name = tagName
 	}
 
-	avroType := fmt.Sprintf(`"type":%s`, convertToAvroType(cfg, f.Type, name, omitEmpty))
+	avroType := `"type":` + convertToAvroType(cfg, f.Type, name, omitEmpty)
 
 	avroName := fmt.Sprintf(`"name":%q`, name)
 	if len(cfg.namespace) != 0 {
@@ -343,7 +343,7 @@ func writeAvroField(cfg avroConfig, f *ast.Field, fieldMap map[string]bool) bool
 		avroName += fmt.Sprintf(`,"doc":%q`, tagDescription)
 	}
 
-	fmt.Fprintf(cfg.writer, "{%s,%s}", avroName, avroType)
+	_, _ = fmt.Fprintf(cfg.writer, "{%s,%s}", avroName, avroType)
 	return true
 }
 
@@ -362,7 +362,7 @@ func writeAvroFields(cfg avroConfig, list *ast.FieldList) {
 	for i, f := range list.List {
 		processed := writeAvroField(cfg, f, fieldMap)
 		if processed && i+1 != length {
-			fmt.Fprint(cfg.writer, ",")
+			_, _ = fmt.Fprint(cfg.writer, ",")
 		}
 	}
 }
@@ -371,7 +371,7 @@ func writeEmbeddedStructFields(cfg avroConfig) {
 	structName := cfg.namespace[len(cfg.namespace)-1]
 	spec, err := parseGoStruct(structName, filepath.Join(cfg.dir, structToFilename(structName)))
 	if err != nil {
-		fmt.Fprint(cfg.writer, `{"type":"embedded struct not found"}`)
+		_, _ = fmt.Fprint(cfg.writer, `{"type":"embedded struct not found"}`)
 		return
 	}
 
@@ -414,7 +414,7 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 		default: // Another go type
 			n, err := parseGoStruct(t.Name, cfg.dir)
 			if err != nil {
-				//panic(fmt.Errorf("failed to parse Go struct: %v", err))
+				// panic(fmt.Errorf("failed to parse Go struct: %v", err))
 				return "unknown"
 			}
 			return writeNestedStruct(cfg, n, name, nullable)
@@ -424,9 +424,8 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 				return fmt.Sprintf(`%q,"default":false`, typeName)
 			}
 			return fmt.Sprintf(`["null",%q]`, typeName)
-		} else {
-			return fmt.Sprintf(`%q`, typeName)
 		}
+		return fmt.Sprintf(`%q`, typeName)
 	case *ast.MapType:
 		keyType := convertToAvroType(cfg, t.Key, name, false)
 		if reflect.TypeOf(keyType).Kind() != reflect.String {
@@ -438,9 +437,8 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 		itemType := convertToAvroType(cfg, t.Elt, name, false)
 		if strings.HasPrefix(itemType, "{") {
 			return fmt.Sprintf(`{"type":"array","items":%s}`, itemType)
-		} else {
-			return fmt.Sprintf(`{"type":"array","items":{"type": %s}}`, itemType)
 		}
+		return fmt.Sprintf(`{"type":"array","items":{"type": %s}}`, itemType)
 	case *ast.StructType:
 		return writeNestedStruct(cfg, t, name, nullable)
 	case *ast.SelectorExpr:
@@ -463,7 +461,7 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 func writeNestedStruct(cfg avroConfig, n ast.Node, name string, nullable bool) string {
 	buf := &bytes.Buffer{}
 	newcfg := cfg
-	newcfg.namespace = append(cfg.namespace, name)
+	newcfg.namespace = append(newcfg.namespace, name)
 	newcfg.writer = buf
 	newcfg.excludeFields = nil
 	// nested structs get _struct appended on their name

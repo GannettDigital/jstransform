@@ -27,8 +27,8 @@ func (c *duration) init(args map[string]string) error {
 	return nil
 }
 
-func (c *duration) transform(raw interface{}) (interface{}, error) {
-	if array, ok := raw.([]interface{}); ok && len(array) == 1 {
+func (c *duration) transform(raw any) (any, error) {
+	if array, ok := raw.([]any); ok && len(array) == 1 {
 		raw = array[0]
 	}
 
@@ -81,7 +81,7 @@ func (c *changeCase) init(args map[string]string) error {
 	return nil
 }
 
-func (c *changeCase) transform(raw interface{}) (interface{}, error) {
+func (c *changeCase) transform(raw any) (any, error) {
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("changeCase only supports strings")
@@ -105,7 +105,7 @@ func (n *valueExists) init(args map[string]string) error {
 	return nil
 }
 
-func (c *valueExists) transform(raw interface{}) (interface{}, error) {
+func (c *valueExists) transform(raw any) (any, error) {
 	switch v := raw.(type) {
 	case string:
 		if len(v) > 0 {
@@ -131,7 +131,7 @@ func (i *inverse) init(args map[string]string) error {
 	return nil
 }
 
-func (i *inverse) transform(raw interface{}) (interface{}, error) {
+func (i *inverse) transform(raw any) (any, error) {
 	in, ok := raw.(bool)
 	if !ok {
 		return nil, errors.New("inverse only supports booleans")
@@ -154,8 +154,8 @@ func (m *max) init(args map[string]string) error {
 	return nil
 }
 
-func (m *max) transform(in interface{}) (interface{}, error) {
-	inArray, ok := in.([]interface{})
+func (m *max) transform(in any) (any, error) {
+	inArray, ok := in.([]any)
 	if !ok {
 		return nil, errors.New("input must be an array")
 	}
@@ -167,7 +167,7 @@ func (m *max) transform(in interface{}) (interface{}, error) {
 	for i, item := range inArray {
 		byRaw, err := jsonpath.Get(byArg, item)
 		if err != nil {
-			return nil, fmt.Errorf("failed extracting 'by' field: %v", err)
+			return nil, fmt.Errorf("failed extracting 'by' field: %w", err)
 		}
 		by, ok := byRaw.(float64)
 		if !ok {
@@ -185,7 +185,7 @@ func (m *max) transform(in interface{}) (interface{}, error) {
 
 	rawReturn, err := jsonpath.Get(returnArg, inArray[largestIndex])
 	if err != nil {
-		return nil, fmt.Errorf("failed extracting 'return' field: %v", err)
+		return nil, fmt.Errorf("failed extracting 'return' field: %w", err)
 	}
 
 	return rawReturn, nil
@@ -204,7 +204,7 @@ func (r *replace) init(args map[string]string) error {
 	}
 	re, err := regexp.Compile(args["regex"])
 	if err != nil {
-		return fmt.Errorf("failed to parse regex %q: %v", args["regex"], err)
+		return fmt.Errorf("failed to parse regex %q: %w", args["regex"], err)
 	}
 
 	r.regex = re
@@ -212,7 +212,7 @@ func (r *replace) init(args map[string]string) error {
 	return nil
 }
 
-func (r *replace) transform(raw interface{}) (interface{}, error) {
+func (r *replace) transform(raw any) (any, error) {
 	if r.regex == nil {
 		return nil, errors.New("init was not run")
 	}
@@ -238,7 +238,7 @@ func (s *split) init(args map[string]string) error {
 	return nil
 }
 
-func (s *split) transform(raw interface{}) (interface{}, error) {
+func (s *split) transform(raw any) (any, error) {
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("split only supports strings")
@@ -248,13 +248,13 @@ func (s *split) transform(raw interface{}) (interface{}, error) {
 	// strings.Split() will return []string{""} instead of an empty array.
 	// https://play.golang.org/p/8ySv_t37haN
 	if in == "" {
-		return []interface{}{}, nil
+		return []any{}, nil
 	}
 
 	splits := strings.Split(in, s.args["on"])
 
-	// Return []interface{} to avoid messing up type casts later in the process
-	var interfaceSplits []interface{}
+	// Return []any to avoid messing up type casts later in the process
+	var interfaceSplits []any
 	for _, s := range splits {
 		interfaceSplits = append(interfaceSplits, s)
 	}
@@ -275,14 +275,14 @@ func (t *timeParse) init(args map[string]string) error {
 	return nil
 }
 
-func (t *timeParse) transform(raw interface{}) (interface{}, error) {
+func (t *timeParse) transform(raw any) (any, error) {
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("timeParse only supports strings")
 	}
 	parsedTime, err := time.Parse(t.args["format"], in)
 	if err != nil {
-		return nil, fmt.Errorf("time could not be parsed using supplied format")
+		return nil, errors.New("time could not be parsed using supplied format")
 	}
 	return parsedTime.Format(t.args["layout"]), nil
 }
@@ -301,7 +301,7 @@ func (c *currentTime) init(args map[string]string) error {
 	return nil
 }
 
-func (c *currentTime) transform(_ interface{}) (interface{}, error) {
+func (c *currentTime) transform(_ any) (any, error) {
 	timeFmt := c.args["format"]
 	switch c.args["format"] {
 	case "RFC3339":
@@ -323,7 +323,7 @@ func (c *toCamelCase) init(args map[string]string) error {
 	return nil
 }
 
-func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
+func (c *toCamelCase) transform(raw any) (any, error) {
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("toCamelCase only supports input of type string")
@@ -351,7 +351,7 @@ func (c *removeHTML) init(args map[string]string) error {
 	return nil
 }
 
-func (c *removeHTML) transform(raw interface{}) (interface{}, error) {
+func (c *removeHTML) transform(raw any) (any, error) {
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("removeHTML only supports input of type string")
@@ -373,7 +373,7 @@ func (c *convertToFloat64) init(args map[string]string) error {
 	return nil
 }
 
-func (c *convertToFloat64) transform(raw interface{}) (interface{}, error) {
+func (c *convertToFloat64) transform(raw any) (any, error) {
 	switch in := raw.(type) {
 	case string:
 		return strconv.ParseFloat(in, 64)
@@ -395,7 +395,7 @@ func (c *convertToInt64) init(args map[string]string) error {
 	return nil
 }
 
-func (c *convertToInt64) transform(raw interface{}) (interface{}, error) {
+func (c *convertToInt64) transform(raw any) (any, error) {
 	switch in := raw.(type) {
 	case string:
 		return strconv.ParseInt(in, 10, 64)
@@ -412,7 +412,7 @@ func (c *convertToInt64) transform(raw interface{}) (interface{}, error) {
 	case int32:
 		return int64(in), nil
 	case int64:
-		return int64(in), nil
+		return in, nil
 	default:
 		return nil, fmt.Errorf("convertToInt64 only supports strings, int, and float64, raw type: %T", raw)
 	}
@@ -427,13 +427,13 @@ func (c *convertToBool) init(args map[string]string) error {
 	return nil
 }
 
-func (c *convertToBool) transform(raw interface{}) (interface{}, error) {
+func (c *convertToBool) transform(raw any) (any, error) {
 	switch in := raw.(type) {
 	case bool:
 		return in, nil
 	case string:
 		return strconv.ParseBool(in)
-	case []interface{}:
+	case []any:
 		return len(in) != 0, nil
 	case float32:
 		return in != 0, nil

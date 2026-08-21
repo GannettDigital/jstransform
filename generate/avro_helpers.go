@@ -48,7 +48,7 @@ type AvroCFWriter interface {
 
 // AvroCFDeleter implements functionality to write an Avro Container file with the metadata field AvroDeleted set
 // to true. This is a record that a delete of the given item occurred but is writing a new Container File. This enables
-// adhering to the the Avro Schema for the given data type and tracking history of changes for any given ID.
+// adhering to the Avro Schema for the given data type and tracking history of changes for any given ID.
 type AvroCFDeleter interface {
 	WriteAvroDeletedCF(io.Writer, time.Time) error
 }
@@ -107,11 +107,11 @@ func buildAvroHelperFunctions(name, goSourcePath, importPath string) error {
 
 	fm, err := newAvroFieldMapper(name, goSourcePath)
 	if err != nil {
-		return fmt.Errorf("failed to initialize field mapper: %v", err)
+		return fmt.Errorf("failed to initialize field mapper: %w", err)
 	}
 	mapped, err := fm.generate()
 	if err != nil {
-		return fmt.Errorf("failed to generate struct field mappings: %v", err)
+		return fmt.Errorf("failed to generate struct field mappings: %w", err)
 	}
 	values["preProcessing"], values["fieldMapping"] = mapped.preProcessing, mapped.fieldMapping
 
@@ -147,19 +147,19 @@ func newAvroFieldMapper(name, goSourcePath string) (*avroFieldMapper, error) {
 	for unionName, templateSource := range unionTypes {
 		tmpl, err := template.New("").Parse(templateSource)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse template for %q: %v", unionName, err)
+			return nil, fmt.Errorf("failed to parse template for %q: %w", unionName, err)
 		}
 		unionTemplates[unionName] = tmpl
 	}
 
 	structSliceTemplate, err := template.New("").Parse(avroStructSliceTemplate)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse avroStructSliceTemplate: %v", err)
+		return nil, fmt.Errorf("failed to parse avroStructSliceTemplate: %w", err)
 	}
 
 	unionNullStructTemplate, err := template.New("").Parse(unionNullStruct)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse unionNullStruct: %v", err)
+		return nil, fmt.Errorf("failed to parse unionNullStruct: %w", err)
 	}
 
 	lowerName := strings.ToLower(name)
@@ -181,12 +181,12 @@ func newAvroFieldMapper(name, goSourcePath string) (*avroFieldMapper, error) {
 func (fm *avroFieldMapper) generate() (mappedFields, error) {
 	generatedFieldsMap, err := mapGeneratedFields(fm.structName, fm.generatedSourcePath)
 	if err != nil {
-		return mappedFields{}, fmt.Errorf("failed to parse generated Go struct: %v", err)
+		return mappedFields{}, fmt.Errorf("failed to parse generated Go struct: %w", err)
 	}
 
 	avroStruct, err := parseGoStruct(fm.structName, fm.avroPackagePath)
 	if err != nil {
-		return mappedFields{}, fmt.Errorf("failed to parse Avro Go struct: %v", err)
+		return mappedFields{}, fmt.Errorf("failed to parse Avro Go struct: %w", err)
 	}
 	avroFields := findStructFields(avroStruct)
 	if avroFields == nil {
@@ -218,21 +218,21 @@ func (fm *avroFieldMapper) generateChildStruct(expr ast.Expr, name, prefix strin
 		structName = ident.Name
 		n, err := parseGoStruct(structName, filepath.Dir(fm.generatedSourcePath))
 		if err != nil {
-			return mappedFields{}, nil, fmt.Errorf("unable to find type named %q: %v", name, err)
+			return mappedFields{}, nil, fmt.Errorf("unable to find type named %q: %w", name, err)
 		}
-		if s, ok := n.Type.(*ast.StructType); ok {
-			stype = s
-		} else {
+		s, ok := n.Type.(*ast.StructType)
+		if !ok {
 			return mappedFields{}, nil, fmt.Errorf("type %q is not a struct", name)
 		}
+		stype = s
 	}
 	generatedChildFieldMap, err := mapFields(stype.Fields, fm.generatedSourcePath)
 	if err != nil {
-		return mappedFields{}, nil, fmt.Errorf("failed to parse generated Go struct: %v", err)
+		return mappedFields{}, nil, fmt.Errorf("failed to parse generated Go struct: %w", err)
 	}
 	mappedStruct, err := fm.generateFields(prefix, avroFields, generatedChildFieldMap)
 	if err != nil {
-		return mappedFields{}, nil, fmt.Errorf("failed generating mappings for field %s: %v", name, err)
+		return mappedFields{}, nil, fmt.Errorf("failed generating mappings for field %s: %w", name, err)
 	}
 	mappedStruct.name = structName
 
@@ -257,7 +257,7 @@ func (fm *avroFieldMapper) generateFields(prefix string, avroFields *ast.FieldLi
 
 		mappedField, err := fm.generateFieldValue(name, prefix, f.Type, generatedField)
 		if err != nil {
-			return mappedFields{}, fmt.Errorf("failed generating field mapping for field %q: %v", name, err)
+			return mappedFields{}, fmt.Errorf("failed generating field mapping for field %q: %w", name, err)
 		}
 
 		fields = append(fields, fmt.Sprintf("%s: %s,", name, mappedField.fieldMapping))
@@ -281,12 +281,12 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 		// check for a nil pointer
 		if _, ok := generatedField.Type.(*ast.StarExpr); ok {
 			return mappedFields{
-				fieldMapping:  fm.generateNullableFieldValue(name, prefix, mappedField.name, fmt.Sprintf("&%s", mappedField.fieldMapping)),
+				fieldMapping:  fm.generateNullableFieldValue(name, prefix, mappedField.name, "&"+mappedField.fieldMapping),
 				preProcessing: mappedField.preProcessing,
 			}, nil
 		}
 		return mappedFields{
-			fieldMapping:  fmt.Sprintf("&%s", mappedField.fieldMapping),
+			fieldMapping:  "&" + mappedField.fieldMapping,
 			preProcessing: mappedField.preProcessing,
 			name:          prefix + name,
 		}, nil
@@ -297,7 +297,7 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 			return mappedFields{}, fmt.Errorf("avro type is map but generated isn't for field %q", name)
 		}
 		if ptr, ok := f.Value.(*ast.StarExpr); ok {
-			fm.generateFieldValue(name, prefix, ptr.X, generatedField)
+			_, _ = fm.generateFieldValue(name, prefix, ptr.X, generatedField)
 		}
 		return fm.generateFieldValue(name, prefix, f.Value, generatedField)
 	case *ast.ArrayType:
@@ -308,7 +308,7 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 			return fm.generateFieldValue(name, prefix, ptr.X, generatedField)
 		}
 		return fm.generateFieldValue(name, prefix, f.Elt, generatedField)
-	case *ast.Ident: // This covers covers all of the basic scalar types but also identifiers for other defined types
+	case *ast.Ident: // This covers all of the basic scalar types but also identifiers for other defined types
 		typeName := f.Name
 		switch typeName { // handle builtin types
 		case "string", "bool", "float64":
@@ -343,7 +343,7 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 		// If not a built in type it could be a special Avro Union type
 		if tmpl, ok := fm.unionTemplates[typeName]; ok {
 			buf := &bytes.Buffer{}
-			format := map[string]string{"packageName": fm.packageName, "value": "z." + prefix + name}
+			formatMap := map[string]string{"packageName": fm.packageName, "value": "z." + prefix + name}
 			// special case for converting time fields
 			fieldType := generatedField.Type
 			pointer := false
@@ -352,10 +352,10 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 				fieldType = p.X
 			}
 			if selector, ok := fieldType.(*ast.SelectorExpr); ok && selector.Sel.Name == "Time" {
-				format = map[string]string{"packageName": fm.packageName, "value": fmt.Sprintf("generate.AvroTime(z.%s)", prefix+name)}
+				formatMap = map[string]string{"packageName": fm.packageName, "value": fmt.Sprintf("generate.AvroTime(z.%s)", prefix+name)}
 			}
-			if err := tmpl.Execute(buf, format); err != nil {
-				return mappedFields{}, fmt.Errorf("failed union template: %v", err)
+			if err := tmpl.Execute(buf, formatMap); err != nil {
+				return mappedFields{}, fmt.Errorf("failed union template: %w", err)
 			}
 			m := mappedFields{fieldMapping: buf.String(), name: typeName}
 			if pointer {
@@ -369,7 +369,7 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 			childTypeName := strings.TrimPrefix(typeName, "UnionNull")
 			mf, err := fm.generateStructValue(name, prefix, childTypeName, generatedField)
 			if err != nil {
-				return mappedFields{}, fmt.Errorf("failed generating UnionNull struct value: %v", err)
+				return mappedFields{}, fmt.Errorf("failed generating UnionNull struct value: %w", err)
 			}
 			buf := &bytes.Buffer{}
 			templateData := map[string]string{
@@ -378,7 +378,7 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 				"value":       mf.fieldMapping,
 			}
 			if err := fm.unionNullStructTemplate.Execute(buf, templateData); err != nil {
-				return mappedFields{}, fmt.Errorf("failed generating UnionNull struct template: %v", err)
+				return mappedFields{}, fmt.Errorf("failed generating UnionNull struct template: %w", err)
 			}
 			return mappedFields{fieldMapping: buf.String(), preProcessing: mf.preProcessing, name: typeName}, nil
 		}
@@ -397,7 +397,8 @@ func (fm *avroFieldMapper) generateNullableFieldValue(name, prefix, fieldTypeNam
 		s = %s
 	}
 	return s
-}()`, returnType, returnType, prefix+name, fieldValue)
+}()`, returnType, returnType, prefix+name, fieldValue,
+	)
 }
 
 // generateStructValue will generate code to match an Avro struct or array of structs with values from the generated
@@ -405,7 +406,7 @@ func (fm *avroFieldMapper) generateNullableFieldValue(name, prefix, fieldTypeNam
 func (fm *avroFieldMapper) generateStructValue(name, prefix, typeName string, generatedField *ast.Field) (mappedFields, error) {
 	avroStruct, err := parseGoStruct(typeName, fm.avroPackagePath)
 	if err != nil {
-		return mappedFields{}, fmt.Errorf("error parsing go struct type %s: %v", typeName, err)
+		return mappedFields{}, fmt.Errorf("error parsing go struct type %s: %w", typeName, err)
 	}
 	avroFields := findStructFields(avroStruct)
 	if avroFields == nil {
@@ -442,7 +443,7 @@ func (fm *avroFieldMapper) generateStructValue(name, prefix, typeName string, ge
 
 		buf := &bytes.Buffer{}
 		if err := fm.structSliceTemplate.Execute(buf, templValues); err != nil {
-			return mappedFields{}, fmt.Errorf("failed running struct slice template %v", err)
+			return mappedFields{}, fmt.Errorf("failed running struct slice template %w", err)
 		}
 
 		return mappedFields{
@@ -484,7 +485,7 @@ func mapGeneratedFields(name, goSourcePath string) (map[string]*ast.Field, error
 	srcDir := filepath.Dir(goSourcePath)
 	generatedStruct, err := parseGoStruct(name, goSourcePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse Go struct: %v", err)
+		return nil, fmt.Errorf("failed to parse Go struct: %w", err)
 	}
 	generatedFields := findStructFields(generatedStruct)
 	if generatedFields == nil {
@@ -510,7 +511,7 @@ func mapFields(list *ast.FieldList, srcDir string) (map[string]*ast.Field, error
 			embedName := t.Name
 			embedStruct, err := parseGoStruct(embedName, filepath.Join(srcDir, structToFilename(embedName)))
 			if err != nil {
-				return nil, fmt.Errorf("failed to parse embedded go struct %q: %v", embedName, err)
+				return nil, fmt.Errorf("failed to parse embedded go struct %q: %w", embedName, err)
 			}
 			embedFields := findStructFields(embedStruct)
 			if embedFields == nil {
@@ -518,7 +519,7 @@ func mapFields(list *ast.FieldList, srcDir string) (map[string]*ast.Field, error
 			}
 			embedMap, err := mapFields(embedFields, srcDir)
 			if err != nil {
-				return nil, fmt.Errorf("failed to map fields for embedded go struct %q: %v", embedName, err)
+				return nil, fmt.Errorf("failed to map fields for embedded go struct %q: %w", embedName, err)
 			}
 			for k, v := range embedMap {
 				if _, ok := fieldMap[k]; !ok {
@@ -577,31 +578,31 @@ func printFields(list *ast.FieldList) string {
 
 // writeCodeTemplate will execute a template from src with values and write to path.
 // The assumption is this is go code so it will have standard go formatting applied.
-func writeCodeTemplate(src string, values map[string]string, path string) error {
+func writeCodeTemplate(src string, values map[string]string, outPath string) error {
 	buf := &bytes.Buffer{}
 	tmpl, err := template.New("").Parse(src)
 	if err != nil {
-		return fmt.Errorf("failed to parse template: %v", err)
+		return fmt.Errorf("failed to parse template: %w", err)
 	}
 	if err := tmpl.Execute(buf, values); err != nil {
-		return fmt.Errorf("failed to execute code generation template: %v", err)
+		return fmt.Errorf("failed to execute code generation template: %w", err)
 	}
 
 	// Apply go formatting
 	final, err := format.Source(buf.Bytes())
 	if err != nil {
-		return fmt.Errorf("failed to format source: %v", err)
+		return fmt.Errorf("failed to format source: %w", err)
 	}
 
-	if err := os.WriteFile(path, final, 0644); err != nil {
-		return fmt.Errorf("failed to write file %q: %v", path, err)
+	if err := os.WriteFile(outPath, final, 0600); err != nil {
+		return fmt.Errorf("failed to write file %q: %w", outPath, err)
 	}
 
 	return nil
 }
 
 // structToFilename will lowercase the first letter of the string to align with the typical
-// Go struct to file naming convention. E.G. GoModel = goModel.go
+// Go struct to file naming convention. E.G. GoModel = goModel.go.
 func structToFilename(structName string) string {
 	s := strings.Split(structName, "")
 	s[0] = strings.ToLower(s[0])

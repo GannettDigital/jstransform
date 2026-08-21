@@ -268,7 +268,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 // write outputs the Golang representation of this field to the writer with prefix before each line.
 // It handles inline structs by calling this method recursively adding a new \t to the prefix for each layer.
 // If required is set to false 'omitempty' is added in the JSON struct tag for the field.
-func (ef *gqlExtractedField) write(w io.Writer, prefix string, required, descriptionAsStructTag, pointers bool) error {
+func (ef *gqlExtractedField) write(w io.Writer, prefix string, required bool) error {
 	var attribute string
 	description := ef.description
 	if strings.HasPrefix(description, "DEPRECATED:") {
@@ -285,7 +285,7 @@ func (ef *gqlExtractedField) write(w io.Writer, prefix string, required, descrip
 
 	// Simple field type.
 	if ef.jsonType != "object" {
-		gqlArgs, gqlType := ef.graphqlType(required, pointers)
+		gqlArgs, gqlType := ef.graphqlType(required)
 		if _, err := fmt.Fprintf(w, "%s%s%s: %s%s\n", prefix, ef.jsonName, gqlArgs, gqlType, attribute); err != nil {
 			return fmt.Errorf("error writing field %q definition: %w", ef.name, err)
 		}
@@ -293,7 +293,7 @@ func (ef *gqlExtractedField) write(w io.Writer, prefix string, required, descrip
 	}
 
 	// Object field type.  (Not generally used for GraphQL as the types aren't nested.)
-	gqlArgs, gqlType := ef.graphqlType(required, pointers)
+	gqlArgs, gqlType := ef.graphqlType(required)
 	if _, err := fmt.Fprintf(w, "%s%s%s\t%s {\n", prefix, ef.jsonName, gqlArgs, gqlType); err != nil {
 		return err
 	}
@@ -301,7 +301,7 @@ func (ef *gqlExtractedField) write(w io.Writer, prefix string, required, descrip
 	sort.Strings(ef.fieldOrder)
 	for _, fieldName := range ef.fieldOrder {
 		field := ef.fields[fieldName]
-		if err := field.write(w, prefix+"\t", ef.requiredFields[field.jsonName], descriptionAsStructTag, pointers); err != nil {
+		if err := field.write(w, prefix+"\t", ef.requiredFields[field.jsonName]); err != nil {
 			return fmt.Errorf("failed writing field %q: %w", field.name, err)
 		}
 	}
@@ -543,7 +543,7 @@ func (gen *generatedGraphQLObject) write(w io.Writer) error {
 
 	sortedFields := gen.fields.Sorted()
 	for idx, field := range sortedFields {
-		if err := field.write(w, "  ", gen.requiredFields[field.jsonName], gen.args.DescriptionAsStructTag, gen.args.Pointers); err != nil {
+		if err := field.write(w, "  ", gen.requiredFields[field.jsonName]); err != nil {
 			return fmt.Errorf("failed writing field %q: %w", field.name, err)
 		}
 		if idx+1 != len(sortedFields) {
@@ -619,19 +619,18 @@ func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst
 		// Second processing of an array type
 		if exists, ok := gen.fields[f.jsonName]; ok {
 			f = exists
-			if f.array {
-				if f.jsonType == "" {
-					f.jsonType = jsonType
-				}
-				// Need to preserve the value if this array's item type had a GraphQL hydration target.
-				if f.target == "" && inst.Target != "" {
-					f.target = "[" + inst.Target + "]"
-					if !(f.nullable || gen.args.Pointers && !gen.requiredFields[f.jsonName]) {
-						f.target += "!"
-					}
-				}
-			} else {
+			if !f.array {
 				return fmt.Errorf("field %q already exists but is not an array field", f.name)
+			}
+			if f.jsonType == "" {
+				f.jsonType = jsonType
+			}
+			// Need to preserve the value if this array's item type had a GraphQL hydration target.
+			if f.target == "" && inst.Target != "" {
+				f.target = "[" + inst.Target + "]"
+				if !(f.nullable || gen.args.Pointers && !gen.requiredFields[f.jsonName]) {
+					f.target += "!"
+				}
 			}
 		}
 		if slices.Contains(inst.Type, "string") && inst.Format == "date-time" {
@@ -689,7 +688,7 @@ func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst
 // If the JSON Schema had a type of "string" and a format of "date-time" it is expected the input jsonType will be
 // "date-time".
 // Non-required times are added as pointers to allow for their values to missing go marshalled JSON.
-func (ef *gqlExtractedField) graphqlType(required, pointers bool) (string, string) {
+func (ef *gqlExtractedField) graphqlType(required bool) (string, string) {
 	// This is a "virtual" field in that no storage exists for it, but the GraphQL schema
 	// still needs for it to be defined so a resolver can be attached to do the lookup.
 	if ef.jsonType == "graphql-hydration" {
@@ -718,7 +717,7 @@ func (ef *gqlExtractedField) graphqlType(required, pointers bool) (string, strin
 	} else {
 		graphqlType = ef.jsonType
 	}
-	if graphqlType != "DateTime" && (regularType && !ef.nullable || required || !pointers) {
+	if graphqlType != "DateTime" && (regularType && !ef.nullable || required || !ef.args.Pointers) {
 		if ef.jsonType != "Any" {
 			graphqlType += "!"
 		}
@@ -733,7 +732,7 @@ func (ef *gqlExtractedField) graphqlType(required, pointers bool) (string, strin
     "Sort the list, ie '{Field: \"position\", Order: \"ASC\"}'"
     sort: ListSortParams
   )`
-		if ef.arrayNullable || pointers && !required {
+		if ef.arrayNullable || ef.args.Pointers && !required {
 			graphqlType = "[" + graphqlType + "]"
 		} else {
 			graphqlType = "[" + graphqlType + "]!"

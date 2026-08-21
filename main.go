@@ -30,7 +30,7 @@ func (mf *mapFlags) Set(value string) error {
 	for _, pair := range strings.Split(value, ",") {
 		kv := strings.SplitN(pair, "=", 2)
 		if len(kv) != 2 {
-			return fmt.Errorf("value in 'key=value' format: %v", value)
+			return fmt.Errorf("value in 'key=value' format: %s", value)
 		}
 		mf.kv[kv[0]] = kv[1]
 	}
@@ -67,19 +67,19 @@ func main() {
 		os.Exit(1)
 	}
 	if *genAvro && *importPath == "" {
-		fmt.Printf("Avro requires specifying an import path.\n")
+		fmt.Println("Avro requires specifying an import path.")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 	if *genGraphQL && *importPath == "" {
-		fmt.Printf("GraphQL requires specifying an import path.\n")
+		fmt.Println("GraphQL requires specifying an import path.")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
 	inputPath, err := filepath.Abs(args[0])
 	if err != nil {
-		fmt.Printf("Input directory \"%s\" error: %v", args[0], err)
+		fmt.Printf("Input directory %q error: %v", args[0], err)
 		os.Exit(2)
 	}
 
@@ -87,7 +87,7 @@ func main() {
 	if len(args) > 1 {
 		outputPath, err = filepath.Abs(args[1])
 		if err != nil {
-			fmt.Printf("Output directory \"%s\" error: %v", args[1], err)
+			fmt.Printf("Output directory %q error: %v", args[1], err)
 			os.Exit(3)
 		}
 	}

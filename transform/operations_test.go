@@ -13,7 +13,7 @@ import (
 
 type testOp struct {
 	args   map[string]string
-	called interface{}
+	called any
 	fail   bool
 }
 
@@ -27,7 +27,7 @@ func (op *testOp) init(args map[string]string) error {
 	return nil
 }
 
-func (op *testOp) transform(in interface{}) (interface{}, error) {
+func (op *testOp) transform(in any) (any, error) {
 	if op.fail {
 		return nil, errors.New("fail")
 	}
@@ -38,8 +38,8 @@ func (op *testOp) transform(in interface{}) (interface{}, error) {
 type opTests struct {
 	description string
 	args        map[string]string
-	in          interface{}
-	want        interface{}
+	in          any
+	want        any
 	wantErr     bool
 	wantInitErr bool
 }
@@ -243,61 +243,61 @@ func TestMax(t *testing.T) {
 		{
 			description: "Simple working case",
 			args:        map[string]string{"by": "@.encodingRate", "return": "@.url"},
-			in: []interface{}{
-				map[string]interface{}{"url": "max", "encodingRate": 10},
-				map[string]interface{}{"url": "min", "encodingRate": 2},
+			in: []any{
+				map[string]any{"url": "max", "encodingRate": 10},
+				map[string]any{"url": "min", "encodingRate": 2},
 			},
 			want: "max",
 		},
 		{
 			description: "Extra args",
 			args:        map[string]string{"by": "@.encodingRate", "return": "@.url", "bye": "bye"},
-			in: []interface{}{
-				map[string]interface{}{"url": "max", "encodingRate": 10},
-				map[string]interface{}{"url": "min", "encodingRate": 2},
+			in: []any{
+				map[string]any{"url": "max", "encodingRate": 10},
+				map[string]any{"url": "min", "encodingRate": 2},
 			},
 			wantInitErr: true,
 		},
 		{
 			description: "Missing by arg",
 			args:        map[string]string{"return": "@.url"},
-			in: []interface{}{
-				map[string]interface{}{"url": "max", "encodingRate": 10},
-				map[string]interface{}{"url": "min", "encodingRate": 2},
+			in: []any{
+				map[string]any{"url": "max", "encodingRate": 10},
+				map[string]any{"url": "min", "encodingRate": 2},
 			},
 			wantInitErr: true,
 		},
 		{
 			description: "Missing return arg",
 			args:        map[string]string{"by": "@.encodingRate"},
-			in: []interface{}{
-				map[string]interface{}{"url": "max", "encodingRate": 10},
-				map[string]interface{}{"url": "min", "encodingRate": 2},
+			in: []any{
+				map[string]any{"url": "max", "encodingRate": 10},
+				map[string]any{"url": "min", "encodingRate": 2},
 			},
 			wantInitErr: true,
 		},
 		{
 			description: "by field is not a number",
 			args:        map[string]string{"by": "@.encodingRate", "return": "@.url"},
-			in: []interface{}{
-				map[string]interface{}{"url": "max", "encodingRate": "10"},
-				map[string]interface{}{"url": "min", "encodingRate": "2"},
+			in: []any{
+				map[string]any{"url": "max", "encodingRate": "10"},
+				map[string]any{"url": "min", "encodingRate": "2"},
 			},
 			wantErr: true,
 		},
 		{
 			description: "return field does not exist",
 			args:        map[string]string{"by": "@.encodingRate", "return": "@.url"},
-			in: []interface{}{
-				map[string]interface{}{"encodingRate": 10},
-				map[string]interface{}{"encodingRate": 2},
+			in: []any{
+				map[string]any{"encodingRate": 10},
+				map[string]any{"encodingRate": 2},
 			},
 			wantErr: true,
 		},
 		{
 			description: "in is not an array",
 			args:        map[string]string{"by": "@.encodingRate", "return": "@.url"},
-			in:          map[string]interface{}{"url": "max", "encodingRate": 10},
+			in:          map[string]any{"url": "max", "encodingRate": 10},
 			wantErr:     true,
 		},
 	}
@@ -348,7 +348,7 @@ func TestSplit(t *testing.T) {
 			description: "Simple working case",
 			args:        map[string]string{"on": "|"},
 			in:          "a|b|c",
-			want:        []interface{}{"a", "b", "c"},
+			want:        []any{"a", "b", "c"},
 		},
 		{
 			description: "Missing on arg",
@@ -372,7 +372,7 @@ func TestSplit(t *testing.T) {
 			description: "Empty input",
 			args:        map[string]string{"on": "|"},
 			in:          "",
-			want:        []interface{}{},
+			want:        []any{},
 		},
 	}
 
@@ -664,7 +664,7 @@ func compareWantErrs(gotErr error, wantErr bool) error {
 	case !wantErr && gotErr == nil:
 		return nil
 	case !wantErr && gotErr != nil:
-		return fmt.Errorf("got error unexpected error: %v", gotErr)
+		return fmt.Errorf("got error unexpected error: %w", gotErr)
 	}
 	return nil
 }

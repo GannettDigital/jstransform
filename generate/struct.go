@@ -73,7 +73,7 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 	for _, field := range ef.fields.Sorted() {
 		fieldRequired := ef.requiredFields[field.jsonName]
 		if err := field.write(w, prefix+"\t", fieldRequired, descriptionAsStructTag, pointers, excludeNested, nestedStructs); err != nil {
-			return fmt.Errorf("failed writing field %q: %v", field.name, err)
+			return fmt.Errorf("failed writing field %q: %w", field.name, err)
 		}
 	}
 
@@ -103,7 +103,6 @@ func (efs extractedFields) IncludeTime() bool {
 
 // Sorted will return the fields in a sorted list. The sort is a string sort on the keys.
 func (efs extractedFields) Sorted() []*extractedField {
-	var sorted []*extractedField
 	var sortedKeys sort.StringSlice
 	fieldsByName := make(map[string]*extractedField)
 	for _, f := range efs {
@@ -113,6 +112,7 @@ func (efs extractedFields) Sorted() []*extractedField {
 
 	sortedKeys.Sort()
 
+	sorted := make([]*extractedField, 0, len(sortedKeys))
 	for _, key := range sortedKeys {
 		sorted = append(sorted, fieldsByName[key])
 	}
@@ -159,7 +159,7 @@ func newGeneratedGoFile(schema *jsonschema.Schema, name, packageName string, emb
 	}
 
 	if err := jsonschema.Walk(schema, gof.walkFunc); err != nil {
-		return nil, fmt.Errorf("failed to walk schema for %q: %v", name, err)
+		return nil, fmt.Errorf("failed to walk schema for %q: %w", name, err)
 	}
 
 	return gof, nil
@@ -246,7 +246,7 @@ func (gof *goFile) write(w io.Writer) error {
 	buf := &bytes.Buffer{} // the formatter uses the entire output, so buffer for that
 
 	if _, err := buf.Write([]byte(fmt.Sprintf("package %s\n\n%s\n\n", gof.packageName, disclaimer))); err != nil {
-		return fmt.Errorf("failed writing struct: %v", err)
+		return fmt.Errorf("failed writing struct: %w", err)
 	}
 
 	var includeTime bool
@@ -262,7 +262,7 @@ func (gof *goFile) write(w io.Writer) error {
 
 	if includeTime {
 		if _, err := buf.Write([]byte("import \"time\"\n")); err != nil {
-			return fmt.Errorf("failed writing imports: %v", err)
+			return fmt.Errorf("failed writing imports: %w", err)
 		}
 	}
 
@@ -271,20 +271,20 @@ func (gof *goFile) write(w io.Writer) error {
 			continue
 		}
 		if _, err := buf.Write([]byte("\n\n")); err != nil {
-			return fmt.Errorf("failed writing struct %q: %v", s.name, err)
+			return fmt.Errorf("failed writing struct %q: %w", s.name, err)
 		}
 		if err := s.write(buf, excludeNested, gof.nestedStructs); err != nil {
-			return fmt.Errorf("failed writing struct %q: %v", s.name, err)
+			return fmt.Errorf("failed writing struct %q: %w", s.name, err)
 		}
 	}
 
 	final, err := format.Source(buf.Bytes())
 	if err != nil {
-		return fmt.Errorf("failed to format source: %v", err)
+		return fmt.Errorf("failed to format source: %w", err)
 	}
 
 	if _, err := w.Write(final); err != nil {
-		return fmt.Errorf("error writing to io.Writer: %v", err)
+		return fmt.Errorf("error writing to io.Writer: %w", err)
 	}
 	return nil
 }
@@ -303,18 +303,18 @@ func (gen *generatedStruct) write(w io.Writer, excludeNested map[string]bool, ne
 		embeds += "\n\n"
 	}
 	if _, err := w.Write([]byte(fmt.Sprintf("type %s struct {\n%s", exportedName(gen.name), embeds))); err != nil {
-		return fmt.Errorf("failed writing struct: %v", err)
+		return fmt.Errorf("failed writing struct: %w", err)
 	}
 
 	for _, field := range gen.fields.Sorted() {
 		req := gen.requiredFields[field.jsonName]
 		if err := field.write(w, "\t", req, gen.args.DescriptionAsStructTag, gen.args.Pointers, excludeNested, nestedStructs); err != nil {
-			return fmt.Errorf("failed writing field %q: %v", field.name, err)
+			return fmt.Errorf("failed writing field %q: %w", field.name, err)
 		}
 	}
 
 	if _, err := w.Write([]byte("}")); err != nil {
-		return fmt.Errorf("failed writing struct: %v", err)
+		return fmt.Errorf("failed writing struct: %w", err)
 	}
 
 	return nil
@@ -338,7 +338,7 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 		f := &extractedField{jsonName: tree[0], jsonType: "object", name: exportedName(tree[0]), fields: make(map[string]*extractedField)}
 		fields[tree[0]] = f
 		if err := addField(f.fields, tree[1:], inst, fieldRenameMap); err != nil {
-			return fmt.Errorf("failed field %q: %v", tree[0], err)
+			return fmt.Errorf("failed field %q: %w", tree[0], err)
 		}
 		return nil
 	}

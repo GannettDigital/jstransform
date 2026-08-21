@@ -25,7 +25,7 @@ var (
 		"item2"
 	]
 }`)
-	testRaw = interface{}(nil)
+	testRaw = any(nil)
 )
 
 func TestMain(m *testing.M) {
@@ -40,8 +40,8 @@ func TestTransformInstruction(t *testing.T) {
 		description string
 		ti          transformInstruction
 		format      inputFormat
-		in          interface{}
-		want        interface{}
+		in          any
+		want        any
 		wantErr     bool
 	}{
 		{
@@ -110,8 +110,8 @@ func TestTransformInstructions(t *testing.T) {
 		description string
 		tis         transformInstructions
 		format      inputFormat
-		in          interface{}
-		want        interface{}
+		in          any
+		want        any
 		wantErr     bool
 	}{
 		{
