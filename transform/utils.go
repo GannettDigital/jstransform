@@ -174,8 +174,7 @@ func extractTransformInstructions(raw json.RawMessage, transformIdentifier, path
 	rawTransformInstruction, _, _, err := jsonparser.Get(raw, "transform", transformIdentifier)
 	if err != nil && !errors.Is(err, jsonparser.KeyPathNotFoundError) {
 		return nil, fmt.Errorf("failed to extract raw instance transform: %w", err)
-	}
-	if len(rawTransformInstruction) == 0 {
+	} else if len(rawTransformInstruction) == 0 {
 		return nil, nil
 	}
 	var parentPath string

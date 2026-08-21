@@ -62,16 +62,15 @@ func dereference(schemaPath string, data json.RawMessage, oneOfType string, flat
 			// would have cleared it.  This wasn't true in JSON Schema draft 4 through 7 but is the current standard.
 			if prior != nil {
 				err := jsonparser.ObjectEach(prior, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
+					var err error
 					keyPath := destPath
 					keyPath = append(keyPath, string(key))
 					if dataType == jsonparser.String {
-						var err error
 						value, err = json.Marshal(string(value))
 						if err != nil {
 							return fmt.Errorf("failed to marshal string %q to update data with ref %q at path %v key %q: %w", value, ref, refPath, key, err)
 						}
 					}
-					var err error
 					data, err = jsonparser.Set(data, value, keyPath...)
 					if err != nil {
 						return fmt.Errorf("failed to update data with ref %q at path %v key %q: %w", ref, refPath, key, err)

@@ -212,10 +212,10 @@ func FieldType(data []byte) (string, bool, error) {
 	if err != nil && !errors.Is(err, jsonparser.KeyPathNotFoundError) {
 		return "", false, fmt.Errorf("error reading schema type: %w", err)
 	}
-	if dataType == jsonparser.String {
+	switch dataType {
+	case jsonparser.String:
 		return string(value), false, nil
-	}
-	if dataType == jsonparser.Array {
+	case jsonparser.Array:
 		var nullable bool
 		var jsonType string
 		_, aErr := jsonparser.ArrayEach(value, func(avalue []byte, adataType jsonparser.ValueType, aoffset int, aerr error) {
@@ -239,6 +239,7 @@ func FieldType(data []byte) (string, bool, error) {
 			return "", false, fmt.Errorf("error iterating over type array: %w", err)
 		}
 		return jsonType, nullable, nil
+	default:
+		return "", false, fmt.Errorf("unknown schema type: %s", dataType)
 	}
-	return "", false, fmt.Errorf("unknown schema type: %s", dataType)
 }
