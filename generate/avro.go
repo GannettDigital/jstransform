@@ -19,6 +19,7 @@ import (
 	avroparser "github.com/actgardner/gogen-avro/v7/parser"
 	"github.com/actgardner/gogen-avro/v7/resolver"
 	"golang.org/x/tools/go/ast/astutil"
+	"golang.org/x/tools/go/packages"
 )
 
 const (
@@ -189,24 +190,36 @@ func parseGoStruct(name, path string) (*ast.TypeSpec, error) {
 
 // filterPackage will filter all the go files found at the path returning a *ast.File containing name.
 func filterPackage(name, path string) (*ast.File, error) {
-	fileSet := token.NewFileSet()
-	pkgmap, err := parser.ParseDir(fileSet, path, nil, parser.AllErrors)
+	cfg := &packages.Config{
+		Mode:  packages.NeedName | packages.NeedFiles | packages.NeedSyntax,
+		Dir:   path,
+		Tests: false, // Don't include test files
+	}
+	pkgs, err := packages.Load(cfg, ".")
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse go files at path %q: %v", path, err)
 	}
-	var pkgs []*ast.Package
-	for _, pkg := range pkgmap {
-		pkgs = append(pkgs, pkg)
+	if len(pkgs) == 0 {
+		return nil, fmt.Errorf("no packages found for go files at path %q", path)
 	}
-	if length := len(pkgs); length != 1 {
-		return nil, fmt.Errorf("expected 1 package for go files at path %q, found %d", path, length)
+	if len(pkgs) > 1 {
+		return nil, fmt.Errorf("expected 1 package for go files at path %q, found %d", path, len(pkgs))
 	}
 	pkg := pkgs[0]
-	if !ast.FilterPackage(pkg, func(itemName string) bool { return itemName == name }) {
+	astPkg := &ast.Package{
+		Name:  pkg.Name,
+		Files: make(map[string]*ast.File),
+	}
+	for i, f := range pkg.Syntax {
+		if i < len(pkg.GoFiles) {
+			astPkg.Files[pkg.GoFiles[i]] = f
+		}
+	}
+	if !ast.FilterPackage(astPkg, func(itemName string) bool { return itemName == name }) {
 		return nil, fmt.Errorf("a struct named %q was not found in file %q", name, path)
 	}
 	var goFile *ast.File
-	for _, f := range pkg.Files {
+	for _, f := range astPkg.Files {
 		// It's necessary to loop over all the decls and their specs to ensure the typeSpec.Name.Name matches our name
 		// because the `ast.FilterPackage` doesn't filter out declarations that only have the wanted itemName as a
 		// function argument. It breaks when we start doing UnionNull with structs since the wanted name is an argument
