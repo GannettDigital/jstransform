@@ -206,22 +206,23 @@ func filterPackage(name, path string) (*ast.File, error) {
 		return nil, fmt.Errorf("expected 1 package for go files at path %q, found %d", path, len(pkgs))
 	}
 	pkg := pkgs[0]
-	astPkg := &ast.Package{
-		Name:  pkg.Name,
-		Files: make(map[string]*ast.File),
-	}
+	var matched bool
+	var filteredFiles []*ast.File
 	for i, f := range pkg.Syntax {
 		if i < len(pkg.GoFiles) {
-			astPkg.Files[pkg.GoFiles[i]] = f
+			if ast.FilterFile(f, func(itemName string) bool { return itemName == name }) {
+				matched = true
+			}
+			filteredFiles = append(filteredFiles, f)
 		}
 	}
-	if !ast.FilterPackage(astPkg, func(itemName string) bool { return itemName == name }) {
+	if !matched {
 		return nil, fmt.Errorf("a struct named %q was not found in file %q", name, path)
 	}
 	var goFile *ast.File
-	for _, f := range astPkg.Files {
+	for _, f := range filteredFiles {
 		// It's necessary to loop over all the decls and their specs to ensure the typeSpec.Name.Name matches our name
-		// because the `ast.FilterPackage` doesn't filter out declarations that only have the wanted itemName as a
+		// because `ast.FilterFile` doesn't filter out declarations that only have the wanted itemName as a
 		// function argument. It breaks when we start doing UnionNull with structs since the wanted name is an argument
 		// to the NewUnionNull${type}() function.
 		for _, d := range f.Decls {
