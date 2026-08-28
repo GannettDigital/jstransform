@@ -213,7 +213,7 @@ func buildAvro(name, path string, args BuildArgs) error {
 
 // buildMessagePackFile generates MessagePack serialization methods for the entire package.
 func buildMessagePackFile(outputDir string, mode gen.Method) error {
-	fs, err := parse.File(outputDir, false)
+	fs, err := parse.File(outputDir, false, nil)
 	if err != nil {
 		return err
 	}

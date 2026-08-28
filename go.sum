@@ -2,8 +2,8 @@ github.com/GannettDigital/PaesslerAG_jsonpath v0.0.0-20230913165611-a0c86cbdaddb
 github.com/GannettDigital/PaesslerAG_jsonpath v0.0.0-20230913165611-a0c86cbdaddb/go.mod h1:ZAEqM/4tGiL5UWbtn3ez3iHVr1KizajdF4y8ScKjk+Y=
 github.com/GannettDigital/gojsonschema v0.0.0-20230605143309-773ed8aacc5c h1:PRnqPOWDUb/teqXxeSke/galrgTxzQYuevJxpStTWAs=
 github.com/GannettDigital/gojsonschema v0.0.0-20230605143309-773ed8aacc5c/go.mod h1:jxrVDTC6IWilPIjNjUgC8qRRUrf1ojMlnpbNRH+TfHw=
-github.com/GannettDigital/msgp v1.2.0-gannett h1:MAUlOcfrzlF3q/l87ldB4RuI3gGkuQxzZ+abM/Myed0=
-github.com/GannettDigital/msgp v1.2.0-gannett/go.mod h1:4aPCiTdejOG+BA4jGk3hhfB6CWrE17diKVi+zGyq/z8=
+github.com/GannettDigital/msgp v1.6.4-gannett h1:0DS3KrncPg8JDljcvAZxqkhbwzMHYLajuLj3LDX3/M8=
+github.com/GannettDigital/msgp v1.6.4-gannett/go.mod h1:VLr6snO8AWlG5KRg7hbrzPZIaSLjPmZTCrcMyiVweRs=
 github.com/PaesslerAG/gval v1.2.4 h1:rhX7MpjJlcxYwL2eTTYIOBUyEKZ+A96T9vQySWkVUiU=
 github.com/PaesslerAG/gval v1.2.4/go.mod h1:XRFLwvmkTEdYziLdaCeCa5ImcGVrfQbeNUbVR+C6xac=
 github.com/PaesslerAG/jsonpath v0.1.0 h1:gADYeifvlqK3R3i2cR5B4DGgxLXIPb3TRTH1mGi0jPI=
