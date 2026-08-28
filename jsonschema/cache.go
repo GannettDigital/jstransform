@@ -10,7 +10,7 @@ import (
 // Cache implements concurrency-safe caching with blocking load.
 // (i.e., if the key is not cached then only one build/store happens.)
 // The singleflight only blocks concurrent generation of the same cache
-// key so syncronization is still needed on the storage map as multiple
+// key so synchronization is still needed on the storage map as multiple
 // different keys can be accessed simultaneously.
 type Cache[T any] struct {
 	data   sync.Map

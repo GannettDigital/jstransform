@@ -84,7 +84,7 @@ func TestBuildAvroHelperFunctions(t *testing.T) {
 			t.Errorf("Test %q - failed: %v", test.description, err)
 		}
 
-		git := exec.Command("git", "diff", "--quiet", test.wantPath)
+		git := exec.CommandContext(t.Context(), "git", "diff", "--quiet", test.wantPath) //nolint:gosec // G204: Subprocess launched with a potential tainted input or cmd arguments (gosec)
 		git.Dir = testPath
 		if err := git.Run(); err != nil {
 			t.Errorf("Test %q - failed git diff of generated file: %v", test.description, err)

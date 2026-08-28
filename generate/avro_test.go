@@ -82,28 +82,32 @@ func TestBuildAvroSchemaFile(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		outpath, err := buildAvroSchemaFile(test.name, test.goPath, true)
-		if err != nil {
-			t.Errorf("Test %q - failed to build Avro schema: %v", test.description, err)
-		}
+		t.Run(test.description, func(t *testing.T) {
+			outpath, err := buildAvroSchemaFile(test.name, test.goPath, true)
+			if err != nil {
+				t.Fatalf("Test %q - failed to build Avro schema: %v", test.description, err)
+			}
+			defer func() {
+				if err := os.Remove(outpath); err != nil {
+					t.Errorf("Test %q - failed to remove generated Avro schema file at %q: %v", test.description, outpath, err)
+				}
+			}()
 
-		got, err := os.ReadFile(outpath)
-		if err != nil {
-			t.Errorf("Test %q - failed to read Avro schema file: %v", test.description, err)
-		}
+			got, err := os.ReadFile(outpath)
+			if err != nil {
+				t.Errorf("Test %q - failed to read Avro schema file: %v", test.description, err)
+			}
 
-		want, err := os.ReadFile(test.wantPath)
-		if err != nil {
-			t.Errorf("Test %q - failed to read want Avro schema file: %v", test.description, err)
-		}
+			want, err := os.ReadFile(test.wantPath)
+			if err != nil {
+				t.Errorf("Test %q - failed to read want Avro schema file: %v", test.description, err)
+			}
 
-		assert.Equal(t, string(want), string(got), test.description)
-		if !reflect.DeepEqual(got, want) {
-			t.Errorf("Test %q - got\n%s\nwant\n%s\n", test.description, got, want)
-		}
-		if err := os.Remove(outpath); err != nil {
-			t.Errorf("Test %q - failed to remove generated Avro schema file at %q: %v", test.description, outpath, err)
-		}
+			assert.Equal(t, string(want), string(got), test.description)
+			if !reflect.DeepEqual(got, want) {
+				t.Errorf("Test %q - got\n%s\nwant\n%s\n", test.description, got, want)
+			}
+		})
 	}
 }
 
@@ -135,16 +139,18 @@ func TestBuildAvroSerializationFunctions(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if err := buildAvroSerializationFunctions(test.path, BuildArgs{}); err != nil {
-			t.Errorf("Test %q - failed: %v", test.description, err)
-		}
+		t.Run(test.description, func(t *testing.T) {
+			if err := buildAvroSerializationFunctions(test.path, BuildArgs{}); err != nil {
+				t.Errorf("Test %q - failed: %v", test.description, err)
+			}
 
-		git := exec.Command("git", "diff", "--quiet", "*.go")
-		schemaName := strings.Split(filepath.Base(test.path), ".")[0]
-		git.Dir = filepath.Join("./avro_test_data/avro", schemaName)
-		if err := git.Run(); err != nil {
-			t.Errorf("Test %q - Differences in generated files found", test.description)
-		}
+			git := exec.CommandContext(t.Context(), "git", "diff", "--quiet", "*.go")
+			schemaName := strings.Split(filepath.Base(test.path), ".")[0]
+			git.Dir = filepath.Join("./avro_test_data/avro", schemaName)
+			if err := git.Run(); err != nil {
+				t.Errorf("Test %q - Differences in generated files found", test.description)
+			}
+		})
 	}
 }
 

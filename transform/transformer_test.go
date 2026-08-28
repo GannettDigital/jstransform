@@ -352,137 +352,137 @@ var (
 
 	saveValueTests = []struct {
 		description string
-		tree        map[string]interface{}
+		tree        map[string]any
 		jsonPath    string
-		value       interface{}
-		want        map[string]interface{}
+		value       any
+		want        map[string]any
 		wantErr     bool
 	}{
 		{
 			description: "Simple string value at empty root",
-			tree:        make(map[string]interface{}),
+			tree:        make(map[string]any),
 			jsonPath:    "$.test",
 			value:       "string",
-			want:        map[string]interface{}{"test": "string"},
+			want:        map[string]any{"test": "string"},
 		},
 		{
 			description: "nil value",
-			tree:        make(map[string]interface{}),
+			tree:        make(map[string]any),
 			jsonPath:    "$.test",
 			value:       nil,
-			want:        map[string]interface{}{},
+			want:        map[string]any{},
 		},
 		{
 			description: "Simple string value at existing root",
-			tree:        map[string]interface{}{"test1": 1},
+			tree:        map[string]any{"test1": 1},
 			jsonPath:    "$.test",
 			value:       "string",
-			want:        map[string]interface{}{"test": "string", "test1": 1},
+			want:        map[string]any{"test": "string", "test1": 1},
 		},
 		{
 			description: "Simple string value overwriting existing value",
-			tree:        map[string]interface{}{"test1": 1},
+			tree:        map[string]any{"test1": 1},
 			jsonPath:    "$.test1",
 			value:       "string",
-			want:        map[string]interface{}{"test1": "string"},
+			want:        map[string]any{"test1": "string"},
 		},
 		{
 			description: "Simple string value non-existent parent",
-			tree:        map[string]interface{}{},
+			tree:        map[string]any{},
 			jsonPath:    "$.test1.test2",
 			value:       "string",
-			want:        map[string]interface{}{"test1": map[string]interface{}{"test2": "string"}},
+			want:        map[string]any{"test1": map[string]any{"test2": "string"}},
 		},
 		{
 			description: "Simple int value at empty root",
-			tree:        make(map[string]interface{}),
+			tree:        make(map[string]any),
 			jsonPath:    "$.test",
 			value:       1,
-			want:        map[string]interface{}{"test": 1},
+			want:        map[string]any{"test": 1},
 		},
 		{
 			description: "New Map at empty root",
-			tree:        map[string]interface{}{},
+			tree:        map[string]any{},
 			jsonPath:    "$.test1",
-			value:       map[string]interface{}{},
-			want:        map[string]interface{}{"test1": map[string]interface{}{}},
+			value:       map[string]any{},
+			want:        map[string]any{"test1": map[string]any{}},
 		},
 		{
 			description: "Map with values at empty root",
-			tree:        map[string]interface{}{},
+			tree:        map[string]any{},
 			jsonPath:    "$.test1",
-			value:       map[string]interface{}{"testA": "a"},
-			want:        map[string]interface{}{"test1": map[string]interface{}{"testA": "a"}},
+			value:       map[string]any{"testA": "a"},
+			want:        map[string]any{"test1": map[string]any{"testA": "a"}},
 		},
 		{
 			description: "Save new value in existing Map",
-			tree:        map[string]interface{}{"test1": map[string]interface{}{"testA": "a"}},
+			tree:        map[string]any{"test1": map[string]any{"testA": "a"}},
 			jsonPath:    "$.test1.testB",
 			value:       "B",
-			want:        map[string]interface{}{"test1": map[string]interface{}{"testA": "a", "testB": "B"}},
+			want:        map[string]any{"test1": map[string]any{"testA": "a", "testB": "B"}},
 		},
 		{
 			description: "Array at empty root",
-			tree:        map[string]interface{}{},
+			tree:        map[string]any{},
 			jsonPath:    "$.test1",
-			value:       []interface{}{"a", "b"},
-			want:        map[string]interface{}{"test1": []interface{}{"a", "b"}},
+			value:       []any{"a", "b"},
+			want:        map[string]any{"test1": []any{"a", "b"}},
 		},
 		{
 			description: "Save value in existing Array",
-			tree:        map[string]interface{}{"test1": []interface{}{"a", "b"}},
+			tree:        map[string]any{"test1": []any{"a", "b"}},
 			jsonPath:    "$.test1[2]",
 			value:       "c",
-			want:        map[string]interface{}{"test1": []interface{}{"a", "b", "c"}},
+			want:        map[string]any{"test1": []any{"a", "b", "c"}},
 		},
 		{
 			description: "Save value in new Array of objects",
-			tree:        map[string]interface{}{},
+			tree:        map[string]any{},
 			jsonPath:    "$.test1[0].a",
 			value:       "aValue",
-			want:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}}},
+			want:        map[string]any{"test1": []any{map[string]any{"a": "aValue"}}},
 		},
 		{
 			description: "Save value in existing Array of objects",
-			tree:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}}},
+			tree:        map[string]any{"test1": []any{map[string]any{"a": "aValue"}}},
 			jsonPath:    "$.test1[0].b",
 			value:       "bValue",
-			want:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue", "b": "bValue"}}},
+			want:        map[string]any{"test1": []any{map[string]any{"a": "aValue", "b": "bValue"}}},
 		},
 		{
 			description: "Save new array item value in existing Array of objects",
-			tree:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}}},
+			tree:        map[string]any{"test1": []any{map[string]any{"a": "aValue"}}},
 			jsonPath:    "$.test1[1].a",
 			value:       "a2ndValue",
-			want:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": "aValue"}, map[string]interface{}{"a": "a2ndValue"}}},
+			want:        map[string]any{"test1": []any{map[string]any{"a": "aValue"}, map[string]any{"a": "a2ndValue"}}},
 		},
 		{
 			description: "Save new array item simple nested Array",
-			tree:        map[string]interface{}{},
+			tree:        map[string]any{},
 			jsonPath:    "$.test1[0][1]",
 			value:       "nestedValue",
-			want:        map[string]interface{}{"test1": []interface{}{[]interface{}{nil, "nestedValue"}}},
+			want:        map[string]any{"test1": []any{[]any{nil, "nestedValue"}}},
 		},
 		{
 			description: "Save new array item new nested Array",
-			tree:        map[string]interface{}{},
+			tree:        map[string]any{},
 			jsonPath:    "$.test1[0].a[1]",
 			value:       "nestedValue",
-			want:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{nil, "nestedValue"}}}},
+			want:        map[string]any{"test1": []any{map[string]any{"a": []any{nil, "nestedValue"}}}},
 		},
 		{
 			description: "Save object field in new nested Array",
-			tree:        map[string]interface{}{},
+			tree:        map[string]any{},
 			jsonPath:    "$.test1[0].a[1].name",
 			value:       "nestedName",
-			want:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{nil, map[string]interface{}{"name": "nestedName"}}}}},
+			want:        map[string]any{"test1": []any{map[string]any{"a": []any{nil, map[string]any{"name": "nestedName"}}}}},
 		},
 		{
 			description: "Save new array item existing nested Array",
-			tree:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{"existingValue"}}}},
+			tree:        map[string]any{"test1": []any{map[string]any{"a": []any{"existingValue"}}}},
 			jsonPath:    "$.test1[0].a[1]",
 			value:       "nestedValue",
-			want:        map[string]interface{}{"test1": []interface{}{map[string]interface{}{"a": []interface{}{"existingValue", "nestedValue"}}}},
+			want:        map[string]any{"test1": []any{map[string]any{"a": []any{"existingValue", "nestedValue"}}}},
 		},
 	}
 )
@@ -500,6 +500,8 @@ func TestSaveValue(t *testing.T) {
 			t.Errorf("Test %q - got error, want nil: %v", test.description, err)
 		case !reflect.DeepEqual(test.tree, test.want):
 			t.Errorf("Test %q - got %v, want %v", test.description, test.tree, test.want)
+		default:
+			// Pass.
 		}
 	}
 }
@@ -525,6 +527,8 @@ func TestTransformer(t *testing.T) {
 					t.Errorf("Test %q - got error, want nil: %v", description, err)
 				case !reflect.DeepEqual(got, want):
 					t.Errorf("Test %q - got\n%s\nwant\n%s", description, got, want)
+				default:
+					// Pass.
 				}
 			}
 		}
@@ -666,8 +670,8 @@ func TestNewXMLTransformer(t *testing.T) {
 		}
 
 		var (
-			outputMap map[string]interface{}
-			wantMap   map[string]interface{}
+			outputMap map[string]any
+			wantMap   map[string]any
 		)
 
 		if err := json.Unmarshal(output, &outputMap); err != nil {

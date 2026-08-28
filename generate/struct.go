@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/format"
 	"io"
+	"maps"
 	"path/filepath"
 	"slices"
 	"sort"
@@ -47,7 +48,7 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 
 	if !descriptionAsStructTag && ef.description != "" {
 		for _, line := range strings.Split(ef.description, "\n") {
-			if _, err := w.Write([]byte(fmt.Sprintf("// %s\n", line))); err != nil {
+			if _, err := fmt.Fprintf(w, "// %s\n", line); err != nil {
 				return err
 			}
 		}
@@ -62,22 +63,22 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 		return nil
 	}
 	if ef.jsonType != "object" || len(ef.fields) == 0 {
-		_, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s\t%s", prefix, ef.name, fieldGoType, structTag)))
+		_, err := fmt.Fprintf(w, "%s%s\t%s\t%s", prefix, ef.name, fieldGoType, structTag)
 		return err
 	}
 
-	if _, err := w.Write([]byte(fmt.Sprintf("%s%s\t%s {\n", prefix, ef.name, fieldGoType))); err != nil {
+	if _, err := fmt.Fprintf(w, "%s%s\t%s {\n", prefix, ef.name, fieldGoType); err != nil {
 		return err
 	}
 
 	for _, field := range ef.fields.Sorted() {
 		fieldRequired := ef.requiredFields[field.jsonName]
 		if err := field.write(w, prefix+"\t", fieldRequired, descriptionAsStructTag, pointers, excludeNested, nestedStructs); err != nil {
-			return fmt.Errorf("failed writing field %q: %v", field.name, err)
+			return fmt.Errorf("failed writing field %q: %w", field.name, err)
 		}
 	}
 
-	if _, err := w.Write([]byte(fmt.Sprintf("%s\t}\t%s", prefix, structTag))); err != nil {
+	if _, err := fmt.Fprintf(w, "%s\t}\t%s", prefix, structTag); err != nil {
 		return err
 	}
 	return nil
@@ -103,8 +104,7 @@ func (efs extractedFields) IncludeTime() bool {
 
 // Sorted will return the fields in a sorted list. The sort is a string sort on the keys.
 func (efs extractedFields) Sorted() []*extractedField {
-	var sorted []*extractedField
-	var sortedKeys sort.StringSlice
+	sortedKeys := make(sort.StringSlice, 0, len(efs))
 	fieldsByName := make(map[string]*extractedField)
 	for _, f := range efs {
 		sortedKeys = append(sortedKeys, f.name)
@@ -113,6 +113,7 @@ func (efs extractedFields) Sorted() []*extractedField {
 
 	sortedKeys.Sort()
 
+	sorted := make([]*extractedField, 0, len(sortedKeys))
 	for _, key := range sortedKeys {
 		sorted = append(sorted, fieldsByName[key])
 	}
@@ -159,7 +160,7 @@ func newGeneratedGoFile(schema *jsonschema.Schema, name, packageName string, emb
 	}
 
 	if err := jsonschema.Walk(schema, gof.walkFunc); err != nil {
-		return nil, fmt.Errorf("failed to walk schema for %q: %v", name, err)
+		return nil, fmt.Errorf("failed to walk schema for %q: %w", name, err)
 	}
 
 	return gof, nil
@@ -180,18 +181,14 @@ func (gof *goFile) structs() []*generatedStruct {
 	if len(gof.nestedStructs) < 1 {
 		return []*generatedStruct{gof.rootStruct}
 	}
-	nested := make([]*generatedStruct, len(gof.nestedStructs))
-	var i int
-	for _, s := range gof.nestedStructs {
-		nested[i] = s
-		i++
-	}
+	nested := slices.Collect(maps.Values(gof.nestedStructs))
 
 	// order with root first and nested in a consistent following order
-	sort.Slice(nested, func(i, j int) bool {
-		return nested[i].name < nested[j].name
+	slices.SortFunc(nested, func(a, b *generatedStruct) int {
+		return strings.Compare(a.name, b.name)
 	})
-	structs := []*generatedStruct{gof.rootStruct}
+	structs := make([]*generatedStruct, 0, 1+len(nested))
+	structs = append(structs, gof.rootStruct)
 	structs = append(structs, nested...)
 
 	return structs
@@ -245,8 +242,8 @@ func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 func (gof *goFile) write(w io.Writer) error {
 	buf := &bytes.Buffer{} // the formatter uses the entire output, so buffer for that
 
-	if _, err := buf.Write([]byte(fmt.Sprintf("package %s\n\n%s\n\n", gof.packageName, disclaimer))); err != nil {
-		return fmt.Errorf("failed writing struct: %v", err)
+	if _, err := fmt.Fprintf(buf, "package %s\n\n%s\n\n", gof.packageName, disclaimer); err != nil {
+		return fmt.Errorf("failed writing struct: %w", err)
 	}
 
 	var includeTime bool
@@ -261,8 +258,8 @@ func (gof *goFile) write(w io.Writer) error {
 	}
 
 	if includeTime {
-		if _, err := buf.Write([]byte("import \"time\"\n")); err != nil {
-			return fmt.Errorf("failed writing imports: %v", err)
+		if _, err := buf.WriteString("import \"time\"\n"); err != nil {
+			return fmt.Errorf("failed writing imports: %w", err)
 		}
 	}
 
@@ -270,21 +267,21 @@ func (gof *goFile) write(w io.Writer) error {
 		if len(s.fields) == 0 {
 			continue
 		}
-		if _, err := buf.Write([]byte("\n\n")); err != nil {
-			return fmt.Errorf("failed writing struct %q: %v", s.name, err)
+		if _, err := buf.WriteString("\n\n"); err != nil {
+			return fmt.Errorf("failed writing struct %q: %w", s.name, err)
 		}
 		if err := s.write(buf, excludeNested, gof.nestedStructs); err != nil {
-			return fmt.Errorf("failed writing struct %q: %v", s.name, err)
+			return fmt.Errorf("failed writing struct %q: %w", s.name, err)
 		}
 	}
 
 	final, err := format.Source(buf.Bytes())
 	if err != nil {
-		return fmt.Errorf("failed to format source: %v", err)
+		return fmt.Errorf("failed to format source: %w", err)
 	}
 
 	if _, err := w.Write(final); err != nil {
-		return fmt.Errorf("error writing to io.Writer: %v", err)
+		return fmt.Errorf("error writing to io.Writer: %w", err)
 	}
 	return nil
 }
@@ -302,19 +299,19 @@ func (gen *generatedStruct) write(w io.Writer, excludeNested map[string]bool, ne
 	if embeds != "" {
 		embeds += "\n\n"
 	}
-	if _, err := w.Write([]byte(fmt.Sprintf("type %s struct {\n%s", exportedName(gen.name), embeds))); err != nil {
-		return fmt.Errorf("failed writing struct: %v", err)
+	if _, err := fmt.Fprintf(w, "type %s struct {\n%s", exportedName(gen.name), embeds); err != nil {
+		return fmt.Errorf("failed writing struct: %w", err)
 	}
 
 	for _, field := range gen.fields.Sorted() {
 		req := gen.requiredFields[field.jsonName]
 		if err := field.write(w, "\t", req, gen.args.DescriptionAsStructTag, gen.args.Pointers, excludeNested, nestedStructs); err != nil {
-			return fmt.Errorf("failed writing field %q: %v", field.name, err)
+			return fmt.Errorf("failed writing field %q: %w", field.name, err)
 		}
 	}
 
 	if _, err := w.Write([]byte("}")); err != nil {
-		return fmt.Errorf("failed writing struct: %v", err)
+		return fmt.Errorf("failed writing struct: %w", err)
 	}
 
 	return nil
@@ -338,12 +335,13 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 		f := &extractedField{jsonName: tree[0], jsonType: "object", name: exportedName(tree[0]), fields: make(map[string]*extractedField)}
 		fields[tree[0]] = f
 		if err := addField(f.fields, tree[1:], inst, fieldRenameMap); err != nil {
-			return fmt.Errorf("failed field %q: %v", tree[0], err)
+			return fmt.Errorf("failed field %q: %w", tree[0], err)
 		}
 		return nil
 	}
 
-	if len(tree) > 0 {
+	//nolint:gosec // G602: slice index out of range (gosec) // Spurious warnings.
+	if len(tree) == 1 {
 		fieldName, ok := fieldRenameMap[tree[0]]
 		if !ok {
 			fieldName = tree[0]
@@ -368,11 +366,10 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 		// Second processing of an array type
 		if exists, ok := fields[f.jsonName]; ok {
 			f = exists
-			if f.array && f.jsonType == "" {
-				f.jsonType = jsonType
-			} else {
+			if !f.array || f.jsonType != "" {
 				return fmt.Errorf("field %q already exists but is not an array field: %q", f.name, f.jsonType)
 			}
+			f.jsonType = jsonType
 		}
 		if slices.Contains(inst.Type, "string") && inst.Format == "date-time" {
 			f.jsonType = "date-time"
@@ -388,6 +385,7 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 				f.requiredFields[name] = true
 			}
 			f.fields = make(map[string]*extractedField)
+		default: // No special structure logic.
 		}
 
 		fields[tree[0]] = f

@@ -249,10 +249,10 @@ func TestGraphQLExtractedField_Write(t *testing.T) {
 
 	for _, test := range tests {
 		buf := &bytes.Buffer{}
-		if err := test.ef.write(buf, test.prefix, test.required, test.descriptionAsStructTag, false); err != nil {
+		if err := test.ef.write(buf, test.prefix, test.required); err != nil {
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
 		}
-		if got, want := string(buf.Bytes()), test.want; got != want {
+		if got, want := buf.String(), test.want; got != want {
 			t.Errorf("Test %q\nwant: %s\ngot:  %s", test.description, want, got)
 		}
 	}
@@ -364,12 +364,15 @@ func TestGraphQLGeneratedStruct(t *testing.T) {
 
 		buf := &bytes.Buffer{}
 		err = g.write(buf)
-		if !test.wantWriteError && err != nil {
+		switch {
+		case !test.wantWriteError && err != nil:
 			t.Fatalf("Test %q - failed write: %v", test.description, err)
-		} else if test.wantWriteError && err == nil {
+		case test.wantWriteError && err == nil:
 			t.Fatalf("Test %q - expected failure but succeeded to write", test.description)
-		} else if test.wantWriteError {
+		case test.wantWriteError:
 			continue
+		default:
+			// Pass.
 		}
 		got := buf.Bytes()
 
@@ -379,7 +382,9 @@ func TestGraphQLGeneratedStruct(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(got, want) {
-			_ = os.WriteFile(test.wantFilePath+".got", got, 0600)
+			if err := os.WriteFile(test.wantFilePath+".got", got, 0o600); err != nil {
+				t.Errorf("error removing %q: %v", test.wantFilePath+".got", err)
+			}
 			t.Errorf("Test %q\nwant: %s\ngot:  %s", test.description, want, got)
 			t.Errorf("Test %q\nwant: %v\ngot:  %v", test.description, want, got)
 			lwant := strings.Split(string(want), "\n")
@@ -390,8 +395,8 @@ func TestGraphQLGeneratedStruct(t *testing.T) {
 					t.Logf("line %d\nwant: %v\ngot:  %v", idx, []byte(lwant[idx]), []byte(lgot[idx]))
 				}
 			}
-		} else {
-			_ = os.Remove(test.wantFilePath + ".got")
+		} else if err := os.Remove(test.wantFilePath + ".got"); err != nil && !os.IsNotExist(err) {
+			t.Errorf("error removing %q: %v", test.wantFilePath+".got", err)
 		}
 	}
 }
@@ -515,8 +520,9 @@ func TestGraphQLType(t *testing.T) {
 		ef := gqlExtractedField{
 			array:    test.array,
 			jsonType: test.jsonType,
+			args:     BuildArgs{Pointers: test.pointers},
 		}
-		gotArgs, gotType := ef.graphqlType(test.required, test.pointers)
+		gotArgs, gotType := ef.graphqlType(test.required)
 		if gotArgs != test.wantArgs {
 			t.Errorf("Test %q arguments\nwant: %q\ngot:  %q", test.description, test.wantArgs, gotArgs)
 		}

@@ -30,13 +30,14 @@ func (mf *mapFlags) Set(value string) error {
 	for _, pair := range strings.Split(value, ",") {
 		kv := strings.SplitN(pair, "=", 2)
 		if len(kv) != 2 {
-			return fmt.Errorf("value in 'key=value' format: %v", value)
+			return fmt.Errorf("value in 'key=value' format: %s", value)
 		}
 		mf.kv[kv[0]] = kv[1]
 	}
 	return nil
 }
 
+//nolint:forbidigo
 func main() {
 	renameStructs := mapFlags{kv: make(map[string]string)}
 	renameFields := mapFlags{kv: make(map[string]string)}
@@ -62,24 +63,24 @@ func main() {
 	args := flag.Args()
 
 	if len(args) < 1 {
-		fmt.Printf("Usage: %s [-avro] [-importPath a/b/c] [-msgp] [-rename k=v] [-renameFields k=v] [-renameGraphQLType k=v] [-graphql] [-outputPathGraphQL a/b/c] <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
+		_, _ = fmt.Printf("Usage: %s [-avro] [-importPath a/b/c] [-msgp] [-rename k=v] [-renameFields k=v] [-renameGraphQLType k=v] [-graphql] [-outputPathGraphQL a/b/c] <JSON Schema Path> [output directory]\n", path.Base(os.Args[0]))
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 	if *genAvro && *importPath == "" {
-		fmt.Printf("Avro requires specifying an import path.\n")
+		_, _ = fmt.Println("Avro requires specifying an import path.")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 	if *genGraphQL && *importPath == "" {
-		fmt.Printf("GraphQL requires specifying an import path.\n")
+		_, _ = fmt.Println("GraphQL requires specifying an import path.")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
 	inputPath, err := filepath.Abs(args[0])
 	if err != nil {
-		fmt.Printf("Input directory \"%s\" error: %v", args[0], err)
+		_, _ = fmt.Printf("Input directory %q error: %v", args[0], err)
 		os.Exit(2)
 	}
 
@@ -87,7 +88,7 @@ func main() {
 	if len(args) > 1 {
 		outputPath, err = filepath.Abs(args[1])
 		if err != nil {
-			fmt.Printf("Output directory \"%s\" error: %v", args[1], err)
+			_, _ = fmt.Printf("Output directory %q error: %v", args[1], err)
 			os.Exit(3)
 		}
 	}
@@ -110,7 +111,7 @@ func main() {
 		EmbedAllOf:             *embedAllOf,
 		ScalarAny:              *scalarAny,
 	}); err != nil {
-		fmt.Printf("Golang Struct generation failed: %v\n", err)
+		_, _ = fmt.Printf("Golang Struct generation failed: %v\n", err)
 		os.Exit(4)
 	}
 }

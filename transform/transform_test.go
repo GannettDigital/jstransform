@@ -25,7 +25,7 @@ var (
 		"item2"
 	]
 }`)
-	testRaw = interface{}(nil)
+	testRaw = any(nil)
 )
 
 func TestMain(m *testing.M) {
@@ -40,8 +40,8 @@ func TestTransformInstruction(t *testing.T) {
 		description string
 		ti          transformInstruction
 		format      inputFormat
-		in          interface{}
-		want        interface{}
+		in          any
+		want        any
 		wantErr     bool
 	}{
 		{
@@ -101,6 +101,8 @@ func TestTransformInstruction(t *testing.T) {
 			t.Errorf("Test %q - got error, want nil: %v", test.description, err)
 		case !reflect.DeepEqual(got, test.want):
 			t.Errorf("Test %q - got %v, want %v", test.description, got, test.want)
+		default:
+			// Pass.
 		}
 	}
 }
@@ -110,8 +112,8 @@ func TestTransformInstructions(t *testing.T) {
 		description string
 		tis         transformInstructions
 		format      inputFormat
-		in          interface{}
-		want        interface{}
+		in          any
+		want        any
 		wantErr     bool
 	}{
 		{
@@ -323,6 +325,8 @@ func TestTransformInstructions(t *testing.T) {
 			t.Errorf("Test %q - got error, want nil: %v", test.description, err)
 		case !reflect.DeepEqual(got, test.want):
 			t.Errorf("Test %q - got %v, want %v", test.description, got, test.want)
+		default:
+			// Pass.
 		}
 	}
 }
@@ -352,12 +356,13 @@ func TestTransformUnmarshal(t *testing.T) {
 	}
 }`,
 			),
-			want: transform{"cumulo": transformInstructions{
-				From: []*transformInstruction{
-					{jsonPath: "$.data.type", Operations: []transformOperation{}},
+			want: transform{
+				"cumulo": transformInstructions{
+					From: []*transformInstruction{
+						{jsonPath: "$.data.type", Operations: []transformOperation{}},
+					},
+					Method: first,
 				},
-				Method: first,
-			},
 			},
 		},
 		{
@@ -374,12 +379,13 @@ func TestTransformUnmarshal(t *testing.T) {
 	}
 }`,
 			),
-			want: transform{"cumulo": transformInstructions{
-				From: []*transformInstruction{
-					{jsonPath: "$.data.type", Operations: []transformOperation{}},
+			want: transform{
+				"cumulo": transformInstructions{
+					From: []*transformInstruction{
+						{jsonPath: "$.data.type", Operations: []transformOperation{}},
+					},
+					Method: last,
 				},
-				Method: last,
-			},
 			},
 		},
 		{
@@ -396,12 +402,13 @@ func TestTransformUnmarshal(t *testing.T) {
 	}
 }`,
 			),
-			want: transform{"cumulo": transformInstructions{
-				From: []*transformInstruction{
-					{jsonPath: "$.data.type", Operations: []transformOperation{}},
+			want: transform{
+				"cumulo": transformInstructions{
+					From: []*transformInstruction{
+						{jsonPath: "$.data.type", Operations: []transformOperation{}},
+					},
+					Method: concatenate,
 				},
-				Method: concatenate,
-			},
 			},
 		},
 		{
@@ -421,15 +428,16 @@ func TestTransformUnmarshal(t *testing.T) {
 	}
 }`,
 			),
-			want: transform{"cumulo": transformInstructions{
-				From: []*transformInstruction{
-					{jsonPath: "$.data.type", Operations: []transformOperation{}},
+			want: transform{
+				"cumulo": transformInstructions{
+					From: []*transformInstruction{
+						{jsonPath: "$.data.type", Operations: []transformOperation{}},
+					},
+					Method: concatenate,
+					MethodOptions: methodOptions{
+						ConcatenateDelimiter: "/",
+					},
 				},
-				Method: concatenate,
-				MethodOptions: methodOptions{
-					ConcatenateDelimiter: "/",
-				},
-			},
 			},
 		},
 		{
@@ -554,7 +562,7 @@ func TestTransformUnmarshal(t *testing.T) {
 				"cumulo": transformInstructions{
 					From: []*transformInstruction{
 						{jsonPath: "$.data.renditions[*]", Operations: []transformOperation{
-							&max{args: map[string]string{"by": "@.encodingRate", "return": "@.url"}},
+							&maxOp{args: map[string]string{"by": "@.encodingRate", "return": "@.url"}},
 							&replace{args: map[string]string{"regex": `(http://.*net)/`, "new": "https://media.gannett-cdn.com"}},
 						}},
 					},
@@ -605,6 +613,8 @@ func TestTransformUnmarshal(t *testing.T) {
 					}
 				}
 			}
+		default:
+			// Pass.
 		}
 	}
 }

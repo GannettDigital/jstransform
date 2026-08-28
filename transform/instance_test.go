@@ -9,17 +9,17 @@ import (
 )
 
 var (
-	testIn = map[string]interface{}{
+	testIn = map[string]any{
 		"type": "image",
 		"date": testTimeStr,
-		"crops": []interface{}{
-			map[string]interface{}{
+		"crops": []any{
+			map[string]any{
 				"height":       0,
 				"path":         "path",
 				"relativePath": "",
 				"width":        1,
 			},
-			map[string]interface{}{
+			map[string]any{
 				"name":         "aname",
 				"height":       0,
 				"path":         "empty",
@@ -27,15 +27,15 @@ var (
 				"width":        0,
 			},
 		},
-		"otherCrops": []interface{}{
-			[]interface{}{
-				map[string]interface{}{
+		"otherCrops": []any{
+			[]any{
+				map[string]any{
 					"height":       10,
 					"path":         "otherpath",
 					"relativePath": "other",
 					"width":        11,
 				},
-				map[string]interface{}{
+				map[string]any{
 					"name":         "otheraname",
 					"height":       10,
 					"path":         "otherempty",
@@ -43,8 +43,8 @@ var (
 					"width":        10,
 				},
 			},
-			[]interface{}{
-				map[string]interface{}{
+			[]any{
+				map[string]any{
 					"name":         "otheraname2",
 					"height":       102,
 					"path":         "otherempty2",
@@ -58,7 +58,7 @@ var (
 		"absoluteUrl": "absoluteURL",
 	}
 
-	testInBadTime = map[string]interface{}{
+	testInBadTime = map[string]any{
 		"date": testBadTimeStr,
 	}
 
@@ -68,7 +68,7 @@ var (
 )
 
 func TestArrayTransform(t *testing.T) {
-	var nilSlice []interface{}
+	var nilSlice []any
 
 	tests := []struct {
 		description string
@@ -76,7 +76,7 @@ func TestArrayTransform(t *testing.T) {
 		child       instanceTransformer
 		path        string
 		raw         json.RawMessage
-		want        interface{}
+		want        any
 	}{
 		{
 			description: "empty",
@@ -90,14 +90,14 @@ func TestArrayTransform(t *testing.T) {
 			format:      jsonInput,
 			path:        "$.crops",
 			raw:         json.RawMessage(`{"type":"array"}`),
-			want: []interface{}{
-				map[string]interface{}{
+			want: []any{
+				map[string]any{
 					"height":       0,
 					"path":         "path",
 					"relativePath": "",
 					"width":        1,
 				},
-				map[string]interface{}{
+				map[string]any{
 					"name":         "aname",
 					"height":       0,
 					"path":         "empty",
@@ -111,14 +111,14 @@ func TestArrayTransform(t *testing.T) {
 			format:      jsonInput,
 			path:        "$.crops",
 			raw:         json.RawMessage(`{"type":"object","transform":{"test":{"from":[{"jsonPath":"$.otherCrops[0]"}]}}}`),
-			want: []interface{}{
-				map[string]interface{}{
+			want: []any{
+				map[string]any{
 					"height":       10,
 					"path":         "otherpath",
 					"relativePath": "other",
 					"width":        11,
 				},
-				map[string]interface{}{
+				map[string]any{
 					"name":         "otheraname",
 					"height":       10,
 					"path":         "otherempty",
@@ -142,7 +142,7 @@ func TestArrayTransform(t *testing.T) {
 			},
 			path: "$.crops",
 			raw:  json.RawMessage(`{"type":"array"}`),
-			want: []interface{}{"name", "aname"},
+			want: []any{"name", "aname"},
 		},
 		{
 			description: "object child",
@@ -201,15 +201,15 @@ func TestArrayTransform(t *testing.T) {
 			},
 			path: "$.crops",
 			raw:  json.RawMessage(`{"type":"array"}`),
-			want: []interface{}{
-				map[string]interface{}{
+			want: []any{
+				map[string]any{
 					"name":         "name",
 					"height":       0,
 					"path":         "path",
 					"relativePath": "",
 					"width":        1,
 				},
-				map[string]interface{}{
+				map[string]any{
 					"name":         "aname",
 					"height":       0,
 					"path":         "empty",
@@ -259,16 +259,16 @@ func TestArrayTransform(t *testing.T) {
 			},
 			path: "$.otherCrops",
 			raw:  json.RawMessage(`{"type":"array"}`),
-			want: []interface{}{
-				[]interface{}{
-					map[string]interface{}{
+			want: []any{
+				[]any{
+					map[string]any{
 						"name":         "name",
 						"height":       10,
 						"path":         "otherpath",
 						"relativePath": "other",
 						"width":        11,
 					},
-					map[string]interface{}{
+					map[string]any{
 						"name":         "otheraname",
 						"height":       10,
 						"path":         "otherempty",
@@ -276,8 +276,8 @@ func TestArrayTransform(t *testing.T) {
 						"width":        10,
 					},
 				},
-				[]interface{}{
-					map[string]interface{}{
+				[]any{
+					map[string]any{
 						"name":         "otheraname2",
 						"height":       102,
 						"path":         "otherempty2",
@@ -297,7 +297,7 @@ func TestArrayTransform(t *testing.T) {
 
 		at.childTransformer = test.child
 
-		testInCopy := make(map[string]interface{})
+		testInCopy := make(map[string]any)
 		for k, v := range testIn {
 			testInCopy[k] = v
 		}
@@ -315,12 +315,12 @@ func TestArrayTransform(t *testing.T) {
 func TestObjectTransform(t *testing.T) {
 	tests := []struct {
 		description string
-		in          interface{}
+		in          any
 		format      inputFormat
 		children    map[string]instanceTransformer
 		path        string
 		raw         json.RawMessage
-		want        interface{}
+		want        any
 	}{
 		{
 			description: "empty",
@@ -384,7 +384,7 @@ func TestObjectTransform(t *testing.T) {
 			},
 			path: "$.firstCrop",
 			raw:  json.RawMessage(`{"type":"object"}`),
-			want: map[string]interface{}{
+			want: map[string]any{
 				"name":         "name",
 				"height":       0,
 				"path":         "path",
@@ -410,7 +410,7 @@ func TestObjectTransform(t *testing.T) {
 			},
 			path: "$.firstCrop",
 			raw:  json.RawMessage(`{"type":"object","transform":{"test":{"from":[{"jsonPath":"$.notFound"}]}}}`),
-			want: map[string]interface{}{
+			want: map[string]any{
 				"name": "name",
 			},
 		},
@@ -443,12 +443,12 @@ func TestScalarTransform(t *testing.T) {
 
 	tests := []struct {
 		description  string
-		in           interface{}
+		in           any
 		path         string
 		instanceType string
 		format       inputFormat
 		raw          json.RawMessage
-		want         interface{}
+		want         any
 		wantError    string
 	}{
 		{
@@ -577,7 +577,6 @@ func TestScalarTransform(t *testing.T) {
 		}
 
 		got, err := st.transform(test.in, nil)
-
 		if err != nil {
 			if err.Error() == test.wantError {
 				continue // pass

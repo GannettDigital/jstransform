@@ -10,7 +10,7 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-// WalkFunc processes a single Instance within a JSON schema file returning an error on any problems.
+// WalkInstanceFunc processes a single Instance within a JSON schema file returning an error on any problems.
 // The path corresponds to the JSONPath (http://goessner.net/articles/JsonPath/) of the instance within the JSON
 // format described by the JSON Schema.
 type WalkInstanceFunc func(path string, i Instance) error
@@ -41,7 +41,7 @@ func Walk(s *Schema, walkFn WalkInstanceFunc) error {
 
 // prependJSONPath a parent JSONPath to the beginning of a JSONPath.
 // This allows for incrementally building up the full JSONPath.
-func prependJSONPath(parent string, child string) string {
+func prependJSONPath(parent, child string) string {
 	newPath := parent
 	if parent == "" {
 		newPath = child
@@ -54,16 +54,16 @@ func prependJSONPath(parent string, child string) string {
 
 // walkInstance will recursively walk JSON Schema Instance calling defined walk functions for the root and for each
 // property within an object and each item in an array.
-// For each layer of depth the the JSONPath is added to so the walkFn received the full path of the JSON instance.
+// For each layer of depth the JSONPath is added to so the walkFn received the full path of the JSON instance.
 // Any error will halt the progress.
 func walkInstance(raw json.RawMessage, path string, walkFn WalkInstanceFunc) error {
 	var i Instance
 	if err := json.Unmarshal(raw, &i); err != nil {
-		return fmt.Errorf("failed to unmarshal Instance at path %q: %v", path, err)
+		return fmt.Errorf("failed to unmarshal Instance at path %q: %w", path, err)
 	}
 
 	if err := walkFn(path, i); err != nil {
-		return fmt.Errorf("walkInstance failed at path %q: %v", path, err)
+		return fmt.Errorf("walkInstance failed at path %q: %w", path, err)
 	}
 
 	switch {
@@ -85,6 +85,7 @@ func walkInstance(raw json.RawMessage, path string, walkFn WalkInstanceFunc) err
 				return err
 			}
 		}
+	default: // No special structure logic.
 	}
 	return nil
 }
@@ -112,29 +113,30 @@ func WalkRaw(s *Schema, walkFn WalkRawFunc) error {
 // function with drives Walk.
 func walkRaw(raw json.RawMessage, path string, walkFn WalkRawFunc) error {
 	if err := walkFn(path, raw); err != nil {
-		return fmt.Errorf("walkRaw failed at path %q: %v", path, err)
+		return fmt.Errorf("walkRaw failed at path %q: %w", path, err)
 	}
 
 	iType, _, err := FieldType(raw)
 	if err != nil {
-		return fmt.Errorf("failed to determine instance type at path %q: %v", path, err)
+		return fmt.Errorf("failed to determine instance type at path %q: %w", path, err)
 	}
 
 	switch iType {
 	case "object":
-		if err := jsonparser.ObjectEach(raw, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
+		if err := jsonparser.ObjectEach(raw, func(key, value []byte, dataType jsonparser.ValueType, offset int) error {
 			return walkRaw(value, prependJSONPath(path, string(key)), walkFn)
 		}, "properties"); err != nil {
-			return fmt.Errorf("failed processing properties at path %q: %v", path, err)
+			return fmt.Errorf("failed processing properties at path %q: %w", path, err)
 		}
 	case "array":
 		items, _, _, err := jsonparser.Get(raw, "items")
 		if err != nil {
-			return fmt.Errorf("failed extracting items at path %q: %v", path, err)
+			return fmt.Errorf("failed extracting items at path %q: %w", path, err)
 		}
 		if err := walkRaw(items, path+"[*]", walkFn); err != nil {
-			return fmt.Errorf("failed processing items at path %q: %v", path, err)
+			return fmt.Errorf("failed processing items at path %q: %w", path, err)
 		}
+	default: // No special structure logic.
 	}
 	return nil
 }

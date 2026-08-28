@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -43,7 +43,8 @@ func (i *Instance) UnmarshalJSON(data []byte) error {
 	value, dataType, _, err := jsonparser.Get(data, "type")
 	if err != nil && !errors.Is(err, jsonparser.KeyPathNotFoundError) {
 		return fmt.Errorf("error reading schema type: %w %s", err, data)
-	} else if dataType == jsonparser.String {
+	}
+	if dataType == jsonparser.String {
 		data, err = jsonparser.Set(data, []byte(fmt.Sprintf("[%q]", value)), "type")
 		if err != nil {
 			return fmt.Errorf("error changing schema type to array: %w", err)
@@ -94,7 +95,7 @@ func SchemaFromFile(schemaPath, oneOfType string) (*Schema, error) {
 	return schemaFromFile(schemaPath, oneOfType, true)
 }
 
-func schemaFromFile(schemaLoadPath string, oneOfType string, flatten bool) (*Schema, error) {
+func schemaFromFile(schemaLoadPath, oneOfType string, flatten bool) (*Schema, error) {
 	schemaPath, err := filepath.Abs(schemaLoadPath)
 	if err != nil {
 		return nil, err
@@ -103,25 +104,25 @@ func schemaFromFile(schemaLoadPath string, oneOfType string, flatten bool) (*Sch
 	return schemaCache.Load(schemaKey, func() (*Schema, error) {
 		data, err := os.ReadFile(schemaPath)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
+			return nil, fmt.Errorf("failed to read schema file %q: %w", schemaPath, err)
 		}
 		v, err := NewValidator(schemaPath)
 		if err != nil {
-			return nil, fmt.Errorf("failed to initialize schema validator: %v", err)
+			return nil, fmt.Errorf("failed to initialize schema validator: %w", err)
 		}
 
 		// dereferencing during walking is more efficient but more complicated so all dereferencing for a file is done immediately
 		data, err = dereference(schemaPath, data, oneOfType, flatten)
 		if err != nil {
-			return nil, fmt.Errorf("failed to Dereference Schema: %v", err)
+			return nil, fmt.Errorf("failed to Dereference Schema: %w", err)
 		}
 
 		// json schema's default behavior is additionalProperties: true if the field is missing so mimic that behavior here
-		var sj = Instance{
+		sj := Instance{
 			AdditionalProperties: true,
 		}
 		if err := json.Unmarshal(data, &sj); err != nil {
-			return nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
+			return nil, fmt.Errorf("failed to Unmarshal Schema: %w", err)
 		}
 
 		s := Schema{
@@ -166,12 +167,12 @@ func schemaFromFile(schemaLoadPath string, oneOfType string, flatten bool) (*Sch
 func SchemaTypes(schemaPath string) ([]string, []string, []string, error) {
 	data, err := os.ReadFile(schemaPath)
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("failed to read schema file %q: %v", schemaPath, err)
+		return nil, nil, nil, fmt.Errorf("failed to read schema file %q: %w", schemaPath, err)
 	}
 
 	var sj Instance
 	if err := json.Unmarshal(data, &sj); err != nil {
-		return nil, nil, nil, fmt.Errorf("failed to Unmarshal Schema: %v", err)
+		return nil, nil, nil, fmt.Errorf("failed to Unmarshal Schema: %w", err)
 	}
 
 	var allOfTypes []string
@@ -186,7 +187,7 @@ func SchemaTypes(schemaPath string) ([]string, []string, []string, error) {
 	for prop := range sj.Properties {
 		properties = append(properties, prop)
 	}
-	sort.Strings(properties)
+	slices.Sort(properties)
 
 	return allOfTypes, oneOfTypes, properties, nil
 }
@@ -210,9 +211,11 @@ func FieldType(data []byte) (string, bool, error) {
 	value, dataType, _, err := jsonparser.Get(data, "type")
 	if err != nil && !errors.Is(err, jsonparser.KeyPathNotFoundError) {
 		return "", false, fmt.Errorf("error reading schema type: %w", err)
-	} else if dataType == jsonparser.String {
+	}
+	switch dataType {
+	case jsonparser.String:
 		return string(value), false, nil
-	} else if dataType == jsonparser.Array {
+	case jsonparser.Array:
 		var nullable bool
 		var jsonType string
 		_, aErr := jsonparser.ArrayEach(value, func(avalue []byte, adataType jsonparser.ValueType, aoffset int, aerr error) {
@@ -236,7 +239,7 @@ func FieldType(data []byte) (string, bool, error) {
 			return "", false, fmt.Errorf("error iterating over type array: %w", err)
 		}
 		return jsonType, nullable, nil
-	} else {
+	default:
 		return "", false, fmt.Errorf("unknown schema type: %s", dataType)
 	}
 }

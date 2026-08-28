@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -13,16 +14,14 @@ import (
 	"github.com/GannettDigital/jstransform/jsonschema"
 )
 
-var (
-	typeJSONGraphQL = map[string]string{
-		"boolean":   "Boolean",
-		"number":    "Float",
-		"integer":   "Int",
-		"string":    "String",
-		"date-time": "DateTime",
-		"object":    "(",
-	}
-)
+var typeJSONGraphQL = map[string]string{
+	"boolean":   "Boolean",
+	"number":    "Float",
+	"integer":   "Int",
+	"string":    "String",
+	"date-time": "DateTime",
+	"object":    "(",
+}
 
 // Developer Note
 // This file started as a copy of `struct.go` and inherits some of its behavior
@@ -136,14 +135,14 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 			nestedStructs: map[string]*generatedGraphQLObject{},
 		}
 		if len(common) != 0 {
-			obj.rootStruct.gqlExtractedField.jsonName = exportedName(packageName)
+			obj.rootStruct.jsonName = exportedName(packageName)
 			name := strings.Split(filepath.Base(schema.AllOf[0].FromRef), ".")[0]
 			if newName, ok := args.StructNameMap[name]; ok {
 				name = newName
 			} else {
 				name = exportedName(name)
 			}
-			obj.rootStruct.gqlExtractedField.name = name
+			obj.rootStruct.name = name
 			for _, com := range common {
 				commonFields += len(com.rootStruct.fields)
 				for fk, fv := range com.rootStruct.fields {
@@ -159,11 +158,11 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 			}
 			if len(schema.OneOf) != 0 {
 				if newName, ok := args.GraphQLTypeNameMap[packageName]; ok {
-					obj.rootStruct.gqlExtractedField.jsonName = newName
+					obj.rootStruct.jsonName = newName
 				} else {
-					obj.rootStruct.gqlExtractedField.jsonName = exportedName(packageName)
+					obj.rootStruct.jsonName = exportedName(packageName)
 				}
-				obj.rootStruct.gqlExtractedField.name = obj.rootStruct.gqlExtractedField.jsonName
+				obj.rootStruct.name = obj.rootStruct.jsonName
 				obj.rootStruct.buildType = "interface"
 			}
 		}
@@ -268,7 +267,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 // write outputs the Golang representation of this field to the writer with prefix before each line.
 // It handles inline structs by calling this method recursively adding a new \t to the prefix for each layer.
 // If required is set to false 'omitempty' is added in the JSON struct tag for the field.
-func (ef *gqlExtractedField) write(w io.Writer, prefix string, required, descriptionAsStructTag, pointers bool) error {
+func (ef *gqlExtractedField) write(w io.Writer, prefix string, required bool) error {
 	var attribute string
 	description := ef.description
 	if strings.HasPrefix(description, "DEPRECATED:") {
@@ -285,7 +284,7 @@ func (ef *gqlExtractedField) write(w io.Writer, prefix string, required, descrip
 
 	// Simple field type.
 	if ef.jsonType != "object" {
-		gqlArgs, gqlType := ef.graphqlType(required, pointers)
+		gqlArgs, gqlType := ef.graphqlType(required)
 		if _, err := fmt.Fprintf(w, "%s%s%s: %s%s\n", prefix, ef.jsonName, gqlArgs, gqlType, attribute); err != nil {
 			return fmt.Errorf("error writing field %q definition: %w", ef.name, err)
 		}
@@ -293,15 +292,15 @@ func (ef *gqlExtractedField) write(w io.Writer, prefix string, required, descrip
 	}
 
 	// Object field type.  (Not generally used for GraphQL as the types aren't nested.)
-	gqlArgs, gqlType := ef.graphqlType(required, pointers)
+	gqlArgs, gqlType := ef.graphqlType(required)
 	if _, err := fmt.Fprintf(w, "%s%s%s\t%s {\n", prefix, ef.jsonName, gqlArgs, gqlType); err != nil {
 		return err
 	}
 
-	sort.Strings(ef.fieldOrder)
+	slices.Sort(ef.fieldOrder)
 	for _, fieldName := range ef.fieldOrder {
 		field := ef.fields[fieldName]
-		if err := field.write(w, prefix+"\t", ef.requiredFields[field.jsonName], descriptionAsStructTag, pointers); err != nil {
+		if err := field.write(w, prefix+"\t", ef.requiredFields[field.jsonName]); err != nil {
 			return fmt.Errorf("failed writing field %q: %w", field.name, err)
 		}
 	}
@@ -314,7 +313,7 @@ func (ef *gqlExtractedField) write(w io.Writer, prefix string, required, descrip
 
 // Sorted will return the fields in a sorted list. The sort is a string sort on the keys.
 func (efs gqlExtractedFields) Sorted() []*gqlExtractedField {
-	var sortedKeys sort.StringSlice
+	sortedKeys := make(sort.StringSlice, 0, len(efs))
 	fieldsByName := make(map[string]*gqlExtractedField, len(efs))
 	for _, f := range efs {
 		sortedKeys = append(sortedKeys, f.name)
@@ -393,18 +392,14 @@ func (gof *goGQL) structs() []*generatedGraphQLObject {
 	if len(gof.nestedStructs) == 0 {
 		return []*generatedGraphQLObject{gof.rootStruct}
 	}
-	nested := make([]*generatedGraphQLObject, len(gof.nestedStructs))
-	var i int
-	for _, s := range gof.nestedStructs {
-		nested[i] = s
-		i++
-	}
+	nested := slices.Collect(maps.Values(gof.nestedStructs))
 
 	// order with root first and nested in a consistent following order
-	sort.Slice(nested, func(i, j int) bool {
-		return nested[i].name < nested[j].name
+	slices.SortFunc(nested, func(a, b *generatedGraphQLObject) int {
+		return strings.Compare(a.name, b.name)
 	})
-	structs := []*generatedGraphQLObject{gof.rootStruct}
+	structs := make([]*generatedGraphQLObject, 0, 1+len(nested))
+	structs = append(structs, gof.rootStruct)
 	structs = append(structs, nested...)
 
 	return structs
@@ -499,7 +494,7 @@ func (gof *goGQL) write(w io.Writer) error {
 
 	for _, s := range gof.structs() {
 		if s.target == "" && s.buildType != "ignored" {
-			if _, err := buf.Write([]byte("\n")); err != nil {
+			if _, err := buf.WriteString("\n"); err != nil {
 				return fmt.Errorf("failed writing GraphQL %q: %w", s.name, err)
 			}
 			if err := s.write(buf); err != nil {
@@ -543,7 +538,7 @@ func (gen *generatedGraphQLObject) write(w io.Writer) error {
 
 	sortedFields := gen.fields.Sorted()
 	for idx, field := range sortedFields {
-		if err := field.write(w, "  ", gen.requiredFields[field.jsonName], gen.args.DescriptionAsStructTag, gen.args.Pointers); err != nil {
+		if err := field.write(w, "  ", gen.requiredFields[field.jsonName]); err != nil {
 			return fmt.Errorf("failed writing field %q: %w", field.name, err)
 		}
 		if idx+1 != len(sortedFields) {
@@ -565,9 +560,9 @@ func (gen *generatedGraphQLObject) write(w io.Writer) error {
 // For all fields the name and jsonType are set, for arrays the array bool is set for true and for JSON objects,
 // the fields map is created and if it exists the requiredFields section populated.
 // fields will be renamed if a matching entry is supplied in the fieldRenameMap.
-func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst jsonschema.Instance) error {
+func (ef *gqlExtractedField) addField(tree, gqlTypeName []string, inst jsonschema.Instance) error {
 	if len(tree) > 1 {
-		if f, ok := gen.fields[tree[0]]; ok {
+		if f, ok := ef.fields[tree[0]]; ok {
 			return f.addField(tree[1:], nil, inst)
 		}
 		f := &gqlExtractedField{
@@ -575,20 +570,21 @@ func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst
 			jsonType:  "object",
 			name:      exportedName(tree[0]),
 			fields:    make(map[string]*gqlExtractedField),
-			args:      gen.args,
+			args:      ef.args,
 			target:    inst.Target,
 			arguments: inst.GraphQLArguments,
 		}
-		gen.fields[tree[0]] = f
-		gen.fieldOrder = append(gen.fieldOrder, tree[0])
+		ef.fields[tree[0]] = f
+		ef.fieldOrder = append(ef.fieldOrder, tree[0])
 		if err := f.addField(tree[1:], nil, inst); err != nil {
 			return fmt.Errorf("failed field %q: %w", tree[0], err)
 		}
 		return nil
 	}
 
-	if len(tree) > 0 {
-		fieldName, ok := gen.args.FieldNameMap[tree[0]]
+	//nolint:gosec // G602: slice index out of range (gosec) // Spurious warnings.
+	if len(tree) == 1 {
+		fieldName, ok := ef.args.FieldNameMap[tree[0]]
 		if !ok {
 			fieldName = tree[0]
 		}
@@ -611,27 +607,26 @@ func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst
 			name:        exportedName(fieldName),
 			jsonName:    tree[0],
 			jsonType:    jsonType,
-			args:        gen.args,
+			args:        ef.args,
 			target:      inst.Target,
 			arguments:   inst.GraphQLArguments,
 			nullable:    slices.Contains(inst.Type, "null"),
 		}
 		// Second processing of an array type
-		if exists, ok := gen.fields[f.jsonName]; ok {
+		if exists, ok := ef.fields[f.jsonName]; ok {
 			f = exists
-			if f.array {
-				if f.jsonType == "" {
-					f.jsonType = jsonType
-				}
-				// Need to preserve the value if this array's item type had a GraphQL hydration target.
-				if f.target == "" && inst.Target != "" {
-					f.target = "[" + inst.Target + "]"
-					if !(f.nullable || gen.args.Pointers && !gen.requiredFields[f.jsonName]) {
-						f.target += "!"
-					}
-				}
-			} else {
+			if !f.array {
 				return fmt.Errorf("field %q already exists but is not an array field", f.name)
+			}
+			if f.jsonType == "" {
+				f.jsonType = jsonType
+			}
+			// Need to preserve the value if this array's item type had a GraphQL hydration target.
+			if f.target == "" && inst.Target != "" {
+				f.target = "[" + inst.Target + "]"
+				if !f.nullable && (!ef.args.Pointers || ef.requiredFields[f.jsonName]) {
+					f.target += "!"
+				}
 			}
 		}
 		if slices.Contains(inst.Type, "string") && inst.Format == "date-time" {
@@ -653,17 +648,17 @@ func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst
 				totalDescription = lines[0] + "\n" + totalDescription
 			}
 			totalName := "total" + f.name
-			gen.fields[totalName] = &gqlExtractedField{
+			ef.fields[totalName] = &gqlExtractedField{
 				description: totalDescription,
 				name:        exportedName(totalName),
 				jsonName:    totalName,
 				jsonType:    "integer",
-				args:        gen.args,
+				args:        ef.args,
 				target:      "",
 				arguments:   nil,
 			}
-			gen.fieldOrder = append(gen.fieldOrder, totalName)
-			gen.requiredFields[totalName] = true
+			ef.fieldOrder = append(ef.fieldOrder, totalName)
+			ef.requiredFields[totalName] = true
 		case "object":
 			// Special case for when the properties field of an object is `{}`. Put `Any` instead of an empty field name.
 			if len(inst.Properties) == 0 {
@@ -675,12 +670,12 @@ func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst
 				f.requiredFields[name] = true
 			}
 			f.fields = make(map[string]*gqlExtractedField)
+		default: // No special structure logic.
 		}
 
-		gen.fields[tree[0]] = f
-		gen.fieldOrder = append(gen.fieldOrder, tree[0])
+		ef.fields[tree[0]] = f
+		ef.fieldOrder = append(ef.fieldOrder, tree[0])
 	}
-
 	return nil
 }
 
@@ -689,7 +684,7 @@ func (gen *gqlExtractedField) addField(tree []string, gqlTypeName []string, inst
 // If the JSON Schema had a type of "string" and a format of "date-time" it is expected the input jsonType will be
 // "date-time".
 // Non-required times are added as pointers to allow for their values to missing go marshalled JSON.
-func (ef *gqlExtractedField) graphqlType(required, pointers bool) (string, string) {
+func (ef *gqlExtractedField) graphqlType(required bool) (string, string) {
 	// This is a "virtual" field in that no storage exists for it, but the GraphQL schema
 	// still needs for it to be defined so a resolver can be attached to do the lookup.
 	if ef.jsonType == "graphql-hydration" {
@@ -718,7 +713,7 @@ func (ef *gqlExtractedField) graphqlType(required, pointers bool) (string, strin
 	} else {
 		graphqlType = ef.jsonType
 	}
-	if graphqlType != "DateTime" && (regularType && !ef.nullable || required || !pointers) {
+	if graphqlType != "DateTime" && (regularType && !ef.nullable || required || !ef.args.Pointers) {
 		if ef.jsonType != "Any" {
 			graphqlType += "!"
 		}
@@ -733,7 +728,7 @@ func (ef *gqlExtractedField) graphqlType(required, pointers bool) (string, strin
     "Sort the list, ie '{Field: \"position\", Order: \"ASC\"}'"
     sort: ListSortParams
   )`
-		if ef.arrayNullable || pointers && !required {
+		if ef.arrayNullable || ef.args.Pointers && !required {
 			graphqlType = "[" + graphqlType + "]"
 		} else {
 			graphqlType = "[" + graphqlType + "]!"
@@ -745,16 +740,18 @@ func (ef *gqlExtractedField) graphqlType(required, pointers bool) (string, strin
 
 // graphqlComment takes a string and returns GraphQL comment syntax.
 func graphqlComment(prefix, description string) string {
-	if strings.IndexRune(description, '\n') < 0 {
+	if !strings.ContainsRune(description, '\n') {
 		return fmt.Sprintf("%s\"%s\"\n", prefix, description)
 	}
 	// Multi-line descriptions get the """ comment syntax.
-	newDescription := prefix + `"""` + "\n"
+	var newDescription strings.Builder
+	_, _ = newDescription.WriteString(prefix + `"""` + "\n")
 	for _, line := range strings.Split(description, "\n") {
 		if line != "" {
-			newDescription += prefix + line
+			_, _ = newDescription.WriteString(prefix + line)
 		}
-		newDescription += "\n"
+		_, _ = newDescription.WriteString("\n")
 	}
-	return newDescription + prefix + `"""` + "\n"
+	_, _ = newDescription.WriteString(prefix + `"""` + "\n")
+	return newDescription.String()
 }

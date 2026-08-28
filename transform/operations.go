@@ -10,8 +10,11 @@ import (
 	"time"
 
 	jsonpath "github.com/GannettDigital/PaesslerAG_jsonpath"
+
 	"github.com/antchfx/xmlquery"
 	"github.com/microcosm-cc/bluemonday"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var durationRe = regexp.MustCompile(`^([\d]*?):?([\d]*):([\d]*)$`)
@@ -27,8 +30,8 @@ func (c *duration) init(args map[string]string) error {
 	return nil
 }
 
-func (c *duration) transform(raw interface{}) (interface{}, error) {
-	if array, ok := raw.([]interface{}); ok && len(array) == 1 {
+func (c *duration) transform(raw any) (any, error) {
+	if array, ok := raw.([]any); ok && len(array) == 1 {
 		raw = array[0]
 	}
 
@@ -81,7 +84,7 @@ func (c *changeCase) init(args map[string]string) error {
 	return nil
 }
 
-func (c *changeCase) transform(raw interface{}) (interface{}, error) {
+func (c *changeCase) transform(raw any) (any, error) {
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("changeCase only supports strings")
@@ -97,15 +100,13 @@ func (c *changeCase) transform(raw interface{}) (interface{}, error) {
 }
 
 // notEmpty is a transformOperation which returns a boolean depending on if the passed in value is considered "empty", as the definition changes on a per-type basis.
-type valueExists struct {
-	args map[string]string
-}
+type valueExists struct{}
 
-func (n *valueExists) init(args map[string]string) error {
+func (v *valueExists) init(args map[string]string) error {
 	return nil
 }
 
-func (c *valueExists) transform(raw interface{}) (interface{}, error) {
+func (v *valueExists) transform(raw any) (any, error) {
 	switch v := raw.(type) {
 	case string:
 		if len(v) > 0 {
@@ -123,15 +124,13 @@ func (c *valueExists) transform(raw interface{}) (interface{}, error) {
 }
 
 // inverse is a transformOperation which flips the value of a boolean.
-type inverse struct {
-	args map[string]string
-}
+type inverse struct{}
 
 func (i *inverse) init(args map[string]string) error {
 	return nil
 }
 
-func (i *inverse) transform(raw interface{}) (interface{}, error) {
+func (i *inverse) transform(raw any) (any, error) {
 	in, ok := raw.(bool)
 	if !ok {
 		return nil, errors.New("inverse only supports booleans")
@@ -139,14 +138,14 @@ func (i *inverse) transform(raw interface{}) (interface{}, error) {
 	return !in, nil
 }
 
-// max is a transformOperation which retrieves a field from the maximum item in
+// maxOp is a transformOperation which retrieves a field from the maximum item in
 // an array. The maxiumum item is determined by comparing values in a defined
 // number field on the array items.
-type max struct {
+type maxOp struct {
 	args map[string]string
 }
 
-func (m *max) init(args map[string]string) error {
+func (m *maxOp) init(args map[string]string) error {
 	if err := requiredArgs([]string{"by", "return"}, args); err != nil {
 		return err
 	}
@@ -154,8 +153,8 @@ func (m *max) init(args map[string]string) error {
 	return nil
 }
 
-func (m *max) transform(in interface{}) (interface{}, error) {
-	inArray, ok := in.([]interface{})
+func (m *maxOp) transform(in any) (any, error) {
+	inArray, ok := in.([]any)
 	if !ok {
 		return nil, errors.New("input must be an array")
 	}
@@ -167,7 +166,7 @@ func (m *max) transform(in interface{}) (interface{}, error) {
 	for i, item := range inArray {
 		byRaw, err := jsonpath.Get(byArg, item)
 		if err != nil {
-			return nil, fmt.Errorf("failed extracting 'by' field: %v", err)
+			return nil, fmt.Errorf("failed extracting 'by' field: %w", err)
 		}
 		by, ok := byRaw.(float64)
 		if !ok {
@@ -185,7 +184,7 @@ func (m *max) transform(in interface{}) (interface{}, error) {
 
 	rawReturn, err := jsonpath.Get(returnArg, inArray[largestIndex])
 	if err != nil {
-		return nil, fmt.Errorf("failed extracting 'return' field: %v", err)
+		return nil, fmt.Errorf("failed extracting 'return' field: %w", err)
 	}
 
 	return rawReturn, nil
@@ -204,7 +203,7 @@ func (r *replace) init(args map[string]string) error {
 	}
 	re, err := regexp.Compile(args["regex"])
 	if err != nil {
-		return fmt.Errorf("failed to parse regex %q: %v", args["regex"], err)
+		return fmt.Errorf("failed to parse regex %q: %w", args["regex"], err)
 	}
 
 	r.regex = re
@@ -212,7 +211,7 @@ func (r *replace) init(args map[string]string) error {
 	return nil
 }
 
-func (r *replace) transform(raw interface{}) (interface{}, error) {
+func (r *replace) transform(raw any) (any, error) {
 	if r.regex == nil {
 		return nil, errors.New("init was not run")
 	}
@@ -238,7 +237,7 @@ func (s *split) init(args map[string]string) error {
 	return nil
 }
 
-func (s *split) transform(raw interface{}) (interface{}, error) {
+func (s *split) transform(raw any) (any, error) {
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("split only supports strings")
@@ -248,13 +247,13 @@ func (s *split) transform(raw interface{}) (interface{}, error) {
 	// strings.Split() will return []string{""} instead of an empty array.
 	// https://play.golang.org/p/8ySv_t37haN
 	if in == "" {
-		return []interface{}{}, nil
+		return []any{}, nil
 	}
 
 	splits := strings.Split(in, s.args["on"])
 
-	// Return []interface{} to avoid messing up type casts later in the process
-	var interfaceSplits []interface{}
+	// Return []any to avoid messing up type casts later in the process
+	var interfaceSplits []any
 	for _, s := range splits {
 		interfaceSplits = append(interfaceSplits, s)
 	}
@@ -275,14 +274,14 @@ func (t *timeParse) init(args map[string]string) error {
 	return nil
 }
 
-func (t *timeParse) transform(raw interface{}) (interface{}, error) {
+func (t *timeParse) transform(raw any) (any, error) {
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("timeParse only supports strings")
 	}
 	parsedTime, err := time.Parse(t.args["format"], in)
 	if err != nil {
-		return nil, fmt.Errorf("time could not be parsed using supplied format")
+		return nil, errors.New("time could not be parsed using supplied format")
 	}
 	return parsedTime.Format(t.args["layout"]), nil
 }
@@ -301,11 +300,13 @@ func (c *currentTime) init(args map[string]string) error {
 	return nil
 }
 
-func (c *currentTime) transform(_ interface{}) (interface{}, error) {
-	timeFmt := c.args["format"]
+func (c *currentTime) transform(_ any) (any, error) {
+	var timeFmt string
 	switch c.args["format"] {
 	case "RFC3339":
 		timeFmt = time.RFC3339
+	default:
+		timeFmt = c.args["format"]
 	}
 	return time.Now().Format(timeFmt), nil
 }
@@ -323,7 +324,7 @@ func (c *toCamelCase) init(args map[string]string) error {
 	return nil
 }
 
-func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
+func (c *toCamelCase) transform(raw any) (any, error) {
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("toCamelCase only supports input of type string")
@@ -336,22 +337,20 @@ func (c *toCamelCase) transform(raw interface{}) (interface{}, error) {
 			arr[0] = strings.ToLower(cap)
 			continue
 		}
-		arr[i] = strings.Title(cap)
+		arr[i] = cases.Title(language.Und, cases.NoLower).String(cap)
 	}
 
 	return strings.Join(arr, ""), nil
 }
 
 // removeHTML is a transformOperation which removes all html from a string.
-type removeHTML struct {
-	args map[string]string
-}
+type removeHTML struct{}
 
 func (c *removeHTML) init(args map[string]string) error {
 	return nil
 }
 
-func (c *removeHTML) transform(raw interface{}) (interface{}, error) {
+func (c *removeHTML) transform(raw any) (any, error) {
 	in, ok := raw.(string)
 	if !ok {
 		return nil, errors.New("removeHTML only supports input of type string")
@@ -365,15 +364,13 @@ func (c *removeHTML) transform(raw interface{}) (interface{}, error) {
 }
 
 // convertToFloat64 is a transformOperation which converts various types to float64.
-type convertToFloat64 struct {
-	args map[string]string
-}
+type convertToFloat64 struct{}
 
 func (c *convertToFloat64) init(args map[string]string) error {
 	return nil
 }
 
-func (c *convertToFloat64) transform(raw interface{}) (interface{}, error) {
+func (c *convertToFloat64) transform(raw any) (any, error) {
 	switch in := raw.(type) {
 	case string:
 		return strconv.ParseFloat(in, 64)
@@ -387,15 +384,13 @@ func (c *convertToFloat64) transform(raw interface{}) (interface{}, error) {
 }
 
 // convertToInt64 is a transformOperation which converts various types to int64.
-type convertToInt64 struct {
-	args map[string]string
-}
+type convertToInt64 struct{}
 
 func (c *convertToInt64) init(args map[string]string) error {
 	return nil
 }
 
-func (c *convertToInt64) transform(raw interface{}) (interface{}, error) {
+func (c *convertToInt64) transform(raw any) (any, error) {
 	switch in := raw.(type) {
 	case string:
 		return strconv.ParseInt(in, 10, 64)
@@ -412,28 +407,26 @@ func (c *convertToInt64) transform(raw interface{}) (interface{}, error) {
 	case int32:
 		return int64(in), nil
 	case int64:
-		return int64(in), nil
+		return in, nil
 	default:
 		return nil, fmt.Errorf("convertToInt64 only supports strings, int, and float64, raw type: %T", raw)
 	}
 }
 
 // convertToBool is a transformOperation which converts various types to boolean.
-type convertToBool struct {
-	args map[string]string
-}
+type convertToBool struct{}
 
 func (c *convertToBool) init(args map[string]string) error {
 	return nil
 }
 
-func (c *convertToBool) transform(raw interface{}) (interface{}, error) {
+func (c *convertToBool) transform(raw any) (any, error) {
 	switch in := raw.(type) {
 	case bool:
 		return in, nil
 	case string:
 		return strconv.ParseBool(in)
-	case []interface{}:
+	case []any:
 		return len(in) != 0, nil
 	case float32:
 		return in != 0, nil

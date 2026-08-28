@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
-	"sort"
+	"slices"
+	"strings"
 
 	"github.com/GannettDigital/gojsonschema"
 )
@@ -61,8 +62,8 @@ func (v *validator) Validate(raw json.RawMessage) (bool, error) {
 		return false, err
 	}
 	if len(result.Errors()) > 0 {
-		sort.Slice(result.Errors(), func(i, j int) bool {
-			return result.Errors()[i].String() < result.Errors()[j].String()
+		slices.SortFunc(result.Errors(), func(a, b gojsonschema.ResultError) int {
+			return strings.Compare(a.String(), b.String())
 		})
 		return false, fmt.Errorf("invalid schema: %v", result.Errors())
 	}

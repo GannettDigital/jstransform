@@ -237,32 +237,37 @@ func TestBuildStructs(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		outDir := test.buildArgs.OutputDir
-		os.Mkdir(outDir, os.ModePerm|os.ModePerm)
+		t.Run(test.description, func(t *testing.T) {
+			outDir := test.buildArgs.OutputDir
+			if err := os.Mkdir(outDir, 0o750); err != nil {
+				t.Fatalf("Test %q - failed to create outDir %q: %v", test.description, outDir, err)
+			}
+			defer func() {
+				if err := os.RemoveAll(outDir); err != nil {
+					t.Errorf("Test %q - failed to cleanup output dir %s for test generated files", test.description, outDir)
+				}
+			}()
 
-		if err := BuildStructsWithArgs(test.buildArgs); err != nil {
-			t.Fatalf("Test %q - BuildStructsRename failed: %v", test.description, err)
-		}
-
-		for i := range test.files {
-			got, err := os.ReadFile(filepath.Join(outDir, test.files[i]))
-			if err != nil {
-				t.Errorf("Test %q - failed to read expected file %q: %v", test.description, test.files[i], err)
+			if err := BuildStructsWithArgs(test.buildArgs); err != nil {
+				t.Fatalf("Test %q - BuildStructsRename failed: %v", test.description, err)
 			}
 
-			want, err := os.ReadFile(filepath.Join(testdir, outDir, test.files[i]))
-			if err != nil {
-				t.Errorf("Test %q - failed to read want file %q: %v", test.description, test.files[i], err)
-			}
+			for i := range test.files {
+				got, err := os.ReadFile(filepath.Join(outDir, test.files[i]))
+				if err != nil {
+					t.Errorf("Test %q - failed to read expected file %q: %v", test.description, test.files[i], err)
+				}
 
-			if string(got) != string(want) {
-				t.Errorf("Test %q - file %q got\n%s\n!= want\n%s", test.description, test.files[i], got, want)
-			}
-		}
+				want, err := os.ReadFile(filepath.Join(testdir, outDir, test.files[i]))
+				if err != nil {
+					t.Errorf("Test %q - failed to read want file %q: %v", test.description, test.files[i], err)
+				}
 
-		if err := os.RemoveAll(outDir); err != nil {
-			t.Errorf("Test %q - failed to cleanup output dir %s for test generated files", test.description, outDir)
-		}
+				if string(got) != string(want) {
+					t.Errorf("Test %q - file %q got\n%s\n!= want\n%s", test.description, test.files[i], got, want)
+				}
+			}
+		})
 	}
 }
 

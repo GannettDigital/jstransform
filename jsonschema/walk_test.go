@@ -33,8 +33,12 @@ func TestWalkJSONSchema(t *testing.T) {
 			description: "Basic walk, no allOf, no oneOf",
 			schemaPath:  "./test_data/image.json",
 			want: map[string]Instance{
-				"$.type": {Type: []string{"string"}},
-				"$.crops": {Type: []string{"array"}, Items: []byte(`{
+				"$.type": {
+					Type: []string{"string"},
+				},
+				"$.crops": {
+					Type: []string{"array"},
+					Items: []byte(`{
         "type": "object",
         "properties": {
           "name": {
@@ -61,14 +65,17 @@ func TestWalkJSONSchema(t *testing.T) {
           "path",
           "relativePath"
         ]
-			}`)},
-				"$.crops[*]": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
-					"name":         []byte(`{"type": "string", "default": "name"}`),
-					"width":        []byte(`{"type": "number" }`),
-					"height":       []byte(`{"type": "number" }`),
-					"path":         []byte(`{"type": "string" }`),
-					"relativePath": []byte(`{"type": "string" }`),
+			}`),
 				},
+				"$.crops[*]": {
+					Type: []string{"object"},
+					Properties: map[string]json.RawMessage{
+						"name":         []byte(`{"type": "string", "default": "name"}`),
+						"width":        []byte(`{"type": "number" }`),
+						"height":       []byte(`{"type": "number" }`),
+						"path":         []byte(`{"type": "string" }`),
+						"relativePath": []byte(`{"type": "string" }`),
+					},
 					Required: []string{"name", "width", "height", "path", "relativePath"},
 				},
 				"$.crops[*].name":         {Type: []string{"string"}},
@@ -76,8 +83,10 @@ func TestWalkJSONSchema(t *testing.T) {
 				"$.crops[*].height":       {Type: []string{"number"}},
 				"$.crops[*].path":         {Type: []string{"string"}},
 				"$.crops[*].relativePath": {Type: []string{"string"}},
-				"$.URL": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
-					"publish": []byte(`{"type": "string",
+				"$.URL": {
+					Type: []string{"object"},
+					Properties: map[string]json.RawMessage{
+						"publish": []byte(`{"type": "string",
           "transform": {
             "cumulo": {
               "from" : [
@@ -87,7 +96,7 @@ func TestWalkJSONSchema(t *testing.T) {
               ]
             }
           }}`),
-					"absolute": []byte(`{
+						"absolute": []byte(`{
           "type": "string",
           "transform": {
             "cumulo": {
@@ -98,7 +107,7 @@ func TestWalkJSONSchema(t *testing.T) {
               ]
             }
           }}`),
-				},
+					},
 					Required: []string{"publish", "absolute"},
 				},
 				"$.URL.publish":  {Type: []string{"string"}},
@@ -115,8 +124,12 @@ func TestWalkJSONSchema(t *testing.T) {
 			oneOfType:   "image",
 			schemaPath:  "./test_data/image_parent.json",
 			want: map[string]Instance{
-				"$.type": {Type: []string{"string"}},
-				"$.crops": {Type: []string{"array"}, Items: []byte(`{
+				"$.type": {
+					Type: []string{"string"},
+				},
+				"$.crops": {
+					Type: []string{"array"},
+					Items: []byte(`{
 			        "type": "object",
 			        "properties": {
 			          "name": {
@@ -143,25 +156,28 @@ func TestWalkJSONSchema(t *testing.T) {
 			          "path",
 			          "relativePath"
 			        ]
-			    }`)},
-				"$.crops[*]": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
-					"name": []byte(`{
+			    }`),
+				},
+				"$.crops[*]": {
+					Type: []string{"object"},
+					Properties: map[string]json.RawMessage{
+						"name": []byte(`{
 			            "type": "string",
 			            "default": "name"
 			          }`),
-					"width": []byte(`{
+						"width": []byte(`{
 			            "type": "number"
 			          }`),
-					"height": []byte(`{
+						"height": []byte(`{
 			            "type": "number"
 			          }`),
-					"path": []byte(`{
+						"path": []byte(`{
 			            "type": "string"
 			          }`),
-					"relativePath": []byte(`{
+						"relativePath": []byte(`{
 			            "type": "string"
 			          }`),
-				},
+					},
 					Required: []string{"name", "width", "height", "path", "relativePath"},
 				},
 				"$.crops[*].name":         {Type: []string{"string"}},
@@ -169,8 +185,10 @@ func TestWalkJSONSchema(t *testing.T) {
 				"$.crops[*].height":       {Type: []string{"number"}},
 				"$.crops[*].path":         {Type: []string{"string"}},
 				"$.crops[*].relativePath": {Type: []string{"string"}},
-				"$.URL": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
-					"publish": []byte(`{
+				"$.URL": {
+					Type: []string{"object"},
+					Properties: map[string]json.RawMessage{
+						"publish": []byte(`{
 			          "type": "string",
 			          "transform": {
 			            "cumulo": {
@@ -182,7 +200,7 @@ func TestWalkJSONSchema(t *testing.T) {
 			            }
 			          }
 			        }`),
-					"absolute": []byte(`{
+						"absolute": []byte(`{
 			          "type": "string",
 			          "transform": {
 			            "cumulo": {
@@ -193,7 +211,8 @@ func TestWalkJSONSchema(t *testing.T) {
 			              ]
 			            }
 			          }
-			      }`)},
+			      }`),
+					},
 					Required: []string{"publish", "absolute"},
 				},
 				"$.URL.publish":  {Type: []string{"string"}},
@@ -205,8 +224,12 @@ func TestWalkJSONSchema(t *testing.T) {
 			oneOfType:   "array-of-array",
 			schemaPath:  "./test_data/parent.json",
 			want: map[string]Instance{
-				"$.type": {Type: []string{"string"}},
-				"$.crops": {Type: []string{"array"}, Items: []byte(`{
+				"$.type": {
+					Type: []string{"string"},
+				},
+				"$.crops": {
+					Type: []string{"array"},
+					Items: []byte(`{
 			        "type": "array",
 			        "items": {
 			          "type": "object",
@@ -216,21 +239,30 @@ func TestWalkJSONSchema(t *testing.T) {
 			            }
 			          }
 			        }
-			    }`)},
-				"$.crops[*]": {Type: []string{"array"}, Items: []byte(`{
+			    }`),
+				},
+				"$.crops[*]": {
+					Type: []string{"array"},
+					Items: []byte(`{
 			          "type": "object",
 			          "properties": {
 			            "name": {
 			              "type": "string"
 			            }
 			          }
-			      }`)},
-				"$.crops[*][*]": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
-					"name": []byte(`{
-			              "type": "string"
-			        }`)},
+			      }`),
 				},
-				"$.crops[*][*].name": {Type: []string{"string"}},
+				"$.crops[*][*]": {
+					Type: []string{"object"},
+					Properties: map[string]json.RawMessage{
+						"name": []byte(`{
+			              "type": "string"
+			        }`),
+					},
+				},
+				"$.crops[*][*].name": {
+					Type: []string{"string"},
+				},
 			},
 		},
 		{
@@ -254,8 +286,12 @@ func TestWalkJSONSchema(t *testing.T) {
 			oneOfType:   "image",
 			schemaPath:  "./test_data/parent4.json",
 			want: map[string]Instance{
-				"$.type": {Type: []string{"string"}},
-				"$.crops": {Type: []string{"array"}, Items: []byte(`{
+				"$.type": {
+					Type: []string{"string"},
+				},
+				"$.crops": {
+					Type: []string{"array"},
+					Items: []byte(`{
 			        "type": "object",
 			        "properties": {
 			          "name": {
@@ -282,25 +318,28 @@ func TestWalkJSONSchema(t *testing.T) {
 			          "path",
 			          "relativePath"
 			        ]
-			    }`)},
-				"$.crops[*]": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
-					"name": []byte(`{
+			    }`),
+				},
+				"$.crops[*]": {
+					Type: []string{"object"},
+					Properties: map[string]json.RawMessage{
+						"name": []byte(`{
 			            "type": "string",
 			            "default": "name"
 			          }`),
-					"width": []byte(`{
+						"width": []byte(`{
 			            "type": "number"
 			          }`),
-					"height": []byte(`{
+						"height": []byte(`{
 			            "type": "number"
 			          }`),
-					"path": []byte(`{
+						"path": []byte(`{
 			            "type": "string"
 			          }`),
-					"relativePath": []byte(`{
+						"relativePath": []byte(`{
 			            "type": "string"
 			          }`),
-				},
+					},
 					Required: []string{"name", "width", "height", "path", "relativePath"},
 				},
 				"$.crops[*].name":         {Type: []string{"string"}},
@@ -308,8 +347,10 @@ func TestWalkJSONSchema(t *testing.T) {
 				"$.crops[*].height":       {Type: []string{"number"}},
 				"$.crops[*].path":         {Type: []string{"string"}},
 				"$.crops[*].relativePath": {Type: []string{"string"}},
-				"$.URL": {Type: []string{"object"}, Properties: map[string]json.RawMessage{
-					"publish": []byte(`{
+				"$.URL": {
+					Type: []string{"object"},
+					Properties: map[string]json.RawMessage{
+						"publish": []byte(`{
 			          "type": "string",
 			          "transform": {
 			            "cumulo": {
@@ -321,7 +362,7 @@ func TestWalkJSONSchema(t *testing.T) {
 			            }
 			          }
 			        }`),
-					"absolute": []byte(`{
+						"absolute": []byte(`{
 			          "type": "string",
 			          "transform": {
 			            "cumulo": {
@@ -332,7 +373,8 @@ func TestWalkJSONSchema(t *testing.T) {
 			              ]
 			            }
 			          }
-			      }`)},
+			      }`),
+					},
 					Required: []string{"publish", "absolute"},
 				},
 				"$.URL.publish":  {Type: []string{"string"}},
@@ -390,6 +432,8 @@ func TestWalkJSONSchema(t *testing.T) {
 			case !test.wantErr && err != nil:
 				t.Errorf("Test %q - got error: %v", test.description, err)
 				return
+			default:
+				// Pass.
 			}
 			if got, want := len(walker.calls), len(test.want); got != want {
 				t.Errorf("Test %q - got %d calls, want %d", test.description, got, want)
@@ -423,6 +467,7 @@ func TestWalkJSONSchema(t *testing.T) {
 		})
 	}
 }
+
 func TestWalkJSONSchemaRaw(t *testing.T) {
 	tests := []struct {
 		description string
@@ -578,7 +623,8 @@ func TestWalkJSONSchemaRaw(t *testing.T) {
 		{
 			description: "Walk with allOf, no oneOf",
 			schemaPath:  "./test_data/embed_parent.json",
-			want: map[string]json.RawMessage{"$.type": []byte(`{
+			want: map[string]json.RawMessage{
+				"$.type": []byte(`{
       "type": "string",
       "enum": [
         "embed"
@@ -808,6 +854,8 @@ func TestWalkJSONSchemaRaw(t *testing.T) {
 		case !test.wantErr && err != nil:
 			t.Errorf("Test %q - got error: %v", test.description, err)
 			continue
+		default:
+			// Pass.
 		}
 		if got, want := len(walker.rawCalls), len(test.want); got != want {
 			t.Errorf("Test %q - got %d calls, want %d", test.description, got, want)
