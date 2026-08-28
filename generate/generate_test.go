@@ -16,6 +16,10 @@ import (
 func TestBuildStructs(t *testing.T) {
 	testdir := "generate_test_data"
 
+	// Note that 'go generate' only runs lines that start with '//go:generate' (no indentation)
+	// but having each 'go:generate' comment with its respective test case will get indented
+	// by 'go fmt'.  So to run the generation commands, temporarily remove the whitespace before
+	// the '//go:generate' comments.
 	tests := []struct {
 		description string
 		// BuildArgs.OutputDir is the directory name that holds the go files
@@ -24,6 +28,7 @@ func TestBuildStructs(t *testing.T) {
 		buildArgs BuildArgs
 		files     []string
 	}{
+		//go:generate go run .. --descriptionAsStructTag=true --embedAllOf=false --nestedStructs=true generate_test_data/complex.json generate_test_data/generated
 		{
 			description: "without oneOfTypes",
 			buildArgs: BuildArgs{
@@ -35,6 +40,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"complex.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=true --embedAllOf=false --nestedStructs=true generate_test_data/all_of_with_properties.json generate_test_data/generated
 		{
 			description: "one allOf with additional properties at the top level",
 			buildArgs: BuildArgs{
@@ -46,6 +52,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"all_of_with_properties.go", "simple.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=true --embedAllOf=false --nestedStructs=true generate_test_data/times.json generate_test_data/generated
 		{
 			description: "test formatting of times",
 			buildArgs: BuildArgs{
@@ -57,6 +64,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"times.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=false --embedAllOf=false --nestedStructs=true generate_test_data/nested.json generate_test_data/generated
 		{
 			description: "nested array structs",
 			buildArgs: BuildArgs{
@@ -69,6 +77,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"nested.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=true --embedAllOf=false --nestedStructs=true generate_test_data/nested_to_primitive.json generate_test_data/generated
 		{
 			description: "nested to primitive array structs",
 			buildArgs: BuildArgs{
@@ -81,6 +90,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"nested_to_primitive.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=true --embedAllOf=false --nestedStructs=true --msgp generate_test_data/test_schema.json generate_test_data/msgp
 		{
 			description: "with oneOfType",
 			buildArgs: BuildArgs{
@@ -92,6 +102,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"simple.go", "complex.go", "msgp_msgp.go", "msgp_msgp_test.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=true --embedAllOf=false --nestedStructs=false --rename complex=ReallyComplex generate_test_data/complex.json generate_test_data/rename
 		{
 			description: "without oneOfTypes, renamed",
 			buildArgs: BuildArgs{
@@ -105,6 +116,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"complex.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=true --embedAllOf=false --nestedStructs=true --msgp --rename simple=TotallySimple,complex=ReallyComplex,height=Not-Renamed,Height=Not-Either generate_test_data/test_schema.json generate_test_data/rename
 		{
 			description: "with oneOfType, renamed",
 			buildArgs: BuildArgs{
@@ -121,6 +133,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"simple.go", "complex.go", "rename_msgp.go", "rename_msgp_test.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=false --embedAllOf=false --nestedStructs=false generate_test_data/test_schema2.json generate_test_data/nonest
 		{
 			description: "without oneOfTypes, with no nested structs and descriptions as comments",
 			buildArgs: BuildArgs{
@@ -133,6 +146,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"simple.go", "complex.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=false --embedAllOf=false --nestedStructs=false generate_test_data/nested.json generate_test_data/nonest
 		{
 			description: "nested array structs - nonest",
 			buildArgs: BuildArgs{
@@ -145,6 +159,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"nested.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=false --embedAllOf=false --nestedStructs=false generate_test_data/nested_to_primitive.json generate_test_data/nonest
 		{
 			description: "nested to primitive array structs - nonest",
 			buildArgs: BuildArgs{
@@ -157,6 +172,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"nested_to_primitive.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=false --embedAllOf=false --nestedStructs=false --msgp --pointers generate_test_data/test_schema2.json generate_test_data/pointers
 		{
 			description: "without oneOfTypes, with no nested structs and descriptions as comments - pointers",
 			buildArgs: BuildArgs{
@@ -170,6 +186,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"simple.go", "complex.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=false --embedAllOf=false --nestedStructs=false --pointers generate_test_data/nested.json generate_test_data/pointers
 		{
 			description: "nested array structs - pointers",
 			buildArgs: BuildArgs{
@@ -183,6 +200,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"nested.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=false --embedAllOf=false --nestedStructs=false --pointers generate_test_data/nested_to_primitive.json generate_test_data/pointers
 		{
 			description: "nested to primitive array structs - pointers",
 			buildArgs: BuildArgs{
@@ -196,6 +214,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"nested_to_primitive.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=false --embedAllOf=false --nestedStructs=false --pointers generate_test_data/times.json generate_test_data/pointers
 		{
 			description: "test formatting of times - pointers",
 			buildArgs: BuildArgs{
@@ -209,6 +228,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"times.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=false --embedAllOf=true --nestedStructs=false generate_test_data/base.json generate_test_data/generated
 		{
 			description: "embedded allOf",
 			buildArgs: BuildArgs{
@@ -222,6 +242,7 @@ func TestBuildStructs(t *testing.T) {
 			},
 			files: []string{"simple_no_nested.go", "embedded.go"},
 		},
+		//go:generate go run .. --descriptionAsStructTag=false --embedAllOf=false --nestedStructs=false generate_test_data/simple_map.json generate_test_data/generated
 		{
 			description: "simple map",
 			buildArgs: BuildArgs{
