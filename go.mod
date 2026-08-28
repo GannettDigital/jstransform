@@ -1,17 +1,18 @@
 module github.com/GannettDigital/jstransform
 
-go 1.26.6
+go 1.26.7
 
 require (
 	github.com/GannettDigital/PaesslerAG_jsonpath v0.0.0-20230913165611-a0c86cbdaddb
 	github.com/GannettDigital/gojsonschema v0.0.0-20230605143309-773ed8aacc5c
-	github.com/GannettDigital/msgp v1.2.0-gannett
+	github.com/GannettDigital/msgp v1.6.4-gannett
 	github.com/actgardner/gogen-avro/v7 v7.3.1
 	github.com/antchfx/xmlquery v1.5.0
 	github.com/buger/jsonparser v1.6.1
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/sync v0.20.0
+	golang.org/x/text v0.37.0
 	golang.org/x/tools v0.44.0
 )
 
@@ -30,6 +31,5 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	golang.org/x/mod v0.35.0 // indirect
 	golang.org/x/net v0.55.0 // indirect
-	golang.org/x/text v0.37.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
