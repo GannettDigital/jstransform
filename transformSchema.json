@@ -145,6 +145,7 @@
         "description": "Returns the current time formatted as a string",
         "type": "object",
         "required": [
+          "type",
           "args"
         ],
         "additionalProperties": false,
@@ -163,7 +164,8 @@
             "additionalProperties": false,
             "properties": {
               "format": {
-                "description": "The format to parse the time string"
+                "description": "The format to parse the time string",
+                "type": "string"
               }
             }
           }
@@ -274,7 +276,7 @@
             "additionalProperties": false,
             "properties": {
               "by": {
-                "descripition": "A JSON path selector that identifies a number to take the max of",
+                "description": "A JSON path selector that identifies a number to take the max of",
                 "$ref": "#/definitions/jsonPath"
               },
               "return": {
@@ -342,7 +344,7 @@
             ],
             "additionalProperties": false,
             "properties": {
-              "format": {
+              "delimiter": {
                 "description": "The delimiter to split the string on",
                 "type": "string"
               }
