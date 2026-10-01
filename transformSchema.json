@@ -454,7 +454,8 @@
         "null",
         "number",
         "object",
-        "string"
+        "string",
+        "graphql-hydration"
       ]
     }
   },
