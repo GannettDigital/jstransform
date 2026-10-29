@@ -99,7 +99,7 @@ func (c *changeCase) transform(raw any) (any, error) {
 	return nil, errors.New("unknown error in changeCase")
 }
 
-// notEmpty is a transformOperation which returns a boolean depending on if the passed in value is considered "empty", as the definition changes on a per-type basis.
+// valueExists is a transformOperation which returns a boolean depending on if the passed in value is considered "empty", as the definition changes on a per-type basis.
 type valueExists struct{}
 
 func (v *valueExists) init(args map[string]string) error {

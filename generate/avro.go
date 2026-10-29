@@ -85,10 +85,10 @@ func buildAvroSerializationFunctions(schemaPath string, args BuildArgs) error {
 }
 
 // buildAvroSchemaFile will generate an Avro schema based on the go struct with the given name in the file at the
-// given path. I will write it to the same directory as the go file as `<name>.avsc` but with the name lowercased.
+// given path. It will write it to the same directory as the go file as `<name>.avsc` but with the name lowercased.
 // http://avro.apache.org/docs/current/spec.html
 //
-// # By default the file is written with now whitespace to minimize the size, choose pretty for better formatting
+// # By default the file is written with no whitespace to minimize the size, choose pretty for better formatting
 //
 // Note: Avro can't handle maps with a key other than a string, http://avro.apache.org/docs/current/spec.html#Maps
 // Neither can JSON schema, https://json-schema.org/understanding-json-schema/reference/object.html so this only
@@ -460,7 +460,7 @@ func writeNestedStruct(cfg avroConfig, n ast.Node, name string, nullable bool) s
 	newcfg.namespace = append(newcfg.namespace, name)
 	newcfg.writer = buf
 	newcfg.excludeFields = nil
-	// nested structs get _struct appended on their name
+	// nested structs get _record appended on their name
 	astutil.Apply(n, writeAvroStruct(newcfg, name+"_record", ""), nil)
 	if nullable {
 		return fmt.Sprintf(`["null",{%s]}]`, buf.String())

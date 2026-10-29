@@ -29,7 +29,7 @@ type extractedField struct {
 
 // write outputs the Golang representation of this field to the writer with prefix before each line.
 // It handles inline structs by calling this method recursively adding a new \t to the prefix for each layer.
-// If required is set to false 'omitempty' is added in the JSON struct tag for the field.
+// If required is set to false, ',omitzero' is added for non-slice, non-nullable nested structs, and ',omitempty' is added otherwise in the JSON struct tag for the field.
 func (ef *extractedField) write(w io.Writer, prefix string, required, descriptionAsStructTag, pointers bool, excludeNested map[string]bool, nestedStructs map[string]*generatedStruct) error {
 	var omitempty string
 	if !required {
@@ -194,7 +194,7 @@ func (gof *goFile) structs() []*generatedStruct {
 	return structs
 }
 
-// walkFunc is a jsonschema.WalkFunc which builds the fields for generatedStructFile within the gofile as the
+// walkFunc is a jsonschema.WalkInstanceFunc which builds the fields for generated structs within the gofile as the
 // JSON schema file is walked.
 func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 	gen := gof.rootStruct
@@ -398,7 +398,7 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 // If Array is true it makes the type into an array.
 // If the JSON Schema had a type of "string" and a format of "date-time" it is expected the input jsonType will be
 // "date-time".
-// Non-required times are added as pointers to allow for their values to missing go marshalled JSON.
+// If pointers is true, non-required times are added as pointers to allow for their values to be missing in Go marshaled JSON.
 func (ef *extractedField) goType(required, pointers bool, nestedStructs map[string]*generatedStruct) string {
 	// Simple types aren't pointers unless explicitly typed to nullable.
 	var goType string

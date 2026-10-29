@@ -78,7 +78,7 @@ func AvroOptionalTime(t *time.Time) int64 {
 	return t.UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond))
 }
 
-// AvroOptionalTimeSlice converts the given []time.Time into a []int64 leveraging AvroTime
+// AvroOptionalTimeSlice converts the given []*time.Time into a []int64 leveraging AvroTime.
 // If the array is empty or all values are nil a nil slice is returned.
 func AvroOptionalTimeSlice(times []*time.Time) []int64 {
 	var newTimes []int64

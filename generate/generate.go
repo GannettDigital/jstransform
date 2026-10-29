@@ -26,7 +26,7 @@ const (
 
 // BuildArgs contains information used to build the structs for a JSONschema.
 //
-//		SchemaPath is the path tot he jsonSchema file to use generate the Go struct representations
+//		SchemaPath is the path to the jsonSchema file to use to generate the Go struct representations
 //
 //		OutputDir is the destination for the generated files
 //
@@ -104,7 +104,7 @@ func BuildStructsRename(schemaPath, outputDir string, useMessagePack bool, nameM
 //
 // The package name is set to the args.OutputDir directory name.
 //
-// NOTE: If oneOf/allOf entries exist than any JSON schema instances in the root schema file will be skipped.
+// NOTE: If oneOf/allOf entries exist and no root properties are defined, then any JSON schema instances in the root schema file will be skipped.
 func BuildStructsWithArgs(args BuildArgs) error {
 	if args.OutputDir == "" {
 		wd, err := os.Getwd()
@@ -265,7 +265,7 @@ func exportedName(name string) string {
 }
 
 // splitJSONPath takes a JSON path and returns an array of path items each of which represents a JSON object with the
-// name normalized in a way suitable for using it as a Go struct filed name.
+// name normalized in a way suitable for using it as a Go struct field name.
 func splitJSONPath(path string) []string {
 	var tree []string
 	for _, split := range strings.Split(path, ".") {

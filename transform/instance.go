@@ -12,7 +12,7 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-// pathModifier is used to modify the JSON path of an instance to indicate.
+// pathModifier is used to modify the path of an instance, such as replacing array wildcards with specific indices.
 type pathModifier func(string) string
 
 func pathReplace(oldPath, newPath string, modifier pathModifier) pathModifier {
@@ -161,7 +161,7 @@ func (at *arrayTransformer) child() instanceTransformer                 { return
 func (at *arrayTransformer) path() string                               { return at.jsonPath }
 func (at *arrayTransformer) selectChild(key string) instanceTransformer { return nil }
 
-// arrayTransformJSON retrieves the value for this object by building the value for the base object and then adding in any
+// arrayTransformJSON retrieves the value for this array by building the value for the base array and then adding in any
 // transforms for all defined child fields.
 func (at *arrayTransformer) arrayTransformJSON(in any, modifier pathModifier) (any, error) {
 	path := at.jsonPath
@@ -213,7 +213,7 @@ func (at *arrayTransformer) arrayTransformJSON(in any, modifier pathModifier) (a
 	return newArray, nil
 }
 
-// arrayTransformXML retrieves the value for this object by building the value for the base object and then adding in any
+// arrayTransformXML retrieves the value for this array by building the value for the base array and then adding in any
 // transforms for all defined child fields.
 func (at *arrayTransformer) arrayTransformXML(in any, modifier pathModifier) (any, error) {
 	path := at.jsonPath
@@ -343,7 +343,7 @@ func (ot *objectTransformer) objectTransformJSON(in any, modifier pathModifier) 
 		}
 	}
 
-	// Add each child value to the paren
+	// Add each child value to the parent
 	for _, child := range ot.children {
 		childValue, err := child.transform(in, modifier)
 		if err != nil {
