@@ -332,12 +332,12 @@ func (c *toCamelCase) transform(raw any) (any, error) {
 
 	arr := strings.Split(in, c.args["delimiter"])
 
-	for i, cap := range arr {
+	for i, capx := range arr {
 		if i == 0 {
-			arr[0] = strings.ToLower(cap)
+			arr[0] = strings.ToLower(capx)
 			continue
 		}
-		arr[i] = cases.Title(language.Und, cases.NoLower).String(cap)
+		arr[i] = cases.Title(language.Und, cases.NoLower).String(capx)
 	}
 
 	return strings.Join(arr, ""), nil

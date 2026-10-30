@@ -147,7 +147,7 @@ func schemaFromFile(schemaLoadPath, oneOfType string, flatten bool) (*Schema, er
 		}
 
 		for _, one := range sj.OneOf {
-			subName := strings.Split(filepath.Base(one.FromRef), ".")[0]
+			subName, _, _ := strings.Cut(filepath.Base(one.FromRef), ".")
 			if subName != oneOfType {
 				continue
 			}

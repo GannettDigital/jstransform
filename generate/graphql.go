@@ -106,7 +106,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 	if len(schema.AllOf) != 0 {
 		common = make([]*goGQL, 0, len(schema.AllOf))
 		for _, allOfSchema := range schema.AllOf {
-			baseName := strings.Split(filepath.Base(schema.AllOf[0].FromRef), ".")[0]
+			baseName, _, _ := strings.Cut(filepath.Base(schema.AllOf[0].FromRef), ".")
 			generated, err := newGeneratedGraphQLFile(allOfSchema, baseName, packageName, false, args)
 			if err != nil {
 				return fmt.Errorf("failed to build generated struct: %w", err)
@@ -136,7 +136,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 		}
 		if len(common) != 0 {
 			obj.rootStruct.jsonName = exportedName(packageName)
-			name := strings.Split(filepath.Base(schema.AllOf[0].FromRef), ".")[0]
+			name, _, _ := strings.Cut(filepath.Base(schema.AllOf[0].FromRef), ".")
 			if newName, ok := args.StructNameMap[name]; ok {
 				name = newName
 			} else {
@@ -149,12 +149,8 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 					obj.rootStruct.fields[fk] = fv
 					obj.rootStruct.fieldOrder = append(obj.rootStruct.fieldOrder, fk)
 				}
-				for rk, rv := range com.rootStruct.requiredFields {
-					obj.rootStruct.requiredFields[rk] = rv
-				}
-				for nk, nv := range com.nestedStructs {
-					obj.nestedStructs[nk] = nv
-				}
+				maps.Copy(obj.rootStruct.requiredFields, com.rootStruct.requiredFields)
+				maps.Copy(obj.nestedStructs, com.nestedStructs)
 			}
 			if len(schema.OneOf) != 0 {
 				if newName, ok := args.GraphQLTypeNameMap[packageName]; ok {
@@ -173,7 +169,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 
 	// If the schema has one or more OneOf definitions then these are the Implementations of the Interface type.
 	for _, oneOfSchema := range schema.OneOf {
-		oneOfName := strings.Split(filepath.Base(oneOfSchema.FromRef), ".")[0]
+		oneOfName, _, _ := strings.Cut(filepath.Base(oneOfSchema.FromRef), ".")
 		generated, err := newGeneratedGraphQLFile(oneOfSchema, oneOfName, packageName, len(schema.AllOf) != 0, args)
 		if err != nil {
 			return fmt.Errorf("failed to build generated struct: %w", err)
@@ -190,7 +186,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 		}
 		if args.EmbedAllOf && len(oneOfSchema.AllOf) != 0 {
 			for _, allOf := range oneOfSchema.AllOf {
-				baseName := strings.Split(filepath.Base(allOf.FromRef), ".")[0]
+				baseName, _, _ := strings.Cut(filepath.Base(allOf.FromRef), ".")
 				allOfGen, err := newGeneratedGraphQLFile(allOf, baseName, packageName, false, args)
 				if err != nil {
 					return fmt.Errorf("failed to build generated struct: %w", err)
@@ -211,9 +207,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 				generated.rootStruct.fields[fk] = fv
 				generated.rootStruct.fieldOrder = append(generated.rootStruct.fieldOrder, fk)
 			}
-			for rk, rv := range com.rootStruct.requiredFields {
-				generated.rootStruct.requiredFields[rk] = rv
-			}
+			maps.Copy(generated.rootStruct.requiredFields, com.rootStruct.requiredFields)
 		}
 		for _, lf := range lfo {
 			generated.rootStruct.fields[lf] = lfd[lf]
@@ -248,7 +242,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 
 	// The properties in this schema.  As in, not AllOf or OneOf subschema definitions.
 	if len(schema.AllOf) == 0 && len(schema.OneOf) == 0 {
-		schemaName := strings.Split(filepath.Base(schemaPath), ".")[0]
+		schemaName, _, _ := strings.Cut(filepath.Base(schemaPath), ".")
 		generated, err := newGeneratedGraphQLFile(schema.Instance, schemaName, packageName, false, args)
 		if err != nil {
 			return fmt.Errorf("failed to build generated struct: %w", err)
@@ -743,7 +737,7 @@ func graphqlComment(prefix, description string) string {
 	// Multi-line descriptions get the """ comment syntax.
 	var newDescription strings.Builder
 	_, _ = newDescription.WriteString(prefix + `"""` + "\n")
-	for _, line := range strings.Split(description, "\n") {
+	for line := range strings.SplitSeq(description, "\n") {
 		if line != "" {
 			_, _ = newDescription.WriteString(prefix + line)
 		}

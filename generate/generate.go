@@ -133,7 +133,7 @@ func BuildStructsWithArgs(args BuildArgs) error {
 	}
 
 	if args.GenerateGraphQL {
-		name := strings.Split(filepath.Base(args.SchemaPath), ".")[0]
+		name, _, _ := strings.Cut(filepath.Base(args.SchemaPath), ".")
 		if err := buildGraphQLFile(args.SchemaPath, name, packageName, args); err != nil {
 			return fmt.Errorf("failed to build GraphQL file for %q: %w", name, err)
 		}
@@ -141,7 +141,7 @@ func BuildStructsWithArgs(args BuildArgs) error {
 
 	var embeds []string
 	for _, allOfPath := range allOfTypes {
-		name := strings.Split(filepath.Base(allOfPath), ".")[0]
+		name, _, _ := strings.Cut(filepath.Base(allOfPath), ".")
 		if newName, ok := args.StructNameMap[name]; ok {
 			name = newName
 		} else {
@@ -161,7 +161,7 @@ func BuildStructsWithArgs(args BuildArgs) error {
 	}
 
 	for _, oneOfPath := range oneOfTypes {
-		name := strings.Split(filepath.Base(oneOfPath), ".")[0]
+		name, _, _ := strings.Cut(filepath.Base(oneOfPath), ".")
 		if newName, ok := args.StructNameMap[name]; ok {
 			name = newName
 		}
@@ -268,7 +268,7 @@ func exportedName(name string) string {
 // name normalized in a way suitable for using it as a Go struct field name.
 func splitJSONPath(path string) []string {
 	var tree []string
-	for _, split := range strings.Split(path, ".") {
+	for split := range strings.SplitSeq(path, ".") {
 		if split == "$" {
 			continue
 		}

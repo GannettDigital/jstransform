@@ -47,7 +47,7 @@ func (ef *extractedField) write(w io.Writer, prefix string, required, descriptio
 	structTag := fmt.Sprintf("`%s`\n", strings.Trim(strings.Join([]string{jsonTag, description}, " "), " "))
 
 	if !descriptionAsStructTag && ef.description != "" {
-		for _, line := range strings.Split(ef.description, "\n") {
+		for line := range strings.SplitSeq(ef.description, "\n") {
 			if _, err := fmt.Fprintf(w, "// %s\n", line); err != nil {
 				return err
 			}
@@ -149,7 +149,7 @@ func newGeneratedGoFile(schema *jsonschema.Schema, name, packageName string, emb
 
 	if args.EmbedAllOf {
 		for _, all := range schema.AllOf {
-			ref := strings.Split(filepath.Base(all.FromRef), ".")[0]
+			ref, _, _ := strings.Cut(filepath.Base(all.FromRef), ".")
 			if newName, ok := args.StructNameMap[ref]; ok {
 				ref = newName
 			} else {

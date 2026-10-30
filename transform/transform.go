@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	jsonpath "github.com/GannettDigital/PaesslerAG_jsonpath"
@@ -256,8 +257,8 @@ func (tis *transformInstructions) transform(in any, fieldType string, modifier p
 	switch tis.Method {
 	case last:
 		var newFrom []*transformInstruction
-		for i := len(tis.From) - 1; i >= 0; i-- {
-			newFrom = append(newFrom, tis.From[i])
+		for _, v := range slices.Backward(tis.From) {
+			newFrom = append(newFrom, v)
 		}
 		tis.From = newFrom
 	case concatenate:

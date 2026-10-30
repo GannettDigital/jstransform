@@ -532,7 +532,7 @@ func TestTransformer(t *testing.T) {
 				}
 			}
 		}
-		for i := 0; i < parallelRuns; i++ {
+		for i := range parallelRuns {
 			t.Run(fmt.Sprintf("%s-%d", test.description, i), testFunc(test.description, test.in, test.wantErr, test.want))
 		}
 	}
