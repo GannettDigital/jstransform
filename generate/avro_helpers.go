@@ -78,7 +78,7 @@ func AvroOptionalTime(t *time.Time) int64 {
 	return t.UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond))
 }
 
-// AvroOptionalTimeSlice converts the given []time.Time into a []int64 leveraging AvroTime
+// AvroOptionalTimeSlice converts the given []*time.Time into a []int64 leveraging AvroTime.
 // If the array is empty or all values are nil a nil slice is returned.
 func AvroOptionalTimeSlice(times []*time.Time) []int64 {
 	var newTimes []int64
@@ -365,8 +365,7 @@ func (fm *avroFieldMapper) generateFieldValue(name, prefix string, avroType ast.
 			return m, nil
 		}
 
-		if strings.HasPrefix(typeName, "UnionNull") {
-			childTypeName := strings.TrimPrefix(typeName, "UnionNull")
+		if childTypeName, ok := strings.CutPrefix(typeName, "UnionNull"); ok {
 			mf, err := fm.generateStructValue(name, prefix, childTypeName, generatedField)
 			if err != nil {
 				return mappedFields{}, fmt.Errorf("failed generating UnionNull struct value: %w", err)
@@ -540,7 +539,7 @@ func mapFields(list *ast.FieldList, srcDir string) (map[string]*ast.Field, error
 
 // printFields outputs the field definition for a struct as it was read from the original code.
 func printFields(list *ast.FieldList) string {
-	var out string
+	var out strings.Builder
 	for _, f := range list.List {
 		if len(f.Names) < 1 {
 			// Embedded struct, skipping for this
@@ -550,12 +549,12 @@ func printFields(list *ast.FieldList) string {
 
 		switch fType := f.Type.(type) {
 		case *ast.Ident:
-			out += fmt.Sprintf("%s %s %s\n", name, fType.Name, f.Tag.Value)
+			_, _ = fmt.Fprintf(&out, "%s %s %s\n", name, fType.Name, f.Tag.Value)
 		case *ast.ArrayType:
 			// Handle the case where an array of structs is inside an array of structs.
 			str, ok := fType.Elt.(*ast.StructType)
 			if ok {
-				out += fmt.Sprintf("%s []struct{\n%s} %s\n", name, printFields(str.Fields), f.Tag.Value)
+				_, _ = fmt.Fprintf(&out, "%s []struct{\n%s} %s\n", name, printFields(str.Fields), f.Tag.Value)
 				continue
 			}
 
@@ -563,19 +562,19 @@ func printFields(list *ast.FieldList) string {
 			if !ok {
 				return "unknown array type"
 			}
-			out += fmt.Sprintf("%s []%s %s\n", name, ident.Name, f.Tag.Value)
+			_, _ = fmt.Fprintf(&out, "%s []%s %s\n", name, ident.Name, f.Tag.Value)
 		case *ast.SelectorExpr:
 			if fType.Sel.Name != "Time" {
 				return fmt.Sprintf(`unsupported type %q`, fType.Sel.Name)
 			}
-			out += fmt.Sprintf("%s time.Time %s\n", name, f.Tag.Value)
+			_, _ = fmt.Fprintf(&out, "%s time.Time %s\n", name, f.Tag.Value)
 		case *ast.StructType:
-			out += fmt.Sprintf("%s struct{\n%s} %s\n", name, printFields(fType.Fields), f.Tag.Value)
+			_, _ = fmt.Fprintf(&out, "%s struct{\n%s} %s\n", name, printFields(fType.Fields), f.Tag.Value)
 		default:
 			return fmt.Sprintf("unsupported type %T", fType)
 		}
 	}
-	return out
+	return out.String()
 }
 
 // writeCodeTemplate will execute a template from src with values and write to path.

@@ -27,7 +27,7 @@ func (mf *mapFlags) String() string {
 
 // Set stores the provided options into the data structure. Multiple key-values pairs can be provided if separated by a comma.
 func (mf *mapFlags) Set(value string) error {
-	for _, pair := range strings.Split(value, ",") {
+	for pair := range strings.SplitSeq(value, ",") {
 		kv := strings.SplitN(pair, "=", 2)
 		if len(kv) != 2 {
 			return fmt.Errorf("value in 'key=value' format: %s", value)

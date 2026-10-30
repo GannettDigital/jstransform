@@ -145,7 +145,7 @@ func TestBuildAvroSerializationFunctions(t *testing.T) {
 			}
 
 			git := exec.CommandContext(t.Context(), "git", "diff", "--quiet", "*.go")
-			schemaName := strings.Split(filepath.Base(test.path), ".")[0]
+			schemaName, _, _ := strings.Cut(filepath.Base(test.path), ".")
 			git.Dir = filepath.Join("./avro_test_data/avro", schemaName)
 			if err := git.Run(); err != nil {
 				t.Errorf("Test %q - Differences in generated files found", test.description)

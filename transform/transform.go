@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	jsonpath "github.com/GannettDigital/PaesslerAG_jsonpath"
@@ -204,7 +205,7 @@ func (ti *transformInstruction) transform(in any, fieldType string, modifier pat
 	return nil, errors.New("no path type specified for transform")
 }
 
-// trransformInstructions defines a set of instructions and a method for combining their results.
+// transformInstructions defines a set of instructions and a method for combining their results.
 // The default method is to take the first non-nil result.
 type transformInstructions struct {
 	From          []*transformInstruction `json:"from"`
@@ -256,8 +257,8 @@ func (tis *transformInstructions) transform(in any, fieldType string, modifier p
 	switch tis.Method {
 	case last:
 		var newFrom []*transformInstruction
-		for i := len(tis.From) - 1; i >= 0; i-- {
-			newFrom = append(newFrom, tis.From[i])
+		for _, v := range slices.Backward(tis.From) {
+			newFrom = append(newFrom, v)
 		}
 		tis.From = newFrom
 	case concatenate:
@@ -292,8 +293,8 @@ func (tis *transformInstructions) transform(in any, fieldType string, modifier p
 	return result, nil
 }
 
-// replaceJSONPathPrefix will switch oldPrefix for newPrefix in the path of the transform instructions if the path starts with
-// old.
+// replaceJSONPathPrefix will switch oldPrefix for newPrefix in the jsonPath and xmlPath of the transform instructions if the path starts with
+// oldPrefix.
 func (tis *transformInstructions) replaceJSONPathPrefix(oldPrefix, newPrefix string) {
 	for _, instruction := range tis.From {
 		if strings.HasPrefix(instruction.jsonPath, oldPrefix) {

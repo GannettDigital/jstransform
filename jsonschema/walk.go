@@ -15,13 +15,13 @@ import (
 // format described by the JSON Schema.
 type WalkInstanceFunc func(path string, i Instance) error
 
-// WalkRawFunc works similar to WalkFunc but rather than accepting an instance it accepts the raw JSON for each
+// WalkRawFunc works similar to WalkInstanceFunc but rather than accepting an instance it accepts the raw JSON for each
 // level of the schema.
 type WalkRawFunc func(path string, value json.RawMessage) error
 
 // Walk runs each instance in the JSON schema through the defined walk function, keeping track of the JSONPath.
 // It assumes the JSON schema is valid and does not check for many errors such as bad property names.
-// For instances that are objects or arrays the WalkFunc will be called for each child instance.
+// For instances that are objects or arrays the WalkInstanceFunc will be called for each child instance.
 func Walk(s *Schema, walkFn WalkInstanceFunc) error {
 	rootPath := "$"
 
@@ -39,7 +39,7 @@ func Walk(s *Schema, walkFn WalkInstanceFunc) error {
 	return nil
 }
 
-// prependJSONPath a parent JSONPath to the beginning of a JSONPath.
+// prependJSONPath prepends a parent JSONPath to the beginning of a child JSONPath.
 // This allows for incrementally building up the full JSONPath.
 func prependJSONPath(parent, child string) string {
 	newPath := parent
@@ -90,8 +90,8 @@ func walkInstance(raw json.RawMessage, path string, walkFn WalkInstanceFunc) err
 	return nil
 }
 
-// WalkRaw works nearly identical to the Walk function but rather than calling a WalkFunc calls a WalkRawFunc.
-// By skipping the JSON unmarshaling of the Instance it runs nearly 10 times faster then WalkFunc.
+// WalkRaw works nearly identical to the Walk function but rather than calling a WalkInstanceFunc calls a WalkRawFunc.
+// By skipping the JSON unmarshaling of the Instance it runs nearly 10 times faster than Walk.
 func WalkRaw(s *Schema, walkFn WalkRawFunc) error {
 	rootPath := "$"
 
@@ -109,8 +109,8 @@ func WalkRaw(s *Schema, walkFn WalkRawFunc) error {
 	return nil
 }
 
-// walkRaw is similar to walkInstance, it is the recursive file which drives walkRaw as walkInstance is the recursive
-// function with drives Walk.
+// walkRaw is similar to walkInstance, it is the recursive function which drives walkRaw as walkInstance is the recursive
+// function which drives Walk.
 func walkRaw(raw json.RawMessage, path string, walkFn WalkRawFunc) error {
 	if err := walkFn(path, raw); err != nil {
 		return fmt.Errorf("walkRaw failed at path %q: %w", path, err)

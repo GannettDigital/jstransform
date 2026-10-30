@@ -16,7 +16,7 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-// inputFormat denotes the type of transform to perfrom, the options are 'JSON' or 'XML'.
+// inputFormat denotes the type of transform to perform, the options are 'JSON' or 'XML'.
 type inputFormat string
 
 const (
@@ -205,7 +205,7 @@ func (tr *Transformer) findParent(path string) (instanceTransformer, error) {
 	return parent, nil
 }
 
-// walker is a WalkFunc for the Transformer which builds an representation of the fields and transforms in the schema.
+// walker is a WalkRawFunc for the Transformer which builds a representation of the fields and transforms in the schema.
 // This is later used to do the actual transform for incoming data.
 func (tr *Transformer) walker(path string, value json.RawMessage) error {
 	instanceType, _, err := jsonschema.FieldType(value)
@@ -242,7 +242,7 @@ func (tr *Transformer) walker(path string, value json.RawMessage) error {
 	return parent.addChild(iTransformer)
 }
 
-// saveInTree is used recursively to add values the tree based on the path even if the parents are nil.
+// saveInTree is used recursively to add values to the tree based on the path even if the parents are nil.
 func saveInTree(tree map[string]any, path string, value any) error {
 	if value == nil {
 		return nil

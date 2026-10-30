@@ -3,6 +3,7 @@ package transform
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"reflect"
 	"testing"
 	"time"
@@ -298,9 +299,7 @@ func TestArrayTransform(t *testing.T) {
 		at.childTransformer = test.child
 
 		testInCopy := make(map[string]any)
-		for k, v := range testIn {
-			testInCopy[k] = v
-		}
+		maps.Copy(testInCopy, testIn)
 		got, err := at.transform(testInCopy, nil)
 		if err != nil {
 			t.Errorf("Test %q - failed transform: %v", test.description, err)

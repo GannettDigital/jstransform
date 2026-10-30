@@ -99,7 +99,7 @@ func (c *changeCase) transform(raw any) (any, error) {
 	return nil, errors.New("unknown error in changeCase")
 }
 
-// notEmpty is a transformOperation which returns a boolean depending on if the passed in value is considered "empty", as the definition changes on a per-type basis.
+// valueExists is a transformOperation which returns a boolean depending on if the passed in value is considered "empty", as the definition changes on a per-type basis.
 type valueExists struct{}
 
 func (v *valueExists) init(args map[string]string) error {
@@ -332,12 +332,12 @@ func (c *toCamelCase) transform(raw any) (any, error) {
 
 	arr := strings.Split(in, c.args["delimiter"])
 
-	for i, cap := range arr {
+	for i, capx := range arr {
 		if i == 0 {
-			arr[0] = strings.ToLower(cap)
+			arr[0] = strings.ToLower(capx)
 			continue
 		}
-		arr[i] = cases.Title(language.Und, cases.NoLower).String(cap)
+		arr[i] = cases.Title(language.Und, cases.NoLower).String(capx)
 	}
 
 	return strings.Join(arr, ""), nil
