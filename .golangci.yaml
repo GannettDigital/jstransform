@@ -193,6 +193,8 @@ linters:
           disabled: true
         - name: max-public-structs
           disabled: true
+        - name: multiline-if-init
+          disabled: true
         - name: nested-structs
           disabled: true
         - name: package-comments
@@ -305,7 +307,10 @@ formatters:
         - pattern: "a[b:len(a)]"
           replacement: "a[b:]"
     gofumpt:
-      extra-rules: true  # `func(aaa string, bbb string)` -> `func(aaa, bbb string)`
+      extra:
+        group-params: true    # `func(aaa string, bbb string)` -> `func(aaa, bbb string)`
+        clothe-returns: true  # Clothes naked returns in functions with named results.
+        balance-calls: true   # Multi-line function calls with "(" at end of line have ")" on own line.
   exclusions:
     generated: strict
     paths:
