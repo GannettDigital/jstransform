@@ -11,7 +11,7 @@ import (
 	"github.com/actgardner/gogen-avro/v7/container"
 )
 
-// WriteAvroCF writes an Avro Containter File to the given io.Writer using snappy compression for the data.
+// WriteAvroCF writes an Avro Container File to the given io.Writer using snappy compression for the data.
 // The time is used as the AvroWriteTime, if the time is the Zero value then the current time is used.
 // NOTE: If the type has a field in an embedded struct with the same name as a field not in the embedded struct the
 // value will be pulled from the field not in the embedded struct.
