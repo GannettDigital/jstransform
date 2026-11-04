@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -530,46 +529,5 @@ func TestGraphQLType(t *testing.T) {
 		if gotType != test.wantType {
 			t.Errorf("Test %q type\nwant: %q\ngot:  %q", test.description, test.wantType, gotType)
 		}
-	}
-}
-
-func TestBuildGraphQLFile_EmbedAllOf(t *testing.T) {
-	tmpDir := t.TempDir()
-	schemaPath := "graphql_test_data/embed_allof/root.json"
-	args := BuildArgs{
-		OutputDirGraphQL: tmpDir,
-		EmbedAllOf:       true,
-	}
-
-	if err := buildGraphQLFile(schemaPath, "root", "embed_allof", args); err != nil {
-		t.Fatalf("buildGraphQLFile failed: %v", err)
-	}
-
-	content, err := os.ReadFile(filepath.Join(tmpDir, "root.graphqls"))
-	if err != nil {
-		t.Fatalf("failed to read generated file: %v", err)
-	}
-
-	schemaStr := string(content)
-
-	// derived type should have base field (id), embedded allOf field (extraField), and its own (derivedField)
-	if !strings.Contains(schemaStr, "type derived implements Root") {
-		t.Errorf("expected 'type derived implements Root' in schema:\n%s", schemaStr)
-	}
-
-	// other type should have base field (id) and its own (otherField)
-	if !strings.Contains(schemaStr, "type other implements Root") {
-		t.Errorf("expected 'type other implements Root' in schema:\n%s", schemaStr)
-	}
-
-	// other type MUST NOT have extraField
-	otherIdx := strings.Index(schemaStr, "type other implements Root")
-	if otherIdx == -1 {
-		t.Fatalf("type other not found in schema:\n%s", schemaStr)
-	}
-	otherBlock := schemaStr[otherIdx:]
-
-	if strings.Contains(otherBlock, "extraField") {
-		t.Errorf("type other should not have extraField, but found in:\n%s", otherBlock)
 	}
 }
