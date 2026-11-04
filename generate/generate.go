@@ -241,7 +241,26 @@ func buildStructFile(childPath, name, packageName string, embeds []string, args 
 		return "", err
 	}
 
-	generated, err := newGeneratedGoFile(schema, name, packageName, embeds, args)
+	effectiveEmbeds := embeds
+	if args.EmbedAllOf && len(schema.AllOf) > 0 && len(embeds) > 0 {
+		_, oneOfTypes, _, sErr := jsonschema.SchemaTypes(args.SchemaPath)
+		if sErr == nil {
+			schemaDir := filepath.Dir(args.SchemaPath)
+			oneOfSet := make(map[string]bool, len(oneOfTypes))
+			for _, o := range oneOfTypes {
+				oneOfSet[filepath.Clean(filepath.Join(schemaDir, o))] = true
+			}
+			for _, all := range schema.AllOf {
+				refTarget := filepath.Clean(filepath.Join(filepath.Dir(childPath), all.FromRef))
+				if inheritsOneOf(refTarget, oneOfSet) {
+					effectiveEmbeds = nil
+					break
+				}
+			}
+		}
+	}
+
+	generated, err := newGeneratedGoFile(schema, name, packageName, effectiveEmbeds, args)
 	if err != nil {
 		return "", fmt.Errorf("failed to build generated struct: %w", err)
 	}
@@ -278,4 +297,22 @@ func splitJSONPath(path string) []string {
 	}
 
 	return tree
+}
+
+func inheritsOneOf(path string, oneOfSet map[string]bool) bool {
+	targetPath := filepath.Clean(path)
+	if oneOfSet[targetPath] {
+		return true
+	}
+	s, err := jsonschema.SchemaFromFileNoFlatten(targetPath, "")
+	if err != nil {
+		return false
+	}
+	for _, all := range s.AllOf {
+		nextPath := filepath.Clean(filepath.Join(filepath.Dir(targetPath), all.FromRef))
+		if inheritsOneOf(nextPath, oneOfSet) {
+			return true
+		}
+	}
+	return false
 }

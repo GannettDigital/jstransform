@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -321,5 +322,44 @@ func TestSplitJSONPath(t *testing.T) {
 		if !reflect.DeepEqual(got, test.want) {
 			t.Errorf("Test %q - got %v, want %v", test.description, got, test.want)
 		}
+	}
+}
+
+func TestBuildStructs_EmbedAllOf_NoDuplicateParentEmbed(t *testing.T) {
+	tmpDir := t.TempDir()
+	outDir := filepath.Join(tmpDir, "embedtest")
+	if err := os.Mkdir(outDir, 0o750); err != nil {
+		t.Fatalf("failed to create outDir: %v", err)
+	}
+	args := BuildArgs{
+		SchemaPath: "generate_test_data/embed_oneof/parent.json",
+		OutputDir:  outDir,
+		EmbedAllOf: true,
+	}
+
+	if err := BuildStructsWithArgs(args); err != nil {
+		t.Fatalf("BuildStructsWithArgs failed: %v", err)
+	}
+
+	derivedBytes, err := os.ReadFile(filepath.Join(outDir, "derived.go"))
+	if err != nil {
+		t.Fatalf("failed to read derived.go: %v", err)
+	}
+
+	derivedStr := string(derivedBytes)
+	if !strings.Contains(derivedStr, "Sibling") {
+		t.Errorf("derived.go should embed Sibling:\n%s", derivedStr)
+	}
+	if strings.Contains(derivedStr, "Base") {
+		t.Errorf("derived.go should NOT embed Base because Sibling already embeds Base:\n%s", derivedStr)
+	}
+
+	siblingBytes, err := os.ReadFile(filepath.Join(outDir, "sibling.go"))
+	if err != nil {
+		t.Fatalf("failed to read sibling.go: %v", err)
+	}
+	siblingStr := string(siblingBytes)
+	if !strings.Contains(siblingStr, "Base") {
+		t.Errorf("sibling.go should embed Base:\n%s", siblingStr)
 	}
 }
