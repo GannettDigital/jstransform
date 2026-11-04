@@ -241,6 +241,9 @@ func buildStructFile(childPath, name, packageName string, embeds []string, args 
 		return "", err
 	}
 
+	// When embedding allOf schemas, check if any embedded schema is already one of the oneOf types in the
+	// parent schema (e.g. livePost embedding text, where text is a sibling oneOf that already embeds the
+	// parent's base struct). If so, omit the parent embeds to prevent duplicate/ambiguous embeddings in Go.
 	effectiveEmbeds := embeds
 	if args.EmbedAllOf && len(schema.AllOf) > 0 && len(embeds) > 0 {
 		_, oneOfTypes, _, sErr := jsonschema.SchemaTypes(args.SchemaPath)
@@ -299,6 +302,8 @@ func splitJSONPath(path string) []string {
 	return tree
 }
 
+// inheritsOneOf recursively checks if a given schema path matches one of the known oneOf types in the schema,
+// or embeds one via its allOf definitions.
 func inheritsOneOf(path string, oneOfSet map[string]bool) bool {
 	targetPath := filepath.Clean(path)
 	if oneOfSet[targetPath] {

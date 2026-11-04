@@ -184,6 +184,9 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 			}
 			generated.rootStruct.implements = implements
 		}
+		// Embedded allOf schemas for a specific oneOf type (e.g. livePost embedding text) must be kept
+		// local to this implementation (oneOfCommon) rather than appended to the outer common slice,
+		// preventing these fields from leaking into subsequent oneOf GraphQL type definitions.
 		var oneOfCommon []*goGQL
 		var oneOfCommonFields int
 		if args.EmbedAllOf && len(oneOfSchema.AllOf) != 0 {
