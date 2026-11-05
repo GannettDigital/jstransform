@@ -106,7 +106,7 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 	if len(schema.AllOf) != 0 {
 		common = make([]*goGQL, 0, len(schema.AllOf))
 		for _, allOfSchema := range schema.AllOf {
-			baseName, _, _ := strings.Cut(filepath.Base(schema.AllOf[0].FromRef), ".")
+			baseName, _, _ := strings.Cut(filepath.Base(allOfSchema.FromRef), ".")
 			generated, err := newGeneratedGraphQLFile(allOfSchema, baseName, packageName, false, args)
 			if err != nil {
 				return fmt.Errorf("failed to build generated struct: %w", err)
@@ -184,14 +184,21 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 			}
 			generated.rootStruct.implements = implements
 		}
+		// Embedded allOf schemas for a specific oneOf type (e.g. livePost embedding text) must be kept
+		// local to this implementation (oneOfCommon) rather than appended to the outer common slice,
+		// preventing these fields from leaking into subsequent oneOf GraphQL type definitions.
+		var oneOfCommon []*goGQL
+		var oneOfCommonFields int
 		if args.EmbedAllOf && len(oneOfSchema.AllOf) != 0 {
+			oneOfCommon = make([]*goGQL, 0, len(oneOfSchema.AllOf))
 			for _, allOf := range oneOfSchema.AllOf {
 				baseName, _, _ := strings.Cut(filepath.Base(allOf.FromRef), ".")
 				allOfGen, err := newGeneratedGraphQLFile(allOf, baseName, packageName, false, args)
 				if err != nil {
 					return fmt.Errorf("failed to build generated struct: %w", err)
 				}
-				common = append(common, allOfGen)
+				oneOfCommon = append(oneOfCommon, allOfGen)
+				oneOfCommonFields += len(allOfGen.rootStruct.fields)
 			}
 		}
 
@@ -200,9 +207,17 @@ func buildGraphQLFile(schemaPath, name, packageName string, args BuildArgs) erro
 		// definition.
 		lfd := generated.rootStruct.fields
 		lfo := generated.rootStruct.fieldOrder
-		generated.rootStruct.fields = make(map[string]*gqlExtractedField, len(generated.rootStruct.fields)+commonFields)
-		generated.rootStruct.fieldOrder = make([]string, 0, len(generated.rootStruct.fields)+commonFields)
+		totalFields := len(generated.rootStruct.fields) + commonFields + oneOfCommonFields
+		generated.rootStruct.fields = make(map[string]*gqlExtractedField, totalFields)
+		generated.rootStruct.fieldOrder = make([]string, 0, totalFields)
 		for _, com := range common {
+			for fk, fv := range com.rootStruct.fields {
+				generated.rootStruct.fields[fk] = fv
+				generated.rootStruct.fieldOrder = append(generated.rootStruct.fieldOrder, fk)
+			}
+			maps.Copy(generated.rootStruct.requiredFields, com.rootStruct.requiredFields)
+		}
+		for _, com := range oneOfCommon {
 			for fk, fv := range com.rootStruct.fields {
 				generated.rootStruct.fields[fk] = fv
 				generated.rootStruct.fieldOrder = append(generated.rootStruct.fieldOrder, fk)

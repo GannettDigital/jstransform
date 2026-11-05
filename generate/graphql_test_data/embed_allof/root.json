@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "oneOf": [
+        {
+            "$ref": "./derived.json"
+        },
+        {
+            "$ref": "./other.json"
+        }
+    ],
+    "allOf": [
+        {
+            "$ref": "./base.json"
+        }
+    ]
+}
