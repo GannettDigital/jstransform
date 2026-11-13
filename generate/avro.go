@@ -405,7 +405,7 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 			typeName = "double"
 		case "byte":
 			typeName = "bytes"
-		case "string":
+		case "string", "Date", "Duration":
 			typeName = "string"
 		default: // Another go type
 			n, err := parseGoStruct(t.Name, cfg.dir)
@@ -443,6 +443,12 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 				return `["null",{"type":"long","logicalType":"timestamp-millis"}]`
 			}
 			return `{"type":"long","logicalType":"timestamp-millis"}`
+		}
+		if t.Sel.Name == "Date" || t.Sel.Name == "Duration" {
+			if nullable {
+				return `["null","string"]`
+			}
+			return `"string"`
 		}
 		return fmt.Sprintf(`unsupported type %q`, t.Sel.Name)
 	default:

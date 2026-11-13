@@ -5,6 +5,7 @@ package pointers
 import (
 	"time"
 
+	"github.com/GannettDigital/jstransform/generate"
 	"github.com/GannettDigital/msgp/msgp"
 )
 
@@ -1437,10 +1438,22 @@ func (z *NestedFactCheckClaims) DecodeMsg(dc *msgp.Reader) (err error) {
 				return
 			}
 		case "Date":
-			z.Date, err = dc.ReadString()
-			if err != nil {
-				err = msgp.WrapError(err, "Date")
-				return
+			if dc.IsNil() {
+				err = dc.ReadNil()
+				if err != nil {
+					err = msgp.WrapError(err, "Date")
+					return
+				}
+				z.Date = nil
+			} else {
+				if z.Date == nil {
+					z.Date = new(generate.Date)
+				}
+				err = z.Date.DecodeMsg(dc)
+				if err != nil {
+					err = msgp.WrapError(err, "Date")
+					return
+				}
 			}
 		case "Rating":
 			z.Rating, err = dc.ReadString()
@@ -1527,10 +1540,17 @@ func (z *NestedFactCheckClaims) EncodeMsg(en *msgp.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	err = en.WriteString(z.Date)
-	if err != nil {
-		err = msgp.WrapError(err, "Date")
-		return
+	if z.Date == nil {
+		err = en.WriteNil()
+		if err != nil {
+			return
+		}
+	} else {
+		err = z.Date.EncodeMsg(en)
+		if err != nil {
+			err = msgp.WrapError(err, "Date")
+			return
+		}
 	}
 	// write "Rating"
 	err = en.Append(0xa6, 0x52, 0x61, 0x74, 0x69, 0x6e, 0x67)
@@ -1573,7 +1593,15 @@ func (z *NestedFactCheckClaims) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.AppendString(o, z.Claim)
 	// string "Date"
 	o = append(o, 0xa4, 0x44, 0x61, 0x74, 0x65)
-	o = msgp.AppendString(o, z.Date)
+	if z.Date == nil {
+		o = msgp.AppendNil(o)
+	} else {
+		o, err = z.Date.MarshalMsg(o)
+		if err != nil {
+			err = msgp.WrapError(err, "Date")
+			return
+		}
+	}
 	// string "Rating"
 	o = append(o, 0xa6, 0x52, 0x61, 0x74, 0x69, 0x6e, 0x67)
 	o = msgp.AppendString(o, z.Rating)
@@ -1670,10 +1698,21 @@ func (z *NestedFactCheckClaims) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				return
 			}
 		case "Date":
-			z.Date, bts, err = msgp.ReadStringBytes(bts)
-			if err != nil {
-				err = msgp.WrapError(err, "Date")
-				return
+			if msgp.IsNil(bts) {
+				bts, err = msgp.ReadNilBytes(bts)
+				if err != nil {
+					return
+				}
+				z.Date = nil
+			} else {
+				if z.Date == nil {
+					z.Date = new(generate.Date)
+				}
+				bts, err = z.Date.UnmarshalMsg(bts)
+				if err != nil {
+					err = msgp.WrapError(err, "Date")
+					return
+				}
 			}
 		case "Rating":
 			z.Rating, bts, err = msgp.ReadStringBytes(bts)
@@ -1703,7 +1742,13 @@ func (z *NestedFactCheckClaims) Msgsize() (s int) {
 			s += 1 + 9 + msgp.BoolSize + 4 + msgp.StringPrefixSize + len(z.AppearanceURLs[za0001].Url)
 		}
 	}
-	s += 7 + msgp.StringPrefixSize + len(z.Author) + 6 + msgp.StringPrefixSize + len(z.Claim) + 5 + msgp.StringPrefixSize + len(z.Date) + 7 + msgp.StringPrefixSize + len(z.Rating)
+	s += 7 + msgp.StringPrefixSize + len(z.Author) + 6 + msgp.StringPrefixSize + len(z.Claim) + 5
+	if z.Date == nil {
+		s += msgp.NilSize
+	} else {
+		s += z.Date.Msgsize()
+	}
+	s += 7 + msgp.StringPrefixSize + len(z.Rating)
 	return
 }
 

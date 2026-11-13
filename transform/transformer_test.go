@@ -13,14 +13,15 @@ import (
 
 // used for the Transformer test and benchmark.
 var (
-	imageSchema, _            = jsonschema.SchemaFromFile("./test_data/image.json", "")
-	arrayTransformsSchema, _  = jsonschema.SchemaFromFile("./test_data/array-transforms.json", "")
-	doublearraySchema, _      = jsonschema.SchemaFromFile("./test_data/double-array.json", "")
-	operationsSchema, _       = jsonschema.SchemaFromFile("./test_data/operations.json", "")
-	dateTimesSchema, _        = jsonschema.SchemaFromFile("./test_data/date-times.json", "")
-	frontSchema, _            = jsonschema.SchemaFromFile("./test_data/front.json", "")
-	arrayTransformsSchema2, _ = jsonschema.SchemaFromFile("./test_data/array-transforms-2.json", "")
-	orderedKeysSchema, _      = jsonschema.SchemaFromFile("./test_data/ordered-keys.json", "")
+	imageSchema, _             = jsonschema.SchemaFromFile("./test_data/image.json", "")
+	arrayTransformsSchema, _   = jsonschema.SchemaFromFile("./test_data/array-transforms.json", "")
+	doublearraySchema, _       = jsonschema.SchemaFromFile("./test_data/double-array.json", "")
+	operationsSchema, _        = jsonschema.SchemaFromFile("./test_data/operations.json", "")
+	dateTimesSchema, _         = jsonschema.SchemaFromFile("./test_data/date-times.json", "")
+	datesAndDurationsSchema, _ = jsonschema.SchemaFromFile("./test_data/dates-and-durations.json", "")
+	frontSchema, _             = jsonschema.SchemaFromFile("./test_data/front.json", "")
+	arrayTransformsSchema2, _  = jsonschema.SchemaFromFile("./test_data/array-transforms-2.json", "")
+	orderedKeysSchema, _       = jsonschema.SchemaFromFile("./test_data/ordered-keys.json", "")
 
 	transformerTests = []struct {
 		description         string
@@ -241,6 +242,27 @@ var (
 		          "optionalDate": ""
 		      }`),
 			want: json.RawMessage(`{"dates":["2018-06-25T20:21:13Z","2018-06-25T20:21:13Z"],"requiredDate":"2018-06-25T20:21:13Z"}`),
+		},
+		{
+			description:         "Test format: date and duration strings",
+			schema:              datesAndDurationsSchema,
+			transformIdentifier: "cumulo",
+			in: json.RawMessage(`
+		      {
+		          "dates": [
+		              1529958073,
+		              "2018-06-25"
+		          ],
+		          "requiredDate": "2018-06-25",
+		          "optionalDate": "",
+		          "durations": [
+		              "P1D",
+		              "PT15M"
+		          ],
+		          "requiredDuration": "PT1H30M",
+		          "optionalDuration": ""
+		      }`),
+			want: json.RawMessage(`{"dates":["2018-06-25","2018-06-25"],"durations":["P1D","PT15M"],"requiredDate":"2018-06-25","requiredDuration":"PT1H30M"}`),
 		},
 		{
 			description:         "Test format: ordered keys",
