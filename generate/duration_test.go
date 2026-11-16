@@ -124,9 +124,9 @@ func TestDuration_Parse(t *testing.T) {
 			wantErr:     true,
 		},
 		{
-			description: "week combined with days",
-			input:       "P1W1D",
-			wantErr:     true,
+			description:  "week combined with days",
+			input:        "P1W1D",
+			wantDuration: 8 * 24 * time.Hour,
 		},
 		{
 			description: "standard Go duration rejected",
@@ -208,7 +208,7 @@ func TestDuration_Text(t *testing.T) {
 	var zero Duration
 	zeroText, err := zero.MarshalText()
 	require.NoError(t, err)
-	assert.Nil(t, zeroText)
+	assert.Equal(t, "PT0S", string(zeroText))
 
 	err = parsed.UnmarshalText([]byte(""))
 	require.NoError(t, err)
@@ -255,7 +255,7 @@ func TestDurationFromTime(t *testing.T) {
 		{
 			description: "zero duration",
 			input:       0,
-			wantString:  "",
+			wantString:  "PT0S",
 		},
 		{
 			description: "30 seconds",

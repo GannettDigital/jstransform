@@ -8,9 +8,6 @@ import (
 	"github.com/GannettDigital/msgp/msgp"
 )
 
-// DateFormat is the RFC 3339 Section 5.6 full-date format (YYYY-MM-DD).
-const DateFormat = "2006-01-02"
-
 // Date represents an RFC 3339 Section 5.6 full-date (YYYY-MM-DD).
 // It wraps time.Time with UTC date normalization and JSON/text/msgp serialization.
 type Date struct {
@@ -36,11 +33,16 @@ func ParseDate(s string) (Date, error) {
 	if s == "" {
 		return Date{}, nil
 	}
-	t, err := time.Parse(DateFormat, s)
+	t, err := time.Parse(time.DateOnly, s)
 	if err != nil {
 		return Date{}, fmt.Errorf("invalid date format %q: %w", s, err)
 	}
 	return Date{Time: t}, nil
+}
+
+// IsZero returns true if the date is zero, enabling omitzero JSON encoding.
+func (d Date) IsZero() bool {
+	return d.Time.IsZero()
 }
 
 // String returns the date formatted as YYYY-MM-DD, or an empty string if zero.
@@ -48,56 +50,39 @@ func (d Date) String() string {
 	if d.IsZero() {
 		return ""
 	}
-	return d.Format(DateFormat)
+	return d.Format(time.DateOnly)
 }
 
-// MarshalJSON marshals the date as a JSON string formatted as "YYYY-MM-DD", or null if zero.
+// MarshalJSON marshals the date as a JSON string formatted as "YYYY-MM-DD".
 func (d Date) MarshalJSON() ([]byte, error) {
-	if d.IsZero() {
-		return []byte("null"), nil
-	}
-	return json.Marshal(d.Format(DateFormat))
+	return json.Marshal(d.Format(time.DateOnly))
 }
 
 // UnmarshalJSON unmarshals a JSON string into a Date.
 func (d *Date) UnmarshalJSON(data []byte) error {
-	var s *string
+	if string(data) == "null" {
+		*d = Date{}
+		return nil
+	}
+	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	if s == nil || *s == "" {
-		d.Time = time.Time{}
-		return nil
-	}
-	parsed, err := ParseDate(*s)
-	if err != nil {
-		return err
-	}
-	*d = parsed
-	return nil
+	var err error
+	*d, err = ParseDate(s)
+	return err
 }
 
 // MarshalText implements encoding.TextMarshaler.
 func (d Date) MarshalText() ([]byte, error) {
-	if d.IsZero() {
-		return nil, nil
-	}
-	return []byte(d.Format(DateFormat)), nil
+	return []byte(d.Format(time.DateOnly)), nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (d *Date) UnmarshalText(text []byte) error {
-	s := string(text)
-	if s == "" {
-		d.Time = time.Time{}
-		return nil
-	}
-	parsed, err := ParseDate(s)
-	if err != nil {
-		return err
-	}
-	*d = parsed
-	return nil
+	var err error
+	*d, err = ParseDate(string(text))
+	return err
 }
 
 // MarshalMsg implements msgp.Marshaler.
@@ -140,5 +125,5 @@ func (d *Date) DecodeMsg(dc *msgp.Reader) error {
 
 // Msgsize implements msgp.Sizer.
 func (d Date) Msgsize() int {
-	return msgp.StringPrefixSize + len(DateFormat)
+	return msgp.StringPrefixSize + len(time.DateOnly)
 }

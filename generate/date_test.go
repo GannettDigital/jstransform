@@ -131,11 +131,19 @@ func TestDate_Text(t *testing.T) {
 	var zero Date
 	zeroText, err := zero.MarshalText()
 	require.NoError(t, err)
-	assert.Nil(t, zeroText)
+	assert.Equal(t, "0001-01-01", string(zeroText))
 
 	err = parsed.UnmarshalText([]byte(""))
 	require.NoError(t, err)
 	assert.True(t, parsed.IsZero())
+}
+
+func TestDate_IsZero(t *testing.T) {
+	var zero Date
+	assert.True(t, zero.IsZero())
+
+	nonZero := NewDate(2026, time.November, 13)
+	assert.False(t, nonZero.IsZero())
 }
 
 func TestDate_Msgp(t *testing.T) {

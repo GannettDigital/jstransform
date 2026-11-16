@@ -11,10 +11,7 @@ import (
 	"github.com/GannettDigital/msgp/msgp"
 )
 
-var (
-	weekDurationRegex     = regexp.MustCompile(`^P(\d+)W$`)
-	dateTimeDurationRegex = regexp.MustCompile(`^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$`)
-)
+var dateTimeDurationRegex = regexp.MustCompile(`^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$`)
 
 // Duration represents an ISO 8601 duration according to RFC 3339 Appendix A.
 type Duration struct {
@@ -29,7 +26,7 @@ func DurationFromTime(d time.Duration) Duration {
 }
 
 // ParseDuration parses an ISO 8601 duration string per RFC 3339 Appendix A.
-// Valid examples: "P1Y2M3D", "P1W", "P1D", "PT1H", "PT15M", "PT30S", "PT0S", "P1Y2M3DT4H5M6S", "-P1D".
+// Valid examples: "P1Y2M3D", "P1W", "P1W1D", "P1D", "PT1H", "PT15M", "PT30S", "PT0S", "P1Y2M3DT4H5M6S", "-P1D".
 func ParseDuration(s string) (Duration, error) {
 	if s == "" {
 		return Duration{}, nil
@@ -42,30 +39,15 @@ func ParseDuration(s string) (Duration, error) {
 		s = s[1:]
 	}
 
-	if matches := weekDurationRegex.FindStringSubmatch(s); len(matches) == 2 {
-		weeks, err := strconv.ParseInt(matches[1], 10, 64)
-		if err != nil {
-			return Duration{}, fmt.Errorf("invalid duration weeks %q: %w", original, err)
-		}
-		total := time.Duration(weeks) * 7 * 24 * time.Hour
-		if negate {
-			total = -total
-		}
-		return Duration{
-			Duration: total,
-			raw:      original,
-		}, nil
-	}
-
 	matches := dateTimeDurationRegex.FindStringSubmatch(s)
-	if len(matches) != 7 {
+	if len(matches) != 8 {
 		return Duration{}, fmt.Errorf("invalid ISO 8601 duration %q", original)
 	}
 
-	yearsStr, monthsStr, daysStr := matches[1], matches[2], matches[3]
-	hoursStr, minutesStr, secondsStr := matches[4], matches[5], matches[6]
+	yearsStr, monthsStr, weeksStr, daysStr := matches[1], matches[2], matches[3], matches[4]
+	hoursStr, minutesStr, secondsStr := matches[5], matches[6], matches[7]
 
-	hasDate := yearsStr != "" || monthsStr != "" || daysStr != ""
+	hasDate := yearsStr != "" || monthsStr != "" || weeksStr != "" || daysStr != ""
 	hasTime := hoursStr != "" || minutesStr != "" || secondsStr != ""
 
 	if strings.Contains(s, "T") && !hasTime {
@@ -90,6 +72,13 @@ func ParseDuration(s string) (Duration, error) {
 			return Duration{}, fmt.Errorf("invalid duration months %q: %w", original, err)
 		}
 		total += time.Duration(v) * 30 * 24 * time.Hour
+	}
+	if weeksStr != "" {
+		v, err := strconv.ParseInt(weeksStr, 10, 64)
+		if err != nil {
+			return Duration{}, fmt.Errorf("invalid duration weeks %q: %w", original, err)
+		}
+		total += time.Duration(v) * 7 * 24 * time.Hour
 	}
 	if daysStr != "" {
 		v, err := strconv.ParseInt(daysStr, 10, 64)
@@ -145,59 +134,39 @@ func (d Duration) String() string {
 	if d.raw != "" {
 		return d.raw
 	}
-	if d.Duration == 0 {
-		return ""
-	}
 	return formatDuration(d.Duration)
 }
 
-// MarshalJSON marshals the duration as an ISO 8601 JSON string, or null if zero.
+// MarshalJSON marshals the duration as an ISO 8601 JSON string.
 func (d Duration) MarshalJSON() ([]byte, error) {
-	if d.IsZero() {
-		return []byte("null"), nil
-	}
 	return json.Marshal(d.String())
 }
 
 // UnmarshalJSON unmarshals an ISO 8601 JSON string into a Duration.
 func (d *Duration) UnmarshalJSON(data []byte) error {
-	var s *string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
-	if s == nil || *s == "" {
+	if string(data) == "null" {
 		*d = Duration{}
 		return nil
 	}
-	parsed, err := ParseDuration(*s)
-	if err != nil {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	*d = parsed
-	return nil
+	var err error
+	*d, err = ParseDuration(s)
+	return err
 }
 
 // MarshalText implements encoding.TextMarshaler.
 func (d Duration) MarshalText() ([]byte, error) {
-	if d.IsZero() {
-		return nil, nil
-	}
 	return []byte(d.String()), nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (d *Duration) UnmarshalText(text []byte) error {
-	s := string(text)
-	if s == "" {
-		*d = Duration{}
-		return nil
-	}
-	parsed, err := ParseDuration(s)
-	if err != nil {
-		return err
-	}
-	*d = parsed
-	return nil
+	var err error
+	*d, err = ParseDuration(string(text))
+	return err
 }
 
 // MarshalMsg implements msgp.Marshaler.
