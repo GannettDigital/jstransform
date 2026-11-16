@@ -53,9 +53,9 @@ func (d Date) String() string {
 	return d.Format(time.DateOnly)
 }
 
-// MarshalJSON marshals the date as a JSON string formatted as "YYYY-MM-DD".
+// MarshalJSON marshals the date as a JSON string formatted as "YYYY-MM-DD", or "" if zero.
 func (d Date) MarshalJSON() ([]byte, error) {
-	return json.Marshal(d.Format(time.DateOnly))
+	return json.Marshal(d.String())
 }
 
 // UnmarshalJSON unmarshals a JSON string into a Date.
@@ -75,7 +75,7 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 
 // MarshalText implements encoding.TextMarshaler.
 func (d Date) MarshalText() ([]byte, error) {
-	return []byte(d.Format(time.DateOnly)), nil
+	return []byte(d.String()), nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.

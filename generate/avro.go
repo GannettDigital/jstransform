@@ -413,10 +413,14 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 			}
 			return `{"type":"int","logicalType":"date"}`
 		case "Duration":
-			if nullable {
-				return `["null",{"type":"fixed","name":"duration","size":12,"logicalType":"duration"}]`
+			fixedName := "duration"
+			if name != "" {
+				fixedName = name + "_duration"
 			}
-			return `{"type":"fixed","name":"duration","size":12,"logicalType":"duration"}`
+			if nullable {
+				return fmt.Sprintf(`["null",{"type":"fixed","name":%q,"size":12,"logicalType":"duration"}]`, fixedName)
+			}
+			return fmt.Sprintf(`{"type":"fixed","name":%q,"size":12,"logicalType":"duration"}`, fixedName)
 		default: // Another go type
 			n, err := parseGoStruct(t.Name, cfg.dir)
 			if err != nil {
@@ -462,10 +466,14 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 				return `{"type":"int","logicalType":"date"}`
 			}
 			if t.Sel.Name == "Duration" {
-				if nullable {
-					return `["null",{"type":"fixed","name":"duration","size":12,"logicalType":"duration"}]`
+				fixedName := "duration"
+				if name != "" {
+					fixedName = name + "_duration"
 				}
-				return `{"type":"fixed","name":"duration","size":12,"logicalType":"duration"}`
+				if nullable {
+					return fmt.Sprintf(`["null",{"type":"fixed","name":%q,"size":12,"logicalType":"duration"}]`, fixedName)
+				}
+				return fmt.Sprintf(`{"type":"fixed","name":%q,"size":12,"logicalType":"duration"}`, fixedName)
 			}
 		}
 		return fmt.Sprintf(`unsupported type %q`, t.Sel.Name)

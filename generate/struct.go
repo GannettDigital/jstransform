@@ -415,12 +415,8 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 		}
 		if slices.Contains(inst.Type, "string") {
 			switch inst.Format {
-			case "date-time":
-				f.jsonType = "date-time"
-			case "date":
-				f.jsonType = "date"
-			case "duration":
-				f.jsonType = "duration"
+			case "date-time", "date", "duration":
+				f.jsonType = inst.Format
 			default:
 			}
 		}

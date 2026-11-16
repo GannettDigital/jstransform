@@ -124,9 +124,9 @@ func (d Duration) TimeDuration() time.Duration {
 	return d.Duration
 }
 
-// IsZero returns true if the duration is unset or zero value.
+// IsZero returns true if the duration is zero.
 func (d Duration) IsZero() bool {
-	return d.Duration == 0 && d.raw == ""
+	return d.Duration == 0
 }
 
 // String returns the duration formatted as an ISO 8601 duration string.

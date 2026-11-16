@@ -215,6 +215,19 @@ func TestDuration_Text(t *testing.T) {
 	assert.True(t, parsed.IsZero())
 }
 
+func TestDuration_IsZero(t *testing.T) {
+	var zero Duration
+	assert.True(t, zero.IsZero())
+
+	pt0s, err := ParseDuration("PT0S")
+	require.NoError(t, err)
+	assert.True(t, pt0s.IsZero())
+
+	nonZero, err := ParseDuration("PT15M")
+	require.NoError(t, err)
+	assert.False(t, nonZero.IsZero())
+}
+
 func TestDuration_Msgp(t *testing.T) {
 	dur, err := ParseDuration("PT45S")
 	require.NoError(t, err)

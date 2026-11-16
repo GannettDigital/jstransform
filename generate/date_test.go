@@ -131,7 +131,7 @@ func TestDate_Text(t *testing.T) {
 	var zero Date
 	zeroText, err := zero.MarshalText()
 	require.NoError(t, err)
-	assert.Equal(t, "0001-01-01", string(zeroText))
+	assert.Empty(t, zeroText)
 
 	err = parsed.UnmarshalText([]byte(""))
 	require.NoError(t, err)

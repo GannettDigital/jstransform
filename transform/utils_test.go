@@ -333,6 +333,12 @@ func TestConvert(t *testing.T) {
 			want:        generate.NewDate(2018, time.June, 25),
 		},
 		{
+			description: "valid unix epoch (int64) -> date",
+			raw:         int64(1529958073),
+			jsonType:    "date",
+			want:        generate.NewDate(2018, time.June, 25),
+		},
+		{
 			description: "empty string -> nil date",
 			raw:         "",
 			jsonType:    "date",
@@ -367,6 +373,12 @@ func TestConvert(t *testing.T) {
 			raw:         "PT0S",
 			jsonType:    "duration",
 			want:        mustParseDuration("PT0S"),
+		},
+		{
+			description: "valid seconds (int64) -> duration",
+			raw:         int64(900),
+			jsonType:    "duration",
+			want:        generate.DurationFromTime(15 * time.Minute),
 		},
 		{
 			description: "invalid ISO8601 duration string -> error",

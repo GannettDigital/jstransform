@@ -151,6 +151,8 @@ func convertDateTime(raw any) (any, error) {
 		return tParsed, nil
 	case int:
 		return time.Unix(int64(t), 0).UTC(), nil
+	case int64:
+		return time.Unix(t, 0).UTC(), nil
 	case float64:
 		return time.Unix(int64(t), 0).UTC(), nil
 	default:
@@ -183,6 +185,8 @@ func convertDate(raw any) (any, error) {
 		return nil, err
 	case int:
 		return generate.DateFromTime(time.Unix(int64(t), 0).UTC()), nil
+	case int64:
+		return generate.DateFromTime(time.Unix(t, 0).UTC()), nil
 	case float64:
 		return generate.DateFromTime(time.Unix(int64(t), 0).UTC()), nil
 	case time.Time:
@@ -212,6 +216,8 @@ func convertDuration(raw any) (any, error) {
 		}
 		return d, nil
 	case int:
+		return generate.DurationFromTime(time.Duration(t) * time.Second), nil
+	case int64:
 		return generate.DurationFromTime(time.Duration(t) * time.Second), nil
 	case float64:
 		return generate.DurationFromTime(time.Duration(t * float64(time.Second))), nil
