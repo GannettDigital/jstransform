@@ -214,9 +214,9 @@ func formatDuration(d time.Duration) string {
 	if d == 0 {
 		return "PT0S"
 	}
-	var negative bool
+	var negative string
 	if d < 0 {
-		negative = true
+		negative = "-"
 		d = -d
 	}
 	days := d / (24 * time.Hour)
@@ -227,29 +227,24 @@ func formatDuration(d time.Duration) string {
 	d %= time.Minute
 	seconds := d / time.Second
 
-	var b strings.Builder
-	if negative {
-		b.WriteString("-")
-	}
-	b.WriteString("P")
+	var datePart string
 	if days > 0 {
-		b.WriteString(strconv.FormatInt(int64(days), 10))
-		b.WriteString("D")
+		datePart = strconv.FormatInt(int64(days), 10) + "D"
 	}
-	if hours > 0 || minutes > 0 || seconds > 0 || days == 0 {
-		b.WriteString("T")
-		if hours > 0 {
-			b.WriteString(strconv.FormatInt(int64(hours), 10))
-			b.WriteString("H")
-		}
-		if minutes > 0 {
-			b.WriteString(strconv.FormatInt(int64(minutes), 10))
-			b.WriteString("M")
-		}
-		if seconds > 0 || (hours == 0 && minutes == 0 && days == 0) {
-			b.WriteString(strconv.FormatInt(int64(seconds), 10))
-			b.WriteString("S")
-		}
+
+	var timePart string
+	if hours > 0 {
+		timePart += strconv.FormatInt(int64(hours), 10) + "H"
 	}
-	return b.String()
+	if minutes > 0 {
+		timePart += strconv.FormatInt(int64(minutes), 10) + "M"
+	}
+	if seconds > 0 || (hours == 0 && minutes == 0 && days == 0) {
+		timePart += strconv.FormatInt(int64(seconds), 10) + "S"
+	}
+	if timePart != "" {
+		timePart = "T" + timePart
+	}
+
+	return negative + "P" + datePart + timePart
 }
