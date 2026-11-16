@@ -444,11 +444,13 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 			}
 			return `{"type":"long","logicalType":"timestamp-millis"}`
 		}
-		if t.Sel.Name == "Date" || t.Sel.Name == "Duration" {
-			if nullable {
-				return `["null","string"]`
+		if ident, ok := t.X.(*ast.Ident); ok && ident.Name == "generate" {
+			if t.Sel.Name == "Date" || t.Sel.Name == "Duration" {
+				if nullable {
+					return `["null","string"]`
+				}
+				return `"string"`
 			}
-			return `"string"`
 		}
 		return fmt.Sprintf(`unsupported type %q`, t.Sel.Name)
 	default:

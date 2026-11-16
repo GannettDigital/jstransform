@@ -13,7 +13,7 @@ import (
 
 var (
 	weekDurationRegex     = regexp.MustCompile(`^P(\d+)W$`)
-	dateTimeDurationRegex = regexp.MustCompile(`^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$`)
+	dateTimeDurationRegex = regexp.MustCompile(`^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$`)
 )
 
 // Duration represents an ISO 8601 duration according to RFC 3339 Appendix A.
@@ -29,26 +29,37 @@ func DurationFromTime(d time.Duration) Duration {
 }
 
 // ParseDuration parses an ISO 8601 duration string per RFC 3339 Appendix A.
-// Valid examples: "P1Y2M3D", "P1W", "P1D", "PT1H", "PT15M", "PT30S", "PT0S", "P1Y2M3DT4H5M6S".
+// Valid examples: "P1Y2M3D", "P1W", "P1D", "PT1H", "PT15M", "PT30S", "PT0S", "P1Y2M3DT4H5M6S", "-P1D".
 func ParseDuration(s string) (Duration, error) {
 	if s == "" {
 		return Duration{}, nil
 	}
 
+	original := s
+	var negate bool
+	if strings.HasPrefix(s, "-") {
+		negate = true
+		s = s[1:]
+	}
+
 	if matches := weekDurationRegex.FindStringSubmatch(s); len(matches) == 2 {
 		weeks, err := strconv.ParseInt(matches[1], 10, 64)
 		if err != nil {
-			return Duration{}, fmt.Errorf("invalid duration weeks %q: %w", s, err)
+			return Duration{}, fmt.Errorf("invalid duration weeks %q: %w", original, err)
+		}
+		total := time.Duration(weeks) * 7 * 24 * time.Hour
+		if negate {
+			total = -total
 		}
 		return Duration{
-			Duration: time.Duration(weeks) * 7 * 24 * time.Hour,
-			raw:      s,
+			Duration: total,
+			raw:      original,
 		}, nil
 	}
 
 	matches := dateTimeDurationRegex.FindStringSubmatch(s)
 	if len(matches) != 7 {
-		return Duration{}, fmt.Errorf("invalid ISO 8601 duration %q", s)
+		return Duration{}, fmt.Errorf("invalid ISO 8601 duration %q", original)
 	}
 
 	yearsStr, monthsStr, daysStr := matches[1], matches[2], matches[3]
@@ -58,42 +69,64 @@ func ParseDuration(s string) (Duration, error) {
 	hasTime := hoursStr != "" || minutesStr != "" || secondsStr != ""
 
 	if strings.Contains(s, "T") && !hasTime {
-		return Duration{}, fmt.Errorf("invalid ISO 8601 duration %q: missing time elements after T", s)
+		return Duration{}, fmt.Errorf("invalid ISO 8601 duration %q: missing time elements after T", original)
 	}
 	if !hasDate && !hasTime {
-		return Duration{}, fmt.Errorf("invalid ISO 8601 duration %q: empty duration", s)
+		return Duration{}, fmt.Errorf("invalid ISO 8601 duration %q: empty duration", original)
 	}
 
 	var total time.Duration
 
 	if yearsStr != "" {
-		v, _ := strconv.ParseInt(yearsStr, 10, 64)
+		v, err := strconv.ParseInt(yearsStr, 10, 64)
+		if err != nil {
+			return Duration{}, fmt.Errorf("invalid duration years %q: %w", original, err)
+		}
 		total += time.Duration(v) * 365 * 24 * time.Hour
 	}
 	if monthsStr != "" {
-		v, _ := strconv.ParseInt(monthsStr, 10, 64)
+		v, err := strconv.ParseInt(monthsStr, 10, 64)
+		if err != nil {
+			return Duration{}, fmt.Errorf("invalid duration months %q: %w", original, err)
+		}
 		total += time.Duration(v) * 30 * 24 * time.Hour
 	}
 	if daysStr != "" {
-		v, _ := strconv.ParseInt(daysStr, 10, 64)
+		v, err := strconv.ParseInt(daysStr, 10, 64)
+		if err != nil {
+			return Duration{}, fmt.Errorf("invalid duration days %q: %w", original, err)
+		}
 		total += time.Duration(v) * 24 * time.Hour
 	}
 	if hoursStr != "" {
-		v, _ := strconv.ParseInt(hoursStr, 10, 64)
+		v, err := strconv.ParseInt(hoursStr, 10, 64)
+		if err != nil {
+			return Duration{}, fmt.Errorf("invalid duration hours %q: %w", original, err)
+		}
 		total += time.Duration(v) * time.Hour
 	}
 	if minutesStr != "" {
-		v, _ := strconv.ParseInt(minutesStr, 10, 64)
+		v, err := strconv.ParseInt(minutesStr, 10, 64)
+		if err != nil {
+			return Duration{}, fmt.Errorf("invalid duration minutes %q: %w", original, err)
+		}
 		total += time.Duration(v) * time.Minute
 	}
 	if secondsStr != "" {
-		v, _ := strconv.ParseInt(secondsStr, 10, 64)
-		total += time.Duration(v) * time.Second
+		sec, err := strconv.ParseFloat(secondsStr, 64)
+		if err != nil {
+			return Duration{}, fmt.Errorf("invalid duration seconds %q: %w", original, err)
+		}
+		total += time.Duration(sec * float64(time.Second))
+	}
+
+	if negate {
+		total = -total
 	}
 
 	return Duration{
 		Duration: total,
-		raw:      s,
+		raw:      original,
 	}, nil
 }
 
@@ -225,7 +258,7 @@ func formatDuration(d time.Duration) string {
 	d %= time.Hour
 	minutes := d / time.Minute
 	d %= time.Minute
-	seconds := d / time.Second
+	seconds := float64(d) / float64(time.Second)
 
 	var datePart string
 	if days > 0 {
@@ -240,7 +273,7 @@ func formatDuration(d time.Duration) string {
 		timePart += strconv.FormatInt(int64(minutes), 10) + "M"
 	}
 	if seconds > 0 || (hours == 0 && minutes == 0 && days == 0) {
-		timePart += strconv.FormatInt(int64(seconds), 10) + "S"
+		timePart += strconv.FormatFloat(seconds, 'f', -1, 64) + "S"
 	}
 	if timePart != "" {
 		timePart = "T" + timePart

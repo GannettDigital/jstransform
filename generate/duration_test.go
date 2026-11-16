@@ -65,8 +65,38 @@ func TestDuration_Parse(t *testing.T) {
 			wantDuration: (365+60+3)*24*time.Hour + 4*time.Hour + 5*time.Minute + 6*time.Second,
 		},
 		{
+			description:  "negative day duration",
+			input:        "-P1D",
+			wantDuration: -24 * time.Hour,
+		},
+		{
+			description:  "negative time duration",
+			input:        "-PT15M",
+			wantDuration: -15 * time.Minute,
+		},
+		{
+			description:  "negative week duration",
+			input:        "-P1W",
+			wantDuration: -7 * 24 * time.Hour,
+		},
+		{
+			description:  "decimal seconds duration",
+			input:        "PT1.5S",
+			wantDuration: 1500 * time.Millisecond,
+		},
+		{
+			description:  "sub-second duration",
+			input:        "PT0.5S",
+			wantDuration: 500 * time.Millisecond,
+		},
+		{
 			description: "empty string returns zero duration",
 			input:       "",
+		},
+		{
+			description: "overflow integer component",
+			input:       "P999999999999999999999999999999Y",
+			wantErr:     true,
 		},
 		{
 			description: "bare P without elements",
@@ -251,6 +281,21 @@ func TestDurationFromTime(t *testing.T) {
 			description: "1 day 2 hours 3 minutes 4 seconds",
 			input:       24*time.Hour + 2*time.Hour + 3*time.Minute + 4*time.Second,
 			wantString:  "P1DT2H3M4S",
+		},
+		{
+			description: "1.5 seconds (sub-second precision)",
+			input:       1500 * time.Millisecond,
+			wantString:  "PT1.5S",
+		},
+		{
+			description: "0.5 seconds (sub-second precision)",
+			input:       500 * time.Millisecond,
+			wantString:  "PT0.5S",
+		},
+		{
+			description: "negative duration",
+			input:       -24 * time.Hour,
+			wantString:  "-P1D",
 		},
 	}
 
