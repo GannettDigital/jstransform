@@ -407,6 +407,20 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 			typeName = "bytes"
 		case "string":
 			typeName = "string"
+		case "Date":
+			if nullable {
+				return `["null",{"type":"int","logicalType":"date"}]`
+			}
+			return `{"type":"int","logicalType":"date"}`
+		case "Duration":
+			fixedName := "duration"
+			if name != "" {
+				fixedName = name + "_duration"
+			}
+			if nullable {
+				return fmt.Sprintf(`["null",{"type":"fixed","name":%q,"size":12,"logicalType":"duration"}]`, fixedName)
+			}
+			return fmt.Sprintf(`{"type":"fixed","name":%q,"size":12,"logicalType":"duration"}`, fixedName)
 		default: // Another go type
 			n, err := parseGoStruct(t.Name, cfg.dir)
 			if err != nil {
@@ -443,6 +457,24 @@ func convertToAvroType(cfg avroConfig, expr ast.Expr, name string, nullable bool
 				return `["null",{"type":"long","logicalType":"timestamp-millis"}]`
 			}
 			return `{"type":"long","logicalType":"timestamp-millis"}`
+		}
+		if ident, ok := t.X.(*ast.Ident); ok && ident.Name == "generate" {
+			if t.Sel.Name == "Date" {
+				if nullable {
+					return `["null",{"type":"int","logicalType":"date"}]`
+				}
+				return `{"type":"int","logicalType":"date"}`
+			}
+			if t.Sel.Name == "Duration" {
+				fixedName := "duration"
+				if name != "" {
+					fixedName = name + "_duration"
+				}
+				if nullable {
+					return fmt.Sprintf(`["null",{"type":"fixed","name":%q,"size":12,"logicalType":"duration"}]`, fixedName)
+				}
+				return fmt.Sprintf(`{"type":"fixed","name":%q,"size":12,"logicalType":"duration"}`, fixedName)
+			}
 		}
 		return fmt.Sprintf(`unsupported type %q`, t.Sel.Name)
 	default:

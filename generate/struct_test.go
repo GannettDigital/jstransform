@@ -114,7 +114,7 @@ func TestAddField(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if err := addField(test.fields, test.tree, test.instance, nil); err != nil {
+		if err := addField(test.fields, test.tree, test.instance, nil, ""); err != nil {
 			t.Fatalf("Test %q - failed to add fields: %v", test.description, err)
 		}
 
@@ -559,6 +559,102 @@ func TestGoType(t *testing.T) {
 				},
 			},
 			want: "[]*time.Time",
+		},
+		{
+			description: "JSON string date",
+			jsonType:    "date",
+			array:       false,
+			required:    true,
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "generate.Date",
+		},
+		{
+			description: "JSON string date array",
+			jsonType:    "date",
+			array:       true,
+			required:    true,
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "[]generate.Date",
+		},
+		{
+			description: "JSON string date, omitempty, pointers",
+			jsonType:    "date",
+			array:       false,
+			pointers:    true,
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "*generate.Date",
+		},
+		{
+			description: "JSON string date array, omitempty, pointers",
+			jsonType:    "date",
+			array:       true,
+			pointers:    true,
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "[]*generate.Date",
+		},
+		{
+			description: "JSON string duration",
+			jsonType:    "duration",
+			array:       false,
+			required:    true,
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "generate.Duration",
+		},
+		{
+			description: "JSON string duration array",
+			jsonType:    "duration",
+			array:       true,
+			required:    true,
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "[]generate.Duration",
+		},
+		{
+			description: "JSON string duration, omitempty, pointers",
+			jsonType:    "duration",
+			array:       false,
+			pointers:    true,
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "*generate.Duration",
+		},
+		{
+			description: "JSON string duration array, omitempty, pointers",
+			jsonType:    "duration",
+			array:       true,
+			pointers:    true,
+			fields: extractedFields{
+				"string": {
+					jsonType: "string",
+				},
+			},
+			want: "[]*generate.Duration",
 		},
 	}
 

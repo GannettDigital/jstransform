@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/GannettDigital/jstransform/generate"
 )
 
 func TestConcat(t *testing.T) {
@@ -307,6 +309,102 @@ func TestConvert(t *testing.T) {
 			wantErr:     true,
 		},
 		{
+			description: "valid RFC3339 full-date string -> date",
+			raw:         "2018-06-25",
+			jsonType:    "date",
+			want:        generate.NewDate(2018, time.June, 25),
+		},
+		{
+			description: "valid RFC3339 date-time string -> date",
+			raw:         "2018-06-25T20:21:13Z",
+			jsonType:    "date",
+			want:        generate.NewDate(2018, time.June, 25),
+		},
+		{
+			description: "invalid full-date string -> error",
+			raw:         "2018-13-25",
+			jsonType:    "date",
+			wantErr:     true,
+		},
+		{
+			description: "valid unix epoch (int) -> date",
+			raw:         1529958073,
+			jsonType:    "date",
+			want:        generate.NewDate(2018, time.June, 25),
+		},
+		{
+			description: "valid unix epoch (int64) -> date",
+			raw:         int64(1529958073),
+			jsonType:    "date",
+			want:        generate.NewDate(2018, time.June, 25),
+		},
+		{
+			description: "empty string -> nil date",
+			raw:         "",
+			jsonType:    "date",
+			want:        nil,
+		},
+		{
+			description: "nil -> nil date",
+			raw:         nil,
+			jsonType:    "date",
+			want:        nil,
+		},
+		{
+			description: "boolean -> invalid date",
+			raw:         true,
+			jsonType:    "date",
+			wantErr:     true,
+		},
+		{
+			description: "valid ISO8601 duration string -> duration",
+			raw:         "PT15M",
+			jsonType:    "duration",
+			want:        mustParseDuration("PT15M"),
+		},
+		{
+			description: "valid ISO8601 day duration string -> duration",
+			raw:         "P1D",
+			jsonType:    "duration",
+			want:        mustParseDuration("P1D"),
+		},
+		{
+			description: "valid ISO8601 zero duration string -> duration",
+			raw:         "PT0S",
+			jsonType:    "duration",
+			want:        mustParseDuration("PT0S"),
+		},
+		{
+			description: "valid seconds (int64) -> duration",
+			raw:         int64(900),
+			jsonType:    "duration",
+			want:        generate.DurationFromTime(15 * time.Minute),
+		},
+		{
+			description: "invalid ISO8601 duration string -> error",
+			raw:         "invalid-duration",
+			jsonType:    "duration",
+			wantErr:     true,
+		},
+		{
+			description: "empty string -> nil duration",
+			raw:         "",
+			jsonType:    "duration",
+			want:        nil,
+		},
+		{
+			description: "nil -> nil duration",
+			raw:         nil,
+			jsonType:    "duration",
+			want:        nil,
+		},
+		{
+			description: "boolean -> invalid duration",
+			raw:         true,
+			jsonType:    "duration",
+			wantErr:     true,
+		},
+		{
 			description: "bool -> integer, true",
 			raw:         true,
 			jsonType:    "integer",
@@ -477,4 +575,12 @@ func TestReplaceIndex(t *testing.T) {
 			t.Errorf("Test %q - got %q, want %q", test.description, got, want)
 		}
 	}
+}
+
+func mustParseDuration(s string) generate.Duration {
+	d, err := generate.ParseDuration(s)
+	if err != nil {
+		panic(err)
+	}
+	return d
 }

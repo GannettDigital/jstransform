@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "dates": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "date"
+      },
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.dates"
+            }
+          ]
+        }
+      }
+    },
+    "requiredDate": {
+      "type": "string",
+      "format": "date",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.requiredDate"
+            }
+          ]
+        }
+      }
+    },
+    "optionalDate": {
+      "type": "string",
+      "format": "date",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.optionalDate"
+            }
+          ]
+        }
+      }
+    },
+    "durations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "duration"
+      },
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.durations"
+            }
+          ]
+        }
+      }
+    },
+    "requiredDuration": {
+      "type": "string",
+      "format": "duration",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.requiredDuration"
+            }
+          ]
+        }
+      }
+    },
+    "optionalDuration": {
+      "type": "string",
+      "format": "duration",
+      "transform": {
+        "cumulo": {
+          "from": [
+            {
+              "jsonPath": "$.optionalDuration"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "required": [
+    "dates",
+    "requiredDate",
+    "durations",
+    "requiredDuration"
+  ]
+}

@@ -460,8 +460,10 @@ func newScalarTransformer(path, transformIdentifier string, raw json.RawMessage,
 		if err != nil && !errors.Is(err, jsonparser.KeyPathNotFoundError) {
 			return nil, fmt.Errorf("failed to extract instance format: %w", err)
 		}
-		if instanceFormat == "date-time" {
-			st.jsonType = "date-time"
+		switch instanceFormat {
+		case "date-time", "date", "duration":
+			st.jsonType = instanceFormat
+		default:
 		}
 	}
 

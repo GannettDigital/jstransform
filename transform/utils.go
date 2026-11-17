@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/GannettDigital/jstransform/generate"
+
 	"github.com/buger/jsonparser"
 )
 
@@ -75,6 +77,10 @@ func convert(raw any, jsonType string) (any, error) {
 		return convertString(raw)
 	case "date-time":
 		return convertDateTime(raw)
+	case "date":
+		return convertDate(raw)
+	case "duration":
+		return convertDuration(raw)
 	}
 	return raw, nil
 }
@@ -145,10 +151,82 @@ func convertDateTime(raw any) (any, error) {
 		return tParsed, nil
 	case int:
 		return time.Unix(int64(t), 0).UTC(), nil
+	case int64:
+		return time.Unix(t, 0).UTC(), nil
 	case float64:
 		return time.Unix(int64(t), 0).UTC(), nil
 	default:
 		return nil, fmt.Errorf("unable to convert type %q to a date-time", reflect.TypeOf(raw))
+	}
+}
+
+func convertDate(raw any) (any, error) {
+	switch t := raw.(type) {
+	case string:
+		if t == "" {
+			return nil, nil
+		}
+		// First attempt RFC 3339 Section 5.6 full-date (YYYY-MM-DD)
+		d, err := generate.ParseDate(t)
+		if err == nil {
+			if d.IsZero() {
+				return nil, nil
+			}
+			return d, nil
+		}
+		// Fall back to parsing RFC 3339 date-time and truncating to date
+		tParsed, errDT := time.Parse(time.RFC3339, t)
+		if errDT == nil {
+			if tParsed.IsZero() {
+				return nil, nil
+			}
+			return generate.DateFromTime(tParsed), nil
+		}
+		return nil, err
+	case int:
+		return generate.DateFromTime(time.Unix(int64(t), 0).UTC()), nil
+	case int64:
+		return generate.DateFromTime(time.Unix(t, 0).UTC()), nil
+	case float64:
+		return generate.DateFromTime(time.Unix(int64(t), 0).UTC()), nil
+	case time.Time:
+		if t.IsZero() {
+			return nil, nil
+		}
+		return generate.DateFromTime(t), nil
+	case generate.Date:
+		if t.IsZero() {
+			return nil, nil
+		}
+		return t, nil
+	default:
+		return nil, fmt.Errorf("unable to convert type %q to a date", reflect.TypeOf(raw))
+	}
+}
+
+func convertDuration(raw any) (any, error) {
+	switch t := raw.(type) {
+	case string:
+		if t == "" {
+			return nil, nil
+		}
+		d, err := generate.ParseDuration(t)
+		if err != nil {
+			return nil, err
+		}
+		return d, nil
+	case int:
+		return generate.DurationFromTime(time.Duration(t) * time.Second), nil
+	case int64:
+		return generate.DurationFromTime(time.Duration(t) * time.Second), nil
+	case float64:
+		return generate.DurationFromTime(time.Duration(t * float64(time.Second))), nil
+	case time.Duration:
+		return generate.DurationFromTime(t), nil
+	case generate.Duration:
+		return t, nil
+	default:
+		return nil, fmt.Errorf("unable to convert type %q to a duration", reflect.TypeOf(raw))
 	}
 }
 

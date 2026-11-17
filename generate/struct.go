@@ -24,6 +24,7 @@ type extractedField struct {
 	jsonType       string
 	name           string
 	nullable       bool
+	packageName    string
 	requiredFields map[string]bool
 }
 
@@ -96,6 +97,36 @@ func (efs extractedFields) IncludeTime() bool {
 			}
 		}
 		if field.jsonType == "date-time" {
+			return true
+		}
+	}
+	return false
+}
+
+// IncludeDate does a depth-first recursive search to see if any field or child field is of type "date".
+func (efs extractedFields) IncludeDate() bool {
+	for _, field := range efs {
+		if field.fields != nil {
+			if field.fields.IncludeDate() {
+				return true
+			}
+		}
+		if field.jsonType == "date" {
+			return true
+		}
+	}
+	return false
+}
+
+// IncludeDuration does a depth-first recursive search to see if any field or child field is of type "duration".
+func (efs extractedFields) IncludeDuration() bool {
+	for _, field := range efs {
+		if field.fields != nil {
+			if field.fields.IncludeDuration() {
+				return true
+			}
+		}
+		if field.jsonType == "duration" {
 			return true
 		}
 	}
@@ -200,7 +231,7 @@ func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 	gen := gof.rootStruct
 
 	if !gof.args.NoNestedStructs {
-		return addField(gen.fields, splitJSONPath(path), i, gen.args.FieldNameMap)
+		return addField(gen.fields, splitJSONPath(path), i, gen.args.FieldNameMap, gof.packageName)
 	}
 
 	parts := []string{exportedName(gof.rootStruct.name)}
@@ -232,10 +263,10 @@ func (gof *goFile) walkFunc(path string, i jsonschema.Instance) error {
 		}
 
 		gof.nestedStructs[key] = gof.newGeneratedStruct(key, requiredFields)
-		return addField(gen.fields, []string{name}, jsonschema.Instance{Description: i.Description, Type: []string{structType}}, gen.args.FieldNameMap)
+		return addField(gen.fields, []string{name}, jsonschema.Instance{Description: i.Description, Type: []string{structType}}, gen.args.FieldNameMap, gof.packageName)
 	}
 
-	return addField(gen.fields, []string{name}, i, gen.args.FieldNameMap)
+	return addField(gen.fields, []string{name}, i, gen.args.FieldNameMap, gof.packageName)
 }
 
 // write will write the generated file to the given io.Writer.
@@ -247,10 +278,14 @@ func (gof *goFile) write(w io.Writer) error {
 	}
 
 	var includeTime bool
+	var includeGenerateTypes bool
 	excludeNested := make(map[string]bool)
 	for _, s := range gof.structs() {
 		if s.fields.IncludeTime() {
 			includeTime = true
+		}
+		if s.fields.IncludeDate() || s.fields.IncludeDuration() {
+			includeGenerateTypes = true
 		}
 		if len(s.fields) == 0 {
 			excludeNested[s.name] = true
@@ -259,6 +294,12 @@ func (gof *goFile) write(w io.Writer) error {
 
 	if includeTime {
 		if _, err := buf.WriteString("import \"time\"\n"); err != nil {
+			return fmt.Errorf("failed writing imports: %w", err)
+		}
+	}
+
+	if includeGenerateTypes && gof.packageName != "generate" {
+		if _, err := buf.WriteString("import \"github.com/GannettDigital/jstransform/generate\"\n"); err != nil {
 			return fmt.Errorf("failed writing imports: %w", err)
 		}
 	}
@@ -322,7 +363,7 @@ func (gen *generatedStruct) write(w io.Writer, excludeNested map[string]bool, ne
 // For all fields the name and jsonType are set, for arrays the array bool is set for true and for JSON objects,
 // the fields map is created and if it exists the requiredFields section populated.
 // fields will be renamed if a matching entry is supplied in the fieldRenameMap.
-func addField(fields extractedFields, tree []string, inst jsonschema.Instance, fieldRenameMap map[string]string) error {
+func addField(fields extractedFields, tree []string, inst jsonschema.Instance, fieldRenameMap map[string]string, packageName string) error {
 	// Ignored type for Go structure.
 	if slices.Contains(inst.Type, "graphql-hydration") {
 		return nil
@@ -330,11 +371,11 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 
 	if len(tree) > 1 {
 		if f, ok := fields[tree[0]]; ok {
-			return addField(f.fields, tree[1:], inst, fieldRenameMap)
+			return addField(f.fields, tree[1:], inst, fieldRenameMap, packageName)
 		}
-		f := &extractedField{jsonName: tree[0], jsonType: "object", name: exportedName(tree[0]), fields: make(map[string]*extractedField)}
+		f := &extractedField{jsonName: tree[0], jsonType: "object", name: exportedName(tree[0]), fields: make(map[string]*extractedField), packageName: packageName}
 		fields[tree[0]] = f
-		if err := addField(f.fields, tree[1:], inst, fieldRenameMap); err != nil {
+		if err := addField(f.fields, tree[1:], inst, fieldRenameMap, packageName); err != nil {
 			return fmt.Errorf("failed field %q: %w", tree[0], err)
 		}
 		return nil
@@ -362,6 +403,7 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 			jsonName:    tree[0],
 			jsonType:    jsonType,
 			nullable:    slices.Contains(inst.Type, "null"),
+			packageName: packageName,
 		}
 		// Second processing of an array type
 		if exists, ok := fields[f.jsonName]; ok {
@@ -371,8 +413,12 @@ func addField(fields extractedFields, tree []string, inst jsonschema.Instance, f
 			}
 			f.jsonType = jsonType
 		}
-		if slices.Contains(inst.Type, "string") && inst.Format == "date-time" {
-			f.jsonType = "date-time"
+		if slices.Contains(inst.Type, "string") {
+			switch inst.Format {
+			case "date-time", "date", "duration":
+				f.jsonType = inst.Format
+			default:
+			}
 		}
 
 		switch f.jsonType {
@@ -414,6 +460,26 @@ func (ef *extractedField) goType(required, pointers bool, nestedStructs map[stri
 		goType = "string"
 	case "date-time":
 		goType = "time.Time"
+		if pointers && !required {
+			goType = "*" + goType
+			customType = true
+		}
+	case "date":
+		if ef.packageName == "generate" {
+			goType = "Date"
+		} else {
+			goType = "generate.Date"
+		}
+		if pointers && !required {
+			goType = "*" + goType
+			customType = true
+		}
+	case "duration":
+		if ef.packageName == "generate" {
+			goType = "Duration"
+		} else {
+			goType = "generate.Duration"
+		}
 		if pointers && !required {
 			goType = "*" + goType
 			customType = true

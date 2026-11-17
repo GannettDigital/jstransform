@@ -1,0 +1,129 @@
+package generate
+
+import (
+	"encoding/json"
+	"fmt"
+	"time"
+
+	"github.com/GannettDigital/msgp/msgp"
+)
+
+// Date represents an RFC 3339 Section 5.6 full-date (YYYY-MM-DD).
+// It wraps time.Time with UTC date normalization and JSON/text/msgp serialization.
+type Date struct {
+	time.Time
+}
+
+// NewDate returns a Date with the given year, month, and day in UTC.
+func NewDate(year int, month time.Month, day int) Date {
+	return Date{Time: time.Date(year, month, day, 0, 0, 0, 0, time.UTC)}
+}
+
+// DateFromTime converts a time.Time into a Date truncated to midnight UTC.
+func DateFromTime(t time.Time) Date {
+	if t.IsZero() {
+		return Date{}
+	}
+	utc := t.UTC()
+	return NewDate(utc.Year(), utc.Month(), utc.Day())
+}
+
+// ParseDate parses an RFC 3339 full-date string (YYYY-MM-DD).
+func ParseDate(s string) (Date, error) {
+	if s == "" {
+		return Date{}, nil
+	}
+	t, err := time.Parse(time.DateOnly, s)
+	if err != nil {
+		return Date{}, fmt.Errorf("invalid date format %q: %w", s, err)
+	}
+	return Date{Time: t}, nil
+}
+
+// IsZero returns true if the date is zero, enabling omitzero JSON encoding.
+func (d Date) IsZero() bool {
+	return d.Time.IsZero()
+}
+
+// String returns the date formatted as YYYY-MM-DD, or an empty string if zero.
+func (d Date) String() string {
+	if d.IsZero() {
+		return ""
+	}
+	return d.Format(time.DateOnly)
+}
+
+// MarshalJSON marshals the date as a JSON string formatted as "YYYY-MM-DD", or "" if zero.
+func (d Date) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.String())
+}
+
+// UnmarshalJSON unmarshals a JSON string into a Date.
+func (d *Date) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" {
+		*d = Date{}
+		return nil
+	}
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	var err error
+	*d, err = ParseDate(s)
+	return err
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (d Date) MarshalText() ([]byte, error) {
+	return []byte(d.String()), nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (d *Date) UnmarshalText(text []byte) error {
+	var err error
+	*d, err = ParseDate(string(text))
+	return err
+}
+
+// MarshalMsg implements msgp.Marshaler.
+func (d Date) MarshalMsg(b []byte) ([]byte, error) {
+	return msgp.AppendString(b, d.String()), nil
+}
+
+// UnmarshalMsg implements msgp.Unmarshaler.
+func (d *Date) UnmarshalMsg(bts []byte) ([]byte, error) {
+	s, bts, err := msgp.ReadStringBytes(bts)
+	if err != nil {
+		return bts, err
+	}
+	parsed, err := ParseDate(s)
+	if err != nil {
+		return bts, err
+	}
+	*d = parsed
+	return bts, nil
+}
+
+// EncodeMsg implements msgp.Encodable.
+func (d Date) EncodeMsg(en *msgp.Writer) error {
+	return en.WriteString(d.String())
+}
+
+// DecodeMsg implements msgp.Decodable.
+func (d *Date) DecodeMsg(dc *msgp.Reader) error {
+	s, err := dc.ReadString()
+	if err != nil {
+		return err
+	}
+	parsed, err := ParseDate(s)
+	if err != nil {
+		return err
+	}
+	*d = parsed
+	return nil
+}
+
+// Msgsize implements msgp.Sizer.
+func (d Date) Msgsize() int {
+	return msgp.StringPrefixSize + len(time.DateOnly)
+}
